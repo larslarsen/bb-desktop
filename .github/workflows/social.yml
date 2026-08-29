@@ -32,7 +32,7 @@ jobs:
       - run: npm run package:linux
       - name: Verify Chromium sandbox permissions
         run: dpkg-deb --contents dist/*.deb | grep --fixed-strings --regexp='-rwsr-xr-x root/root' | grep --fixed-strings './usr/lib/bitbook/chrome-sandbox'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: bitbook-linux-deb
           path: dist/*.deb
