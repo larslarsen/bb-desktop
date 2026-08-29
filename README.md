@@ -1,83 +1,66 @@
-# OpenBazaar Client v2
+# BitBook Desktop
 
-This is the reference client for the OpenBazaar network. It is an interface for your OpenBazaar node, to use it you will need to run an [OpenBazaar node](https://github.com/OpenBazaar/openbazaar-go) either locally or on a remote server.
+BitBook Desktop is the wallet-free client for the BitBook distributed social
+network. It provides profiles, signed posts, follows, peer status, and signed
+direct chat without starting any of OpenBazaar's marketplace or Bitcoin UI.
 
-For full installable versions of the OpenBazaar app, with the server and client bundled together, go to [the OpenBazaar download page.](https://www.openbazaar.org/download/)
+The historical OpenBazaar renderer remains in this repository as migration
+reference, but the default Electron entry point is the small client in
+[`social/`](social).
 
-[![Build Status](https://travis-ci.org/OpenBazaar/openbazaar-desktop.svg?branch=master)](https://travis-ci.org/OpenBazaar/openbazaar-desktop)
+## Run it
 
-## Getting Started
+First start the maintained Go daemon:
 
-To create a local development copy of the reference client, clone the client repository into a directory of your choice:
-- `git clone https://github.com/OpenBazaar/openbazaar-desktop`
+```sh
+cd ../bb-go/modern
+GOTOOLCHAIN=go1.27.0 go run ./cmd/bitbookd
+```
 
-Make sure you have Node.js and NPM installed. Node versions older than 8.9.2 or NPM versions older than 5.5.1 may not work.
+Then install and start the desktop client:
 
-This client uses Babel to compile [ES6 JavaScript](https://github.com/lukehoban/es6features). You should be familiar with ES6 before modifying its code.
+```sh
+npm install
+npm start
+```
 
-### Installation
+Development requires Node.js 22.12 or newer. The package pins Electron 44 so
+fresh installs use a maintained browser runtime rather than OpenBazaar's old
+Electron 6 stack.
 
-1. Navigate to the directory you cloned the repo into.
-2. Enter `npm install`
+The client connects to `http://127.0.0.1:4002` by default. Click the connection
+indicator to point it at a different daemon. A non-local daemon should be
+protected with transport security and authentication before it is exposed to
+the internet.
 
-### Running
+## Current scope
 
-`npm start` will:
-- compile your Sass / re-compile on changes
-- run BrowserSync in watch mode so the app automatically refreshes on JS and HTML changes and dynamically injects any CSS / Sass changes**.
-- launch the Electron app
+- Persistent libp2p identity and peer discovery
+- Signed, IPNS-published profiles and posts
+- Signed follow and unfollow notifications
+- Signed direct chat, offline queuing, typing indicators, and read receipts
+- Live updates over the daemon WebSocket
+- No marketplace, order, listing, wallet, exchange-rate, or Bitcoin flows
 
-** At this time, the app will not refresh on main.js (or other root folder JS changes). This would require the entire Electron app to refresh and BrowserSync is only refreshing our browser.
+Payment support is intentionally not part of this client. Any future tipping
+feature should use a narrow coin-agnostic integration so that privacy and
+network choices can be made explicitly instead of inheriting OpenBazaar's
+Bitcoin assumptions.
 
-### Linux Troubleshooting
+## Development checks
 
-If you see an ENOSPC error after trying `npm start` and you are using Linux, you may need to do the following:
+The maintained client is plain browser JavaScript and requires no build-time
+transpilation:
 
-1. Enter this on the command line:
-`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+```sh
+npm run build
+npm run test:social
+```
 
-For Arch Linux add this line to /etc/sysctl.d/99-sysctl.conf:
-`fs.inotify.max_user_watches=524288`
-
-2. Execute: sysctl --system
-
-This will prevent your system from having errors due to too many files being watched.
-
-### Linting
-
-`npm run lint` will run eslint on the JS files.
-
-`npm run lint:watch` will run eslint on any JS file changes.
-
-### Testing
-
-`npm run test` will execute test files in the test folder.
-
-`npm run test:watch` will execute the tests on any file changes.
-
-
-## Built With
-
-* [Electron](https://electron.atom.io/)
-* [Backbone](http://backbonejs.org/)
-* [Babel](https://babeljs.io/)
-
-## Contributing
-
-We welcome contributions to the reference client. The best way to get started is to look for an issue with the [Help Wanted label](https://github.com/OpenBazaar/openbazaar-desktop/labels/help%20wanted).
-
-You can also look for issues with the [bug label](https://github.com/OpenBazaar/openbazaar-desktop/labels/bug). These are confirmed bugs that need to be fixed.
-
-Contributions are expected to match the coding style already present in this repo, and must pass es-lint with no errors.
-
-Contributions that make visual changes are also expected to match the repo's current style.
-
-If you want to help with translations, please request to join the translation team at [https://www.transifex.com/ob1/openbazaar](https://www.transifex.com/ob1/openbazaar).
-
-You can request new languages there, and contribute to the translation of existing languages.
-
-New languages are usually added when they reach 80% or more completion, and not removed from the client unless they fall below 60% for several releases.
+The archived OpenBazaar renderer remains in the Git history and source tree for
+migration reference, but its abandoned dependency graph is no longer installed
+or loaded by the BitBook package.
 
 ## License
-This project is licensed under the MIT License. You can view [LICENSE.MD](https://github.com/OpenBazaar/openbazaar-desktop/blob/master/LICENSE) for more details.
 
+[MIT](LICENSE)
