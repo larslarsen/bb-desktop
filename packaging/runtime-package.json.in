@@ -1,0 +1,8 @@
+{
+  "name": "bitbook-desktop",
+  "productName": "BitBook",
+  "version": "@VERSION@",
+  "description": "Barebones desktop client for the BitBook distributed social network.",
+  "main": "social-main.js",
+  "license": "MIT"
+}

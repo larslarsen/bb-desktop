@@ -1,7 +1,9 @@
 'use strict';
 
 const path = require('path');
-const { app, BrowserWindow, Menu, shell } = require('electron');
+const { app, BrowserWindow, Menu, session, shell } = require('electron');
+
+app.enableSandbox();
 
 let window;
 
@@ -18,11 +20,20 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
     },
   });
   window.loadFile(path.join(__dirname, 'social', 'index.html'));
+  window.webContents.on('will-navigate', (event) => event.preventDefault());
   window.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    try {
+      const target = new URL(url);
+      if (target.protocol === 'https:' || target.protocol === 'http:') {
+        shell.openExternal(target.toString());
+      }
+    } catch (_error) {
+      // Malformed and non-web destinations remain blocked.
+    }
     return { action: 'deny' };
   });
   window.on('closed', () => {
@@ -31,6 +42,7 @@ function createWindow() {
 }
 
 app.on('ready', () => {
+  session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   Menu.setApplicationMenu(null);
   createWindow();
 });

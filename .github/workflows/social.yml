@@ -17,3 +17,23 @@ jobs:
           node-version: 24
       - run: npm run build
       - run: npm run test:social
+
+  package-linux:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm audit --omit=optional
+      - run: npm run package:linux
+      - name: Verify Chromium sandbox permissions
+        run: dpkg-deb --contents dist/*.deb | grep --fixed-strings --regexp='-rwsr-xr-x root/root' | grep --fixed-strings './usr/lib/bitbook/chrome-sandbox'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bitbook-linux-deb
+          path: dist/*.deb
+          if-no-files-found: error

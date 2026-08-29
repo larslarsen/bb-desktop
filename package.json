@@ -5,8 +5,10 @@
   "description": "Barebones desktop client for the BitBook distributed social network.",
   "main": "social-main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js",
+    "start": "electron --no-sandbox .",
+    "start:sandboxed": "electron .",
+    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js && bash -n scripts/build-deb.sh",
+    "package:linux": "bash scripts/build-deb.sh",
     "test": "npm run test:social",
     "test:social": "node test/socialCore.node.js"
   },

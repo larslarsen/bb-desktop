@@ -1,0 +1,13 @@
+Package: bitbook
+Version: @VERSION@
+Section: net
+Priority: optional
+Architecture: @ARCH@
+Installed-Size: @INSTALLED_SIZE@
+Maintainer: Lars Larsen <larslarsen@gmail.com>
+Homepage: https://github.com/larslarsen/bb-desktop
+Depends: libgtk-3-0 | libgtk-3-0t64, libnotify4, libnss3, xdg-utils, libatspi2.0-0, libdrm2, libgbm1, libxcb-dri3-0
+Recommends: pulseaudio | libasound2 | libasound2t64
+Description: Barebones desktop client for the BitBook distributed social network
+ BitBook provides signed profiles, posts, follows, and direct chat over an
+ isolated peer-to-peer network without marketplace or wallet functionality.

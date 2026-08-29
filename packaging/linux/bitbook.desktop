@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=BitBook
+GenericName=Distributed Social Network
+Comment=Signed peer-to-peer profiles, posts, follows, and chat
+Exec=/usr/bin/bitbook
+Icon=bitbook
+Terminal=false
+Type=Application
+Categories=Network;

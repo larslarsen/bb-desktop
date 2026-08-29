@@ -17,7 +17,7 @@ cd ../bb-go/modern
 GOTOOLCHAIN=go1.27.0 go run ./cmd/bitbookd
 ```
 
-Then install and start the desktop client:
+For source-tree development, install and start the desktop client:
 
 ```sh
 npm install
@@ -26,7 +26,25 @@ npm start
 
 Development requires Node.js 22.12 or newer. The package pins Electron 44 so
 fresh installs use a maintained browser runtime rather than OpenBazaar's old
-Electron 6 stack.
+Electron 6 stack. On Linux, `npm start` uses Chromium's `--no-sandbox` switch
+only for local development because unpacked npm binaries cannot be installed
+with the root-owned helper Chromium requires. Do not distribute that command.
+
+## Linux package
+
+Build the production Debian package with:
+
+```sh
+npm ci
+npm run package:linux
+```
+
+The result is `dist/bitbook_<version>_<architecture>.deb`. Install it through
+your desktop software center or with `apt install ./dist/bitbook_*.deb`. The
+package records `chrome-sandbox` as root-owned mode `4755`, so the installed app
+runs with Chromium's full process sandbox and users perform no manual setup.
+BitBook itself always runs as the signed-in user; only Chromium's small sandbox
+launcher briefly holds the privilege required to create the containment layer.
 
 The client connects to `http://127.0.0.1:4002` by default. Click the connection
 indicator to point it at a different daemon. A non-local daemon should be
@@ -55,6 +73,7 @@ transpilation:
 ```sh
 npm run build
 npm run test:social
+npm run package:linux
 ```
 
 The archived OpenBazaar renderer remains in the Git history and source tree for
