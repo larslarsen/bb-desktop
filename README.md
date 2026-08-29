@@ -46,6 +46,23 @@ runs with Chromium's full process sandbox and users perform no manual setup.
 BitBook itself always runs as the signed-in user; only Chromium's small sandbox
 launcher briefly holds the privilege required to create the containment layer.
 
+## Windows and macOS test packages
+
+CI also builds native, unsigned test artifacts for Windows x64 and macOS on
+both Apple Silicon and Intel:
+
+```sh
+npm run package:windows # on Windows
+npm run package:macos   # on macOS
+```
+
+These artifacts prove that the native bundles start and are intentionally named
+`unsigned`. They are for development and private testing, not public release.
+Windows distribution still needs Microsoft Store or Artifact Signing credentials.
+macOS distribution still needs an Apple Developer ID signature and notarization.
+Once those accounts exist, signing can be added to the existing OS-native CI jobs
+without changing the application payload.
+
 The client connects to `http://127.0.0.1:4002` by default. Click the connection
 indicator to point it at a different daemon. A non-local daemon should be
 protected with transport security and authentication before it is exposed to

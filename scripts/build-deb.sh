@@ -48,7 +48,7 @@ cp -a social/. "$APP_SOURCE/social/"
 install -m 0644 imgs/icon.png "$APP_SOURCE/imgs/icon.png"
 install -m 0644 LICENSE "$PACKAGE_ROOT/usr/share/doc/bitbook/copyright"
 install -m 0644 packaging/linux/bitbook.desktop "$PACKAGE_ROOT/usr/share/applications/bitbook.desktop"
-install -m 0644 imgs/icon.png "$PACKAGE_ROOT/usr/share/icons/hicolor/512x512/apps/bitbook.png"
+install -m 0644 imgs/icon-512.png "$PACKAGE_ROOT/usr/share/icons/hicolor/512x512/apps/bitbook.png"
 ln -s ../lib/bitbook/bitbook "$PACKAGE_ROOT/usr/bin/bitbook"
 
 find "$PACKAGE_ROOT" -type d -exec chmod 0755 {} +
