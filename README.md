@@ -48,8 +48,10 @@ launcher briefly holds the privilege required to create the containment layer.
 
 ## Windows and macOS test packages
 
-CI also builds native, unsigned test artifacts for Windows x64 and macOS on
-both Apple Silicon and Intel:
+The manually triggered GitHub Actions workflow can build native, unsigned test
+artifacts for Linux, Windows x64, and macOS on both Apple Silicon and Intel.
+Normal pushes and pull requests run tests only, so packaging does not consume
+runner time until someone explicitly requests it.
 
 ```sh
 npm run package:windows # on Windows

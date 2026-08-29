@@ -3,6 +3,7 @@ name: Social client
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,6 +20,7 @@ jobs:
       - run: npm run test:social
 
   package-linux:
+    if: github.event_name == 'workflow_dispatch'
     needs: check
     runs-on: ubuntu-latest
     steps:
@@ -39,6 +41,7 @@ jobs:
           if-no-files-found: error
 
   package-windows:
+    if: github.event_name == 'workflow_dispatch'
     needs: check
     runs-on: windows-latest
     steps:
@@ -64,6 +67,7 @@ jobs:
           if-no-files-found: error
 
   package-macos:
+    if: github.event_name == 'workflow_dispatch'
     needs: check
     strategy:
       fail-fast: false
