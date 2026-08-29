@@ -1,13 +1,13 @@
 # Current Task
 
-Ticket: BBD-GOV-001
+Ticket: BBD-GOV-002
 
 State: ACCEPTED
 
 Actor: Lead Engineer/Reviewer — Codex
 
-The repository-local reviewer/Grok Build workflow is established by
-[BBD-GOV-001](../../tickets/BBD-GOV-001.md). No production or test implementation is
+The repository-local test-first policy is established by
+[BBD-GOV-002](../../tickets/BBD-GOV-002.md). No production or test implementation is
 currently authorized. The reviewer must publish a new bounded ticket with an exact source
-baseline, authorized paths, commands, acceptance criteria, and stop condition before Sr
-Dev — Grok Build edits source.
+baseline, authorized paths, red/green and falsification evidence, commands, acceptance
+criteria, and stop condition before Sr Dev — Grok Build edits source.
