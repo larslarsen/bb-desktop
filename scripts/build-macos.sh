@@ -64,9 +64,10 @@ install -m 0644 social-main.js "$APP_SOURCE/social-main.js"
 cp -R social "$APP_SOURCE/social"
 install -m 0644 imgs/icon.png "$APP_SOURCE/imgs/icon.png"
 
-# Ad-hoc signing lets CI verify bundle integrity. Public releases must replace
-# this with a Developer ID signature followed by Apple notarization.
-codesign --force --deep --options runtime --sign - "$APP_BUNDLE"
+# Ad-hoc signing lets CI verify bundle integrity and run this private-test app.
+# Public releases must replace it with a Developer ID hardened-runtime signature,
+# the Electron JIT entitlements, and Apple notarization.
+codesign --force --deep --sign - "$APP_BUNDLE"
 codesign --verify --deep --strict "$APP_BUNDLE"
 hdiutil create -volname BitBook -srcfolder "$APP_BUNDLE" -ov -format UDZO "$DMG_PATH"
 
