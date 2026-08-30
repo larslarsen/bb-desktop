@@ -4,11 +4,17 @@ Status: AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
-Test source actor: Sr Dev — Grok Build (Grok 4.6 High)
+Test source actor: Temporary Sr Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
 Architecture baseline: `9dcade2cf4b0fc298733657148fdae002638ff48`
+
+Owner-approved actor substitution: Grok Build returned a quota-exhausted 402 before
+reading or editing any source. On 2026-08-30 the owner authorized Codex Sol at High to
+author this bounded test-only drop, with Lead Engineer/Reviewer — Codex at XHigh for
+independent review. This ticket-specific substitution does not change the standing roles
+or give Sol execution, integration, evidence, Git, or production authority.
 
 ## Objective
 
@@ -43,7 +49,7 @@ broadcast through every fake adapter.
 
 ## Current authorization: test source only
 
-Grok Build may create or edit only:
+Codex Sol may create or edit only:
 
 - `test/fixtures/wallet-contract/golden-v1.json`
 - `test/walletContract.node.js`
@@ -58,7 +64,7 @@ hide an inherited regression.
 
 No production source, dependency, lockfile, package script, workflow, checker, evidence,
 Git, GitHub, generated artifact, other repository, wallet, device, network, node, or
-transaction change is authorized in the test-source phase. Grok must stop after writing
+transaction change is authorized in the test-source phase. Sol must stop after writing
 the four paths and must not execute anything.
 
 ## Reserved production paths — not yet authorized

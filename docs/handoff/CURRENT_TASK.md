@@ -6,16 +6,20 @@ State: AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
-Source actor: Sr Dev — Grok Build (Grok 4.6 High)
+Source actor: Temporary Sr Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
 [BBD-WAL-002](../../tickets/BBD-WAL-002.md) is the only authorized work. The current
-phase authorizes Sr Dev — Grok Build to author test source only under the exact durable
-contract in
-[`GROK_BUILD_BBD_WAL_002_TESTS.md`](GROK_BUILD_BBD_WAL_002_TESTS.md). It must stop
+phase authorizes temporary Sr Dev — Codex Sol to author test source only under the exact
+durable contract in
+[`CODEX_SOL_BBD_WAL_002_TESTS.md`](CODEX_SOL_BBD_WAL_002_TESTS.md). It must stop
 without execution, production source, dependencies, Git, network, wallets, nodes,
 devices, keys, or transaction capability.
+
+The owner approved this ticket-specific substitution after Grok Build returned a
+quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
+Sol authors at High. Standing project roles are otherwise unchanged.
 
 The reviewer must inspect the complete test drop before Jr Dev — Codex Luna may run the
 three named expected-red commands. Production remains unauthorized until the red failures
