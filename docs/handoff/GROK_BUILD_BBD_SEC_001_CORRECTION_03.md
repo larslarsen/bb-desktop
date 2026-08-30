@@ -171,3 +171,39 @@ After reviewer source acceptance, Luna reruns Electron 13/13, policy 47/47, chec
 audit, build syntax, social tests, complete security tests, exact Gitleaks, diff check,
 and the unchanged local manual SBOM sequence. Luna also falsifies reintroduction of the
 formerly pinned scanner before Git.
+
+## Source delivery and reviewer acceptance
+
+Grok authored both tests completely before either production/policy path and ran
+nothing. Delivered test source:
+
+```text
+c794d5e063bb121f52ae09bd96bb3ced061a02bc38c2f866957fe629d6999089  test/electronSecurity.node.js  508 lines  13 tests
+6dbd7d2bf534b587efd0445045a662911dfc83fd6498ae1b048e0439369d22dd  test/securityPolicy.node.js    860 lines  47 tests
+```
+
+Delivered production/policy source after the tests:
+
+```text
+473ce9702c8d8bd4518a6ef02b8bcb59b8e4cc8f62fdab9406c8990d544f93e3  scripts/security-policy.js       1348 lines
+0e4fb13b7efb206137972eb70851703340d8f8f237ba2f64a380d5104365fd83  .github/workflows/security.yml     45 lines
+```
+
+Reviewer independently reproduced every hash, line count, and test count and inspected
+the fail-closed source. Accepted findings:
+
+- the live deny handler is exercised across background-tab, foreground-tab, and
+  new-window dispositions without a runtime change;
+- the sink scan reads exactly the four authorized maintained files;
+- all 46 prior policy cases remain conceptually represented and the new dedicated
+  obsolete-report/suppression case yields 47;
+- obsolete scanner vocabulary is rejected before remaining required commands;
+- no obsolete scanner constant/function/export remains in production policy;
+- the security workflow removed exactly the obsolete step while preserving audit,
+  boundary/policy checks, and the exact pinned full-history Gitleaks design; and
+- no unauthorized path was changed.
+
+Codex Luna may now integrate these exact hashes under the ticket. It must reconstruct a
+bounded correction-specific red without deleting files, restore hashes, run full green,
+falsify obsolete-scanner reintroduction, then rerun the complete corrected acceptance and
+unchanged manual SBOM sequence. Any failure or Gitleaks finding stops before Git.

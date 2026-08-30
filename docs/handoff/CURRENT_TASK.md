@@ -72,3 +72,10 @@ while blocking npm audit and complete-history Gitleaks remain. No runtime, CSP, 
 lockfile, SBOM, routine CI, packaging, or inherited-source change is authorized. Grok may
 author only the four correction paths and must run nothing; Luna remains stopped until
 the reviewer accepts Grok's exact hashes.
+
+Correction 03 source is now delivered and reviewer-accepted. Independent hashes and
+counts match the durable source report: Electron 13 tests, policy 47 tests, and only the
+checker plus security workflow production paths. Codex Luna may resume under the ticket:
+correction-specific bounded red and restore, obsolete-scanner reintroduction
+falsification, complete corrected acceptance from the beginning, then the unchanged
+manual SBOM sequence. Any failure or Gitleaks finding stops before Git.

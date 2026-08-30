@@ -271,3 +271,9 @@ as the maintained-source security scan, alongside blocking npm audit and complet
 Gitleaks. After correction, Luna reruns every acceptance command from the beginning and
 adds an obsolete-scanner-reintroduction falsification. The historical network handoff is
 superseded for execution but remains preserved as evidence of the stopped attempt.
+
+Correction 3 was delivered test-first at the exact four authorized paths. Reviewer
+independently verified the reported hashes and accepted the source: Electron 13 tests,
+policy 47 tests, fail-closed obsolete-scanner rejection, and deletion of only the invalid
+workflow step. Luna may now resume correction-specific red/restore/falsification and the
+complete corrected acceptance sequence.
