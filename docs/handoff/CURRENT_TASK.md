@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: PRODUCTION SOURCE ACCEPTED — TARGETED GREEN AUTHORIZED
+State: TARGETED GREEN ACCEPTED — ACCEPTANCE/FALSIFICATION/INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -24,8 +24,11 @@ tests. Its exact 45-pass/3-fail expected red is accepted at evidence commit
 `12061f5c1ab24a90dda9f7e74c846b0174d0e039`. Production Correction 02 is XHigh-accepted
 at the exact hashes in
 [`CODEX_LUNA_BBD_WAL_002_TARGETED_GREEN.md`](CODEX_LUNA_BBD_WAL_002_TARGETED_GREEN.md).
-Jr Dev — Codex Luna alone may run the three foreground targeted-green Node commands and
-must stop without edits, evidence, Git, or broader commands. Sol is stopped.
+Targeted green passed 48 wallet, 14 Electron-security, and 54 policy tests with no drift.
+Jr Dev — Codex Luna alone is authorized by
+[`CODEX_LUNA_BBD_WAL_002_ACCEPTANCE.md`](CODEX_LUNA_BBD_WAL_002_ACCEPTANCE.md) for the
+foreground broader commands, exact temporary falsifications/restores, implementation
+evidence, and 15-path commit/push. Sol is stopped.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
