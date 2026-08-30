@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: CORRECTION 04 TEST SOURCE ACCEPTED — POLICY RED AUTHORIZED
+Status: CORRECTION 04 EXPECTED RED RECORDED — PRODUCTION NOT AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -11,6 +11,9 @@ Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 Source baseline: `d472785ab896bb5d1367c4117ffd659a9a8512ae`
 
 Architecture: `docs/architecture/BBD-WAL-001-REVIEW.md` §§4.1–4.3 and 5.3–5.4
+
+Correction 04 expected red is recorded in
+[`docs/testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md`](../docs/testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md).
 
 ## Objective
 

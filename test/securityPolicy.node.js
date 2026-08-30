@@ -1188,7 +1188,7 @@ test('inherited metrics and feedback loaders are structurally neutralized and un
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
