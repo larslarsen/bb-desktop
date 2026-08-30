@@ -279,3 +279,40 @@ Required falsifications, applied temporarily and never committed:
   wallet contract on relevant changes.
 - Falsifications fail for the claimed reason, are restored, and final acceptance is
   green with a clean worktree and unchanged lockfile.
+
+## Reviewer source decision — Correction 01
+
+The initial Sol test drop is not accepted. It contains the four authorized paths and no
+execution or scope violation, but reviewer XHigh inspection found blockers before the
+expected-red phase:
+
+1. The malformed-UTF-8 signed-object case is structurally incomplete. A decoder that
+   replaces invalid bytes can still return `SCHEMA` for missing fields, so the assertion
+   does not prove strict UTF-8 rejection.
+2. `golden-v1.json` contains only three positive vectors. The architecture requires
+   durable, fixture-driven adversarial vectors so later Go and Rust implementations
+   consume the same invalid inputs and classifications rather than copying Node test
+   construction logic.
+3. Status/review schema coverage does not systematically exercise every missing field,
+   declared field type, or timestamp validation, and it never directly proves a valid
+   XMR request plus `ReviewImageV1` pair.
+4. Explicit `machine.cancel()` state transitions do not prove that durable cancellation
+   is re-read after signing and immediately before broadcast. A mutable injected request
+   status must win at both boundaries without a broadcast call.
+5. Crash recovery re-confirms an unchanged artifact only. It must also revalidate a
+   recovered mutated artifact to `INTENT_MISMATCH`, and cancellation/expiry must still
+   win during recovery.
+6. The broadcasting-crash test uses `deferBroadcast` to make fake `broadcast()` return
+   `ok: true`. That contradicts the absolute ticket invariant that every fake adapter
+   broadcast returns `UNAVAILABLE` or `CAPABILITY_MISSING`. The state may be restored or
+   injected as already-broadcasting for crash handling, but no fake broadcast success is
+   permitted and its call count must remain zero in that setup.
+7. Package/security tests require `test:wallet` but do not require top-level `npm test`
+   and the build syntax contract to cover the wallet reference modules. They must also
+   reject `node:` and dynamic-import forms of forbidden process/network/device modules,
+   not just a few literal `require()` spellings.
+
+The exact bounded correction contract is
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md).
+Sol may edit only the same four test paths, may use only the previously authorized
+read-only inspection/measurement commands, and must run nothing. Luna remains stopped.

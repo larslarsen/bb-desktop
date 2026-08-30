@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: AUTHORIZED — TEST SOURCE ONLY
+State: CORRECTION 01 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -11,9 +11,10 @@ Source actor: Temporary Sr Dev — Codex Sol (`gpt-5.6-sol`, High)
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
 [BBD-WAL-002](../../tickets/BBD-WAL-002.md) is the only authorized work. The current
-phase authorizes temporary Sr Dev — Codex Sol to author test source only under the exact
-durable contract in
-[`CODEX_SOL_BBD_WAL_002_TESTS.md`](CODEX_SOL_BBD_WAL_002_TESTS.md). It must stop
+phase authorizes temporary Sr Dev — Codex Sol to correct its test source only under the
+exact durable contract in
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md).
+It must stop
 without execution, production source, dependencies, Git, network, wallets, nodes,
 devices, keys, or transaction capability.
 
@@ -21,10 +22,13 @@ The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
 Sol authors at High. Standing project roles are otherwise unchanged.
 
-The reviewer must inspect the complete test drop before Jr Dev — Codex Luna may run the
-three named expected-red commands. Production remains unauthorized until the red failures
-are accepted as proving the absent reference implementation and missing fail-closed
-security/CI wiring. A failing test tree must not be committed.
+The initial Sol drop is not accepted. Reviewer XHigh inspection found the exact blockers
+recorded in the correction handoff: vacuous malformed-UTF-8 coverage, insufficient
+fixture-driven cross-language negatives, no injected post-sign cancellation rechecks,
+incomplete crash-recovery revalidation, an inert-fake contradiction, and incomplete
+package/security wiring assertions. Codex Luna must not run the expected-red commands
+until the corrected source is reviewer-accepted. Production remains unauthorized and a
+failing test tree must not be committed.
 
 BBD-WAL-001 architecture is integrated and reviewer-accepted in commit
 `ffebcc179d3b2aaca687213de54d3c3298ac0696` at exactly 2,271 lines and SHA-256
