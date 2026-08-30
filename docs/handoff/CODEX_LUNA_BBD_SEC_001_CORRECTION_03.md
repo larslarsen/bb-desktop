@@ -5,7 +5,8 @@ Luna handoff and supersedes the Electronegativity execution in Network Boundary 
 
 Repository: `/home/lars/OpenBazaar/bb-desktop`
 
-Governance HEAD before integration: `990bf35a`
+Source-acceptance governance commit: `990bf35a`. Begin from the current governance HEAD
+that contains this handoff; do not require this file to name its own commit.
 
 Read `AGENTS.md`, `TESTING.md`, the complete ticket, `CURRENT_TASK.md`, every prior
 BBD-SEC-001 handoff, and especially the complete authorized/accepted Correction 03.
