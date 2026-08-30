@@ -20,8 +20,9 @@ Reviewer-accepted uncommitted production paths:
 
 Read the ticket, current task, production handoff and Correction 01, both expected-red
 evidence files, and the accepted source/tests. Verify the exact eight line counts/hashes,
-that they are the only dirty paths, and that `HEAD == origin/master == 946739b6...`.
-Do not alter source or tests.
+that they are the only dirty paths, that `HEAD == origin/master`, and that governance
+baseline `946739b652cbe194503ddb885f450f3b5cf6fa60` is in the current history. Do not alter
+source or tests.
 
 Run these targeted commands in order, stopping immediately on the first nonzero result or
 wrong registered count:
