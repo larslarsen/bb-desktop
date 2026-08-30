@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-001
 
-State: CORRECTION 02 — SOURCE ONLY
+State: SOURCE ACCEPTED — LUNA INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -15,14 +15,13 @@ owner's decision to support built-in shielded ZEC and optional local-node XMR fr
 beginning, with software, hardware-backed, and watch-only accounts shaped by a common
 contract. Ledger and Trezor support are first-class requirements.
 
-Correction 01 resolved the protocol-fact, canonicalization, state-machine, XMR RPC, IPC,
-and Electron authorization blockers. Before integration, the owner identified the
-inherited OB1 exchange-rate dependency. Only the bounded rate architecture and validation
-fixes in
-[GROK_BUILD_BBD_WAL_001_CORRECTION_02.md](GROK_BUILD_BBD_WAL_001_CORRECTION_02.md) are
-now authorized. Grok may edit only
-[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) and must run nothing.
-Codex Luna remains stopped.
+Correction 02 is reviewer-accepted at exactly 2,271 lines and SHA-256
+`aae487b169689f310b222640427c1cdae62850d39ebb0243e29f10568d6fcb3f`. It resolves the
+original wallet-boundary blockers and the owner-raised OB1 exchange-rate dependency.
+Codex Luna may now integrate only the exact accepted
+[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) under
+[CODEX_LUNA_BBD_WAL_001.md](CODEX_LUNA_BBD_WAL_001.md). No implementation or dependency
+work is authorized.
 
 The maintained `../bb-go/modern` social daemon remains wallet-free. The local wallet
 broker belongs to the desktop product boundary. Electron may supervise and request a

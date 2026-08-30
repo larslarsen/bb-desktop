@@ -1,6 +1,6 @@
 # BBD-WAL-001 — Dual-Coin Wallet Architecture Review
 
-Status: CORRECTION 02 — SOURCE ONLY
+Status: SOURCE ACCEPTED — LUNA INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -201,3 +201,28 @@ the remaining Unicode/timestamp validation imprecision found during reviewer ins
 The exact bounded contract is
 [`GROK_BUILD_BBD_WAL_001_CORRECTION_02.md`](../docs/handoff/GROK_BUILD_BBD_WAL_001_CORRECTION_02.md).
 Grok may edit only the architecture document and must run nothing. Luna remains stopped.
+
+## Reviewer acceptance — architecture source
+
+Correction 02 source is accepted at exactly 2,271 lines and SHA-256
+`aae487b169689f310b222640427c1cdae62850d39ebb0243e29f10568d6fcb3f`.
+
+Reviewer verified that the final architecture:
+
+- keeps the social daemon and Electron outside spend authorization;
+- uses a Rust broker sidecar with broker-owned native authorization and inherited
+  anonymous child pipes;
+- models NU6.3/Ironwood, ZEC hardware capability drift, full authenticated XMR wallet
+  RPC, and Ledger/Trezor without unverified privacy claims;
+- defines one canonical signed request, a prepare-before-confirm state machine, and
+  crash/cancel/expiry behavior that cannot auto-broadcast;
+- makes exchange rates optional, untrusted presentation from a separate quote worker,
+  rejects the inherited OB1 chain, and keeps exact atomic amounts authoritative;
+- preserves an offline, credential-free BBD-WAL-002 first slice that cannot construct or
+  move funds.
+
+Open questions Q1–Q14 are intentionally deferred to their named bounded tickets; none is
+required to integrate this design document. Codex Luna is authorized only by
+[`CODEX_LUNA_BBD_WAL_001.md`](../docs/handoff/CODEX_LUNA_BBD_WAL_001.md) to verify and
+commit the exact accepted document. No implementation, dependency, test, wallet, node,
+device, provider call, or other-repository change is authorized.
