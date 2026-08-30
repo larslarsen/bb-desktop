@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: LOCAL GREEN RECORDED — FALSIFICATION/CI REVIEW PENDING
+Status: LOCAL GREEN AND CI PASSED — FALSIFICATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -187,6 +187,9 @@ four PID/nonce inputs. Only
 `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md` may close that final
 protocol-only boundary. Its exact 340-line protocol source at SHA-256
 `79b0ac8bdd1dc6f4d54793dd1137ae72172688412eefbbe853f1cc421be630f4` is reviewer-accepted.
-Only `docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md` may rerun the full local
-gate sequence and integrate on exact green. Falsification and CI review remain later
-gates.
+`docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md` completed the full local gate
+sequence and integrated production at `584019e9a89022d77b4bbb6710c2b7670e42d95b`.
+GitHub Social client run `33342988248` passed its routine check with all package jobs
+skipped. Only `docs/handoff/CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md` may now perform the
+three isolated negative mutations, exact restorations, and evidence integration. The
+ticket is not complete until reviewer acceptance of that result.

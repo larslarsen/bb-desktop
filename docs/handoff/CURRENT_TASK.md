@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: LOCAL GREEN RECORDED — FALSIFICATION/CI REVIEW PENDING
+State: LOCAL GREEN AND CI PASSED — FALSIFICATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -42,9 +42,14 @@ function still coerces its four PID/nonce inputs. Only
 that final protocol-only boundary. Its exact protocol source is reviewer-accepted at 340
 lines and SHA-256
 `79b0ac8bdd1dc6f4d54793dd1137ae72172688412eefbbe853f1cc421be630f4`.
-Only [Green Resume 01](CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md) may rerun the full local
-gate sequence and integrate on exact green. Native binary, Rust install, wallet, node,
-network service, hardware, and device work remain unauthorized.
+[Green Resume 01](CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md) completed the full local
+gate sequence and integrated production at
+`584019e9a89022d77b4bbb6710c2b7670e42d95b`. GitHub Social client run `33342988248`
+passed its routine check with all package jobs skipped. Only
+[the Luna falsification handoff](CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md) may perform the
+three isolated negative mutations, exact restorations, evidence commit, and push. Native
+binary, Rust install, wallet, node, network service, hardware, and device work remain
+unauthorized.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
