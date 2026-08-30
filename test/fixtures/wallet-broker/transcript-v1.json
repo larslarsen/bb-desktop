@@ -1,0 +1,22 @@
+{
+  "name": "wallet-broker-session-v1",
+  "domain_separator": "bitbook-wallet-session-v1\n",
+  "parent_pid": "41001",
+  "child_pid": "41002",
+  "parent_nonce": "00112233445566778899aabbccddeeff",
+  "child_nonce": "ffeeddccbbaa99887766554433221100",
+  "session_id": "d1427a9ddeb9ed176859f95a6ccf9912e98e44377c8f2b173c40fa48245571df",
+  "hello": {
+    "protocol": "bitbook-wallet-broker",
+    "min": 1,
+    "max": 1,
+    "child_nonce": "ffeeddccbbaa99887766554433221100",
+    "child_pid": "41002"
+  },
+  "hello_ack": {
+    "protocol": "bitbook-wallet-broker",
+    "version": 1,
+    "parent_nonce": "00112233445566778899aabbccddeeff",
+    "parent_pid": "41001"
+  }
+}

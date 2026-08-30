@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: TEST SOURCE REVIEWER ACCEPTED — EXPECTED RED RESUME 01 AUTHORIZED
+State: EXPECTED RED RECORDED — PRODUCTION NOT AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,8 +19,8 @@ before execution. Correction 03 is accepted at the exact hashes in the
 integration, evidence, exact test-source commit, and push are authorized. The first three
 missing-module commands matched; the Electron raw inventory is accepted at 13 pass / 6
 expected fail despite an initial reporting miscount. Only
-[Resume 01](CODEX_LUNA_BBD_WAL_003_RED_RESUME_01.md) may run the remaining policy red and
-finish the record sequence. Production, package/workflow/policy implementation, native
+[Resume 01](CODEX_LUNA_BBD_WAL_003_RED_RESUME_01.md) ran the remaining policy red and
+recorded [the expected-red evidence](../testing/BBD-WAL-003-EXPECTED-RED.md). Production, package/workflow/policy implementation, native
 binary, Rust install, wallet, node, network service, hardware, and device work remain
 unauthorized.
 

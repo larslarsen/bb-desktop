@@ -8,10 +8,10 @@ const path = require('path');
 const repoRoot = path.resolve(__dirname, '..');
 const mainPath = path.join(repoRoot, 'social-main.js');
 const expectedPage = path.join(repoRoot, 'social', 'index.html');
+const expectedPreload = path.join(repoRoot, 'wallet-preload.js');
 const packagePath = path.join(repoRoot, 'package.json');
 
 const FORBIDDEN_ELECTRON_APIS = [
-  'ipcMain',
   'ipcRenderer',
   'remote',
   'BrowserView',
@@ -81,12 +81,20 @@ function createElectronMock() {
     openExternalCalls: [],
     appHandlers: Object.create(null),
     quitCalls: 0,
+    ipcHandlers: Object.create(null),
+    supervisorCalls: [],
+    supervisorResults: [],
+    supervisorSubscribers: [],
+    rendererMessages: [],
   };
 
   class WebContents {
     constructor() {
       this.handlers = Object.create(null);
       this.windowOpenHandler = null;
+      this.mainFrame = { url: `file://${expectedPage}` };
+      this.getURL = () => `file://${expectedPage}`;
+      this.send = (channel, payload) => state.rendererMessages.push([this.mainFrame, channel, payload]);
     }
 
     on(event, handler) {
@@ -174,7 +182,16 @@ function createElectronMock() {
     },
   };
 
-  const target = { app, BrowserWindow, Menu, session, shell };
+  const ipcMain = {
+    handle(channel, handler) {
+      assert.strictEqual(typeof channel, 'string');
+      assert.strictEqual(typeof handler, 'function');
+      assert.ok(!state.ipcHandlers[channel], `duplicate ipcMain channel ${channel}`);
+      state.ipcHandlers[channel] = handler;
+    },
+  };
+
+  const target = { app, BrowserWindow, Menu, session, shell, ipcMain };
 
   const electron = new Proxy(target, {
     get(receiver, prop) {
@@ -211,6 +228,24 @@ function loadMaintainedMain() {
   Module._load = function loadWithElectronMock(request, parent, isMain) {
     if (request === 'electron') {
       return mock.electron;
+    }
+    if (/(?:^|\/)wallet-broker\/supervisor$/.test(request)) {
+      return {
+        createWalletSupervisor() {
+          return {
+            dispatch(method, params) {
+              mock.state.supervisorCalls.push([method, params]);
+              const result = { ok: true, value: params };
+              mock.state.supervisorResults.push(result);
+              return result;
+            },
+            subscribeSnapshot(callback) {
+              mock.state.supervisorSubscribers.push(callback);
+              return () => true;
+            },
+          };
+        },
+      };
     }
     return originalLoad.call(this, request, parent, isMain);
   };
@@ -319,7 +354,7 @@ test('BrowserWindow explicitly sets the fail-closed webPreferences', () => {
   assert.strictEqual(prefs.webSecurity, true);
   assert.strictEqual(prefs.allowRunningInsecureContent, false);
   assert.strictEqual(prefs.experimentalFeatures, false);
-  assert.ok(prefs.preload == null, 'preload script is not authorized');
+  assert.strictEqual(path.resolve(prefs.preload), path.resolve(expectedPreload));
   assert.notStrictEqual(prefs.webviewTag, true, 'webviewTag must not be enabled');
   assert.notStrictEqual(prefs.nodeIntegrationInWorker, true);
   assert.notStrictEqual(prefs.nodeIntegrationInSubFrames, true);
@@ -415,13 +450,15 @@ test('permission check handler denies every permission', () => {
   }
 });
 
-test('no preload, webview, IPC bridge, or remote Electron API is introduced', () => {
+test('only the explicit local wallet preload and exact ipcMain bridge are introduced', () => {
   const ctx = boot();
   for (const api of FORBIDDEN_ELECTRON_APIS) {
     assert.ok(!ctx.accessed.has(api), `maintained main accessed forbidden Electron API ${api}`);
   }
   const prefs = windowUnderTest().options.webPreferences;
-  assert.ok(!Object.prototype.hasOwnProperty.call(prefs, 'preload'));
+  assert.strictEqual(path.resolve(prefs.preload), path.resolve(expectedPreload));
+  assert.ok(fs.existsSync(prefs.preload), 'wallet preload is missing');
+  assert.ok(ctx.accessed.has('ipcMain'), 'maintained main did not register the exact wallet IPC boundary');
   assert.notStrictEqual(prefs.webviewTag, true);
 });
 
@@ -476,6 +513,127 @@ test('maintained source has no HTML injection, eval, or javascript: sinks', () =
   }
   assert.deepStrictEqual(scanned, MAINTAINED_SOURCE_PATHS);
   assert.strictEqual(scanned.length, 4);
+});
+
+const WALLET_IPC_CHANNELS = [
+  'wallet:accounts:list',
+  'wallet:intent:begin',
+  'wallet:intent:cancel',
+  'wallet:payee-request:get',
+  'wallet:snapshot:get',
+];
+
+test('wallet IPC registers only the exact renderer channel allowlist', () => {
+  const ctx = boot();
+  assert.deepStrictEqual(Object.keys(ctx.state.ipcHandlers).sort(), WALLET_IPC_CHANNELS);
+  for (const forbidden of [
+    'wallet:invoke', 'wallet:intent:confirm', 'wallet:account:unlock',
+    'wallet:account:export-backup', 'wallet:account:create-software',
+    'wallet:signer:sign', 'wallet:tx:broadcast', 'wallet:intent:broadcast',
+  ]) assert.strictEqual(ctx.state.ipcHandlers[forbidden], undefined);
+});
+
+test('wallet IPC rejects non-main frames, non-local origins, malformed shapes, and oversize input', () => {
+  const ctx = boot();
+  const handler = ctx.state.ipcHandlers['wallet:intent:begin'];
+  assert.strictEqual(typeof handler, 'function');
+  const valid = { senderFrame: windowUnderTest().webContents.mainFrame, sender: windowUnderTest().webContents };
+  const before = ctx.state.supervisorCalls.length;
+  assert.throws(() => handler({ senderFrame: {}, sender: valid.sender }, {}));
+  assert.throws(() => handler({ senderFrame: valid.senderFrame, sender: { getURL: () => 'https://evil.example' } }, {}));
+  assert.throws(() => handler(valid, { unexpected: true }));
+  assert.throws(() => handler(valid, { payment_request: { memo: 'x'.repeat(64 * 1024) } }));
+  let getterCalls = 0;
+  const nested = {};
+  Object.defineProperty(nested, 'request_id', {
+    enumerable: true,
+    get() { getterCalls += 1; return '0'.repeat(32); },
+  });
+  assert.throws(() => handler(valid, { payment_request: nested }));
+  assert.strictEqual(getterCalls, 0);
+  assert.strictEqual(ctx.state.supervisorCalls.length, before);
+});
+
+test('wallet IPC valid calls map once to fixed supervisor methods with cloned parameters', async () => {
+  const ctx = boot();
+  const win = windowUnderTest();
+  const event = { senderFrame: win.webContents.mainFrame, sender: win.webContents };
+  const rows = [
+    ['wallet:snapshot:get', 'status.get', undefined],
+    ['wallet:accounts:list', 'account.list', undefined],
+    ['wallet:intent:begin', 'intent.begin', { payment_request: { v: 1, request_id: '0'.repeat(32) } }],
+    ['wallet:intent:cancel', 'intent.cancel', { intent_id: '1'.repeat(32) }],
+    ['wallet:payee-request:get', 'receiver.fresh', {
+      account_id: '2'.repeat(32), asset: 'ZEC', network: 'zec-testnet', request_id: '3'.repeat(32),
+    }],
+  ];
+  for (const [channel, method, params] of rows) {
+    const input = params === undefined ? undefined : JSON.parse(JSON.stringify(params));
+    const inputBytes = input === undefined ? undefined : JSON.stringify(input);
+    const output = await ctx.state.ipcHandlers[channel](event, input);
+    const received = ctx.state.supervisorCalls[ctx.state.supervisorCalls.length - 1][1];
+    const rawResult = ctx.state.supervisorResults[ctx.state.supervisorResults.length - 1];
+    if (input) {
+      assert.notStrictEqual(received, input);
+      assert.deepStrictEqual(received, params);
+      received.observer_mutation = true;
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(input, 'observer_mutation'), false);
+      delete received.observer_mutation;
+      if (method === 'intent.begin') {
+        assert.notStrictEqual(received.payment_request, input.payment_request);
+        const originalRequestId = received.payment_request.request_id;
+        received.payment_request.request_id = 'f'.repeat(32);
+        assert.strictEqual(JSON.stringify(input), inputBytes);
+        received.payment_request.request_id = originalRequestId;
+      }
+    }
+    assert.notStrictEqual(output, rawResult);
+    assert.deepStrictEqual(output, { ok: true, value: params });
+    if (params) {
+      assert.notStrictEqual(output.value, rawResult.value);
+      const rawBytes = JSON.stringify(rawResult);
+      output.value.renderer_nested_mutation = true;
+      assert.strictEqual(JSON.stringify(rawResult), rawBytes);
+      delete output.value.renderer_nested_mutation;
+      if (method === 'intent.begin') {
+        assert.notStrictEqual(output.value.payment_request, rawResult.value.payment_request);
+        output.value.payment_request.request_id = 'e'.repeat(32);
+        assert.strictEqual(JSON.stringify(rawResult), rawBytes);
+      }
+    }
+    output.renderer_mutation = true;
+    assert.strictEqual(Object.prototype.hasOwnProperty.call(rawResult, 'renderer_mutation'), false);
+  }
+  assert.deepStrictEqual(ctx.state.supervisorCalls, rows.map(([, method, params]) => [method, params]));
+});
+
+test('wallet snapshot subscription targets only the maintained main frame with sanitized cloned data', () => {
+  const ctx = boot();
+  const win = windowUnderTest();
+  assert.strictEqual(ctx.state.supervisorSubscribers.length, 1);
+  const source = { v: 1, broker: 'down', accounts: [], secret: 'CANARY' };
+  ctx.state.supervisorSubscribers[0](source);
+  assert.deepStrictEqual(ctx.state.rendererMessages, [[
+    win.webContents.mainFrame,
+    'wallet:snapshot:subscribe',
+    { v: 1, broker: 'down', accounts: [] },
+  ]]);
+  const delivered = ctx.state.rendererMessages[0][2];
+  assert.notStrictEqual(delivered, source);
+  assert.notStrictEqual(delivered.accounts, source.accounts);
+  delivered.accounts.push({ account_id: 'mutated' });
+  assert.deepStrictEqual(source.accounts, []);
+  assert.ok(!JSON.stringify(ctx.state.rendererMessages).includes('CANARY'));
+  assert.strictEqual(source.secret, 'CANARY');
+});
+
+test('wallet Electron boundary exposes no confirmation, unlock, backup, sign, or broadcast surface', () => {
+  const ctx = boot();
+  const observable = JSON.stringify({ channels: Object.keys(ctx.state.ipcHandlers), windows: ctx.state.windows.length });
+  for (const authority of ['confirm', 'unlock', 'backup', 'sign', 'broadcast']) {
+    assert.ok(!observable.toLowerCase().includes(authority));
+  }
+  assert.strictEqual(ctx.state.windows.length, 1, 'Electron confirmation window is forbidden');
 });
 
 const WALLET_CONTRACT_MAINTAINED_PATHS = [
@@ -609,11 +767,11 @@ test('wallet reference contract is maintained source and retains an offline iner
   }
 });
 
-function run() {
+async function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
     try {
-      fn();
+      await fn();
       process.stdout.write(`ok ${name}\n`);
     } catch (err) {
       failed += 1;

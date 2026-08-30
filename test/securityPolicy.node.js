@@ -1367,6 +1367,184 @@ test('routine CI executes the exact wallet contract command and rejects its remo
   assertRejects(() => policy.checkSocialWorkflow(mutated), /wallet|test:wallet|walletContract/i);
 });
 
+const BROKER_BOUNDARY_PATHS = [
+  'wallet-broker/protocol.js',
+  'wallet-broker/supervisor.js',
+  'wallet-preload.js',
+];
+const BROKER_TEST_COMMANDS = [
+  'node test/walletBrokerProtocol.node.js',
+  'node test/walletSupervisor.node.js',
+  'node test/walletPreload.node.js',
+];
+const BROKER_TEST_SCRIPT = 'test:wallet-broker';
+const BROKER_TEST_COMMAND = BROKER_TEST_COMMANDS.join(' && ');
+const BROKER_CI_COMMAND = `npm run ${BROKER_TEST_SCRIPT}`;
+const BROKER_BUILD_COMMANDS = BROKER_BOUNDARY_PATHS.map((rel) => `node --check ${rel}`);
+const BROKER_IMPORT_ALLOWLISTS = {
+  'wallet-broker/protocol.js': ['crypto', 'node:crypto', 'buffer', 'node:buffer'],
+  'wallet-broker/supervisor.js': [
+    'crypto', 'node:crypto', 'buffer', 'node:buffer', 'fs', 'node:fs', 'path', 'node:path',
+    'child_process', 'node:child_process', './protocol', './protocol.js',
+  ],
+  'wallet-preload.js': ['electron'],
+};
+const PRELOAD_INVOKE_CHANNELS = [
+  'wallet:snapshot:get',
+  'wallet:intent:begin',
+  'wallet:intent:cancel',
+  'wallet:accounts:list',
+  'wallet:payee-request:get',
+];
+const PRELOAD_SUBSCRIBE_CHANNEL = 'wallet:snapshot:subscribe';
+
+test('wallet broker boundary package scripts and syntax checks are exact', () => {
+  const policy = loadPolicy();
+  const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
+  const pkg = JSON.parse(packageText);
+  assert.strictEqual(pkg.scripts[BROKER_TEST_SCRIPT], BROKER_TEST_COMMAND);
+  assert.ok(pkg.scripts.test.split(/\s*&&\s*/).includes(BROKER_CI_COMMAND));
+  const build = pkg.scripts.build.split(/\s*&&\s*/);
+  for (const command of BROKER_BUILD_COMMANDS) assert.ok(build.includes(command), `build omits ${command}`);
+  assert.deepStrictEqual(policy.BROKER_BOUNDARY_PATHS, BROKER_BOUNDARY_PATHS);
+  assert.deepStrictEqual(policy.BROKER_TEST_COMMANDS, BROKER_TEST_COMMANDS);
+  policy.checkPackageJson(packageText);
+  const missingScript = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, { [BROKER_TEST_SCRIPT]: 'echo skipped' }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingScript), /wallet|broker|test/i);
+  const missingTopLevel = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, {
+      test: pkg.scripts.test.split(/\s*&&\s*/).filter((item) => item !== BROKER_CI_COMMAND).join(' && '),
+    }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingTopLevel), /wallet|broker|top-level|npm test/i);
+  for (const command of BROKER_BUILD_COMMANDS) {
+    const mutated = JSON.stringify(Object.assign({}, pkg, {
+      scripts: Object.assign({}, pkg.scripts, {
+        build: pkg.scripts.build.split(/\s*&&\s*/).filter((item) => item !== command).join(' && '),
+      }),
+    }));
+    assertRejects(() => policy.checkPackageJson(mutated), /wallet|broker|build|syntax/i);
+  }
+});
+
+test('wallet broker and preload paths are required on every routine workflow trigger', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  for (const [name, workflow, checker] of [
+    ['social', workflows.social, policy.checkSocialWorkflow],
+    ['security', workflows.security, policy.checkSecurityWorkflow],
+  ]) {
+    for (const [, paths] of assertedTriggerPaths(workflow, name)) {
+      assert.ok(paths.includes('wallet-broker/**'));
+      assert.ok(paths.includes('wallet-preload.js'));
+    }
+    for (const filter of ['wallet-broker/**', 'wallet-preload.js']) {
+      const mutated = replaceOnce(workflow.text, `      - "${filter}"\n`, '');
+      assertRejects(() => checker.call(policy, mutated), /wallet|broker|preload|path/i);
+    }
+  }
+});
+
+test('routine CI executes the named wallet broker suite and rejects omission', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  const commands = [];
+  for (const [, job, step] of policy.iterSteps(workflows.social.data)) {
+    if (!job.if) commands.push(...policy.stepRunLines(step));
+  }
+  assert.ok(commands.includes(BROKER_CI_COMMAND), `routine CI omits ${BROKER_CI_COMMAND}`);
+  assertRejects(
+    () => policy.checkSocialWorkflow(replaceOnce(workflows.social.text, `      - run: ${BROKER_CI_COMMAND}\n`, '')),
+    /wallet|broker|preload|test/i
+  );
+});
+
+test('wallet boundary source policy allows only reviewed built-ins and forbids listeners, shell, and generic IPC', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkWalletBoundarySource, 'function');
+  assert.deepStrictEqual(policy.BROKER_IMPORT_ALLOWLISTS, BROKER_IMPORT_ALLOWLISTS);
+  assert.deepStrictEqual(policy.PRELOAD_INVOKE_CHANNELS, PRELOAD_INVOKE_CHANNELS);
+  assert.strictEqual(policy.PRELOAD_SUBSCRIBE_CHANNEL, PRELOAD_SUBSCRIBE_CHANNEL);
+  policy.checkWalletBoundarySource("const crypto = require('crypto');", 'wallet-broker/protocol.js');
+  policy.checkWalletBoundarySource(
+    "const { spawn } = require('child_process'); spawn(file, [], { shell: false, stdio: ['pipe','pipe','pipe'], env: cleanEnv });",
+    'wallet-broker/supervisor.js'
+  );
+  policy.checkWalletBoundarySource(
+    [
+      "const { contextBridge, ipcRenderer } = require('electron');",
+      "const api = {",
+      "  getSnapshot: () => ipcRenderer.invoke('wallet:snapshot:get'),",
+      "  beginIntent: (value) => ipcRenderer.invoke('wallet:intent:begin', value),",
+      "  cancelIntent: (value) => ipcRenderer.invoke('wallet:intent:cancel', value),",
+      "  listAccounts: () => ipcRenderer.invoke('wallet:accounts:list'),",
+      "  getPayeeRequest: (value) => ipcRenderer.invoke('wallet:payee-request:get', value),",
+      "};",
+      "const listener = (_event, value) => callback(value);",
+      "ipcRenderer.on('wallet:snapshot:subscribe', listener);",
+      "ipcRenderer.removeListener('wallet:snapshot:subscribe', listener);",
+      "contextBridge.exposeInMainWorld('bitbookWallet', api);",
+    ].join('\n'),
+    'wallet-preload.js'
+  );
+  const wrongPathLoads = [
+    ['wallet-broker/protocol.js', "require('fs')"],
+    ['wallet-broker/protocol.js', "require('child_process')"],
+    ['wallet-broker/protocol.js', "require('electron')"],
+    ['wallet-broker/supervisor.js', "require('electron')"],
+    ['wallet-preload.js', "require('fs')"],
+    ['wallet-preload.js', "require('child_process')"],
+  ];
+  const forbidden = wrongPathLoads.concat([
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.exec('wallet')"],
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.execFile(file)"],
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.spawnSync(file)"],
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.execSync('wallet')"],
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.execFileSync(file)"],
+    ['wallet-broker/supervisor.js', "const c=require('child_process'); c.fork(file)"],
+    ['wallet-broker/supervisor.js', "spawn(file, [], { shell: true, env: cleanEnv })"],
+    ['wallet-broker/supervisor.js', "spawn(file, [], { shell: false, env: process.env })"],
+    ['wallet-broker/supervisor.js', "spawn(file, [], { shell: false, env: { PATH: process.env.PATH } })"],
+    ['wallet-broker/supervisor.js', "spawn(file, ['--token=secret'], { shell: false, env: cleanEnv })"],
+    ['wallet-broker/supervisor.js', "spawn(file, ['--verbose'], { shell: false, env: cleanEnv })"],
+    ['wallet-broker/supervisor.js', "spawn(file, [], { shell: false, stdio: 'inherit', env: cleanEnv })"],
+    ['wallet-broker/supervisor.js', "spawn(file, [], { shell: false, stdio: ['pipe','inherit','pipe'], env: cleanEnv })"],
+    ['wallet-broker/supervisor.js', "require('net').createServer().listen('/tmp/wallet.sock')"],
+    ['wallet-broker/supervisor.js', "require('net').createServer().listen('\\\\.\\pipe\\wallet')"],
+    ['wallet-broker/supervisor.js', "require('net').createServer().listen(8123, '127.0.0.1')"],
+    ['wallet-broker/supervisor.js', "require('http').createServer().listen(8080)"],
+    ['wallet-broker/protocol.js', "const name='crypto'; require(name)"],
+    ['wallet-broker/protocol.js', "import('crypto')"],
+    ['wallet-preload.js', "ipcRenderer.invoke(channel, payload)"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:intent:confirm')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:account:unlock')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:account:export-backup')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:account:create-software')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:signer:sign')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:tx:broadcast')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:intent:broadcast')"],
+    ['wallet-preload.js', "ipcRenderer.invoke('wallet:anything')"],
+    ['wallet-preload.js', "ipcRenderer.send('wallet:snapshot:get')"],
+    ['wallet-preload.js', "ipcRenderer.sendSync('wallet:any')"],
+    ['wallet-preload.js', "ipcRenderer.on('wallet:snapshot:subscribe', listener); ipcRenderer.removeListener('wallet:other', listener)"],
+    ['wallet-broker/supervisor.js', "fetch('https://provider.invalid')"],
+    ['wallet-broker/supervisor.js', "new WebSocket('ws://127.0.0.1')"],
+    ['wallet-broker/supervisor.js', "require('worker_threads')"],
+    ['wallet-broker/supervisor.js', "require('usb')"],
+    ['wallet-broker/supervisor.js', "require('node-hid')"],
+    ['wallet-broker/supervisor.js', "dispatch('rpc.raw', params)"],
+    ['wallet-broker/supervisor.js', "dispatch('rate.fetch', params)"],
+    ['wallet-broker/supervisor.js', "dispatch('http.proxy', params)"],
+    ['wallet-broker/supervisor.js', "dispatch('wallet.raw', params)"],
+  ]);
+  for (const [rel, source] of forbidden) assertRejects(
+    () => policy.checkWalletBoundarySource(source, rel),
+    /wallet|boundary|forbidden|allowlist|listener|generic|module|capability|spawn|ipc/i
+  );
+});
+
 function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
