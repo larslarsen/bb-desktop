@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: LOCAL GREEN STOPPED — PRODUCTION CORRECTION 02 AUTHORIZED
+Status: PRODUCTION CORRECTION 02 REVIEW INCOMPLETE — CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -179,4 +179,7 @@ integrate/push after exact green. It stopped on the first command at 10 protocol
 1 handshake failure because numeric `child_pid` passed through regex coercion. Only
 `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_02.md` may now add explicit
 string guards for that validation defect family in protocol, supervisor, and Electron
-main. Execution, falsification, and CI review remain unauthorized pending review.
+main. Those guards are accepted, but the exported session-hash function still coerces its
+four PID/nonce inputs. Only
+`docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md` may close that final
+protocol-only boundary. Execution, falsification, and CI review remain unauthorized.

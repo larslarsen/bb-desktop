@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: LOCAL GREEN STOPPED — PRODUCTION CORRECTION 02 AUTHORIZED
+State: PRODUCTION CORRECTION 02 REVIEW INCOMPLETE — CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -35,8 +35,12 @@ targeted command at 10 protocol passes / 1 handshake failure; no later command r
 numeric child PID was accepted through regex string coercion. Only
 [Production Correction 02](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_02.md) may add
 explicit string guards for the same validation defect family in protocol, supervisor, and
-Electron main. Execution, native binary, Rust install, wallet, node, network service,
-hardware, and device work remain unauthorized pending renewed reviewer acceptance.
+Electron main. Its guards are accepted, but review found the exported session-hash
+function still coerces its four PID/nonce inputs. Only
+[Production Correction 03](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md) may close
+that final protocol-only boundary. Execution, native binary, Rust install, wallet, node,
+network service, hardware, and device work remain unauthorized pending renewed reviewer
+acceptance.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
