@@ -32,3 +32,24 @@ metadata, evidence/current documents, exact commit/push, and reviewer return.
 Do not repeat completed tests/falsifications/scanners. Do not use Electronegativity,
 `/tmp`, deletion/cleanup, native packaging, workflow dispatch, suppression, or finding
 bodies. Leave dependency/cache/artifact state for owner inspection.
+
+## Network boundary result
+
+Reviewer executed the exact approved bounded commands outside the restricted network
+sandbox, without sudo/root:
+
+- `npm ci`: exit 0; 13 packages installed, 14 audited, zero vulnerabilities;
+- pinned CycloneDX npm 6.0.1 JSON generation: exit 0; and
+- output SHA-256:
+  `9a628e9ff915b7fece623b8158cbd700c80351bdbff62ba5037ce74a6a95e17f`.
+
+The generator emitted deprecation warnings for its transient `glob` and
+`prebuild-install` packages; it did not change BitBook dependencies. Reviewer reverified
+unchanged `package-lock.json` SHA-256
+`7d347693664abe2639dfd1cd04f5f7e8757adb2dd71098b0a23b49aedade5413`
+and an empty lockfile diff.
+
+Luna may resume at blocking `npm audit`, then validate the existing exact JSON and record
+its safe format/spec/root/count/hash/size metadata. It must not regenerate the SBOM or
+repeat completed security gates. Full green permits evidence/current, final diff/path
+checks, exact commit/push, and reviewer return.

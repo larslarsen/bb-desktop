@@ -351,3 +351,8 @@ full-history Gitleaks over 4,558 commits and current-tree Gitleaks with zero fin
 manual SBOM sequence stopped at sandboxed `npm ci` on registry DNS `EAI_AGAIN`, before any
 SBOM/evidence/Git work. One exact bounded external-network retry is authorized under
 `docs/handoff/CODEX_LUNA_BBD_SEC_001_SBOM_NETWORK_01.md`.
+
+The exact bounded external-network `npm ci` and CycloneDX 6.0.1 generation both passed;
+the app graph audited at zero vulnerabilities, the JSON was written only to the approved
+artifact path, and the package-lock hash/diff remain unchanged. Luna resumes at audit and
+local validation/evidence under the recorded boundary result.

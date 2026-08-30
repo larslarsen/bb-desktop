@@ -138,3 +138,9 @@ DNS `EAI_AGAIN` for `undici-types`. The exact bounded disk-backed network retry 
 point are preserved in
 [SBOM Network Boundary 01](CODEX_LUNA_BBD_SEC_001_SBOM_NETWORK_01.md). No completed gate
 is repeated.
+
+The exact bounded external-network retry succeeded: `npm ci` installed 13/audited 14 at
+zero vulnerabilities, and pinned CycloneDX 6.0.1 generated the approved JSON. Reviewer
+verified the lockfile is unchanged and recorded the artifact hash in the SBOM network
+handoff. Luna resumes at audit plus local validation/metadata, then evidence and Git only
+on full green; no scanner or generation replay is needed.
