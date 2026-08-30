@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: EXPECTED RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
+Status: PRODUCTION SOURCE REVIEW REJECTED — CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -168,4 +168,9 @@ is reviewer-accepted at 1,574 lines and SHA-256
 recorded the exact 53-pass/5-fail result at commit
 `7a1bde2372fbd94a85efc42ec1919ac451e6797a`. The reviewer accepts that expected-red gate.
 Only `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION.md` now authorizes production source;
-execution and integration remain unauthorized pending reviewer source acceptance.
+its first eight-path drop was reviewer-rejected before execution because the public real
+supervisor rejected the two no-payload Electron calls instead of mapping them to strict
+empty broker parameters. Only
+`docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_01.md` may edit
+`wallet-broker/supervisor.js` to correct that mismatch. Execution and integration remain
+unauthorized pending reviewer source acceptance.
