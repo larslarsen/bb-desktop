@@ -79,3 +79,8 @@ checker plus security workflow production paths. Codex Luna may resume under the
 correction-specific bounded red and restore, obsolete-scanner reintroduction
 falsification, complete corrected acceptance from the beginning, then the unchanged
 manual SBOM sequence. Any failure or Gitleaks finding stops before Git.
+
+Luna's exact resumed integration contract is
+[Correction 03 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_03.md). It prevents repeat
+work, supersedes only the obsolete scanner command, and preserves every disk-path,
+no-cleanup, no-native-build, hard-stop, evidence, commit, and reviewer-return rule.

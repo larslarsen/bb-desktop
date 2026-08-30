@@ -277,3 +277,8 @@ independently verified the reported hashes and accepted the source: Electron 13 
 policy 47 tests, fail-closed obsolete-scanner rejection, and deletion of only the invalid
 workflow step. Luna may now resume correction-specific red/restore/falsification and the
 complete corrected acceptance sequence.
+
+Luna executes under `docs/handoff/CODEX_LUNA_BBD_SEC_001_CORRECTION_03.md`, which fixes
+the exact correction-specific red/green/falsification order and supersedes only the old
+Electronegativity command. All other safety, acceptance, SBOM, evidence, and Git rules
+remain in force.
