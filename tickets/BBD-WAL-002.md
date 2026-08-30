@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+Status: EXPECTED RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -403,3 +403,22 @@ Jr Dev — Codex Luna is authorized only by
 the hashes, run the three expected-red Node commands, write the named red-evidence file,
 and commit/push that evidence file alone if every failure matches. Luna must not modify,
 stage, commit, or push the failing test source. Production remains unauthorized.
+
+## Reviewer acceptance — expected red
+
+Jr Dev — Codex Luna produced accepted red evidence in commit
+`3a60b33c2b4c2f8355007fbd3535066cd0a0d1c6`. Reviewer independently verified that the
+commit contains only `docs/testing/BBD-WAL-002-RED-EVIDENCE.md`, at 31 lines and
+SHA-256 `f8b33e5f5c510188676deee11a073d6c053ae3d9b4de9279a3cfca25a68e2819`, and that
+`HEAD` equals `origin/master`.
+
+The three commands failed for the intended reasons only: late `MODULE_NOT_FOUND` after
+fixture preflight; 13 inherited Electron assertions green before one missing-source red;
+and 50 inherited policy assertions green before four absent-wiring reds. This is accepted
+evidence that production—not the tests, fixtures, dependencies, or inherited behavior—is
+missing.
+
+Temporary Sr Dev — Codex Sol is now authorized only by
+[`CODEX_SOL_BBD_WAL_002_PRODUCTION.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_PRODUCTION.md)
+to author the bounded green source. Sol must not run anything or modify the accepted
+tests. Codex Luna remains stopped until reviewer source acceptance.
