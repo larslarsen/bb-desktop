@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: PRODUCTION SOURCE REVIEW REJECTED — TEST CORRECTION 04 AUTHORIZED
+State: PRODUCTION SOURCE REVIEW REJECTED — TEST CORRECTION 05 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -15,11 +15,11 @@ expected-red evidence is reviewer-accepted at commit
 `3a60b33c2b4c2f8355007fbd3535066cd0a0d1c6`. The first bounded production drop is
 present but reviewer-rejected before execution. The current phase authorizes temporary
 Sr Dev — Codex Sol only under
-[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_04.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_04.md)
-to add test-first coverage in `test/walletContract.node.js` for the source-review
-blockers. Sol must not execute commands, edit production/wiring or the accepted fixture
-and security tests, use Git, or create dependencies. Luna remains stopped until reviewer
-acceptance of the correction test source.
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_05.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_05.md)
+to close two remaining non-vacuity gaps in the Correction 04 test-first coverage in
+`test/walletContract.node.js`. Sol must not execute commands, edit production/wiring or
+the accepted fixture and security tests, use Git, or create dependencies. Luna remains
+stopped until reviewer acceptance of the correction test source.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
