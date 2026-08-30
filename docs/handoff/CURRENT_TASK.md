@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-001
 
-State: AUTHORIZED — DESIGN ONLY
+State: CORRECTION 01 — SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -15,16 +15,21 @@ owner's decision to support built-in shielded ZEC and optional local-node XMR fr
 beginning, with software, hardware-backed, and watch-only accounts shaped by a common
 contract. Ledger and Trezor support are first-class requirements.
 
-This is a design-only gate. Grok Build may author only
-[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) under the complete prompt
-in [GROK_BUILD_BBD_WAL_001.md](GROK_BUILD_BBD_WAL_001.md). No implementation, test,
-dependency, wallet, node, hardware, network, mainnet, package, or other-repository work is
-authorized.
+Grok's initial architecture source is not accepted. Reviewer found protocol-fact,
+canonicalization, state-machine, XMR RPC, IPC, and Electron authorization-boundary
+blockers. Only the bounded source correction in
+[GROK_BUILD_BBD_WAL_001_CORRECTION_01.md](GROK_BUILD_BBD_WAL_001_CORRECTION_01.md) is
+authorized. Grok may edit only
+[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) and must run nothing.
+Codex Luna remains stopped.
 
-The maintained `../bb-go/modern` social daemon remains wallet-free. The proposed local
-wallet broker belongs to the desktop product boundary but must run outside the Electron
-renderer and expose no generic wallet HTTP API. The inherited OpenBazaar wallet and
-deprecated `../go-ipfs` are not implementation foundations.
+The maintained `../bb-go/modern` social daemon remains wallet-free. The local wallet
+broker belongs to the desktop product boundary. Electron may supervise and request a
+review but may not carry confirmation, unlock credentials, backup material, sign, or
+broadcast authority. The broker owns the native authorization surface. Product/generic
+wallet HTTP is forbidden; authenticated loopback XMR wallet RPC remains contained behind
+the broker. The inherited OpenBazaar wallet and deprecated `../go-ipfs` are not
+implementation foundations.
 
 BBD-SEC-001 remains complete and accepted at implementation commit
 `47bf45884d737b4b89571f06d8ba3b4e20238bfb`, with documentation acceptance commit

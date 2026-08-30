@@ -1,6 +1,6 @@
 # BBD-WAL-001 — Dual-Coin Wallet Architecture Review
 
-Status: AUTHORIZED — DESIGN ONLY
+Status: CORRECTION 01 — SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -129,9 +129,51 @@ authorized.
 - Ledger and Trezor are represented through capabilities, not vendor assumptions.
 - The document does not claim current shielded-ZEC hardware support without a verified
   device/protocol capability.
-- No spend authority enters Electron, the renderer, `bb-go`, HTTP, logs, or evidence.
+- No spend authority enters Electron, the renderer, `bb-go`, product/generic HTTP, logs,
+  or evidence. The authenticated loopback `monero-wallet-rpc` transport is an internal
+  XMR-adapter exception and must not cross the wallet-broker boundary.
 - The social daemon stays wallet-free and the old OpenBazaar wallet is rejected as an
   implementation base.
 - The first implementation slice is offline, deterministic, credential-free, and cannot
   create or move funds.
 
+## Reviewer source decision — Correction 01
+
+Grok's initial source at 1,245 lines and SHA-256
+`d9c0107ee4b7381cf5c70240eeae1d041791d0eaa2f926f9c2abf79e63c3a816` is not accepted.
+It has a sound dual-coin direction, but the following blockers must be corrected before
+Codex Luna may integrate it:
+
+1. Ironwood is incorrectly described as NU7-class and future/approximate. It activated
+   as Zcash NU6.3 on 2026-07-28 at mainnet height 3,428,143. The old Orchard pool is now
+   restricted.
+2. The document invents an “Ironwood receiver set.” Ironwood is a distinct pool using
+   the Orchard protocol receiver and incoming viewing key. Pool, transaction-v6,
+   migration, and signer capabilities must be modeled explicitly without inventing a
+   new address kind.
+3. The XMR spending design ambiguously enables `monero-wallet-rpc --restricted-rpc`.
+   That mode is view-only. Spending requires full authenticated wallet RPC bound only to
+   loopback and contained behind the broker; a restricted local `monerod` RPC is a
+   separate matter.
+4. The payment request and `intent_hash` have no single normative canonical encoding,
+   cite the wrong section, and leave timestamps/status mutation underspecified.
+5. The state diagram prepares after confirmation even though the confirmation UI must
+   show the prepared fee, and it conflicts with the separate broadcast method and the
+   one-button UX. Cancelled, signed-but-unverified, crash, and post-sign cancellation
+   behavior are not unambiguous.
+6. The proposed Electron confirm/unlock window can transmit spend authorization and a
+   software-wallet passphrase through Electron, contradicting this ticket's trust
+   boundary. A broker-owned native authorization/secret-entry surface (or equivalently
+   isolated broker-controlled OS credential agent) must be the authority. Electron may
+   request review, show a non-authoritative preview, receive sanitized state, and cancel;
+   it cannot confirm, unlock, export, sign, or broadcast.
+7. A listening UDS/named-pipe endpoint is unnecessary for a single supervised child and
+   weakens the local-process boundary. V1 must use inherited anonymous bidirectional
+   child pipes/handles, exact packaged-binary verification, and transcript/session
+   binding with no secret in argv or environment. Any later listening endpoint requires
+   a separate threat review.
+
+The exact correction contract is
+[`GROK_BUILD_BBD_WAL_001_CORRECTION_01.md`](../docs/handoff/GROK_BUILD_BBD_WAL_001_CORRECTION_01.md).
+Grok may edit only the same architecture document and must run nothing. Luna remains
+stopped until the reviewer accepts the corrected source and records its exact hash.
