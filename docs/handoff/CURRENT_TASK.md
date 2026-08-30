@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: PRODUCTION CORRECTION 03 ACCEPTED — GREEN RESUME 01 AUTHORIZED
+State: LOCAL GREEN RECORDED — FALSIFICATION/CI REVIEW PENDING
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -22,7 +22,8 @@ reviewer-accepted at 1,574 lines and SHA-256
 The Luna Correction 04 policy-red handoff executed the corrected policy suite and
 recorded its exact 53-pass/5-fail result in
 [the correction evidence](../testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md). The
-reviewer accepts that gate. Only
+reviewer accepts that gate. The local-green targeted and broader checks are recorded in
+[the local-green evidence](../testing/BBD-WAL-003-LOCAL-GREEN.md). Only
 [the Sol production handoff](CODEX_SOL_BBD_WAL_003_PRODUCTION.md) authored the eight named
 production/package/workflow/policy paths without execution. The reviewer rejected that
 drop before execution because the real supervisor does not normalize the two accepted

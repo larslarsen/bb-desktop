@@ -6,6 +6,8 @@ on:
       - "social-main.js"
       - "social/**"
       - "wallet-contract/**"
+      - "wallet-broker/**"
+      - "wallet-preload.js"
       - "test/**"
       - "scripts/security-policy.js"
       - "scripts/validate-sbom.js"

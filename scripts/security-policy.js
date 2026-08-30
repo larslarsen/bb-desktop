@@ -115,7 +115,7 @@ const SECURITY_PATHS = [
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
@@ -144,14 +144,48 @@ const WALLET_IMPORT_ALLOWLIST = [
   './index',
   './index.js',
 ];
+const BROKER_BOUNDARY_PATHS = [
+  'wallet-broker/protocol.js',
+  'wallet-broker/supervisor.js',
+  'wallet-preload.js',
+];
+const BROKER_TEST_COMMANDS = [
+  'node test/walletBrokerProtocol.node.js',
+  'node test/walletSupervisor.node.js',
+  'node test/walletPreload.node.js',
+];
+const BROKER_TEST_SCRIPT = 'test:wallet-broker';
+const BROKER_TEST_COMMAND = BROKER_TEST_COMMANDS.join(' && ');
+const BROKER_CI_COMMAND = `npm run ${BROKER_TEST_SCRIPT}`;
+const BROKER_BUILD_COMMANDS = BROKER_BOUNDARY_PATHS.map((rel) => `node --check ${rel}`);
+const BROKER_IMPORT_ALLOWLISTS = {
+  'wallet-broker/protocol.js': ['crypto', 'node:crypto', 'buffer', 'node:buffer'],
+  'wallet-broker/supervisor.js': [
+    'crypto', 'node:crypto', 'buffer', 'node:buffer', 'fs', 'node:fs', 'path', 'node:path',
+    'child_process', 'node:child_process', './protocol', './protocol.js',
+  ],
+  'wallet-preload.js': ['electron'],
+};
+const PRELOAD_INVOKE_CHANNELS = [
+  'wallet:snapshot:get',
+  'wallet:intent:begin',
+  'wallet:intent:cancel',
+  'wallet:accounts:list',
+  'wallet:payee-request:get',
+];
+const PRELOAD_SUBSCRIBE_CHANNEL = 'wallet:snapshot:subscribe';
 const SOCIAL_WORKFLOW_PATHS = [
   ...SOCIAL_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
+  'wallet-broker/**',
+  'wallet-preload.js',
   ...SOCIAL_PATHS.slice(2),
 ];
 const SECURITY_WORKFLOW_PATHS = [
   ...SECURITY_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
+  'wallet-broker/**',
+  'wallet-preload.js',
   ...SECURITY_PATHS.slice(2),
 ];
 
@@ -1040,7 +1074,9 @@ function checkSocialWorkflow(text, data) {
     }
   }
 
-  for (const command of [BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD]) {
+  for (const command of [
+    BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD, BROKER_CI_COMMAND,
+  ]) {
     if (!routineCommands.includes(command)) {
       throw new PolicyError(`${name} missing command ${command}`);
     }
@@ -1557,6 +1593,107 @@ function checkWalletContractSource(source, rel) {
   }
 }
 
+function checkWalletBoundarySource(source, rel) {
+  if (typeof source !== 'string' || !source.trim()) {
+    throw new PolicyError(`wallet boundary source ${rel} is empty`);
+  }
+  const configured = BROKER_IMPORT_ALLOWLISTS[rel];
+  if (!configured || !BROKER_BOUNDARY_PATHS.includes(rel)) {
+    throw new PolicyError(`unknown wallet boundary path ${rel}`);
+  }
+  const allowed = new Set(configured);
+  const callPattern = /\b(require|import)\s*\(([^)]*)\)/g;
+  let match;
+  while ((match = callPattern.exec(source)) !== null) {
+    if (match[1] === 'import') {
+      throw new PolicyError(`${rel} contains forbidden dynamic import`);
+    }
+    const specifier = literalModuleSpecifier(match[2]);
+    if (!specifier || !allowed.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted module load`);
+    }
+  }
+  const staticPattern = /\bimport\s+(?!\s*\()([^;\n]+)/g;
+  while ((match = staticPattern.exec(source)) !== null) {
+    const clause = match[1].trim();
+    const direct = clause.match(/^(['"])([^'"]+)\1$/);
+    const from = clause.match(/\bfrom\s+(['"])([^'"]+)\1$/);
+    const specifier = direct ? direct[2] : from ? from[2] : null;
+    if (!specifier || !allowed.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted static import`);
+    }
+  }
+  if (/\bfetch\s*\(|\b(?:new\s+)?WebSocket\s*\(|\bcreateServer\s*\(|\.listen\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden network or listener capability`);
+  }
+  if (/\b(?:exec|execFile|execSync|execFileSync|spawnSync|fork)\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden process capability`);
+  }
+  if (/\bprocess\.env\b|\bshell\s*:\s*true\b|['"]inherit['"]/.test(source)) {
+    throw new PolicyError(`${rel} inherits process authority, shell, environment, or stdio`);
+  }
+  for (const forbidden of [
+    'intent.confirm', 'account.unlock', 'account.exportBackup', 'account.createSoftware',
+    'signer.sign', 'tx.broadcast', 'intent.broadcast', 'rpc.raw', 'rate.fetch',
+    'http.proxy', 'wallet.raw',
+  ]) {
+    if (source.includes(forbidden)) throw new PolicyError(`${rel} contains forbidden wallet authority ${forbidden}`);
+  }
+
+  if (rel === 'wallet-broker/protocol.js' &&
+      !/\brequire\s*\(\s*['"](?:crypto|node:crypto|buffer|node:buffer)['"]\s*\)/.test(source)) {
+    throw new PolicyError(`${rel} does not contain a reviewed pure protocol capability`);
+  }
+
+  if (rel === 'wallet-broker/supervisor.js') {
+    const spawnCount = (source.match(/\bspawn\s*\(/g) || []).length;
+    if (spawnCount === 0) throw new PolicyError(`${rel} does not contain the reviewed inert spawn boundary`);
+    const spawnCalls = source.match(/\bspawn\s*\([^;]*\)/g) || [];
+    if (spawnCount !== spawnCalls.length) throw new PolicyError(`${rel} contains an unreviewable spawn call`);
+    for (const call of spawnCalls) {
+      if (!/\bspawn\s*\(\s*[^,]+,\s*\[\s*\]\s*,\s*\{/.test(call) ||
+          !/\bshell\s*:\s*false\b/.test(call) ||
+          !/\bstdio\s*:\s*\[\s*['"]pipe['"]\s*,\s*['"]pipe['"]\s*,\s*['"]pipe['"]\s*\]/.test(call) ||
+          !/\benv\s*:\s*cleanEnv\b/.test(call)) {
+        throw new PolicyError(`${rel} spawn must use empty argv, clean env, no shell, and three pipes`);
+      }
+    }
+  }
+
+  if (rel === 'wallet-preload.js') {
+    if (/\bipcRenderer\s*\.\s*(?:send|sendSync)\s*\(/.test(source)) {
+      throw new PolicyError(`${rel} contains forbidden generic IPC send`);
+    }
+    const invokes = [];
+    const invokePattern = /\bipcRenderer\s*\.\s*invoke\s*\(\s*([^,)]+)/g;
+    while ((match = invokePattern.exec(source)) !== null) {
+      const channel = literalModuleSpecifier(match[1]);
+      if (!channel || !PRELOAD_INVOKE_CHANNELS.includes(channel)) {
+        throw new PolicyError(`${rel} contains dynamic or unlisted IPC invoke`);
+      }
+      invokes.push(channel);
+    }
+    if (invokes.length !== PRELOAD_INVOKE_CHANNELS.length ||
+        PRELOAD_INVOKE_CHANNELS.some((channel) => !invokes.includes(channel))) {
+      throw new PolicyError(`${rel} must contain every fixed wallet invoke channel exactly once`);
+    }
+    const onChannels = [];
+    const removeChannels = [];
+    const listenerPattern = /\bipcRenderer\s*\.\s*(on|removeListener)\s*\(\s*([^,)]+)/g;
+    while ((match = listenerPattern.exec(source)) !== null) {
+      const channel = literalModuleSpecifier(match[2]);
+      if (!channel || channel !== PRELOAD_SUBSCRIBE_CHANNEL) {
+        throw new PolicyError(`${rel} contains dynamic or mismatched subscription IPC`);
+      }
+      (match[1] === 'on' ? onChannels : removeChannels).push(channel);
+    }
+    if (onChannels.length !== 1 || removeChannels.length !== 1 ||
+        !/contextBridge\s*\.\s*exposeInMainWorld\s*\(\s*['"]bitbookWallet['"]/.test(source)) {
+      throw new PolicyError(`${rel} must expose one bounded wallet subscription bridge`);
+    }
+  }
+}
+
 function checkPackageJson(packageText) {
   let pkg;
   try {
@@ -1583,6 +1720,9 @@ function checkPackageJson(packageText) {
   if (pkg.scripts[WALLET_TEST_SCRIPT] !== WALLET_TEST_CMD) {
     throw new PolicyError(`package.json must expose ${WALLET_TEST_SCRIPT} as ${WALLET_TEST_CMD}`);
   }
+  if (pkg.scripts[BROKER_TEST_SCRIPT] !== BROKER_TEST_COMMAND) {
+    throw new PolicyError(`package.json must expose ${BROKER_TEST_SCRIPT} as the exact broker tests`);
+  }
   if (pkg.scripts.test !== TOP_LEVEL_TEST_CMD) {
     throw new PolicyError('package.json top-level npm test must include the exact wallet contract command');
   }
@@ -1593,6 +1733,11 @@ function checkPackageJson(packageText) {
   for (const command of WALLET_BUILD_COMMANDS) {
     if (!buildCommands.includes(command)) {
       throw new PolicyError(`package.json wallet build syntax omits ${command}`);
+    }
+  }
+  for (const command of BROKER_BUILD_COMMANDS) {
+    if (!buildCommands.includes(command)) {
+      throw new PolicyError(`package.json wallet broker build syntax omits ${command}`);
     }
   }
   if (!pkg.scripts.start || !pkg.scripts.start.includes('--no-sandbox')) {
@@ -1617,6 +1762,11 @@ function checkRepository(root) {
     const sourcePath = path.join(root, rel);
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkWalletContractSource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
+  for (const rel of BROKER_BOUNDARY_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkWalletBoundarySource(fs.readFileSync(sourcePath, 'utf8'), rel);
   }
   const social = loadWorkflow(path.join(root, '.github/workflows/social.yml'));
   const security = loadWorkflow(path.join(root, '.github/workflows/security.yml'));
@@ -1670,6 +1820,15 @@ module.exports = {
   WALLET_CONTRACT_PATHS,
   WALLET_BUILD_COMMANDS,
   WALLET_IMPORT_ALLOWLIST,
+  BROKER_BOUNDARY_PATHS,
+  BROKER_TEST_COMMANDS,
+  BROKER_TEST_SCRIPT,
+  BROKER_TEST_COMMAND,
+  BROKER_CI_COMMAND,
+  BROKER_BUILD_COMMANDS,
+  BROKER_IMPORT_ALLOWLISTS,
+  PRELOAD_INVOKE_CHANNELS,
+  PRELOAD_SUBSCRIBE_CHANNEL,
   parseYaml,
   loadWorkflow,
   eventTriggers,
@@ -1683,6 +1842,7 @@ module.exports = {
   checkSbomWorkflow,
   checkPackageJson,
   checkWalletContractSource,
+  checkWalletBoundarySource,
   checkRepository,
   checkGitleaksRatchetBytes,
   checkInheritedLoaderNeutralization,
