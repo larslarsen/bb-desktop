@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: POST-RED TEST CONTRACT CORRECTION 04 AUTHORIZED — PRODUCTION NOT AUTHORIZED
+State: CORRECTION 04 TEST SOURCE ACCEPTED — POLICY RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,13 +16,14 @@ Source baseline: `d472785ab896bb5d1367c4117ffd659a9a8512ae`
 in this repository. Its accepted test source and expected-red evidence are preserved at
 commit `a8a70a520ad0a02696086f1f8e79d198ef98f72e`. Before issuing any production handoff,
 the reviewer found that the inherited exact three-suite `npm test` assertion conflicts
-with the new requirement to include `npm run test:wallet-broker`. Only
-[Correction 04](CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_04.md) may edit the shared
-`TOP_LEVEL_TEST_CMD` in `test/securityPolicy.node.js` to append that broker command.
-Production, package/workflow/policy implementation, evidence revision, native binary,
-Rust install, wallet, node, network service, hardware, and device work remain
-unauthorized until the reviewer accepts the correction and independently records its
-revised policy expected red.
+with the new requirement to include `npm run test:wallet-broker`. Sol Correction 04 is
+reviewer-accepted at 1,574 lines and SHA-256
+`1414a32cb114b1467c9d39bbcbf02228aa185857b0ccc304cd4356be9a02507b`.
+Only [the Luna Correction 04 policy-red handoff](CODEX_LUNA_BBD_WAL_003_CORRECTION_04_RED.md)
+may execute the corrected policy suite, record its exact 53-pass/5-fail result, and commit
+the correction/evidence. Production, package/workflow/policy implementation, native
+binary, Rust install, wallet, node, network service, hardware, and device work remain
+unauthorized until the reviewer accepts that revised policy expected red.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
