@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: PRODUCTION CORRECTION 02 REVIEW INCOMPLETE — CORRECTION 03 AUTHORIZED
+State: PRODUCTION CORRECTION 03 ACCEPTED — GREEN RESUME 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -38,9 +38,12 @@ explicit string guards for the same validation defect family in protocol, superv
 Electron main. Its guards are accepted, but review found the exported session-hash
 function still coerces its four PID/nonce inputs. Only
 [Production Correction 03](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md) may close
-that final protocol-only boundary. Execution, native binary, Rust install, wallet, node,
-network service, hardware, and device work remain unauthorized pending renewed reviewer
-acceptance.
+that final protocol-only boundary. Its exact protocol source is reviewer-accepted at 340
+lines and SHA-256
+`79b0ac8bdd1dc6f4d54793dd1137ae72172688412eefbbe853f1cc421be630f4`.
+Only [Green Resume 01](CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md) may rerun the full local
+gate sequence and integrate on exact green. Native binary, Rust install, wallet, node,
+network service, hardware, and device work remain unauthorized.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit

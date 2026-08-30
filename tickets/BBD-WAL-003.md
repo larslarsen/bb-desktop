@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: PRODUCTION CORRECTION 02 REVIEW INCOMPLETE — CORRECTION 03 AUTHORIZED
+Status: PRODUCTION CORRECTION 03 ACCEPTED — GREEN RESUME 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -182,4 +182,8 @@ string guards for that validation defect family in protocol, supervisor, and Ele
 main. Those guards are accepted, but the exported session-hash function still coerces its
 four PID/nonce inputs. Only
 `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md` may close that final
-protocol-only boundary. Execution, falsification, and CI review remain unauthorized.
+protocol-only boundary. Its exact 340-line protocol source at SHA-256
+`79b0ac8bdd1dc6f4d54793dd1137ae72172688412eefbbe853f1cc421be630f4` is reviewer-accepted.
+Only `docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md` may rerun the full local
+gate sequence and integrate on exact green. Falsification and CI review remain later
+gates.
