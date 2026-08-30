@@ -340,3 +340,8 @@ Luna's restored green passed Electron 13/13 and policy 49/50. The only failure i
 over-eager checker branch that labels a valid ninth fingerprint as trailing bytes before
 the intended extra-count rule. Correction 04 Oracle 02 authorizes Grok to remove only
 that premature branch in `scripts/security-policy.js`. Luna remains stopped.
+
+Oracle 02 was delivered and reviewer-accepted at checker SHA-256
+`c693e4055c0da3d244603857b44a6ea849d1ebb521624cce698d3bc87894f72a`.
+All other accepted hashes remain unchanged. Luna resumes from restored green without
+repeating its completed Correction 04 red/restore.

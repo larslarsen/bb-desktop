@@ -216,7 +216,7 @@ nothing. Oracle 01 then changed only that test file. Final accepted hashes:
 306def13efe09ee6d435dc5ad0b206e65731c3e536aa6e708a67c340dbb81fce  .gitleaksignore                       8 lines
 c81417697b3a01dfbbd7c4ef71b7dd21665e999bc49dfdfeced02e276d7bc0c6  js/utils/metrics.js                 166 lines
 376b0ff528931d4cb9db3c427600e5e4d89aa0218f4cff0e469692bb594e244d  js/utils/feedback.js                  2 lines
-3a100adc33b7d95cc2e51c158d13d2640a2fd7baae7fe5fdca789d3e82858a09  scripts/security-policy.js          1587 lines
+c693e4055c0da3d244603857b44a6ea849d1ebb521624cce698d3bc87894f72a  scripts/security-policy.js          1584 lines
 38836e829d2edcb9941fb40139d5e32146e781b5447b542791b8cbd64f5a3ca7  .github/workflows/security.yml        49 lines
 ```
 
@@ -240,3 +240,9 @@ Correction-04-specific red/falsifications, restore and hash-check after every bo
 patch, rerun all corrected gates, require both exact Gitleaks commands to return zero,
 then perform the unchanged manual SBOM/evidence/commit/push sequence. Any failure or
 finding stops before later work and Git.
+
+Oracle 02 was delivered as the exact one-branch removal. Reviewer independently
+reproduced checker SHA-256
+`c693e4055c0da3d244603857b44a6ea849d1ebb521624cce698d3bc87894f72a`
+at 1584 lines and confirmed every other accepted hash is unchanged. The corrected checker
+is accepted. The source-delivery table above now contains the authoritative final hash.

@@ -91,3 +91,11 @@ verify exact paths and unchanged package lock, final `git diff --check`, commit 
 BBD-SEC-001 source/evidence, push `origin/master`, and stop for reviewer inspection.
 Record exact commands, versions, counts, exit codes, hashes, safe summaries, commit, and
 push result.
+
+## Oracle 02 resume
+
+The correction-specific bounded red/restore was already completed before restored green
+stopped at policy 49/50. Do not repeat it. Verify the final checker hash from the accepted
+Correction 04 report, then restart restored green at Electron 13/13, policy 50/50,
+checker, and audit. Continue with the still-unrun Correction 04 falsifications and later
+acceptance only on full green.
