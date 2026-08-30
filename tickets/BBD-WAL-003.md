@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: PRODUCTION SOURCE REVIEW REJECTED — CORRECTION 01 AUTHORIZED
+Status: PRODUCTION SOURCE ACCEPTED — LOCAL GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -172,5 +172,7 @@ its first eight-path drop was reviewer-rejected before execution because the pub
 supervisor rejected the two no-payload Electron calls instead of mapping them to strict
 empty broker parameters. Only
 `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_01.md` may edit
-`wallet-broker/supervisor.js` to correct that mismatch. Execution and integration remain
-unauthorized pending reviewer source acceptance.
+`wallet-broker/supervisor.js` to correct that mismatch. The reviewer accepts its narrow
+normalization and the complete eight-path production hash set. Only
+`docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN.md` may now run the named local gates and
+integrate/push after exact green. Falsification and CI review remain later gates.
