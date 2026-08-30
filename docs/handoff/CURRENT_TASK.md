@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-001
 
-State: CORRECTION 01 — SOURCE ONLY
+State: CORRECTION 02 — SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -15,11 +15,12 @@ owner's decision to support built-in shielded ZEC and optional local-node XMR fr
 beginning, with software, hardware-backed, and watch-only accounts shaped by a common
 contract. Ledger and Trezor support are first-class requirements.
 
-Grok's initial architecture source is not accepted. Reviewer found protocol-fact,
-canonicalization, state-machine, XMR RPC, IPC, and Electron authorization-boundary
-blockers. Only the bounded source correction in
-[GROK_BUILD_BBD_WAL_001_CORRECTION_01.md](GROK_BUILD_BBD_WAL_001_CORRECTION_01.md) is
-authorized. Grok may edit only
+Correction 01 resolved the protocol-fact, canonicalization, state-machine, XMR RPC, IPC,
+and Electron authorization blockers. Before integration, the owner identified the
+inherited OB1 exchange-rate dependency. Only the bounded rate architecture and validation
+fixes in
+[GROK_BUILD_BBD_WAL_001_CORRECTION_02.md](GROK_BUILD_BBD_WAL_001_CORRECTION_02.md) are
+now authorized. Grok may edit only
 [BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) and must run nothing.
 Codex Luna remains stopped.
 
@@ -30,6 +31,10 @@ broadcast authority. The broker owns the native authorization surface. Product/g
 wallet HTTP is forbidden; authenticated loopback XMR wallet RPC remains contained behind
 the broker. The inherited OpenBazaar wallet and deprecated `../go-ipfs` are not
 implementation foundations.
+
+Exchange rates are optional, untrusted presentation data. Exact atomic ZEC/XMR amounts
+remain authoritative, and payments must work when every quote source is unavailable. The
+legacy daemon route, `ticker.openbazaar.org`, and old exchange fallbacks are rejected.
 
 BBD-SEC-001 remains complete and accepted at implementation commit
 `47bf45884d737b4b89571f06d8ba3b4e20238bfb`, with documentation acceptance commit

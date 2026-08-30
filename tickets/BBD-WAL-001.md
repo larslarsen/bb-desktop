@@ -1,6 +1,6 @@
 # BBD-WAL-001 — Dual-Coin Wallet Architecture Review
 
-Status: CORRECTION 01 — SOURCE ONLY
+Status: CORRECTION 02 — SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -177,3 +177,27 @@ The exact correction contract is
 [`GROK_BUILD_BBD_WAL_001_CORRECTION_01.md`](../docs/handoff/GROK_BUILD_BBD_WAL_001_CORRECTION_01.md).
 Grok may edit only the same architecture document and must run nothing. Luna remains
 stopped until the reviewer accepts the corrected source and records its exact hash.
+
+## Reviewer source decision — Correction 02
+
+Correction 01 source at 1,776 lines and SHA-256
+`6389f4b920c594f97e3d2eb8048d308ab563c2cce23f345f1279982d57283aa4` resolves the seven
+original blockers. Before integration, the owner identified one omitted inherited
+dependency: exchange-rate display. Reviewer trace established:
+
+- the inherited desktop polls local daemon endpoint `/ob/exchangerates/<coin>` every five
+  minutes;
+- the daemon delegates to the inherited multiwallet exchange-rate providers;
+- the ZEC provider tries `https://ticker.openbazaar.org/api` first, then historical
+  Bittrex, Bitfinex, Poloniex, and Kraken endpoints;
+- OB1 released MIT-licensed `OpenBazaar/tickerproxy`, but it is a 2018-era
+  BitcoinAverage-backed caching/S3 service and is not a current production foundation.
+
+The architecture must include a replacement before acceptance. It must not revive the
+daemon wallet endpoint, put rate fetching in the wallet broker's trusted core, trust P2P
+peers as price oracles, or make wallet availability depend on fiat data. It must also fix
+the remaining Unicode/timestamp validation imprecision found during reviewer inspection.
+
+The exact bounded contract is
+[`GROK_BUILD_BBD_WAL_001_CORRECTION_02.md`](../docs/handoff/GROK_BUILD_BBD_WAL_001_CORRECTION_02.md).
+Grok may edit only the architecture document and must run nothing. Luna remains stopped.
