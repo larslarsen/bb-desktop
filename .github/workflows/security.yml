@@ -5,6 +5,7 @@ on:
     paths:
       - "social-main.js"
       - "social/**"
+      - "wallet-contract/**"
       - "test/**"
       - "scripts/security-policy.js"
       - "scripts/validate-sbom.js"

@@ -5,6 +5,7 @@ on:
     paths:
       - "social-main.js"
       - "social/**"
+      - "wallet-contract/**"
       - "test/**"
       - "package.json"
       - "package-lock.json"
@@ -18,6 +19,7 @@ on:
     paths:
       - "social-main.js"
       - "social/**"
+      - "wallet-contract/**"
       - "test/**"
       - "package.json"
       - "package-lock.json"
@@ -43,6 +45,7 @@ jobs:
       - run: npm run build
       - run: npm run test:social
       - run: npm run test:security
+      - run: npm run test:wallet
 
   package-linux:
     if: github.event_name == 'workflow_dispatch'

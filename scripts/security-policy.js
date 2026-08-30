@@ -112,6 +112,49 @@ const SECURITY_PATHS = [
   'js/utils/feedback.js',
 ];
 
+const WALLET_TEST_SCRIPT = 'test:wallet';
+const WALLET_TEST_CMD = 'node test/walletContract.node.js';
+const WALLET_CI_CMD = 'npm run test:wallet';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet';
+const WALLET_SOURCE_FILTER = 'wallet-contract/**';
+const WALLET_CONTRACT_PATHS = [
+  'wallet-contract/canonical.js',
+  'wallet-contract/framing.js',
+  'wallet-contract/model.js',
+  'wallet-contract/state-machine.js',
+  'wallet-contract/fakes.js',
+  'wallet-contract/index.js',
+];
+const WALLET_BUILD_COMMANDS = WALLET_CONTRACT_PATHS.map((rel) => `node --check ${rel}`);
+const WALLET_IMPORT_ALLOWLIST = [
+  'crypto',
+  'node:crypto',
+  'buffer',
+  'node:buffer',
+  './canonical',
+  './canonical.js',
+  './framing',
+  './framing.js',
+  './model',
+  './model.js',
+  './state-machine',
+  './state-machine.js',
+  './fakes',
+  './fakes.js',
+  './index',
+  './index.js',
+];
+const SOCIAL_WORKFLOW_PATHS = [
+  ...SOCIAL_PATHS.slice(0, 2),
+  WALLET_SOURCE_FILTER,
+  ...SOCIAL_PATHS.slice(2),
+];
+const SECURITY_WORKFLOW_PATHS = [
+  ...SECURITY_PATHS.slice(0, 2),
+  WALLET_SOURCE_FILTER,
+  ...SECURITY_PATHS.slice(2),
+];
+
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
   '**/*',
@@ -945,7 +988,7 @@ function checkSocialWorkflow(text, data) {
     throw new PolicyError(`${name} must trigger on push, pull_request, and workflow_dispatch`);
   }
   for (const event of ['push', 'pull_request']) {
-    checkPathFilter(triggerPaths(data, event), SOCIAL_PATHS, name, event);
+    checkPathFilter(triggerPaths(data, event), SOCIAL_WORKFLOW_PATHS, name, event);
   }
   const dispatch = triggers.workflow_dispatch;
   if (dispatch !== null && !(dispatch && typeof dispatch === 'object' && !Array.isArray(dispatch) && Object.keys(dispatch).length === 0)) {
@@ -997,7 +1040,7 @@ function checkSocialWorkflow(text, data) {
     }
   }
 
-  for (const command of [BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD]) {
+  for (const command of [BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD]) {
     if (!routineCommands.includes(command)) {
       throw new PolicyError(`${name} missing command ${command}`);
     }
@@ -1380,7 +1423,7 @@ function checkSecurityWorkflow(text, data) {
   if (!sameSet(Object.keys(triggers), ['pull_request', 'workflow_dispatch'])) {
     throw new PolicyError(`${name} must trigger only on pull_request and workflow_dispatch`);
   }
-  checkPathFilter(triggerPaths(data, 'pull_request'), SECURITY_PATHS, name, 'pull_request');
+  checkPathFilter(triggerPaths(data, 'pull_request'), SECURITY_WORKFLOW_PATHS, name, 'pull_request');
   const dispatch = triggers.workflow_dispatch;
   if (dispatch !== null && dispatch !== undefined && Object.keys(dispatch || {}).length) {
     throw new PolicyError(`${name} workflow_dispatch must not add extra configuration`);
@@ -1481,9 +1524,46 @@ function checkNoPackageOrUploadExceptSbom(data, text, workflowName) {
   }
 }
 
-function checkPackageJson(root) {
-  const pkgPath = path.join(root, 'package.json');
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+function literalModuleSpecifier(expression) {
+  const match = expression.trim().match(/^(['"])([^'"]+)\1$/);
+  return match ? match[2] : null;
+}
+
+function checkWalletContractSource(source, rel) {
+  if (typeof source !== 'string' || !source.trim()) {
+    throw new PolicyError(`wallet source ${rel} is empty`);
+  }
+  const allowed = new Set(WALLET_IMPORT_ALLOWLIST);
+  const callPattern = /\b(require|import)\s*\(([^)]*)\)/g;
+  let match;
+  while ((match = callPattern.exec(source)) !== null) {
+    const specifier = literalModuleSpecifier(match[2]);
+    if (!specifier || !allowed.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted ${match[1]} module load`);
+    }
+  }
+  const staticPattern = /\bimport\s+(?!\s*\()([^;\n]+)/g;
+  while ((match = staticPattern.exec(source)) !== null) {
+    const clause = match[1].trim();
+    const direct = clause.match(/^(['"])([^'"]+)\1$/);
+    const from = clause.match(/\bfrom\s+(['"])([^'"]+)\1$/);
+    const specifier = direct ? direct[2] : from ? from[2] : null;
+    if (!specifier || !allowed.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted static import`);
+    }
+  }
+  if (/\bfetch\s*\(/.test(source) || /\b(?:new\s+)?WebSocket\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden network capability`);
+  }
+}
+
+function checkPackageJson(packageText) {
+  let pkg;
+  try {
+    pkg = JSON.parse(packageText);
+  } catch (error) {
+    throw new PolicyError(`package.json is not valid JSON: ${error.message}`);
+  }
   if (pkg.main !== 'social-main.js') {
     throw new PolicyError('package.json main must remain social-main.js');
   }
@@ -1499,6 +1579,21 @@ function checkPackageJson(root) {
   }
   if (!pkg.scripts || pkg.scripts['test:security'] !== TEST_SECURITY_SCRIPT) {
     throw new PolicyError('package.json must expose test:security');
+  }
+  if (pkg.scripts[WALLET_TEST_SCRIPT] !== WALLET_TEST_CMD) {
+    throw new PolicyError(`package.json must expose ${WALLET_TEST_SCRIPT} as ${WALLET_TEST_CMD}`);
+  }
+  if (pkg.scripts.test !== TOP_LEVEL_TEST_CMD) {
+    throw new PolicyError('package.json top-level npm test must include the exact wallet contract command');
+  }
+  if (typeof pkg.scripts.build !== 'string') {
+    throw new PolicyError('package.json build script is missing');
+  }
+  const buildCommands = pkg.scripts.build.split(/\s*&&\s*/);
+  for (const command of WALLET_BUILD_COMMANDS) {
+    if (!buildCommands.includes(command)) {
+      throw new PolicyError(`package.json wallet build syntax omits ${command}`);
+    }
   }
   if (!pkg.scripts.start || !pkg.scripts.start.includes('--no-sandbox')) {
     throw new PolicyError('package.json must preserve the labeled dev-only --no-sandbox start workaround');
@@ -1517,7 +1612,12 @@ function checkRepository(root) {
     fs.readFileSync(path.join(root, 'js/utils/metrics.js'), 'utf8'),
     fs.readFileSync(path.join(root, 'js/utils/feedback.js'), 'utf8')
   );
-  checkPackageJson(root);
+  checkPackageJson(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  for (const rel of WALLET_CONTRACT_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkWalletContractSource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
   const social = loadWorkflow(path.join(root, '.github/workflows/social.yml'));
   const security = loadWorkflow(path.join(root, '.github/workflows/security.yml'));
   const sbom = loadWorkflow(path.join(root, '.github/workflows/sbom.yml'));
@@ -1567,6 +1667,9 @@ module.exports = {
   SBOM_RETENTION_DAYS,
   SOCIAL_PATHS,
   SECURITY_PATHS,
+  WALLET_CONTRACT_PATHS,
+  WALLET_BUILD_COMMANDS,
+  WALLET_IMPORT_ALLOWLIST,
   parseYaml,
   loadWorkflow,
   eventTriggers,
@@ -1578,6 +1681,8 @@ module.exports = {
   checkSocialWorkflow,
   checkSecurityWorkflow,
   checkSbomWorkflow,
+  checkPackageJson,
+  checkWalletContractSource,
   checkRepository,
   checkGitleaksRatchetBytes,
   checkInheritedLoaderNeutralization,

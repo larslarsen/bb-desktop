@@ -1185,6 +1185,188 @@ test('inherited metrics and feedback loaders are structurally neutralized and un
   }
 });
 
+const WALLET_TEST_SCRIPT = 'test:wallet';
+const WALLET_TEST_CMD = 'node test/walletContract.node.js';
+const WALLET_CI_CMD = 'npm run test:wallet';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet';
+const WALLET_SOURCE_FILTER = 'wallet-contract/**';
+const WALLET_CONTRACT_PATHS = [
+  'wallet-contract/canonical.js',
+  'wallet-contract/framing.js',
+  'wallet-contract/model.js',
+  'wallet-contract/state-machine.js',
+  'wallet-contract/fakes.js',
+  'wallet-contract/index.js',
+];
+const WALLET_BUILD_COMMANDS = WALLET_CONTRACT_PATHS.map((rel) => `node --check ${rel}`);
+const WALLET_IMPORT_ALLOWLIST = [
+  'crypto',
+  'node:crypto',
+  'buffer',
+  'node:buffer',
+  './canonical',
+  './canonical.js',
+  './framing',
+  './framing.js',
+  './model',
+  './model.js',
+  './state-machine',
+  './state-machine.js',
+  './fakes',
+  './fakes.js',
+  './index',
+  './index.js',
+];
+
+function assertedTriggerPaths(workflow, workflowName) {
+  const triggers = workflow.data.on;
+  assert.ok(triggers && typeof triggers === 'object', `${workflowName} workflow triggers are missing`);
+  const paths = [];
+  for (const triggerName of ['push', 'pull_request']) {
+    const trigger = triggers[triggerName];
+    if (!trigger) {
+      continue;
+    }
+    assert.ok(Array.isArray(trigger.paths), `${workflowName} ${triggerName} paths are missing`);
+    paths.push([triggerName, trigger.paths]);
+  }
+  assert.ok(paths.length > 0, `${workflowName} has no maintained-source path-filtered trigger`);
+  return paths;
+}
+
+test('wallet contract package command and maintained-source policy are exact and fail closed', () => {
+  const policy = loadPolicy();
+  const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
+  const pkg = JSON.parse(packageText);
+  assert.ok(pkg.scripts && typeof pkg.scripts === 'object', 'package scripts are missing');
+  assert.strictEqual(pkg.scripts[WALLET_TEST_SCRIPT], WALLET_TEST_CMD);
+  assert.strictEqual(pkg.scripts.test, TOP_LEVEL_TEST_CMD);
+  assert.strictEqual(typeof pkg.scripts.build, 'string');
+  const buildCommands = pkg.scripts.build.split(/\s*&&\s*/);
+  for (const command of WALLET_BUILD_COMMANDS) {
+    assert.ok(buildCommands.includes(command), `build syntax path omits ${command}`);
+  }
+  assert.deepStrictEqual(policy.WALLET_CONTRACT_PATHS, WALLET_CONTRACT_PATHS);
+  assert.deepStrictEqual(policy.WALLET_BUILD_COMMANDS, WALLET_BUILD_COMMANDS);
+  assert.strictEqual(typeof policy.checkPackageJson, 'function');
+  policy.checkPackageJson(packageText);
+
+  const mutatedPackage = JSON.stringify(
+    Object.assign({}, pkg, { scripts: Object.assign({}, pkg.scripts, { [WALLET_TEST_SCRIPT]: 'echo skipped' }) })
+  );
+  assertRejects(() => policy.checkPackageJson(mutatedPackage), /wallet|test:wallet|walletContract/i);
+
+  const missingTopLevelWallet = JSON.stringify(
+    Object.assign({}, pkg, {
+      scripts: Object.assign({}, pkg.scripts, {
+        test: 'npm run test:social && npm run test:security',
+      }),
+    })
+  );
+  assertRejects(() => policy.checkPackageJson(missingTopLevelWallet), /wallet|top-level|npm test/i);
+
+  for (const command of WALLET_BUILD_COMMANDS) {
+    const missingBuildCommand = JSON.stringify(
+      Object.assign({}, pkg, {
+        scripts: Object.assign({}, pkg.scripts, {
+          build: pkg.scripts.build
+            .split(/\s*&&\s*/)
+            .filter((candidate) => candidate !== command)
+            .join(' && '),
+        }),
+      })
+    );
+    assertRejects(() => policy.checkPackageJson(missingBuildCommand), /wallet|build|syntax|node --check/i);
+  }
+});
+
+test('wallet maintained-source checker permits only exact literal pure sibling, crypto, and buffer module loads', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkWalletContractSource, 'function');
+  assert.deepStrictEqual(policy.WALLET_IMPORT_ALLOWLIST, WALLET_IMPORT_ALLOWLIST);
+  for (const specifier of WALLET_IMPORT_ALLOWLIST) {
+    for (const source of [
+      `module.exports = require('${specifier}');`,
+      `import '${specifier}';`,
+      `async function load() { return import('${specifier}'); }`,
+    ]) {
+      policy.checkWalletContractSource(source, 'wallet-contract/synthetic.js');
+    }
+  }
+  for (const specifier of [
+    '../canonical',
+    '../wallet-contract/canonical',
+    '/wallet-contract/canonical.js',
+    'C:/wallet-contract/canonical.js',
+    './other',
+    'left-pad',
+    'path',
+    'child_process',
+    'node:fs',
+    'net',
+    'electron',
+    'usb',
+    'node-hid',
+    'worker_threads',
+  ]) {
+    for (const source of [
+      `module.exports = require('${specifier}');`,
+      `import '${specifier}';`,
+      `async function load() { return import('${specifier}'); }`,
+    ]) {
+      assertRejects(
+        () => policy.checkWalletContractSource(source, 'wallet-contract/synthetic.js'),
+        /wallet|allowlist|computed|module|source/i
+      );
+    }
+  }
+  for (const source of [
+    "const name = 'crypto'; module.exports = require(name);",
+    "module.exports = require('child_' + 'process');",
+    'module.exports = require(`crypto`);',
+    "const name = 'crypto'; async function load() { return import(name); }",
+    "async function load() { return import('child_' + 'process'); }",
+    'async function load() { return import(`crypto`); }',
+    "fetch('https://example.invalid')",
+    "new WebSocket('wss://example.invalid')",
+  ]) {
+    assertRejects(
+      () => policy.checkWalletContractSource(source, 'wallet-contract/synthetic.js'),
+      /wallet|forbidden|allowlist|computed|capability|module|network|source/i
+    );
+  }
+});
+
+test('wallet maintained-source filters are required on every routine social and security trigger', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  for (const [name, workflow, checker] of [
+    ['social', workflows.social, policy.checkSocialWorkflow],
+    ['security', workflows.security, policy.checkSecurityWorkflow],
+  ]) {
+    for (const [, paths] of assertedTriggerPaths(workflow, name)) {
+      assert.ok(paths.includes(WALLET_SOURCE_FILTER), `${name} workflow omits ${WALLET_SOURCE_FILTER}`);
+    }
+    assert.ok(workflow.text.includes(`      - "${WALLET_SOURCE_FILTER}"\n`));
+    const mutated = replaceOnce(workflow.text, `      - "${WALLET_SOURCE_FILTER}"\n`, '');
+    assertRejects(() => checker.call(policy, mutated), /wallet-contract|wallet|path/i);
+  }
+});
+
+test('routine CI executes the exact wallet contract command and rejects its removal', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  const routineCommands = [];
+  for (const [, job, step] of policy.iterSteps(workflows.social.data)) {
+    if (!job.if) {
+      routineCommands.push(...policy.stepRunLines(step));
+    }
+  }
+  assert.ok(routineCommands.includes(WALLET_CI_CMD), `routine CI omits ${WALLET_CI_CMD}`);
+  const mutated = replaceOnce(workflows.social.text, `      - run: ${WALLET_CI_CMD}\n`, '');
+  assertRejects(() => policy.checkSocialWorkflow(mutated), /wallet|test:wallet|walletContract/i);
+});
+
 function run() {
   let failed = 0;
   for (const { name, fn } of tests) {

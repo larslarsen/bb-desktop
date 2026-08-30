@@ -478,6 +478,137 @@ test('maintained source has no HTML injection, eval, or javascript: sinks', () =
   assert.strictEqual(scanned.length, 4);
 });
 
+const WALLET_CONTRACT_MAINTAINED_PATHS = [
+  path.join('wallet-contract', 'canonical.js'),
+  path.join('wallet-contract', 'framing.js'),
+  path.join('wallet-contract', 'model.js'),
+  path.join('wallet-contract', 'state-machine.js'),
+  path.join('wallet-contract', 'fakes.js'),
+  path.join('wallet-contract', 'index.js'),
+];
+
+const WALLET_IMPORT_ALLOWLIST = new Set([
+  'crypto',
+  'node:crypto',
+  'buffer',
+  'node:buffer',
+  './canonical',
+  './canonical.js',
+  './framing',
+  './framing.js',
+  './model',
+  './model.js',
+  './state-machine',
+  './state-machine.js',
+  './fakes',
+  './fakes.js',
+  './index',
+  './index.js',
+]);
+
+function literalModuleSpecifier(expression) {
+  const match = expression.trim().match(/^(['"])([^'"]+)\1$/);
+  return match ? match[2] : null;
+}
+
+function assertWalletImportAllowlist(source, rel) {
+  const callPattern = /\b(require|import)\s*\(([^)]*)\)/g;
+  let match;
+  while ((match = callPattern.exec(source)) !== null) {
+    const specifier = literalModuleSpecifier(match[2]);
+    if (!specifier || !WALLET_IMPORT_ALLOWLIST.has(specifier)) {
+      throw new PolicyError(`${rel} contains non-allowlisted or computed ${match[1]} module load`);
+    }
+  }
+
+  const staticPattern = /\bimport\s+(?!\s*\()([^;\n]+)/g;
+  while ((match = staticPattern.exec(source)) !== null) {
+    const clause = match[1].trim();
+    const direct = clause.match(/^(['"])([^'"]+)\1$/);
+    const from = clause.match(/\bfrom\s+(['"])([^'"]+)\1$/);
+    const specifier = direct ? direct[2] : from ? from[2] : null;
+    if (!specifier || !WALLET_IMPORT_ALLOWLIST.has(specifier)) {
+      throw new PolicyError(`${rel} contains non-allowlisted static import`);
+    }
+  }
+
+  if (/\bfetch\s*\(/.test(source) || /\b(?:new\s+)?WebSocket\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden network capability`);
+  }
+}
+
+test('wallet reference contract is maintained source and retains an offline inert boundary', () => {
+  assert.deepStrictEqual(
+    WALLET_CONTRACT_MAINTAINED_PATHS.map((rel) => rel.split(path.sep).join('/')),
+    [
+      'wallet-contract/canonical.js',
+      'wallet-contract/framing.js',
+      'wallet-contract/model.js',
+      'wallet-contract/state-machine.js',
+      'wallet-contract/fakes.js',
+      'wallet-contract/index.js',
+    ]
+  );
+  for (const rel of WALLET_CONTRACT_MAINTAINED_PATHS) {
+    const abs = path.join(repoRoot, rel);
+    assert.ok(fs.existsSync(abs), `maintained wallet reference source ${rel} is missing`);
+    const source = fs.readFileSync(abs, 'utf8');
+    assert.ok(source.trim(), `maintained wallet reference source ${rel} is empty`);
+    for (const sink of FORBIDDEN_MAINTAINED_SINKS) {
+      assert.ok(!source.includes(sink), `${rel} contains forbidden maintained-source sink ${JSON.stringify(sink)}`);
+    }
+    assertWalletImportAllowlist(source, rel);
+  }
+
+  for (const specifier of WALLET_IMPORT_ALLOWLIST) {
+    for (const source of [
+      `require('${specifier}')`,
+      `import '${specifier}'`,
+      `import('${specifier}')`,
+    ]) {
+      assert.doesNotThrow(() => assertWalletImportAllowlist(source, 'wallet-contract/synthetic.js'));
+    }
+  }
+  for (const specifier of [
+    '../canonical',
+    '../wallet-contract/canonical',
+    '/wallet-contract/canonical.js',
+    'C:/wallet-contract/canonical.js',
+    './other',
+    'left-pad',
+    'path',
+    'node:fs',
+    'child_process',
+    'electron',
+  ]) {
+    for (const source of [
+      `require('${specifier}')`,
+      `import '${specifier}'`,
+      `import('${specifier}')`,
+    ]) {
+      assert.throws(
+        () => assertWalletImportAllowlist(source, 'wallet-contract/synthetic.js'),
+        PolicyError
+      );
+    }
+  }
+  for (const source of [
+    "const name = 'crypto'; require(name)",
+    "require('child_' + 'process')",
+    'require(`crypto`)',
+    "const name = 'crypto'; import(name)",
+    "import('child_' + 'process')",
+    'import(`crypto`)',
+    "fetch('https://example.invalid')",
+    "new WebSocket('wss://example.invalid')",
+  ]) {
+    assert.throws(
+      () => assertWalletImportAllowlist(source, 'wallet-contract/synthetic.js'),
+      PolicyError
+    );
+  }
+});
+
 function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
