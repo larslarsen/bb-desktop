@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: CORRECTION 02 AUTHORIZED — TEST SOURCE ONLY
+State: CORRECTION 03 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -13,7 +13,7 @@ Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 [BBD-WAL-002](../../tickets/BBD-WAL-002.md) is the only authorized work. The current
 phase authorizes temporary Sr Dev — Codex Sol to correct its test source only under the
 exact durable contract in
-[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md).
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_03.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_03.md).
 It must stop
 without execution, production source, dependencies, Git, network, wallets, nodes,
 devices, keys, or transaction capability.
@@ -22,13 +22,13 @@ The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
 Sol authors at High. Standing project roles are otherwise unchanged.
 
-Correction 01 resolved the initial blockers, but is not yet accepted. Reviewer XHigh
-inspection found a smaller second set recorded in Correction 02: an inherited security
-test was modified instead of leaving all old assertions untouched, strict `v: 1` and
-status/review identifier/network/pool cases remain incomplete, and computed imports can
-escape the maintained-source guard. Codex Luna must not run the expected-red commands
-until the corrected source is reviewer-accepted. Production remains unauthorized and a
-failing test tree must not be committed.
+Correction 02 resolved its named blockers, but the reviewer found that its reviewer-
+specified four-entry import allowlist accidentally rejects necessary imports between the
+six pure `wallet-contract/` sibling modules. Correction 03 permits only those exact
+sibling specifiers in addition to crypto/buffer while keeping every external, parent,
+absolute, computed, network, filesystem, and device capability closed. Codex Luna must
+not run the expected-red commands until the corrected source is reviewer-accepted.
+Production remains unauthorized and a failing test tree must not be committed.
 
 BBD-WAL-001 architecture is integrated and reviewer-accepted in commit
 `ffebcc179d3b2aaca687213de54d3c3298ac0696` at exactly 2,271 lines and SHA-256

@@ -348,3 +348,23 @@ The exact bounded correction contract is
 [`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md).
 Sol may edit only the same four test paths, may use only the previously authorized
 read-only inspection/measurement commands, and must run nothing. Luna remains stopped.
+
+## Reviewer source decision — Correction 03
+
+Correction 02 resolves all five of its source defects, but its reviewer-specified import
+allowlist is over-constrained: it rejects all relative imports, including the imports
+`wallet-contract/index.js` necessarily uses to export its five sibling modules. Forcing
+duplication or an empty façade would make the green contract structurally unsound.
+
+Permit literal relative imports only for the exact six sibling basenames
+`./canonical[.js]`, `./framing[.js]`, `./model[.js]`, `./state-machine[.js]`,
+`./fakes[.js]`, and `./index[.js]`, in addition to crypto/buffer. Continue rejecting
+parent traversal, absolute paths, other relative files, packages, built-ins, computed
+specifiers, filesystem/network/device capabilities, fetch, and WebSocket.
+
+The exact bounded correction contract is
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_03.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_03.md).
+Sol may edit only `test/electronSecurity.node.js` and `test/securityPolicy.node.js`, may
+use only the previously authorized read-only inspection/measurement commands, and must
+run nothing. The fixture and wallet test must remain byte-identical. Luna remains
+stopped.
