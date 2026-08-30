@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: TEST SOURCE REVIEWER ACCEPTED — EXPECTED RED RESUME 01 AUTHORIZED
+Status: POST-RED TEST CONTRACT CORRECTION 04 AUTHORIZED — PRODUCTION NOT AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -150,4 +150,10 @@ Correction 03 is reviewer-accepted at the exact six hashes in
 is authorized. The first four commands are accepted after the raw Electron inventory
 confirmed 13 pass / 6 expected fail; only
 `docs/handoff/CODEX_LUNA_BBD_WAL_003_RED_RESUME_01.md` may resume the policy red and
-record sequence. Production remains unauthorized until the reviewer accepts that evidence.
+record sequence. That evidence was accepted and committed at
+`a8a70a520ad0a02696086f1f8e79d198ef98f72e`, but the reviewer then found one
+unsatisfiable green-state conflict before authorizing production: the inherited exact
+three-suite `TOP_LEVEL_TEST_CMD` cannot also contain the newly required broker suite.
+Only `docs/handoff/CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_04.md` is now authorized to
+append `npm run test:wallet-broker` to that shared test constant. The policy expected red
+must then be independently rerun and accepted. Production remains unauthorized.
