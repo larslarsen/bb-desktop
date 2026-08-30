@@ -104,3 +104,8 @@ now author exactly one test file first (policy total 50), then only the exact ei
 commit fingerprint ratchet, the two inherited loader neutralizations, the policy checker,
 and security workflow. Full-history Gitleaks remains unchanged and a blocking dir scan
 is added. Grok runs nothing; Luna stays stopped until exact hashes are reviewed.
+
+Reviewer accepted the production design but stopped on one vacuous synthetic metrics
+fixture: it fails missing exports before exercising loader rejection. Correction 04
+Oracle 01 authorizes Grok to fix only `test/securityPolicy.node.js`, keep 50 tests, and
+run nothing. Luna remains stopped pending the corrected hash and review.

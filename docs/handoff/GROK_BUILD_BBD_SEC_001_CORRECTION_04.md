@@ -173,3 +173,19 @@ presence/order/flags; and structural neutralization/no-loader/no-maintained-impo
 47 prior concepts remain, with existing Gitleaks cases converted for the second scan and
 approved default ignore filename. Checker validation must reject every mutation listed
 above and must read the committed `.gitleaksignore` in `checkRepository`.
+
+## Oracle correction 01 — Authorized
+
+Reviewer source inspection rejected one test mutation before execution. The synthetic
+metrics-loader fixture is a standalone module containing only `addMetrics`; production
+`checkInheritedLoaderNeutralization` correctly checks required public exports first, so
+the test would fail for a missing export rather than the intended Countly/remote-loader
+reason. This is vacuous for the mechanism it claims to prove.
+
+Grok may edit only `test/securityPolicy.node.js`. Replace only that synthetic fixture so
+it starts from the delivered `metricsSource` and structurally replaces the exact
+`export function addMetrics() {\n}` no-op with the synthetic loader body. All public
+exports must remain, causing the checker to reach and reject the loader-specific rule.
+Keep exactly 50 tests. Do not change the synthetic token, any other test, production,
+ratchet, workflow, sensitive source, or behavior. Run nothing and report the new test
+hash and line count only.

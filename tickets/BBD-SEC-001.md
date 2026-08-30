@@ -323,3 +323,9 @@ upload, dependency, package/lockfile, maintained social runtime/CSP, SBOM, routi
 native package, unrelated inherited source, deletion/cleanup, scanner execution, Git, or
 GitHub mutation is authorized for Grok. Luna resumes only after reviewer hash/source
 acceptance.
+
+Reviewer inspection found one vacuous synthetic-loader oracle before execution: its
+standalone fixture fails the earlier public-export invariant instead of the intended
+remote-loader invariant. Correction 04 Oracle 01 authorizes Grok to edit only
+`test/securityPolicy.node.js` as specified in the handoff, preserving 50 tests and all
+production hashes. Luna remains stopped.
