@@ -7,12 +7,13 @@
   "scripts": {
     "start": "electron --no-sandbox .",
     "start:sandboxed": "electron .",
-    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js && bash -n scripts/build-deb.sh && bash -n scripts/build-macos.sh",
+    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js && node --check scripts/security-policy.js && node --check scripts/validate-sbom.js && bash -n scripts/build-deb.sh && bash -n scripts/build-macos.sh",
     "package:linux": "bash scripts/build-deb.sh",
     "package:macos": "bash scripts/build-macos.sh",
     "package:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows.ps1",
-    "test": "npm run test:social",
-    "test:social": "node test/socialCore.node.js"
+    "test": "npm run test:social && npm run test:security",
+    "test:social": "node test/socialCore.node.js",
+    "test:security": "node test/electronSecurity.node.js && node test/securityPolicy.node.js"
   },
   "repository": {
     "type": "git",

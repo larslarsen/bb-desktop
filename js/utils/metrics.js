@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import MetricsModal from '../views/modals/MetricsModal';
 import app from '../app';
-import { version } from '../../package.json';
 import { cpus, totalmem, freemem } from 'os';
 import { getCurrentConnection } from './serverConnect';
 import { remote } from 'electron';
@@ -63,45 +62,6 @@ export function isMetricRestartNeeded() {
 }
 
 export function addMetrics() {
-  // Never record metrics on testnet
-  if (app.serverConfig.testnet) return;
-
-  function loadMetrics() {
-    // Reverse the countly opt out in local storage. This is required or nothing will be tracked.
-    window.localStorage.setItem('cly_ignore', 'false');
-    metricsRestartNeeded = !!window.Countly;
-
-    //  If Countly has already been added, it won't run again until the app is restarted.
-    if (window.Countly) return;
-
-    window.Countly = {};
-    window.Countly.q = [];
-    window.Countly.app_key = '979774c41bab3a6e5232a3630e6e151e439c412e';
-    window.Countly.app_version = `client_${version}|server_${app.settings.prettyServerVer}`;
-    window.Countly.url = 'https://countly.openbazaar.org';
-    window.Countly.interval = 30000;
-    window.Countly.q.push(['track_sessions']);
-    window.Countly.q.push(['track_errors']);
-    // add anonymous details
-    window.Countly.q.push(['user_details', {
-      custom: {
-        ...userStats(),
-      },
-    }]);
-
-    const scriptEl = document.createElement('script');
-    scriptEl.id = 'metricsScrtipt';
-    scriptEl.type = 'text/javascript';
-    scriptEl.async = true;
-    scriptEl.src = 'https://countly.openbazaar.org/sdk/web/countly.min.js';
-    scriptEl.onload = () => window.Countly.init();
-    (document.getElementsByTagName('head')[0]).appendChild(scriptEl);
-  }
-  if (document.readyState === 'complete') {
-    loadMetrics();
-  } else {
-    window.addEventListener('load', loadMetrics, false);
-  }
 }
 
 export function changeMetrics(bool) {

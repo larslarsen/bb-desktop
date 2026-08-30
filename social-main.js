@@ -1,11 +1,15 @@
 'use strict';
 
 const path = require('path');
-const { app, BrowserWindow, Menu, session, shell } = require('electron');
+const { app, BrowserWindow, Menu, session } = require('electron');
 
 app.enableSandbox();
 
 let window;
+
+function denyNavigation(event) {
+  event.preventDefault();
+}
 
 function createWindow() {
   window = new BrowserWindow({
@@ -21,21 +25,16 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false,
     },
   });
   window.loadFile(path.join(__dirname, 'social', 'index.html'));
-  window.webContents.on('will-navigate', (event) => event.preventDefault());
-  window.webContents.setWindowOpenHandler(({ url }) => {
-    try {
-      const target = new URL(url);
-      if (target.protocol === 'https:' || target.protocol === 'http:') {
-        shell.openExternal(target.toString());
-      }
-    } catch (_error) {
-      // Malformed and non-web destinations remain blocked.
-    }
-    return { action: 'deny' };
-  });
+  window.webContents.on('will-navigate', denyNavigation);
+  window.webContents.on('will-redirect', denyNavigation);
+  window.webContents.on('will-attach-webview', denyNavigation);
+  window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.on('closed', () => {
     window = null;
   });
@@ -43,6 +42,7 @@ function createWindow() {
 
 app.on('ready', () => {
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+  session.defaultSession.setPermissionCheckHandler(() => false);
   Menu.setApplicationMenu(null);
   createWindow();
 });

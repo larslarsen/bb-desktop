@@ -144,3 +144,11 @@ zero vulnerabilities, and pinned CycloneDX 6.0.1 generated the approved JSON. Re
 verified the lockfile is unchanged and recorded the artifact hash in the SBOM network
 handoff. Luna resumes at audit plus local validation/metadata, then evidence and Git only
 on full green; no scanner or generation replay is needed.
+
+Luna completed the authorized final audit and existing-SBOM validation. The SBOM is
+CycloneDX 1.6 with root `bitbook-desktop`, 13 components, 14 dependency entries, 30,515
+bytes, and SHA-256
+`9a628e9ff915b7fece623b8158cbd700c80351bdbff62ba5037ce74a6a95e17f`. Full evidence is in
+`docs/security/BBD-SEC-001-EVIDENCE.md`. The complete BBD-SEC-001 source/evidence change
+is ready for reviewer inspection after the authorized commit and push; no native package
+or deprecated `go-ipfs` work was performed.
