@@ -198,3 +198,9 @@ verified by exact SHA-256 and size, followed by exact root command
 `gitleaks git --redact=100 --no-banner .`; and inclusion of the Windows build script in
 both routine path filters. No other source or behavior may change. Luna does not execute
 until reviewer accepts the bounded correction source.
+
+Correction 1 was delivered test-first and reviewer source inspection accepted the exact
+four-path hashes and fail-closed CLI design preserved in the correction handoff. Codex
+Luna may now begin the ticketed red/green/falsification and acceptance sequence. All
+original stop, disk-path, no-cleanup, no-native-package, and no-secret-output rules remain
+in force.
