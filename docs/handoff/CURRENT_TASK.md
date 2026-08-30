@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: PRODUCTION SOURCE REVIEW REJECTED — TEST CORRECTION 05 AUTHORIZED
+State: CORRECTION TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -13,13 +13,13 @@ Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 [BBD-WAL-002](../../tickets/BBD-WAL-002.md) is the only authorized work. Its
 expected-red evidence is reviewer-accepted at commit
 `3a60b33c2b4c2f8355007fbd3535066cd0a0d1c6`. The first bounded production drop is
-present but reviewer-rejected before execution. The current phase authorizes temporary
-Sr Dev — Codex Sol only under
-[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_05.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_05.md)
-to close two remaining non-vacuity gaps in the Correction 04 test-first coverage in
-`test/walletContract.node.js`. Sol must not execute commands, edit production/wiring or
-the accepted fixture and security tests, use Git, or create dependencies. Luna remains
-stopped until reviewer acceptance of the correction test source.
+present but reviewer-rejected before execution. Correction 05 test source is accepted at
+1,697 lines and SHA-256
+`3e51281d16da7eec4a178eeb799ec23e2854206a096ed741cba920fc35825ee9`, with 45 wallet
+tests total. The current phase authorizes Jr Dev — Codex Luna only under
+[`CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md`](CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md)
+to run the single wallet expected-red command, record evidence, and commit/push that
+evidence file alone. Sol is stopped. Production correction remains unauthorized.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;

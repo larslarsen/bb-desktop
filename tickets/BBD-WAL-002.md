@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: PRODUCTION SOURCE REVIEW REJECTED — TEST CORRECTION 05 AUTHORIZED
+Status: CORRECTION TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -422,3 +422,30 @@ Temporary Sr Dev — Codex Sol is now authorized only by
 [`CODEX_SOL_BBD_WAL_002_PRODUCTION.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_PRODUCTION.md)
 to author the bounded green source. Sol must not run anything or modify the accepted
 tests. Codex Luna remains stopped until reviewer source acceptance.
+
+## Reviewer source decision — production drop and Corrections 04–05
+
+The first production drop is bounded correctly but rejected before execution. XHigh
+inspection found untested fail-open behavior: prepared reviews were not bound back to the
+selected request/account; account/adapter/signer substitution and loose synthetic
+protocol pins could pass; crash recovery released or failed to reacquire account locks
+and lacked required terminal/restart behavior; injected dependency exceptions could
+escape with locks held; and the structured-log sanitizer validated field names but not
+their values.
+
+Corrections 04 and 05 add seven behavioral tests without changing the fixture or either
+security suite. Correction 05 closes the final two non-vacuity gaps by requiring a
+repeated recovery crash to be a successful snapshot-preserving no-op and proving lock
+release after an injected broadcast exception.
+
+The corrected source is accepted for expected-red execution at:
+
+- `test/walletContract.node.js`: 1,697 lines, SHA-256
+  `3e51281d16da7eec4a178eeb799ec23e2854206a096ed741cba920fc35825ee9`
+
+The accepted inventory is now 45 wallet tests: the prior 38 unchanged tests plus seven
+correction tests. Fixture, Electron-security test, security-policy test, and lockfile
+hashes remain the previously accepted values. Jr Dev — Codex Luna is authorized only by
+[`CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md`](../docs/handoff/CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md)
+to run the single wallet expected-red command and commit/push the named evidence file
+alone. Production correction remains unauthorized.
