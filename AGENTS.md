@@ -17,6 +17,13 @@ This file governs agent work in the `bb-desktop` repository.
   remain clearly labeled and must not become product installation instructions.
 - Never commit signing credentials, secrets, private keys, user data, or local absolute
   paths.
+- Never run recursive deletion through an environment variable, shell variable, command
+  substitution, glob, symlink-derived path, or other unresolved target. An authorized
+  cleanup must name an explicit reviewable path.
+- Before placing build tools, caches, binaries, or large artifacts in a temporary path,
+  inspect its filesystem type. Do not use local `/tmp` for substantial work when it is
+  RAM-backed; use an explicit disk-backed path under `/home/lars` and record it in the
+  active handoff.
 
 ## Roles
 
@@ -27,14 +34,20 @@ This file governs agent work in the `bb-desktop` repository.
   source/test integration, acceptance-command execution, implementation evidence, or
   data mutation.
 - **Implementation Dev — Codex Spark:** agentic, using GPT-5.3-Codex-Spark High. Authors
-  reviewer-bounded low/medium-risk boilerplate, scaffolding, mechanical adapters, and
-  their test source. It does not make architecture, security, sandbox, native packaging,
-  concurrency, or persistence-design decisions. It does not execute tests or own
-  integration, repository records, Git, commits, or pushes.
-- **Sr Dev — Grok Build:** agentic, using Grok 4.6 High. Authors architecture-sensitive,
-  security, sandbox, native packaging, concurrency, persistence, corrective, and other
-  senior production and test source bounded by the active ticket. It does not execute
-  tests or own integration, repository records, Git, commits, or pushes.
+  reviewer-bounded boilerplate, fixture/table plumbing, schema scaffolding, and later UI
+  wiring whose semantics are already fixed. It does not make architecture, security,
+  sandbox, native packaging, cryptography, concurrency, custody, or persistence-design
+  decisions. It does not execute tests or own integration, repository records, Git,
+  commits, or pushes.
+- **Principal Dev — Codex Sol:** agentic, using `gpt-5.6-sol` at High. Authors the
+  highest-risk trust-boundary, custody, cryptography, concurrency, persistence, native
+  process, coin-adapter, and release-gate source and test source bounded by the active
+  ticket. It does not execute tests or own integration, repository records, Git,
+  commits, or pushes.
+- **Sr Dev — Grok Build:** agentic, using Grok 4.6 High. Authors bounded protocol,
+  rate-worker, corrective, and other senior source and test source after the reviewer has
+  fixed the sensitive semantics. It does not execute tests or own integration,
+  repository records, Git, commits, or pushes.
 - **Jr Dev — Codex Luna:** agentic, using `gpt-5.6-luna`. Owns production/test
   source-drop integration, test and acceptance-command
   execution, implementation/evidence records, and the corresponding Git, commits, and
