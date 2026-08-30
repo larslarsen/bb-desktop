@@ -116,3 +116,8 @@ commit fingerprints; both inherited loaders are disabled; and security CI requir
 full-history plus current-tree Gitleaks scans. Luna now owns the durable integration in
 [Correction 04 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_04.md). Any test/scanner
 failure or finding stops before SBOM and Git.
+
+Luna's first Correction 04 resume stopped before all work because the integration handoff
+mis-transcribed the package-lock SHA-256. Reviewer recomputed it, confirmed the lockfile
+has no diff and matches the original source report, and corrected only that durable guard.
+Luna may restart the same Correction 04 contract from hash verification.

@@ -14,10 +14,15 @@ critical hashes as well:
 
 ```text
 c794d5e063bb121f52ae09bd96bb3ced061a02bc38c2f866957fe629d6999089  test/electronSecurity.node.js
-7d34769394a1630079f640cfbe19d1dd9929446003cc8fe062cbe48e0ade5413  package-lock.json
+7d347693664abe2639dfd1cd04f5f7e8757adb2dd71098b0a23b49aedade5413  package-lock.json
 ```
 
 Stop on mismatch.
+
+Guard correction: the first version of this handoff transcribed the lockfile hash
+incorrectly. Luna stopped before all work. Reviewer independently recomputed the hash
+above and confirmed it matches the original Grok source report; `git diff` for
+`package-lock.json` is empty. This corrected value is authoritative.
 
 ## Correction-specific red and falsification
 
