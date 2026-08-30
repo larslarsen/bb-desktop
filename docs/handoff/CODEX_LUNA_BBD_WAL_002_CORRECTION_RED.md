@@ -30,8 +30,8 @@ The protected source remains:
 
 ## Authorized execution
 
-1. Verify `HEAD`, `origin/master`, worktree status, and every hash above. `HEAD` and
-   `origin/master` must both be governance commit `87791930` (record the full hash).
+1. Verify `HEAD`, `origin/master`, worktree status, and every hash above. `HEAD` must
+   equal `origin/master`, contain this authorization handoff, and be recorded in full.
 2. Run exactly this one foreground command from the repository root:
 
    ```text
