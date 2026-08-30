@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: TARGETED GREEN ACCEPTED — ACCEPTANCE/FALSIFICATION/INTEGRATION AUTHORIZED
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -25,23 +25,20 @@ tests. Its exact 45-pass/3-fail expected red is accepted at evidence commit
 at the exact hashes in
 [`CODEX_LUNA_BBD_WAL_002_TARGETED_GREEN.md`](CODEX_LUNA_BBD_WAL_002_TARGETED_GREEN.md).
 Targeted green passed 48 wallet, 14 Electron-security, and 54 policy tests with no drift.
-Jr Dev — Codex Luna alone is authorized by
-[`CODEX_LUNA_BBD_WAL_002_ACCEPTANCE.md`](CODEX_LUNA_BBD_WAL_002_ACCEPTANCE.md) for the
-foreground broader commands, exact temporary falsifications/restores, implementation
-evidence, and 15-path commit/push. Sol is stopped.
+Broader acceptance, audit, three falsifications/restores, evidence, and the exact 15-path
+integration commit completed at `62ad0ceb90a96805cabff0296fd6980a739554fd`. GitHub
+Actions Social client run `33338667462` passed. Reviewer acceptance is recorded in
+[`BBD-WAL-002-ACCEPTANCE.md`](../testing/BBD-WAL-002-ACCEPTANCE.md). All source and
+integration actors are stopped; no further implementation is authorized.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
 Sol authors at High. Standing project roles are otherwise unchanged.
 
-Correction 03 test source remains the accepted baseline at the hashes in the ticket. Red evidence is
-31 lines at SHA-256
-`f8b33e5f5c510188676deee11a073d6c053ae3d9b4de9279a3cfca25a68e2819`. The green
-source must use only Node built-ins, remain offline/inert, preserve `package-lock.json`,
-and satisfy the tests without weakening their schemas, lifecycle, or security boundaries.
-The added correction coverage must prove request/review and account/signer binding,
-crash-recovery locking and terminal transitions, fail-closed injected dependency errors,
-and value-safe structured log sanitization before production correction resumes.
+The accepted implementation uses only Node built-ins, remains offline/inert, preserves
+`package-lock.json`, and closes the tested schema, lifecycle, recovery, capability,
+dependency-error, and structured-log boundaries. Historical red and correction evidence
+hashes remain recorded in the ticket and testing documents.
 
 BBD-WAL-001 architecture is integrated and reviewer-accepted in commit
 `ffebcc179d3b2aaca687213de54d3c3298ac0696` at exactly 2,271 lines and SHA-256

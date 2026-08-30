@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: TARGETED GREEN ACCEPTED — ACCEPTANCE/FALSIFICATION/INTEGRATION AUTHORIZED
+Status: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -468,3 +468,17 @@ Temporary Sr Dev — Codex Sol is now authorized only by
 to correct `wallet-contract/model.js`, `wallet-contract/state-machine.js`, and
 `wallet-contract/fakes.js`. Sol must not run anything, use Git, or modify tests or any
 other path. Codex Luna remains stopped until reviewer source acceptance.
+
+## Final reviewer acceptance
+
+The implementation is accepted at commit
+`62ad0ceb90a96805cabff0296fd6980a739554fd`. The commit contains exactly the authorized
+15 paths and the worktree is clean. Full acceptance evidence and independent checks are
+recorded in
+[`BBD-WAL-002-ACCEPTANCE.md`](../docs/testing/BBD-WAL-002-ACCEPTANCE.md).
+
+All targeted and broad commands passed, audit reported zero vulnerabilities, all three
+required falsifications failed for their intended safety reasons and were restored, and
+GitHub Actions Social client run `33338667462` passed without invoking manual platform
+packaging. `package-lock.json` remains byte-identical. BBD-WAL-002 is complete and no
+later wallet ticket is authorized here.
