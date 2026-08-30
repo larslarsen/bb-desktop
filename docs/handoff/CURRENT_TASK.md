@@ -98,3 +98,9 @@ marketplace utility modules. The current values cannot be baselined away. Grok B
 owns design review only under [Correction 04](GROK_BUILD_BBD_SEC_001_CORRECTION_04.md) for
 safe neutralization, an exact commit-fingerprint ratchet, and a required current-tree
 scan. No source edit or integration resume is authorized.
+
+Correction 04 design is reviewer-accepted and fully preserved in its handoff. Grok may
+now author exactly one test file first (policy total 50), then only the exact eight-line
+commit fingerprint ratchet, the two inherited loader neutralizations, the policy checker,
+and security workflow. Full-history Gitleaks remains unchanged and a blocking dir scan
+is added. Grok runs nothing; Luna stays stopped until exact hashes are reviewed.

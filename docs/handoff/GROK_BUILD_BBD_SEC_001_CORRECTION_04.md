@@ -78,3 +78,98 @@ Return:
 5. safe method for neutralizing current values without disclosure;
 6. exact red/green/falsification and acceptance sequence; and
 7. ratchet owner, rationale, expiry/removal condition, and residual risks.
+
+## Grok Build design return — Reviewer-preserved
+
+Grok classified the gate as correct and the missing controls as: no reviewed inherited
+history ratchet, two retained current-tree integrations, and no blocking directory scan.
+It rejected a baseline report because that would store finding bodies and could hide
+current-tree matches. It recommended eight exact commit-qualified `.gitleaksignore`
+fingerprints, which contain no secret values and cannot match three-part current-tree
+fingerprints.
+
+The two inactive integrations are not merely inert strings: the inherited metrics module
+can initialize Countly and load a remote script, while feedback can initialize Doorbell
+and load its remote embed. Grok therefore recommended removing those loader bodies, not
+substituting look-alike values or adding `gitleaks:allow`. Large marketplace deletion
+remains a separate ticket.
+
+Grok proposed:
+
+- test-first edits to `test/securityPolicy.node.js` only;
+- production edits afterward to `.gitleaksignore`, `js/utils/metrics.js`,
+  `js/utils/feedback.js`, `scripts/security-policy.js`, and
+  `.github/workflows/security.yml` only;
+- Electron stays 13 tests; policy grows from 47 to 50;
+- exact full-history command remains
+  `gitleaks git --redact=100 --no-banner .`;
+- exact current-tree command is added immediately after it:
+  `gitleaks dir --redact=100 --no-banner .`;
+- no baseline/config/report/range/exit/ignore-path flags, Gitleaks Action, token, summary,
+  upload, native package, or routine push scan;
+- the security PR path filter adds `.gitleaksignore`, `js/utils/metrics.js`, and
+  `js/utils/feedback.js`; routine `social.yml` stays unchanged;
+- the checker exports and enforces the exact ratchet metadata/body and requires
+  install → git scan → dir scan with no intervening step; and
+- whole-workflow suppression checks are narrowed only enough to allow the literal
+  `.gitleaksignore` path-filter entry, while command flags and all other suppression
+  mechanisms remain forbidden.
+
+Its mutation matrix covers missing/extra/duplicate/malformed/global/wrong/shuffled
+fingerprints, comments/blanks/wildcards/secret-bearing text, BOM/CRLF/trailing bytes,
+missing/reordered/modified scan commands, command-line ignore/baseline/report/exit flags,
+missing path filters, and synthetic current-tree key-shaped values. No mutation uses the
+inherited values.
+
+Grok's ratchet terms:
+
+- owner: Lead Engineer/Reviewer — Codex;
+- rationale: eight inherited 2016–2018 upstream commit fingerprints only; current-tree
+  copies are disabled and removed, never ignored; and
+- removal condition: delete `.gitleaksignore` when a later authorized ticket removes the
+  inherited OpenBazaar marketplace tree (`js/`, old root `index.html`, and its unused
+  renderer entry).
+
+Residual risk remains in immutable public upstream history until that tree/history is
+retired; any history rewrite or moved finding fails closed as a new fingerprint. Other
+unused marketplace code is not comprehensively audited by this bounded correction.
+
+## Reviewer authorization
+
+Accepted with these precision changes:
+
+1. The eight lines must be true lexical order, making the ordering oracle objective:
+
+```text
+7f6a71d6d5ec94b0d8ed02a23eddd7d1bfeaf802:index.html:generic-api-key:57
+988fcc3da2d2b13689fdd98e936df14e2f989709:js/models/order/Case.js:generic-api-key:107
+b0637a03e1eb12e4e5d49c9dfba92dcbf51a0d8c:js/utils/feedback.js:generic-api-key:8
+bfd12cbe6e1f586af1f728c6d4e1ba68b8d9d103:js/utils/metrics.js:generic-api-key:13
+d38fc4819f1aa16f692394c56acc90db5d4f973a:js/views/modals/wallet/ReceiveMoney.js:generic-api-key:65
+e30e2ebbe6cc6198ca3c507167d26ff934ef9deb:js/views/modals/wallet/ReceiveMoney.js:generic-api-key:65
+f527597842b38bbe25c36cb42d204f16747e7e72:js/start.js:generic-api-key:409
+f83f40146c4bd2eb6da9f7fdd7a8eab8fb660b13:js/views/modals/wallet/ReceiveMoney.js:generic-api-key:63
+```
+
+2. `js/utils/metrics.js` must preserve its public exports and non-loader behavior, but
+   `addMetrics` becomes an immediate no-op and its entire Countly initialization/remote
+   loader body is removed, including the detected literal. `js/utils/feedback.js` may be
+   reduced to its public `addFeedback` export as an immediate no-op, removing all
+   Doorbell setup/remote loader code and imports. Do not leave sensitive literals in dead
+   code.
+3. For the two sensitive source paths, use `apply_patch` full-file sanitized replacement
+   if needed so the patch request contains only post-state and never reproduces an old
+   detected value. Never print their Git diff. Tests use only structural identifiers and
+   synthetic values.
+
+Grok may now author `test/securityPolicy.node.js` completely first, targeting exactly
+50 tests, then only `.gitleaksignore`, `js/utils/metrics.js`, `js/utils/feedback.js`,
+`scripts/security-policy.js`, and `.github/workflows/security.yml`. No other source path
+may change. It runs nothing, uses no Git, and reports test and production hashes/line
+counts separately without file diffs or sensitive bodies.
+
+Required new tests are exactly: strict eight-line ratchet bytes/content; exact dir-scan
+presence/order/flags; and structural neutralization/no-loader/no-maintained-import. All
+47 prior concepts remain, with existing Gitleaks cases converted for the second scan and
+approved default ignore filename. Checker validation must reject every mutation listed
+above and must read the committed `.gitleaksignore` in `checkRepository`.

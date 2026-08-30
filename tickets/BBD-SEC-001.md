@@ -150,6 +150,7 @@ npm run build
 npm run test:social
 npm run test:security
 gitleaks git --redact=100 --no-banner .
+gitleaks dir --redact=100 --no-banner .
 git diff --check
 ```
 
@@ -301,3 +302,24 @@ matches in inactive inherited marketplace utility modules. No ratchet may hide t
 current-tree matches. Grok Build owns design review only under
 `docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_04.md`; no implementation or resume is
 authorized yet.
+
+## Correction 4 — Authorized
+
+Grok Build's exact test-first secret-ratchet design is accepted under
+`docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_04.md`. It authorizes only one test file
+first, then an eight-line lexically sorted commit-fingerprint `.gitleaksignore`, explicit
+no-op/removal of the inherited Countly and Doorbell loader bodies in the two exact utility
+files, checker enforcement, and a second exact blocking current-tree Gitleaks workflow
+step. The full-history command remains unchanged.
+
+The ratchet owner is Lead Engineer/Reviewer — Codex. Its sole rationale is the eight
+reviewed 2016–2018 fingerprints proven ancestral to upstream OpenBazaar. It must be
+removed when a later authorized ticket removes the inherited marketplace tree, old root
+page, and unused renderer entry. It may never contain a global/current-tree fingerprint,
+comment, wildcard, extra line, secret value, or finding body.
+
+No baseline report, config/allowlist, command-line ignore, altered exit/range, report,
+upload, dependency, package/lockfile, maintained social runtime/CSP, SBOM, routine CI,
+native package, unrelated inherited source, deletion/cleanup, scanner execution, Git, or
+GitHub mutation is authorized for Grok. Luna resumes only after reviewer hash/source
+acceptance.
