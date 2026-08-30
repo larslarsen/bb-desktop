@@ -5,7 +5,9 @@ prompt; ephemeral chat is not authoritative.
 
 Repository: `/home/lars/OpenBazaar/bb-desktop`
 
-Baseline: `f40d8404`
+Production baseline: `f40d8404`
+
+Governance baseline: `b64a7d00`
 
 Read completely before editing: `AGENTS.md`, `TESTING.md`,
 `docs/engineering/DEVELOPMENT_ROLES.md`, `tickets/BBD-SEC-001.md`, and
@@ -31,4 +33,3 @@ Report test-source-first order; test names and non-vacuous oracles; exact workfl
 triggers, commands and pins; production behavior; SBOM validation; final path hashes and
 line counts; ambiguities; and confirmation of no out-of-scope action. Codex Luna owns
 execution, evidence, Git, and push.
-

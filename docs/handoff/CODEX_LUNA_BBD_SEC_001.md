@@ -5,6 +5,8 @@ contract; ephemeral chat is not authoritative.
 
 Repository: `/home/lars/OpenBazaar/bb-desktop`
 
+Governance baseline: `b64a7d00`
+
 Read completely: `AGENTS.md`, `TESTING.md`, `docs/engineering/DEVELOPMENT_ROLES.md`,
 `tickets/BBD-SEC-001.md`, `docs/handoff/CURRENT_TASK.md`, and the completed
 `docs/handoff/GROK_BUILD_BBD_SEC_001.md` source report.
@@ -32,4 +34,3 @@ If every gate passes, author only `docs/security/BBD-SEC-001-EVIDENCE.md` and up
 `docs/handoff/CURRENT_TASK.md`, run `git diff --check`, commit exactly the authorized
 ticket change, push `origin/master`, and stop for reviewer inspection. Record exact
 commands, versions, exit codes, counts, hashes, safe summaries, commit, and push result.
-
