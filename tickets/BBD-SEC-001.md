@@ -184,3 +184,17 @@ committing the generated document.
 - Manual SBOM generation produces one validated CycloneDX JSON and no application binary.
 - Reviewer accepts the integrated commit and required remote routine CI passes.
 
+## Correction 1 — Authorized
+
+Reviewer source inspection rejected the Gitleaks Action design before execution. Despite
+complete checkout, that action applies event-specific first-parent ranges and does not
+execute the ticket's complete-history command, creating a merge-history false-negative
+risk. Its default summary behavior also conflicts with the no-finding-body rule. The
+routine path filters also omitted `scripts/build-windows.ps1`.
+
+Grok may perform only `docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_01.md`: test-first
+replacement of the Action with the official pinned Gitleaks v8.30.1 Linux archive,
+verified by exact SHA-256 and size, followed by exact root command
+`gitleaks git --redact=100 --no-banner .`; and inclusion of the Windows build script in
+both routine path filters. No other source or behavior may change. Luna does not execute
+until reviewer accepts the bounded correction source.
