@@ -294,3 +294,10 @@ staging, commit, or push.
 Reviewer-only redacted metadata triage is authorized under
 `docs/handoff/BBD_SEC_001_GITLEAKS_TRIAGE_01.md`. It authorizes no suppression, baseline,
 repair, deletion, Git, or integration resumption.
+
+Triage proved eight unique findings are inherited upstream commit fingerprints; one is
+duplicated three times by Gitleaks. A redacted current-tree scan also found two retained
+matches in inactive inherited marketplace utility modules. No ratchet may hide those
+current-tree matches. Grok Build owns design review only under
+`docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_04.md`; no implementation or resume is
+authorized yet.

@@ -91,3 +91,10 @@ after scanning 4,549 commits and reporting 10 findings. No SBOM/evidence/Git wor
 Reviewer owns redacted metadata-only triage under
 [Gitleaks Triage 01](BBD_SEC_001_GITLEAKS_TRIAGE_01.md); no baseline, suppression, repair,
 or resume is yet authorized.
+
+Reviewer triage verified 100-percent redaction, eight unique upstream-history
+fingerprints (10 emitted findings), and two retained current-tree matches in inactive
+marketplace utility modules. The current values cannot be baselined away. Grok Build now
+owns design review only under [Correction 04](GROK_BUILD_BBD_SEC_001_CORRECTION_04.md) for
+safe neutralization, an exact commit-fingerprint ratchet, and a required current-tree
+scan. No source edit or integration resume is authorized.
