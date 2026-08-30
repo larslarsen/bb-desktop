@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: LOCAL GREEN AND CI PASSED — FALSIFICATION AUTHORIZED
+Status: FALSIFICATION AND CI PASSED — REVIEWER ACCEPTANCE PENDING
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -17,6 +17,9 @@ Correction 04 expected red is recorded in
 
 Local green is recorded in
 [`docs/testing/BBD-WAL-003-LOCAL-GREEN.md`](../docs/testing/BBD-WAL-003-LOCAL-GREEN.md).
+
+Falsification is recorded in
+[`docs/testing/BBD-WAL-003-FALSIFICATION.md`](../docs/testing/BBD-WAL-003-FALSIFICATION.md).
 
 ## Objective
 
