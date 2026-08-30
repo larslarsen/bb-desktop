@@ -109,3 +109,10 @@ Reviewer accepted the production design but stopped on one vacuous synthetic met
 fixture: it fails missing exports before exercising loader rejection. Correction 04
 Oracle 01 authorizes Grok to fix only `test/securityPolicy.node.js`, keep 50 tests, and
 run nothing. Luna remains stopped pending the corrected hash and review.
+
+Correction 04 plus Oracle 01 source is delivered and reviewer-accepted at the exact
+recorded hashes: Electron remains 13 tests; policy is 50; the ratchet is eight exact
+commit fingerprints; both inherited loaders are disabled; and security CI requires exact
+full-history plus current-tree Gitleaks scans. Luna now owns the durable integration in
+[Correction 04 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_04.md). Any test/scanner
+failure or finding stops before SBOM and Git.

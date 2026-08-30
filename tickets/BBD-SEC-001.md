@@ -329,3 +329,9 @@ standalone fixture fails the earlier public-export invariant instead of the inte
 remote-loader invariant. Correction 04 Oracle 01 authorizes Grok to edit only
 `test/securityPolicy.node.js` as specified in the handoff, preserving 50 tests and all
 production hashes. Luna remains stopped.
+
+Correction 04 and Oracle 01 were delivered test-first at the exact authorized paths.
+Reviewer independently reproduced every hash/count and accepted the strict eight-line
+ratchet, two loader neutralizations, checker, exact dual-scan workflow, 50 policy tests,
+and corrected non-vacuous loader mutation. Luna may resume only under
+`docs/handoff/CODEX_LUNA_BBD_SEC_001_CORRECTION_04.md`.
