@@ -1,8 +1,8 @@
 # Current Task
 
-Ticket: BBD-SEC-001
+Ticket: BBD-WAL-001
 
-State: COMPLETE — REVIEWER ACCEPTED
+State: AUTHORIZED — DESIGN ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -10,151 +10,22 @@ Source actor: Sr Dev — Grok Build (Grok 4.6 High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-[BBD-SEC-001](../../tickets/BBD-SEC-001.md) is the only authorized implementation. It
-hardens and tests the maintained Electron entry point, adds pinned pull-request/manual
-security gates, makes routine CI package-free and path-filtered, and adds manual SBOM-only
-evidence. Native package builds, cross-platform fuse work, the inherited marketplace,
-and deprecated `go-ipfs` are out of scope.
+[BBD-WAL-001](../../tickets/BBD-WAL-001.md) is the only authorized work. It records the
+owner's decision to support built-in shielded ZEC and optional local-node XMR from the
+beginning, with software, hardware-backed, and watch-only accounts shaped by a common
+contract. Ledger and Trezor support are first-class requirements.
 
-Complete source and integration prompts are preserved in
-[GROK_BUILD_BBD_SEC_001.md](GROK_BUILD_BBD_SEC_001.md) and
-[CODEX_LUNA_BBD_SEC_001.md](CODEX_LUNA_BBD_SEC_001.md). No production work begins until
-this governance baseline is committed.
+This is a design-only gate. Grok Build may author only
+[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) under the complete prompt
+in [GROK_BUILD_BBD_WAL_001.md](GROK_BUILD_BBD_WAL_001.md). No implementation, test,
+dependency, wallet, node, hardware, network, mainnet, package, or other-repository work is
+authorized.
 
-Grok delivered the test-first source drop without execution. Reviewer accepted the
-runtime/CSP and SBOM design but rejected the Gitleaks Action because it does not scan full
-merge history, and found the Windows build script missing from routine path filters.
-Only [Correction 1](GROK_BUILD_BBD_SEC_001_CORRECTION_01.md) is now authorized. Luna must
-not execute until the corrected source report is preserved and reviewed.
+The maintained `../bb-go/modern` social daemon remains wallet-free. The proposed local
+wallet broker belongs to the desktop product boundary but must run outside the Electron
+renderer and expose no generic wallet HTTP API. The inherited OpenBazaar wallet and
+deprecated `../go-ipfs` are not implementation foundations.
 
-Correction 1 was delivered test-first and reviewer source inspection accepted the pinned
-complete-history CLI scan and both Windows path filters. Codex Luna now owns the exact
-integration sequence in [its handoff](CODEX_LUNA_BBD_SEC_001.md): verify hashes,
-reconstruct bounded red, restore and falsify, then run scanners and manual SBOM commands
-without native packaging. Any failure or finding stops before later work and Git.
-
-Luna verified hashes, reconstructed/restored red, and reached green: Electron 12/12;
-policy 47/48. The sole failure is a test oracle that does not match the checker's plural
-“summaries” rejection. No later gate ran. Only the one-test-file correction in
-[Correction 2](GROK_BUILD_BBD_SEC_001_CORRECTION_02.md) is authorized; Luna resumes after
-its report is preserved and reviewed.
-
-Correction 2 was delivered as a one-assertion semantic regex fix and reviewer inspection
-accepted the new test-file hash. Luna may now verify that hash, rerun the complete policy
-suite, and continue at the ticketed falsification sequence only if all tests pass.
-
-Luna subsequently completed/restored the bounded red and falsification work and passed
-Electron 12/12, corrected policy 46/46, the policy checker, and npm audit with zero
-vulnerabilities. Electronegativity then hit a network boundary: sandboxed npm returned
-`EAI_AGAIN`, while an escalated retry remained silent indefinitely and was interrupted
-without changing repository, evidence, artifacts, staging, commits, or the remote.
-
-The durable resume contract is
-[Network Boundary 01](CODEX_LUNA_BBD_SEC_001_NETWORK_01.md). Luna resumes at the exact
-pinned Electronegativity command with a disk-backed npm cache and finite foreground
-timeout. Timeout, network/tool error, or any finding stops the ticket; only a zero-finding
-result permits the remaining acceptance and manual-SBOM sequence.
-
-The bounded command later completed with network access but printed three findings and
-returned exit 0. Reviewer diagnostics established a broken gate: upstream marks
-Electronegativity unmaintained, its release model does not recognize Electron 44, and its
-CLI does not fail on findings. A maintained-app-only diagnostic also conflicts with the
-intentional configurable daemon endpoint and owner-approved dev sandbox workaround.
-
-Integration is stopped before every later gate and Git. Grok Build owns design review
-only under [Correction 03](GROK_BUILD_BBD_SEC_001_CORRECTION_03.md); implementation is not
-authorized until the reviewer records the exact correction.
-
-Grok's design review is now reviewer-accepted and fully preserved in Correction 03. The
-obsolete non-blocking scanner concept will be removed test-first; it is replaced by the
-existing executable Electron boundary/policy suite plus a maintained-source sink test,
-while blocking npm audit and complete-history Gitleaks remain. No runtime, CSP, package,
-lockfile, SBOM, routine CI, packaging, or inherited-source change is authorized. Grok may
-author only the four correction paths and must run nothing; Luna remains stopped until
-the reviewer accepts Grok's exact hashes.
-
-Correction 03 source is now delivered and reviewer-accepted. Independent hashes and
-counts match the durable source report: Electron 13 tests, policy 47 tests, and only the
-checker plus security workflow production paths. Codex Luna may resume under the ticket:
-correction-specific bounded red and restore, obsolete-scanner reintroduction
-falsification, complete corrected acceptance from the beginning, then the unchanged
-manual SBOM sequence. Any failure or Gitleaks finding stops before Git.
-
-Luna's exact resumed integration contract is
-[Correction 03 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_03.md). It prevents repeat
-work, supersedes only the obsolete scanner command, and preserves every disk-path,
-no-cleanup, no-native-build, hard-stop, evidence, commit, and reviewer-return rule.
-
-Luna completed every corrected gate through the security test suite, including the
-required red/restore and obsolete-scanner falsification. Gitleaks then stopped integration
-after scanning 4,549 commits and reporting 10 findings. No SBOM/evidence/Git work ran.
-Reviewer owns redacted metadata-only triage under
-[Gitleaks Triage 01](BBD_SEC_001_GITLEAKS_TRIAGE_01.md); no baseline, suppression, repair,
-or resume is yet authorized.
-
-Reviewer triage verified 100-percent redaction, eight unique upstream-history
-fingerprints (10 emitted findings), and two retained current-tree matches in inactive
-marketplace utility modules. The current values cannot be baselined away. Grok Build now
-owns design review only under [Correction 04](GROK_BUILD_BBD_SEC_001_CORRECTION_04.md) for
-safe neutralization, an exact commit-fingerprint ratchet, and a required current-tree
-scan. No source edit or integration resume is authorized.
-
-Correction 04 design is reviewer-accepted and fully preserved in its handoff. Grok may
-now author exactly one test file first (policy total 50), then only the exact eight-line
-commit fingerprint ratchet, the two inherited loader neutralizations, the policy checker,
-and security workflow. Full-history Gitleaks remains unchanged and a blocking dir scan
-is added. Grok runs nothing; Luna stays stopped until exact hashes are reviewed.
-
-Reviewer accepted the production design but stopped on one vacuous synthetic metrics
-fixture: it fails missing exports before exercising loader rejection. Correction 04
-Oracle 01 authorizes Grok to fix only `test/securityPolicy.node.js`, keep 50 tests, and
-run nothing. Luna remains stopped pending the corrected hash and review.
-
-Correction 04 plus Oracle 01 source is delivered and reviewer-accepted at the exact
-recorded hashes: Electron remains 13 tests; policy is 50; the ratchet is eight exact
-commit fingerprints; both inherited loaders are disabled; and security CI requires exact
-full-history plus current-tree Gitleaks scans. Luna now owns the durable integration in
-[Correction 04 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_04.md). Any test/scanner
-failure or finding stops before SBOM and Git.
-
-Luna's first Correction 04 resume stopped before all work because the integration handoff
-mis-transcribed the package-lock SHA-256. Reviewer recomputed it, confirmed the lockfile
-has no diff and matches the original source report, and corrected only that durable guard.
-Luna may restart the same Correction 04 contract from hash verification.
-
-Luna then reached restored green at Electron 13/13 and policy 49/50. The only failure is
-a checker ordering issue: an appended valid fingerprint is rejected as trailing bytes
-before the intended extra-count rule. Correction 04 Oracle 02 authorizes Grok to edit
-only that branch in `scripts/security-policy.js`; Luna remains stopped.
-
-Oracle 02 is delivered and reviewer-accepted at the final checker hash recorded in
-Correction 04. All other hashes are unchanged. Luna may resume from restored green,
-without repeating the completed Correction 04 red/restore; policy must now reach 50/50
-before any remaining falsification, scanner, SBOM, or Git work.
-
-All corrected code/security gates are now green, including zero findings from both exact
-Gitleaks scans. Manual SBOM setup alone is stopped: sandboxed `npm ci` returned registry
-DNS `EAI_AGAIN` for `undici-types`. The exact bounded disk-backed network retry and resume
-point are preserved in
-[SBOM Network Boundary 01](CODEX_LUNA_BBD_SEC_001_SBOM_NETWORK_01.md). No completed gate
-is repeated.
-
-The exact bounded external-network retry succeeded: `npm ci` installed 13/audited 14 at
-zero vulnerabilities, and pinned CycloneDX 6.0.1 generated the approved JSON. Reviewer
-verified the lockfile is unchanged and recorded the artifact hash in the SBOM network
-handoff. Luna resumes at audit plus local validation/metadata, then evidence and Git only
-on full green; no scanner or generation replay is needed.
-
-Luna completed the authorized final audit and existing-SBOM validation. The SBOM is
-CycloneDX 1.6 with root `bitbook-desktop`, 13 components, 14 dependency entries, 30,515
-bytes, and SHA-256
-`9a628e9ff915b7fece623b8158cbd700c80351bdbff62ba5037ce74a6a95e17f`. Full evidence is in
-`docs/security/BBD-SEC-001-EVIDENCE.md`. The complete BBD-SEC-001 source/evidence change
-is ready for reviewer inspection after the authorized commit and push; no native package
-or deprecated `go-ipfs` work was performed.
-
-Reviewer accepted implementation commit
-`47bf45884d737b4b89571f06d8ba3b4e20238bfb` on 2026-08-30 after routine GitHub workflow
-run `33322584615` completed successfully. The worktree was clean and `origin/master`
-matched that implementation before this documentation-only acceptance update. The
-ticket is complete; `go-ipfs` remains deprecated and out of scope.
+BBD-SEC-001 remains complete and accepted at implementation commit
+`47bf45884d737b4b89571f06d8ba3b4e20238bfb`, with documentation acceptance commit
+`20c7f7e7e71a5d98c1e236fea9d7d3dc1eeffb8a`.

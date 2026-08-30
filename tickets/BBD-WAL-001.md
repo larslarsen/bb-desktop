@@ -1,0 +1,137 @@
+# BBD-WAL-001 — Dual-Coin Wallet Architecture Review
+
+Status: AUTHORIZED — DESIGN ONLY
+
+Reviewer: Lead Engineer/Reviewer — Codex
+
+Source actor: Sr Dev — Grok Build (Grok 4.6 High)
+
+Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
+
+Governance baseline: `20c7f7e7e71a5d98c1e236fea9d7d3dc1eeffb8a`
+
+## Owner decisions
+
+- BitBook will offer both ZEC and XMR from the beginning rather than choosing one coin.
+- ZEC is the built-in basic wallet and must use the maintained shielded protocol, not the
+  inherited transparent-only OpenBazaar implementation.
+- XMR is optional and connects to a user-controlled local `monerod`; the design must
+  account for the separate Monero wallet process required to hold/view/sign.
+- Wallet use remains optional, but payments are a first-class native social feature with
+  no address copying or QR requirement for ordinary peer payments.
+- Software, hardware-backed, and watch-only accounts are first-class. The owner has
+  Ledger and Trezor devices and prefers hardware signing.
+- BitBook remains a distributed social network. Marketplace, listing, order, escrow,
+  dispute, exchange, custodial service, and centralized payment-provider behavior are
+  out of scope.
+- The legacy `go-ipfs` repository is deprecated and out of scope.
+
+## Objective
+
+Produce a threat-model-led architecture that can be converted into small, test-first
+implementation tickets without putting spend authority in Electron or the social daemon.
+The review must define the local wallet-broker boundary, coin adapters, signer contract,
+payment-intent lifecycle, recovery model, hardware capability model, process isolation,
+and staged verification plan.
+
+This ticket does not implement a wallet or payment feature.
+
+## Required architecture decisions
+
+The review must make a concrete recommendation, identify rejected alternatives, and
+state uncertainty for each of these topics:
+
+1. **Repository and process boundary.** Decide whether a dedicated wallet broker belongs
+   in this desktop repository, how it is launched, and why `../bb-go/modern` remains
+   wallet-free. Do not propose reviving the legacy daemon or renderer.
+2. **IPC boundary.** Prefer private child-process IPC without a listening wallet HTTP
+   endpoint. Define message framing, request correlation, cancellation, timeouts, size
+   limits, schema/version negotiation, error normalization, crash/restart behavior, and
+   prevention of renderer access to generic wallet commands.
+3. **Account and signer model.** Define software, hardware-backed, and watch-only
+   accounts; device-neutral capabilities; prepare/review/sign/verify/broadcast phases;
+   and the invariant that signed output is revalidated against user-confirmed intent.
+4. **Key custody and recovery.** Keep social identity, ZEC, and XMR secrets separate.
+   Define encrypted-at-rest software secrets, hardware-derived accounts, backup/restore,
+   lock/unlock, zeroization limits, logs, diagnostics, and explicit prohibitions on seed
+   or spend-key exposure to renderer, HTTP, crash reports, or ordinary evidence.
+5. **ZEC adapter.** Use current maintained Zcash components, Ironwood-capable shielded
+   operation, shielded-only receiving by default, PCZT/external signing, light-client
+   synchronization, network privacy, and explicit capability handling for Keystone,
+   Ledger, and Trezor. Trezor transparent-only ZEC support must not be represented as a
+   private account.
+6. **XMR adapter.** Use maintained Monero software, a user-controlled local `monerod`,
+   authenticated loopback `monero-wallet-rpc`, subaddresses, Ledger/Trezor signing,
+   synchronization state, device disconnects, and process lifecycle. No public/remote
+   node fallback is assumed without a later owner decision.
+7. **Payment protocol.** Define a coin-agnostic, signed, replay-resistant payment request
+   that can later be implemented in `../bb-go/modern`: payer/payee peer IDs, asset,
+   network, exact atomic amount, fresh receiver, memo or purpose, nonce, creation and
+   expiry, request ID, status, and cancellation. Never bind a permanent public payment
+   address directly to the social profile when a fresh receiver is available.
+8. **User experience.** Define wallet onboarding, hot versus hardware accounts, explicit
+   network/asset/recipient/amount/fee confirmation, unavailable/syncing/locked states,
+   and the native Pay flow from a profile, post, or conversation.
+9. **Testing and security evidence.** Apply `TESTING.md`: independent canonical fixtures,
+   parser fuzzing, property tests, boundary tests, failure injection, compound failures,
+   fake signer/device/node implementations, testnet/stagenet only, mutation/falsification,
+   secret-log canaries, crash recovery, dependency scanning, SBOMs, and package-content
+   checks. Define hard mainnet and real-device gates.
+10. **Ticket decomposition.** Produce ordered, independently reviewable tickets. Both
+    coins and all three account types must shape the common contract from the first
+    implementation ticket, even if the adapters reach usable depth sequentially.
+
+## Required threat model
+
+At minimum cover a compromised renderer, malicious social peer, malicious payment
+request, hostile or stale chain service, compromised remote site/content, forged device
+response, device disconnect, wallet-broker crash, rollback/corrupt state, concurrent
+spends, replay, address substitution, decimal/atomic-unit confusion, wrong network,
+malicious dependency/update, local unprivileged process, logs/crash dumps, clipboard,
+and accidental transparent ZEC downgrade.
+
+Clearly separate what a hardware wallet protects from what it does not protect. The host
+still owns chain scanning, payment-request interpretation, fee calculation, transaction
+construction, display, and broadcast unless the selected device independently verifies a
+field.
+
+## Authorized path
+
+Grok Build may author only:
+
+- `docs/architecture/BBD-WAL-001-REVIEW.md`
+
+The reviewer may author only the ticket and handoff governance paths named in this
+baseline. Codex Luna may later update `docs/handoff/CURRENT_TASK.md` and commit the
+reviewer-accepted architecture document.
+
+No production, test, dependency, lockfile, workflow, package, generated artifact, other
+repository, GitHub setting, hardware, wallet, node, network, or secret change is
+authorized.
+
+## Execution and safety rules
+
+- Grok runs in one foreground session and writes its complete reasoning to the authorized
+  document; ephemeral chat is not authoritative.
+- Grok runs no tests, builds, installs, formatters, scanners, Git, GitHub, wallet, node,
+  device, USB, HID, PC/SC, network, or package commands.
+- Do not use `/tmp`, root, `sudo`, deletion, cleanup, `rm`, globs, environment-variable
+  targets, or unresolved paths.
+- Do not inspect, request, display, or invent a seed, spend key, PIN, device recovery
+  phrase, wallet file, or real address.
+- Mainnet transaction construction, signing, and broadcast are forbidden.
+
+## Acceptance criteria
+
+- The review is specific enough to turn into bounded test-first tickets without an
+  implementation actor making architecture decisions.
+- Both ZEC and XMR shape the first common contract.
+- Ledger and Trezor are represented through capabilities, not vendor assumptions.
+- The document does not claim current shielded-ZEC hardware support without a verified
+  device/protocol capability.
+- No spend authority enters Electron, the renderer, `bb-go`, HTTP, logs, or evidence.
+- The social daemon stays wallet-free and the old OpenBazaar wallet is rejected as an
+  implementation base.
+- The first implementation slice is offline, deterministic, credential-free, and cannot
+  create or move funds.
+
