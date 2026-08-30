@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: TEST CORRECTION 06 ACCEPTED — EXPECTED RED AUTHORIZED
+State: CORRECTION 06 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -20,10 +20,12 @@ tests total. Its exact 38-pass/7-fail correction red is accepted at evidence com
 `3207667e276cffcb438988610cfa90a64e130ffd`. Production Correction 01 closes those seven
 causes but is reviewer-rejected before green. Correction 06 is accepted at 1,803 lines,
 SHA-256 `43830b1caec19904d23b400974c77c1edbebe32b4927b2f31ee4279611a46dbf`, and 48 wallet
-tests. Jr Dev — Codex Luna alone is authorized by
-[`CODEX_LUNA_BBD_WAL_002_CORRECTION_06_RED.md`](CODEX_LUNA_BBD_WAL_002_CORRECTION_06_RED.md)
-to run the single correction-red wallet command and commit/push its named evidence file
-alone. Production is frozen and Sol is stopped.
+tests. Its exact 45-pass/3-fail expected red is accepted at evidence commit
+`12061f5c1ab24a90dda9f7e74c846b0174d0e039`. Temporary Sr Dev — Codex Sol alone is
+authorized by
+[`CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_02.md`](CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_02.md)
+to correct only `model.js` and `state-machine.js`. Sol must run nothing and use no Git.
+Luna is stopped until reviewer source acceptance.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
