@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: CORRECTION TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+Status: CORRECTION EXPECTED RED ACCEPTED — PRODUCTION CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -449,3 +449,22 @@ hashes remain the previously accepted values. Jr Dev — Codex Luna is authorize
 [`CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md`](../docs/handoff/CODEX_LUNA_BBD_WAL_002_CORRECTION_RED.md)
 to run the single wallet expected-red command and commit/push the named evidence file
 alone. Production correction remains unauthorized.
+
+## Reviewer acceptance — correction expected red
+
+Jr Dev — Codex Luna produced accepted correction-red evidence in commit
+`3207667e276cffcb438988610cfa90a64e130ffd`. Reviewer independently verified that the
+commit contains only `docs/testing/BBD-WAL-002-CORRECTION-RED-EVIDENCE.md`, at 32 lines
+and SHA-256 `9846d8a03b23e84f63ad20b9342a458f6c0e1df4e3f4810861dd4d4ac86c8f99`, and that
+`HEAD` equals `origin/master`.
+
+The single wallet command exited 1 with exactly the 38 prior tests green and all seven
+correction tests red for their intended production gaps. No inherited test failed, no
+new test unexpectedly passed, no protected hash changed, and no secret canary appeared
+in output.
+
+Temporary Sr Dev — Codex Sol is now authorized only by
+[`CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_01.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_01.md)
+to correct `wallet-contract/model.js`, `wallet-contract/state-machine.js`, and
+`wallet-contract/fakes.js`. Sol must not run anything, use Git, or modify tests or any
+other path. Codex Luna remains stopped until reviewer source acceptance.
