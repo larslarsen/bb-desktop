@@ -36,11 +36,14 @@ existing security tests after their old assertions so their red result preserves
 coverage.
 
 Do not create production code, a stub module, dependency, lockfile change, package
-script, workflow, checker, evidence file, or handoff edit. Do not execute tests, Node,
-npm, builds, installs, formatters, scanners, Git, GitHub, network, wallet, node,
-subprocess, hardware, USB/HID, or device commands. Do not use `/tmp`, root, `sudo`,
-deletion, cleanup, `rm`, globs, environment-variable targets, or unresolved paths. Do
-not touch a real key, wallet, address, device, or transaction.
+script, workflow, checker, evidence file, or handoff edit. Read-only shell commands are
+authorized solely to read the exact required repository documents and current/authorized
+test files, plus `wc -l` and `sha256sum` over the four authorized paths for the final
+report. Use `apply_patch` for edits. Do not execute tests, Node, npm, builds, installs,
+formatters, scanners, Git, GitHub, network, wallet, node, subprocess, hardware, USB/HID,
+or device commands. Do not use `/tmp`, root, `sudo`, deletion, cleanup, `rm`, globs,
+environment-variable targets, or unresolved paths. Do not touch a real key, wallet,
+address, device, or transaction.
 
 Stop after writing the four authorized paths. Report only the paths, line counts,
 SHA-256 hashes, test counts/categories, expected red causes, and confirmation that no

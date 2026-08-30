@@ -64,8 +64,11 @@ hide an inherited regression.
 
 No production source, dependency, lockfile, package script, workflow, checker, evidence,
 Git, GitHub, generated artifact, other repository, wallet, device, network, node, or
-transaction change is authorized in the test-source phase. Sol must stop after writing
-the four paths and must not execute anything.
+transaction change is authorized in the test-source phase. Sol may use read-only shell
+commands solely to read the exact required repository documents/current tests and to
+report final line counts and SHA-256 hashes for the four authorized paths. It must not
+run Node, tests, builds, installs, formatters, scanners, Git, network, wallet, node,
+subprocess, hardware, or device commands, and must stop after writing the four paths.
 
 ## Reserved production paths — not yet authorized
 
