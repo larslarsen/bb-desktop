@@ -32,3 +32,9 @@ complete-history CLI scan and both Windows path filters. Codex Luna now owns the
 integration sequence in [its handoff](CODEX_LUNA_BBD_SEC_001.md): verify hashes,
 reconstruct bounded red, restore and falsify, then run scanners and manual SBOM commands
 without native packaging. Any failure or finding stops before later work and Git.
+
+Luna verified hashes, reconstructed/restored red, and reached green: Electron 12/12;
+policy 47/48. The sole failure is a test oracle that does not match the checker's plural
+“summaries” rejection. No later gate ran. Only the one-test-file correction in
+[Correction 2](GROK_BUILD_BBD_SEC_001_CORRECTION_02.md) is authorized; Luna resumes after
+its report is preserved and reviewed.

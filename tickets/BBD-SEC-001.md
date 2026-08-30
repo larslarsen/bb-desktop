@@ -204,3 +204,13 @@ four-path hashes and fail-closed CLI design preserved in the correction handoff.
 Luna may now begin the ticketed red/green/falsification and acceptance sequence. All
 original stop, disk-path, no-cleanup, no-native-package, and no-secret-output rules remain
 in force.
+
+## Correction 2 — Authorized
+
+Luna's green run passed Electron 12/12 and policy 47/48. The only failure was an overly
+narrow test-message regex: the summary mutation was correctly rejected with “summaries,”
+while the oracle matched singular `summary` only. No falsification, scanner, SBOM, Git, or
+push ran. Grok may edit only `test/securityPolicy.node.js` under
+`docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_02.md` to make the existing semantic
+oracle recognize the summary-specific rejection without weakening it. Luna resumes only
+after reviewer accepts that one-path report.
