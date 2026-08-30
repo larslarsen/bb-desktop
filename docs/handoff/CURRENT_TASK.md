@@ -42,3 +42,15 @@ its report is preserved and reviewed.
 Correction 2 was delivered as a one-assertion semantic regex fix and reviewer inspection
 accepted the new test-file hash. Luna may now verify that hash, rerun the complete policy
 suite, and continue at the ticketed falsification sequence only if all tests pass.
+
+Luna subsequently completed/restored the bounded red and falsification work and passed
+Electron 12/12, corrected policy 46/46, the policy checker, and npm audit with zero
+vulnerabilities. Electronegativity then hit a network boundary: sandboxed npm returned
+`EAI_AGAIN`, while an escalated retry remained silent indefinitely and was interrupted
+without changing repository, evidence, artifacts, staging, commits, or the remote.
+
+The durable resume contract is
+[Network Boundary 01](CODEX_LUNA_BBD_SEC_001_NETWORK_01.md). Luna resumes at the exact
+pinned Electronegativity command with a disk-backed npm cache and finite foreground
+timeout. Timeout, network/tool error, or any finding stops the ticket; only a zero-finding
+result permits the remaining acceptance and manual-SBOM sequence.

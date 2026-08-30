@@ -218,3 +218,18 @@ after reviewer accepts that one-path report.
 Correction 2 was delivered as the exact semantic oracle change and reviewer inspection
 accepted its hash. Luna may verify the corrected test file, rerun the complete policy
 suite, and resume the prior falsification/scanner/SBOM sequence only on full green.
+
+## Network execution correction — Authorized
+
+Luna completed and restored the bounded red/falsification work, then passed the Electron
+suite 12/12, corrected policy suite 46/46, repository policy checker, and npm audit with
+zero vulnerabilities. The first sandboxed Electronegativity attempt failed with npm
+`EAI_AGAIN`; its escalated retry remained silent indefinitely and was interrupted. It
+made no repository, evidence, artifact, staging, commit, or push change.
+
+Luna may resume under
+`docs/handoff/CODEX_LUNA_BBD_SEC_001_NETWORK_01.md`: exact disk-backed npm cache and
+artifacts, exact pinned scanners, and a 180-second foreground timeout for each
+network-backed `npx` invocation. A timeout, network/tool error, or finding remains a hard
+stop. No source repair, cleanup, deletion, native packaging, workflow dispatch, or `/tmp`
+use is authorized.
