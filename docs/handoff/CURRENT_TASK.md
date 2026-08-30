@@ -38,3 +38,7 @@ policy 47/48. The sole failure is a test oracle that does not match the checker'
 “summaries” rejection. No later gate ran. Only the one-test-file correction in
 [Correction 2](GROK_BUILD_BBD_SEC_001_CORRECTION_02.md) is authorized; Luna resumes after
 its report is preserved and reviewed.
+
+Correction 2 was delivered as a one-assertion semantic regex fix and reviewer inspection
+accepted the new test-file hash. Luna may now verify that hash, rerun the complete policy
+suite, and continue at the ticketed falsification sequence only if all tests pass.

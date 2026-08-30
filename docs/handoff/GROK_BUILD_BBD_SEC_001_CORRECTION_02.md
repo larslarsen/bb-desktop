@@ -41,3 +41,17 @@ final read-only hash and line count of the one authorized path is allowed.
 Report the exact oracle change, final hash/line count, and confirmation of no out-of-scope
 action. Codex Luna owns rerun and continuation.
 
+## Delivered correction report — 2026-08-29
+
+Grok changed only the existing summary mutation assertion from
+`/report|upload|artifact|summary/i` to
+`/report|upload|artifact|summar(?:y|ies)/i`. The mutation and checker are unchanged, and
+the oracle still requires a report/upload/artifact/summary-specific rejection. No test or
+other command was run.
+
+Delivered path: `test/securityPolicy.node.js`, 821 lines, SHA-256
+`666a4de0022a4507ebe6c9d59e0c121b861369f4a1fef47f3ad28ec17ec2602a`.
+
+Reviewer read-only inspection verified the exact assertion and hash and accepted the
+one-path correction. Luna must verify the new hash, rerun the complete policy suite, and
+resume the ticket sequence only if it passes completely.

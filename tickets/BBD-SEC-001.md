@@ -214,3 +214,7 @@ push ran. Grok may edit only `test/securityPolicy.node.js` under
 `docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_02.md` to make the existing semantic
 oracle recognize the summary-specific rejection without weakening it. Luna resumes only
 after reviewer accepts that one-path report.
+
+Correction 2 was delivered as the exact semantic oracle change and reviewer inspection
+accepted its hash. Luna may verify the corrected test file, rerun the complete policy
+suite, and resume the prior falsification/scanner/SBOM sequence only on full green.
