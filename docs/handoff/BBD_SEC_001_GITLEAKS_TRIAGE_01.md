@@ -31,6 +31,26 @@ redacted. Determine whether every match is inherited and immutable, or whether a
 was introduced/retained by BitBook. Stop for a new correction if any active or BitBook
 finding exists.
 
+Reviewer confirmed that all eight unique finding commits are ancestors of
+`upstream/master` and predate BitBook's first authored commit by eight or more years.
+Historical provenance is therefore inherited. To determine whether any finding remains
+in the current checkout, one additional 100-percent-redacted directory scan is
+authorized, writing exactly:
+
+```text
+/home/lars/OpenBazaar/.security-artifacts/bbd-sec-001-20260829/gitleaks-current-tree-01.json
+```
+
+```sh
+/home/lars/OpenBazaar/.security-tools/bbgo-sec-tools-20260829/gitleaks dir \
+  --redact=100 --no-banner --report-format json \
+  --report-path /home/lars/OpenBazaar/.security-artifacts/bbd-sec-001-20260829/gitleaks-current-tree-01.json \
+  .
+```
+
+Inspect only the same safe metadata and verify redaction without printing `Secret` or
+`Match`. This remains diagnosis, not acceptance, and authorizes no deletion or repair.
+
 If all findings are inherited historical material, reviewer may propose an exact
 time-bounded ratchet for separate authorization. It must preserve full-history scanning,
 must fail on any additional fingerprint or count change, must not hide current-tree
