@@ -1,5 +1,9 @@
 # Codex Luna Resume — BBD-SEC-001 Network Boundary 01
 
+Status: SUPERSEDED FOR EXECUTION by Correction 03. Preserve this file as historical
+evidence; do not run its Electronegativity command. The SBOM disk paths and bounded npm
+settings remain applicable when Luna reaches the unchanged manual SBOM sequence.
+
 You are **Jr Dev — Codex Luna** (`gpt-5.6-luna`). This file supplements, and does not
 replace, `CODEX_LUNA_BBD_SEC_001.md`.
 

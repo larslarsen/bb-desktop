@@ -40,9 +40,10 @@ maintained application source by this ticket.
 - `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` (`v7.0.1`)
 - `actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` (`v6.4.0`)
 - `actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (`v7.0.1`)
-- `gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e`
-  (`v3.0.0`)
-- `@doyensec/electronegativity@1.10.3`
+- Gitleaks CLI: `8.30.1`
+- Gitleaks Linux x64 archive SHA-256:
+  `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`
+- Gitleaks Linux x64 archive size: `8230402` bytes
 - `@cyclonedx/cyclonedx-npm@6.0.1`
 
 ## Authorized paths
@@ -102,12 +103,12 @@ the existing CSP. It must not change daemon connectivity or social behavior.
 - routine native packaging, artifact upload, or product-binary build;
 - security or SBOM workflows running on ordinary pushes;
 - missing relevant path filters or documentation-only CI filtering;
-- a missing `npm audit`, maintained Electron test, policy test, Electronegativity scan, or
+- a missing `npm audit`, maintained Electron boundary/sink test, policy test/checker, or
   complete-history Gitleaks scan;
 - non-blocking scanner behavior, ignore/baseline/suppression flags, report uploads, or
   altered exit behavior;
-- Electronegativity scanning the inherited repository instead of the maintained entry
-  point; or
+- reintroduction of unmaintained Electronegativity/ElectroNG commands, reports,
+  exclusions, annotations, or inherited-source scan targets; or
 - SBOM output other than one validated CycloneDX JSON artifact.
 
 The existing native Linux/Windows/macOS jobs remain manual-only and are not dispatched.
@@ -145,7 +146,6 @@ node test/electronSecurity.node.js
 node test/securityPolicy.node.js
 node scripts/security-policy.js
 npm audit --audit-level=low
-npx --yes @doyensec/electronegativity@1.10.3 -i social-main.js
 npm run build
 npm run test:social
 npm run test:security
@@ -178,7 +178,7 @@ committing the generated document.
 ## Acceptance criteria
 
 - Red, green, and falsification evidence is non-vacuous.
-- All acceptance commands pass with zero npm, Electronegativity, or new Gitleaks findings.
+- All acceptance commands pass with zero npm vulnerabilities or new Gitleaks findings.
 - Routine CI remains package-free and documentation-only changes do not consume it.
 - The maintained Electron security boundary is executable and fail closed.
 - Manual SBOM generation produces one validated CycloneDX JSON and no application binary.
@@ -234,7 +234,7 @@ network-backed `npx` invocation. A timeout, network/tool error, or finding remai
 stop. No source repair, cleanup, deletion, native packaging, workflow dispatch, or `/tmp`
 use is authorized.
 
-## Scanner finding stop — Under review
+## Scanner finding stop — Resolved by Correction 3
 
 The bounded Electronegativity command obtained network access and completed, but printed
 three findings while returning exit 0. Reviewer diagnostics confirmed that the pinned
@@ -248,3 +248,26 @@ Correction design is delegated to Grok Build under
 `docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_03.md`. This is design review only; no
 source change or integration resumption is authorized until the reviewer accepts and
 records an exact test-first replacement.
+
+## Correction 3 — Authorized
+
+Grok Build's design review and reviewer source inspection agree that Electronegativity
+1.10.3 cannot serve as a blocking Electron 44 control: upstream marks it unmaintained,
+its release model predates Electron 44, and findings do not change the CLI's success
+exit. Encoding exclusions or product no-ops would be dishonest. The invalid scanner
+concept is removed, not suppressed or baselined.
+
+Grok may now perform only the exact test-first source correction preserved in
+`docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_03.md`: strengthen the live window-open
+test for aux-click dispositions; add a maintained-source injection/eval sink test;
+mutation-test rejection of Electronegativity/ElectroNG and their report/suppression/scope
+forms; remove the obsolete checker constant/function/export; and delete its one workflow
+step. No runtime, CSP, package, lockfile, SBOM, routine workflow, packaging, inherited
+source, or dependency change is authorized. Grok runs nothing and reports exact
+test/production hashes separately. Luna resumes only after reviewer source acceptance.
+
+Acceptance now treats the executable Electron boundary/sink suite and policy mutations
+as the maintained-source security scan, alongside blocking npm audit and complete-history
+Gitleaks. After correction, Luna reruns every acceptance command from the beginning and
+adds an obsolete-scanner-reintroduction falsification. The historical network handoff is
+superseded for execution but remains preserved as evidence of the stopped attempt.

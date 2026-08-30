@@ -84,3 +84,90 @@ Return:
 
 Do not implement until the reviewer records explicit authorization here and in the
 ticket.
+
+## Grok Build design return — Reviewer-preserved
+
+Grok concluded that the scanner gate is invalid independently of each printed finding:
+the CLI exits nonzero for invocation/tool errors, not findings; the upstream project is
+unmaintained; its Electron release knowledge predates 44; and its successor is a
+commercial service rather than an immutable local replacement. Wrapping the old tool,
+scanning a larger tree, or adding exclusions would either keep a non-blocking control or
+encode known false results. Adding Semgrep, CodeQL, or ESLint solely to preserve the SAST
+label would add network/rule-pack/dependency cost without improving the already explicit
+Electron boundary.
+
+The recommended correction is therefore to remove the Electronegativity policy concept
+and keep three complementary blocking controls:
+
+1. executable Electron runtime, CSP, maintained-source sink, and workflow-mutation tests;
+2. `npm audit --audit-level=low` over the lockfile-resolved dependency graph; and
+3. the exact complete-history Gitleaks command.
+
+No product runtime or CSP change is recommended. In particular, do not add
+`disableBlinkFeatures: 'Auxclick'`: the old heuristic recognizes only that retired Blink
+flag and cannot see Electron's modern deny-all `setWindowOpenHandler`. The useful
+defense-in-depth is to invoke the live handler with `background-tab`, `foreground-tab`,
+and `new-window` dispositions and prove they all return `{ action: 'deny' }` without
+reaching `shell.openExternal`.
+
+Grok proposed these exact source paths and test-first behavior:
+
+- tests first: `test/electronSecurity.node.js`, `test/securityPolicy.node.js`;
+- production/policy only after tests: `scripts/security-policy.js`,
+  `.github/workflows/security.yml`;
+- strengthen the existing new-window test without changing its count;
+- add one maintained-source test over only `social-main.js`, `social/index.html`,
+  `social/app.js`, and `social/core.js`, rejecting `innerHTML`, `outerHTML`,
+  `insertAdjacentHTML`, `document.write`, `eval(`, `new Function`, and `javascript:`;
+- retain every existing audit, Gitleaks, Action-pin, permissions, path-filter, routine
+  packaging, SBOM, and no-suppression mutation;
+- remove only the Electronegativity pin/presence expectations;
+- reject any reintroduction of Electronegativity/ElectroNG, including the formerly pinned
+  command, inherited or maintained scan targets, SARIF/CSV output, `-x`,
+  `--exclude-checks`, or `eng-disable` annotations; and
+- remove only the Electronegativity constant/command/check/export and its one workflow
+  step.
+
+Residuals recorded by Grok: there is no generic third-party JS SAST after this correction;
+Electron fuses and packaged sandbox verification remain deferred with native packaging;
+the app continues to use `file://`; and the owner-configured daemon endpoint plus
+development-only `--no-sandbox` script remain intentional. These do not weaken the
+tested production window, permission, navigation, CSP, dependency, or secret boundaries.
+
+## Reviewer authorization
+
+Accepted with one precision correction: the final expected counts are Electron 13/13 and
+policy 47/47. Preserve all 46 current policy test cases conceptually, converting the
+Electronegativity-specific cases rather than dropping them, and add exactly one distinct
+obsolete-scanner report/suppression case.
+
+Grok is authorized to edit only:
+
+- `test/electronSecurity.node.js` first;
+- `test/securityPolicy.node.js` first;
+- `scripts/security-policy.js` only after both tests are complete; and
+- `.github/workflows/security.yml` only after both tests are complete.
+
+Required policy-test conversions:
+
+- constants test drops only the Electronegativity export assertion;
+- unpinned-tool test becomes CycloneDX-only;
+- missing-Electronegativity test becomes exact pinned Electronegativity plus ElectroNG
+  reintroduction rejection;
+- inherited-repository test becomes obsolete Electron-SAST input rejection for
+  `social-main.js`, `.`, `main.js`, and `js/`;
+- the existing suppression test retains all Gitleaks baseline/config/ignore mutations;
+  and
+- one new test rejects obsolete-scanner SARIF/CSV output, `-x`, `--exclude-checks`, and
+  `eng-disable` forms.
+
+The checker must reject the obsolete scanner vocabulary fail closed before checking the
+remaining required commands, while retaining every existing Gitleaks and generic
+non-blocking/suppression rule. The workflow deletes exactly the one obsolete scanner
+step. No other path or behavior changes. Grok runs nothing, uses no Git, and returns
+separate ordered hashes for tests and production/policy source.
+
+After reviewer source acceptance, Luna reruns Electron 13/13, policy 47/47, checker, npm
+audit, build syntax, social tests, complete security tests, exact Gitleaks, diff check,
+and the unchanged local manual SBOM sequence. Luna also falsifies reintroduction of the
+formerly pinned scanner before Git.

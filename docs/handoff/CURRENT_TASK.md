@@ -64,3 +64,11 @@ intentional configurable daemon endpoint and owner-approved dev sandbox workarou
 Integration is stopped before every later gate and Git. Grok Build owns design review
 only under [Correction 03](GROK_BUILD_BBD_SEC_001_CORRECTION_03.md); implementation is not
 authorized until the reviewer records the exact correction.
+
+Grok's design review is now reviewer-accepted and fully preserved in Correction 03. The
+obsolete non-blocking scanner concept will be removed test-first; it is replaced by the
+existing executable Electron boundary/policy suite plus a maintained-source sink test,
+while blocking npm audit and complete-history Gitleaks remain. No runtime, CSP, package,
+lockfile, SBOM, routine CI, packaging, or inherited-source change is authorized. Grok may
+author only the four correction paths and must run nothing; Luna remains stopped until
+the reviewer accepts Grok's exact hashes.

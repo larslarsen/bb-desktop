@@ -86,8 +86,10 @@ but is not a substitute for executable tests.
 
 ## Security and Supply-Chain Evidence
 
-- Audit the lockfile-resolved npm dependency graph, scan application source with a pinned
-  static-analysis tool, and scan committed content for secrets before acceptance.
+- Audit the lockfile-resolved npm dependency graph, execute fail-closed security-boundary
+  and dangerous-sink checks over maintained application source, and scan committed
+  content for secrets before acceptance. Use a pinned third-party static-analysis tool
+  only when it supports the maintained stack and findings produce a blocking result.
 - Establish a reviewed baseline for inherited findings. New findings fail the ratchet;
   critical or plausibly exploitable findings require immediate review regardless of the
   baseline.
@@ -97,7 +99,8 @@ but is not a substitute for executable tests.
 - Generate a machine-readable SPDX or CycloneDX SBOM from each platform's exact packaged
   application inputs. Attach it to the release and scan the package or its SBOM before
   publication. Routine pushes do not need to build packages or regenerate release SBOMs.
-- Pin scanner and SBOM-generator versions. Preserve their reports as CI or release
+- Pin external scanner and SBOM-generator versions. Preserve reports when a tool produces
+  them as CI or release evidence; executable local security checks remain durable test
   evidence. Network access is limited to fetching tools and signed advisory data; tests
   must not depend on a mutable service response.
 
