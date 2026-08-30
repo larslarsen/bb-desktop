@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: TEST SOURCE REVIEWER ACCEPTED — EXPECTED RED AUTHORIZED
+Status: TEST SOURCE REVIEWER ACCEPTED — EXPECTED RED RESUME 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -147,4 +147,7 @@ added. No routine cross-platform package build is required.
 The first six-path Sol drop and Corrections 01–02 were reviewer-rejected before execution.
 Correction 03 is reviewer-accepted at the exact six hashes in
 `docs/handoff/CODEX_LUNA_BBD_WAL_003_RED.md`. Only Codex Luna's expected-red integration
-is authorized. Production remains unauthorized until the reviewer accepts that evidence.
+is authorized. The first four commands are accepted after the raw Electron inventory
+confirmed 13 pass / 6 expected fail; only
+`docs/handoff/CODEX_LUNA_BBD_WAL_003_RED_RESUME_01.md` may resume the policy red and
+record sequence. Production remains unauthorized until the reviewer accepts that evidence.
