@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: TEST SOURCE CORRECTION 02 AUTHORIZED
+State: TEST SOURCE CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -13,9 +13,9 @@ Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 Source baseline: `d472785ab896bb5d1367c4117ffd659a9a8512ae`
 
 [BBD-WAL-003](../../tickets/BBD-WAL-003.md) is the only authorized implementation task
-in this repository. Its first test drop and Correction 01 are reviewer-rejected before
+in this repository. Its first test drop and Corrections 01–02 are reviewer-rejected before
 execution. Only the same six-path
-[Correction 02](CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_02.md) is active. No production
+[Correction 03](CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_03.md) is active. No production
 source, execution, evidence, Git, package, workflow, native binary, Rust install, wallet,
 node, network, hardware, or device action is authorized for the source actor.
 

@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: TEST SOURCE CORRECTION 02 AUTHORIZED
+Status: TEST SOURCE CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -144,7 +144,7 @@ added. No routine cross-platform package build is required.
 
 ## Test-source review status
 
-The first six-path Sol drop and Correction 01 are reviewer-rejected before execution.
+The first six-path Sol drop and Corrections 01–02 are reviewer-rejected before execution.
 The remaining correction is limited to
-`docs/handoff/CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_02.md`. No production or test
+`docs/handoff/CODEX_SOL_BBD_WAL_003_TESTS_CORRECTION_03.md`. No production or test
 execution is authorized until the reviewer accepts that corrected source.
