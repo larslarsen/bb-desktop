@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: CORRECTION 01 AUTHORIZED — TEST SOURCE ONLY
+State: CORRECTION 02 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -13,7 +13,7 @@ Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 [BBD-WAL-002](../../tickets/BBD-WAL-002.md) is the only authorized work. The current
 phase authorizes temporary Sr Dev — Codex Sol to correct its test source only under the
 exact durable contract in
-[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md).
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md).
 It must stop
 without execution, production source, dependencies, Git, network, wallets, nodes,
 devices, keys, or transaction capability.
@@ -22,11 +22,11 @@ The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
 Sol authors at High. Standing project roles are otherwise unchanged.
 
-The initial Sol drop is not accepted. Reviewer XHigh inspection found the exact blockers
-recorded in the correction handoff: vacuous malformed-UTF-8 coverage, insufficient
-fixture-driven cross-language negatives, no injected post-sign cancellation rechecks,
-incomplete crash-recovery revalidation, an inert-fake contradiction, and incomplete
-package/security wiring assertions. Codex Luna must not run the expected-red commands
+Correction 01 resolved the initial blockers, but is not yet accepted. Reviewer XHigh
+inspection found a smaller second set recorded in Correction 02: an inherited security
+test was modified instead of leaving all old assertions untouched, strict `v: 1` and
+status/review identifier/network/pool cases remain incomplete, and computed imports can
+escape the maintained-source guard. Codex Luna must not run the expected-red commands
 until the corrected source is reviewer-accepted. Production remains unauthorized and a
 failing test tree must not be committed.
 

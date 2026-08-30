@@ -316,3 +316,35 @@ The exact bounded correction contract is
 [`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_01.md).
 Sol may edit only the same four test paths, may use only the previously authorized
 read-only inspection/measurement commands, and must run nothing. Luna remains stopped.
+
+## Reviewer source decision — Correction 02
+
+Correction 01 resolves its seven named blockers, but the corrected source is not yet
+accepted. Second XHigh inspection found these focused defects:
+
+1. `test/securityPolicy.node.js` adds the wallet command assertion inside the pre-existing
+   `routine social check keeps offline syntax and Node tests only` test. This violates the
+   explicit red contract that all 50 inherited policy assertions remain unchanged and
+   execute before appended wallet expectations. The assertion is already covered by an
+   appended wallet test and must be removed from the inherited test.
+2. The field-type table does not reject JSON integers `0`, `2`, or `-1` for `v`, even
+   though every signed schema requires integer `1` only. Review pool tests also omit an
+   empty ZEC pool list and unknown/mixed pool entries.
+3. The common schema is not proven across every enumerated network. Offline decoding
+   must accept ZEC mainnet/testnet/regtest and XMR mainnet/stagenet/testnet when each is
+   paired with the correct asset/receiver kind, while rejecting cross-asset pairs.
+   Decoding is not transaction construction or mainnet use.
+4. Status and review tests cover types but not enough lexical identifiers. They must
+   reject malformed event/request/nonces, payment/memo hashes, blank intent/prepared/
+   account/peer/receiver values, and invalid review asset/network/receiver/change/tx/pool
+   combinations. Include positive paid-with-nonempty-`tx_ref` and expired-with-empty-
+   `tx_ref` status events so the rule cannot be implemented as “only cancelled works.”
+5. The forbidden-module tests enumerate literal imports but permit computed imports such
+   as `require(name)` or `import(name)`. The reference modules need a fail-closed module
+   allowlist: only literal `crypto`, `node:crypto`, `buffer`, or `node:buffer` imports may
+   appear; computed/nonliteral imports and other static/dynamic imports are rejected.
+
+The exact bounded correction contract is
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md`](../docs/handoff/CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_02.md).
+Sol may edit only the same four test paths, may use only the previously authorized
+read-only inspection/measurement commands, and must run nothing. Luna remains stopped.
