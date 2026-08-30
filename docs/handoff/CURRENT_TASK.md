@@ -131,3 +131,10 @@ Oracle 02 is delivered and reviewer-accepted at the final checker hash recorded 
 Correction 04. All other hashes are unchanged. Luna may resume from restored green,
 without repeating the completed Correction 04 red/restore; policy must now reach 50/50
 before any remaining falsification, scanner, SBOM, or Git work.
+
+All corrected code/security gates are now green, including zero findings from both exact
+Gitleaks scans. Manual SBOM setup alone is stopped: sandboxed `npm ci` returned registry
+DNS `EAI_AGAIN` for `undici-types`. The exact bounded disk-backed network retry and resume
+point are preserved in
+[SBOM Network Boundary 01](CODEX_LUNA_BBD_SEC_001_SBOM_NETWORK_01.md). No completed gate
+is repeated.

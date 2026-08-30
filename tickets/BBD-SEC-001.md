@@ -345,3 +345,9 @@ Oracle 02 was delivered and reviewer-accepted at checker SHA-256
 `c693e4055c0da3d244603857b44a6ea849d1ebb521624cce698d3bc87894f72a`.
 All other accepted hashes remain unchanged. Luna resumes from restored green without
 repeating its completed Correction 04 red/restore.
+
+Correction 04 subsequently passed every application/security gate, including exact
+full-history Gitleaks over 4,558 commits and current-tree Gitleaks with zero findings. The
+manual SBOM sequence stopped at sandboxed `npm ci` on registry DNS `EAI_AGAIN`, before any
+SBOM/evidence/Git work. One exact bounded external-network retry is authorized under
+`docs/handoff/CODEX_LUNA_BBD_SEC_001_SBOM_NETWORK_01.md`.
