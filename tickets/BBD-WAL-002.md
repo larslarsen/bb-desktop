@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: CORRECTION 06 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION 02 AUTHORIZED
+Status: PRODUCTION SOURCE ACCEPTED — TARGETED GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
