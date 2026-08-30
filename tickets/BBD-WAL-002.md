@@ -1,6 +1,6 @@
 # BBD-WAL-002 — Offline Dual-Coin Wallet Reference Contract
 
-Status: AUTHORIZED — TEST SOURCE ONLY
+Status: TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -368,3 +368,38 @@ Sol may edit only `test/electronSecurity.node.js` and `test/securityPolicy.node.
 use only the previously authorized read-only inspection/measurement commands, and must
 run nothing. The fixture and wallet test must remain byte-identical. Luna remains
 stopped.
+
+## Reviewer acceptance — test source
+
+Correction 03 test source is accepted for expected-red execution at these exact values:
+
+- `test/fixtures/wallet-contract/golden-v1.json`: 231 lines,
+  SHA-256 `08905d2b082fa6370211ebd494130d62e3696db0f8314636f3685ba5887f929f`
+- `test/walletContract.node.js`: 1,344 lines,
+  SHA-256 `a814bf327345dbdde276343fc40ff6fd8ca770569b12afc0860c664a8c99b7d9`
+- `test/electronSecurity.node.js`: 639 lines,
+  SHA-256 `3c18292790642ec3430b3ca1717657603da1a4e41c46b6c7812184dfb978939a`
+- `test/securityPolicy.node.js`: 1,396 lines,
+  SHA-256 `79b9286be5a679ba40baa5171417ab13bd19f0a2d8a56029398db8b083713204`
+
+The accepted inventory is 3 positive and 19 invalid fixture vectors, 38 wallet tests,
+14 Electron security tests (13 inherited plus one appended), and 54 security-policy
+tests (50 inherited plus four appended). The corrected source:
+
+- preflights and independently hashes fixtures before importing the absent production
+  module;
+- closes all three signed schemas across types, lexical fields, Unicode, Gregorian time,
+  asset/network/receiver relations, fee/pool rules, and all six network enums;
+- proves incremental frame boundaries, both coins, every account kind, post-sign
+  cancellation/expiry, intent mismatch, crash recovery, account locking, inert
+  broadcast, secret canaries, and rate absence;
+- preserves the inherited security tests and appends fail-closed package/CI/source
+  expectations; and
+- permits only crypto/buffer and exact pure sibling imports while rejecting external,
+  computed, parent, filesystem, network, Electron, device, and worker capabilities.
+
+Jr Dev — Codex Luna is authorized only by
+[`CODEX_LUNA_BBD_WAL_002_RED.md`](../docs/handoff/CODEX_LUNA_BBD_WAL_002_RED.md) to verify
+the hashes, run the three expected-red Node commands, write the named red-evidence file,
+and commit/push that evidence file alone if every failure matches. Luna must not modify,
+stage, commit, or push the failing test source. Production remains unauthorized.
