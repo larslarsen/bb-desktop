@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: CORRECTION 04 EXPECTED RED RECORDED — PRODUCTION NOT AUTHORIZED
+Status: EXPECTED RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -69,25 +69,28 @@ test phase must not install Rust or claim that a Node child is the wallet broker
 - Quote workers, rates, fiat values, provider hosts, exchange routes, coin adapters,
   transaction construction, custody, unlock, backup, signing, and broadcast are absent.
 
-## Current authorization — test source only
+## Current authorization — production source only
 
-Codex Sol may create or edit only:
+The accepted tests and fixtures are frozen. Under
+`docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION.md`, Codex Sol may create or edit only:
 
-- `test/fixtures/wallet-broker/transcript-v1.json`
-- `test/walletBrokerProtocol.node.js`
-- `test/walletSupervisor.node.js`
-- `test/walletPreload.node.js`
-- `test/electronSecurity.node.js`
-- `test/securityPolicy.node.js`
+- `wallet-broker/protocol.js`
+- `wallet-broker/supervisor.js`
+- `wallet-preload.js`
+- `social-main.js`
+- `package.json`
+- `.github/workflows/social.yml`
+- `.github/workflows/security.yml`
+- `scripts/security-policy.js`
 
-The two existing security files must preserve all accepted BBD-SEC-001 and BBD-WAL-002
-coverage. Their former blanket no-preload/no-IPC assertions must become a stronger exact
-allowlist: every unlisted Electron API, channel, method, sender frame, shape, and
-authority-bearing operation remains rejected.
+The implementation must satisfy all accepted BBD-SEC-001, BBD-WAL-002, and BBD-WAL-003
+tests without editing them. The prior blanket no-preload/no-IPC production state becomes
+a stronger exact allowlist: every unlisted Electron API, channel, method, sender frame,
+shape, and authority-bearing operation remains rejected.
 
-No production source, package/lock file, workflow, policy implementation, Rust source,
-binary, build, install, evidence, documentation, handoff, Git, GitHub, network, wallet,
-node, child process, hardware, or device action is authorized in this phase.
+No package-lock/test/fixture/Rust/native-binary/wallet/coin/rate/renderer/inherited source,
+build, execution, install, evidence, documentation, Git, GitHub, network, real child
+process, hardware, or device action is authorized for the source actor.
 
 ## Required test groups
 
@@ -161,6 +164,8 @@ three-suite `TOP_LEVEL_TEST_CMD` cannot also contain the newly required broker s
 `npm run test:wallet-broker` to that shared test constant. Sol's exact one-line correction
 is reviewer-accepted at 1,574 lines and SHA-256
 `1414a32cb114b1467c9d39bbcbf02228aa185857b0ccc304cd4356be9a02507b`.
-Only `docs/handoff/CODEX_LUNA_BBD_WAL_003_CORRECTION_04_RED.md` may now execute the policy
-suite, record the expected 53-pass/5-fail result, and integrate the correction. Production
-remains unauthorized.
+`docs/handoff/CODEX_LUNA_BBD_WAL_003_CORRECTION_04_RED.md` executed the policy suite and
+recorded the exact 53-pass/5-fail result at commit
+`7a1bde2372fbd94a85efc42ec1919ac451e6797a`. The reviewer accepts that expected-red gate.
+Only `docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION.md` now authorizes production source;
+execution and integration remain unauthorized pending reviewer source acceptance.

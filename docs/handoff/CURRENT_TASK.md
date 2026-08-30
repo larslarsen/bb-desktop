@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: CORRECTION 04 EXPECTED RED RECORDED — PRODUCTION NOT AUTHORIZED
+State: PRODUCTION SOURCE AUTHORIZED — EXECUTION NOT AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,11 +19,15 @@ the reviewer found that the inherited exact three-suite `npm test` assertion con
 with the new requirement to include `npm run test:wallet-broker`. Sol Correction 04 is
 reviewer-accepted at 1,574 lines and SHA-256
 `1414a32cb114b1467c9d39bbcbf02228aa185857b0ccc304cd4356be9a02507b`.
-Only [the Luna Correction 04 policy-red handoff](CODEX_LUNA_BBD_WAL_003_CORRECTION_04_RED.md)
-executed the corrected policy suite and recorded its exact 53-pass/5-fail result in
-[the correction evidence](../testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md). Production, package/workflow/policy implementation, native
+The Luna Correction 04 policy-red handoff executed the corrected policy suite and
+recorded its exact 53-pass/5-fail result in
+[the correction evidence](../testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md). The
+reviewer accepts that gate. Only
+[the Sol production handoff](CODEX_SOL_BBD_WAL_003_PRODUCTION.md) may now author the
+eight named production/package/workflow/policy paths. Tests, execution, Git, native
 binary, Rust install, wallet, node, network service, hardware, and device work remain
-unauthorized until the reviewer accepts that revised policy expected red.
+unauthorized for the source actor. Codex Luna may execute only after reviewer source
+acceptance and a separate durable handoff.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
