@@ -121,3 +121,8 @@ Luna's first Correction 04 resume stopped before all work because the integratio
 mis-transcribed the package-lock SHA-256. Reviewer recomputed it, confirmed the lockfile
 has no diff and matches the original source report, and corrected only that durable guard.
 Luna may restart the same Correction 04 contract from hash verification.
+
+Luna then reached restored green at Electron 13/13 and policy 49/50. The only failure is
+a checker ordering issue: an appended valid fingerprint is rejected as trailing bytes
+before the intended extra-count rule. Correction 04 Oracle 02 authorizes Grok to edit
+only that branch in `scripts/security-policy.js`; Luna remains stopped.

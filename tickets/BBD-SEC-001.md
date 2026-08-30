@@ -335,3 +335,8 @@ Reviewer independently reproduced every hash/count and accepted the strict eight
 ratchet, two loader neutralizations, checker, exact dual-scan workflow, 50 policy tests,
 and corrected non-vacuous loader mutation. Luna may resume only under
 `docs/handoff/CODEX_LUNA_BBD_SEC_001_CORRECTION_04.md`.
+
+Luna's restored green passed Electron 13/13 and policy 49/50. The only failure is an
+over-eager checker branch that labels a valid ninth fingerprint as trailing bytes before
+the intended extra-count rule. Correction 04 Oracle 02 authorizes Grok to remove only
+that premature branch in `scripts/security-policy.js`. Luna remains stopped.

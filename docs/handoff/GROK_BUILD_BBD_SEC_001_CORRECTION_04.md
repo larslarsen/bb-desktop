@@ -190,6 +190,22 @@ Keep exactly 50 tests. Do not change the synthetic token, any other test, produc
 ratchet, workflow, sensitive source, or behavior. Run nothing and report the new test
 hash and line count only.
 
+## Oracle correction 02 — Authorized
+
+Luna's restored green reached policy 49/50. The sole failure is semantic ordering in
+`checkGitleaksRatchetBytes`: an appended valid ninth commit-qualified fingerprint is
+correctly rejected, but the early exact-prefix/longer-buffer shortcut labels it
+“trailing bytes” before parsing/counting can reach the intended “extra fingerprint”
+invariant. The test oracle accepts only the mechanism-specific extra rejection.
+
+Grok may edit only `scripts/security-policy.js`. Remove only the premature condition that
+classifies any buffer longer than the exact body with the exact body as a prefix as
+trailing bytes. Preserve every other validation and its order. A valid ninth newline-
+terminated fingerprint must then parse and fail the existing extra-count rule; a
+no-final-newline suffix must still fail trailing bytes, and blanks/malformed content must
+still fail their existing rules. Do not edit tests, ratchet, workflow, loaders, or any
+other path. Run nothing. Report only the new checker hash/line count and safe summary.
+
 ## Source delivery and reviewer acceptance
 
 Grok authored the policy test file completely before all production paths and ran
