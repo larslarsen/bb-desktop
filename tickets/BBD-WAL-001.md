@@ -1,6 +1,6 @@
 # BBD-WAL-001 — Dual-Coin Wallet Architecture Review
 
-Status: SOURCE ACCEPTED — LUNA INTEGRATION AUTHORIZED
+Status: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -226,3 +226,9 @@ required to integrate this design document. Codex Luna is authorized only by
 [`CODEX_LUNA_BBD_WAL_001.md`](../docs/handoff/CODEX_LUNA_BBD_WAL_001.md) to verify and
 commit the exact accepted document. No implementation, dependency, test, wallet, node,
 device, provider call, or other-repository change is authorized.
+
+Codex Luna integrated only the accepted architecture in commit
+`ffebcc179d3b2aaca687213de54d3c3298ac0696`. Reviewer independently verified on
+2026-08-30 that `HEAD` and `origin/master` matched, the worktree was clean, the commit
+contained only `docs/architecture/BBD-WAL-001-REVIEW.md`, and the accepted line count and
+SHA-256 were unchanged. BBD-WAL-001 is complete.

@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-001
 
-State: SOURCE ACCEPTED — LUNA INTEGRATION AUTHORIZED
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -15,13 +15,16 @@ owner's decision to support built-in shielded ZEC and optional local-node XMR fr
 beginning, with software, hardware-backed, and watch-only accounts shaped by a common
 contract. Ledger and Trezor support are first-class requirements.
 
-Correction 02 is reviewer-accepted at exactly 2,271 lines and SHA-256
+The architecture is integrated and reviewer-accepted in commit
+`ffebcc179d3b2aaca687213de54d3c3298ac0696` at exactly 2,271 lines and SHA-256
 `aae487b169689f310b222640427c1cdae62850d39ebb0243e29f10568d6fcb3f`. It resolves the
-original wallet-boundary blockers and the owner-raised OB1 exchange-rate dependency.
-Codex Luna may now integrate only the exact accepted
-[BBD-WAL-001-REVIEW.md](../architecture/BBD-WAL-001-REVIEW.md) under
-[CODEX_LUNA_BBD_WAL_001.md](CODEX_LUNA_BBD_WAL_001.md). No implementation or dependency
-work is authorized.
+wallet trust boundary, ZEC/XMR/hardware model, canonical Pay protocol, offline ticket
+sequence, and the owner-raised OB1 exchange-rate dependency. The worktree and remote were
+independently verified clean and equal.
+
+No implementation ticket is currently authorized. The architecture names BBD-WAL-002 as
+the next slice: an offline, dependency-free Node reference contract with tests first and
+no ability to construct or move funds.
 
 The maintained `../bb-go/modern` social daemon remains wallet-free. The local wallet
 broker belongs to the desktop product boundary. Electron may supervise and request a
