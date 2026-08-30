@@ -1,6 +1,6 @@
 # BBD-SEC-001 — Harden the Maintained Electron Client and Add Security/SBOM Gates
 
-Status: AUTHORIZED
+Status: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -184,6 +184,19 @@ committing the generated document.
 - The maintained Electron security boundary is executable and fail closed.
 - Manual SBOM generation produces one validated CycloneDX JSON and no application binary.
 - Reviewer accepts the integrated commit and required remote routine CI passes.
+
+## Reviewer acceptance — 2026-08-30
+
+Accepted implementation commit: `47bf45884d737b4b89571f06d8ba3b4e20238bfb`.
+
+The complete test-first, mutation, acceptance, Gitleaks, and SBOM evidence is preserved
+in `docs/security/BBD-SEC-001-EVIDENCE.md`. The required routine GitHub workflow passed
+for the accepted implementation in run `33322584615`. The local worktree was clean and
+`origin/master` matched the accepted implementation before this documentation-only
+acceptance record was authored.
+
+No native package workflow, security workflow, or SBOM workflow was dispatched. No
+deprecated `go-ipfs` work was performed. BBD-SEC-001 is complete.
 
 ## Correction 1 — Authorized
 

@@ -2,7 +2,7 @@
 
 Ticket: BBD-SEC-001
 
-State: AUTHORIZED
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -152,3 +152,9 @@ bytes, and SHA-256
 `docs/security/BBD-SEC-001-EVIDENCE.md`. The complete BBD-SEC-001 source/evidence change
 is ready for reviewer inspection after the authorized commit and push; no native package
 or deprecated `go-ipfs` work was performed.
+
+Reviewer accepted implementation commit
+`47bf45884d737b4b89571f06d8ba3b4e20238bfb` on 2026-08-30 after routine GitHub workflow
+run `33322584615` completed successfully. The worktree was clean and `origin/master`
+matched that implementation before this documentation-only acceptance update. The
+ticket is complete; `go-ipfs` remains deprecated and out of scope.
