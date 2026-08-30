@@ -233,3 +233,18 @@ artifacts, exact pinned scanners, and a 180-second foreground timeout for each
 network-backed `npx` invocation. A timeout, network/tool error, or finding remains a hard
 stop. No source repair, cleanup, deletion, native packaging, workflow dispatch, or `/tmp`
 use is authorized.
+
+## Scanner finding stop — Under review
+
+The bounded Electronegativity command obtained network access and completed, but printed
+three findings while returning exit 0. Reviewer diagnostics confirmed that the pinned
+tool is no longer actively maintained, does not understand Electron 44, and does not
+fail its process when findings exist. A maintained-app-only SARIF diagnostic produced
+four results, including tool-age, owner-approved development sandbox, configurable daemon
+endpoint, and aux-click heuristics. No later gate, SBOM, source repair, evidence, Git, or
+push ran.
+
+Correction design is delegated to Grok Build under
+`docs/handoff/GROK_BUILD_BBD_SEC_001_CORRECTION_03.md`. This is design review only; no
+source change or integration resumption is authorized until the reviewer accepts and
+records an exact test-first replacement.
