@@ -282,3 +282,15 @@ Luna executes under `docs/handoff/CODEX_LUNA_BBD_SEC_001_CORRECTION_03.md`, whic
 the exact correction-specific red/green/falsification order and supersedes only the old
 Electronegativity command. All other safety, acceptance, SBOM, evidence, and Git rules
 remain in force.
+
+## Gitleaks finding stop — Reviewer triage authorized
+
+Correction integration passed bounded red/restore, Electron 13/13, policy 47/47, checker,
+npm audit with zero vulnerabilities, obsolete-scanner falsification/restore, build
+syntax, social tests, and the complete security suite. Exact Gitleaks v8.30.1 then scanned
+4,549 commits, reported 10 findings, and exited 1. Luna stopped before SBOM, evidence,
+staging, commit, or push.
+
+Reviewer-only redacted metadata triage is authorized under
+`docs/handoff/BBD_SEC_001_GITLEAKS_TRIAGE_01.md`. It authorizes no suppression, baseline,
+repair, deletion, Git, or integration resumption.

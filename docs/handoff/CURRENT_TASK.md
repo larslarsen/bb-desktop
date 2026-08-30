@@ -84,3 +84,10 @@ Luna's exact resumed integration contract is
 [Correction 03 Integration](CODEX_LUNA_BBD_SEC_001_CORRECTION_03.md). It prevents repeat
 work, supersedes only the obsolete scanner command, and preserves every disk-path,
 no-cleanup, no-native-build, hard-stop, evidence, commit, and reviewer-return rule.
+
+Luna completed every corrected gate through the security test suite, including the
+required red/restore and obsolete-scanner falsification. Gitleaks then stopped integration
+after scanning 4,549 commits and reporting 10 findings. No SBOM/evidence/Git work ran.
+Reviewer owns redacted metadata-only triage under
+[Gitleaks Triage 01](BBD_SEC_001_GITLEAKS_TRIAGE_01.md); no baseline, suppression, repair,
+or resume is yet authorized.
