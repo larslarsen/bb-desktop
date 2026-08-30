@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: PRODUCTION SOURCE ACCEPTED — LOCAL GREEN AUTHORIZED
+State: LOCAL GREEN STOPPED — PRODUCTION CORRECTION 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -30,10 +30,13 @@ no-payload Electron calls to the broker's required empty parameter object. Only
 [Production Correction 01](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_01.md) edited only
 `wallet-broker/supervisor.js` to close that mismatch. The reviewer accepts the exact
 eight-path source hash set recorded in
-[the Luna green handoff](CODEX_LUNA_BBD_WAL_003_GREEN.md). Only that handoff may execute
-the targeted and broader local gates, record evidence, and integrate/push on exact green.
-Native binary, Rust install, wallet, node, network service, hardware, and device work
-remain unauthorized.
+[the Luna green handoff](CODEX_LUNA_BBD_WAL_003_GREEN.md). Luna stopped on its first
+targeted command at 10 protocol passes / 1 handshake failure; no later command ran. The
+numeric child PID was accepted through regex string coercion. Only
+[Production Correction 02](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_02.md) may add
+explicit string guards for the same validation defect family in protocol, supervisor, and
+Electron main. Execution, native binary, Rust install, wallet, node, network service,
+hardware, and device work remain unauthorized pending renewed reviewer acceptance.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit

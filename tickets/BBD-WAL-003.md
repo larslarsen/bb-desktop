@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: PRODUCTION SOURCE ACCEPTED — LOCAL GREEN AUTHORIZED
+Status: LOCAL GREEN STOPPED — PRODUCTION CORRECTION 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -175,4 +175,8 @@ empty broker parameters. Only
 `wallet-broker/supervisor.js` to correct that mismatch. The reviewer accepts its narrow
 normalization and the complete eight-path production hash set. Only
 `docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN.md` may now run the named local gates and
-integrate/push after exact green. Falsification and CI review remain later gates.
+integrate/push after exact green. It stopped on the first command at 10 protocol passes /
+1 handshake failure because numeric `child_pid` passed through regex coercion. Only
+`docs/handoff/CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_02.md` may now add explicit
+string guards for that validation defect family in protocol, supervisor, and Electron
+main. Execution, falsification, and CI review remain unauthorized pending review.
