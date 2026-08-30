@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-002
 
-State: CORRECTION EXPECTED RED ACCEPTED — PRODUCTION CORRECTION 01 AUTHORIZED
+State: PRODUCTION CORRECTION 01 REVIEW REJECTED — TEST CORRECTION 06 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex
 
@@ -17,11 +17,12 @@ present but reviewer-rejected before execution. Correction 05 test source is acc
 1,697 lines and SHA-256
 `3e51281d16da7eec4a178eeb799ec23e2854206a096ed741cba920fc35825ee9`, with 45 wallet
 tests total. Its exact 38-pass/7-fail correction red is accepted at evidence commit
-`3207667e276cffcb438988610cfa90a64e130ffd`. The current phase authorizes temporary Sr
+`3207667e276cffcb438988610cfa90a64e130ffd`. Production Correction 01 closes those seven
+causes but is reviewer-rejected before green. The current phase authorizes temporary Sr
 Dev — Codex Sol only under
-[`CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_01.md`](CODEX_SOL_BBD_WAL_002_PRODUCTION_CORRECTION_01.md)
-to correct `model.js`, `state-machine.js`, and `fakes.js`. Sol must run nothing and use no
-Git. Luna is stopped until reviewer source acceptance.
+[`CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_06.md`](CODEX_SOL_BBD_WAL_002_TESTS_CORRECTION_06.md)
+to add test-first coverage for the three residual source-review blockers in
+`test/walletContract.node.js`. Production is frozen and Luna is stopped.
 
 The owner approved this ticket-specific substitution after Grok Build returned a
 quota-exhausted 402 before reading or changing source. The reviewer operates at XHigh;
