@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY SOURCE ACCEPTED — OFFLINE GATE AUTHORIZED
+State: SUPPORT-DEPENDENCY LOCK GATE RESUME AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_RESUME_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_RESUME_01.md)
+
+Support-dependency gate stop review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-01.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-01.md)
+
+Stopped original support-dependency gate:
 [CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md)
 
 Accepted support-dependency production-source review:
@@ -217,6 +223,12 @@ and policy SHA-256
 `60e41a12462d77c6be875f1659e5ef8a86d2b8146bd25d37ec7777297847d767`.
 Luna is authorized only for the exact offline lock/policy/custody gate. ZEC Rust
 production and broader feature/source policy remain frozen.
+
+The Node portion passed exactly at 71/3. The selected offline metadata command exited 0
+but did not refresh the root lock dependency list, so Luna stopped before further work.
+The resume substitutes one offline, unlocked `vault_crypto` check as the sole lock
+resolution step, then retains the exact lock-diff/feature/11-test requirements. No source
+repair or ZEC production is authorized.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD

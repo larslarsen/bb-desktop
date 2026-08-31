@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SUPPORT-DEPENDENCY SOURCE ACCEPTED — OFFLINE GATE AUTHORIZED
+Status: SUPPORT-DEPENDENCY LOCK GATE RESUME AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -342,6 +342,11 @@ That correction is accepted. Luna may run only
 `docs/handoff/CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md` to resolve and
 inspect the offline lock, verify the focused policy/custody gates, and integrate if
 exact. ZEC Rust production remains frozen.
+
+The first gate's Node result matched 71/3, but `cargo metadata --no-deps` made no lock
+change. The exact resume in
+`docs/handoff/CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_RESUME_01.md` replaces only
+that ineffective resolution command. ZEC Rust production remains frozen.
 
 ### Phase C2 — address production source (future, separate handoff)
 
