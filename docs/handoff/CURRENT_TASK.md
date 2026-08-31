@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: AUTHORIZED — CODEX SOL TEST SOURCE ONLY
+State: REVIEW CORRECTION 1 — CODEX SOL TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -20,12 +20,14 @@ broker-invoked native file picker may select backup paths. Electron never owns t
 window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
 hardware devices confirm independently when capable.
 
-Only [the Sol test-source handoff](CODEX_SOL_BBD_WAL_004_TESTS.md) may create the exact
-nine test-harness/test/fixture paths named there. No Rust toolchain is installed yet.
-Sol must not execute or install anything. After reviewer acceptance, the owner will be
-asked to install the pinned user-level Rust toolchain under `/home/lars`; Luna will then
-resolve `Cargo.lock` and execute the separately authorized expected-red command. Large
-build/cache/temp trees may not use `/tmp`.
+The initial Sol drop is complete but remains uncommitted and is not reviewer-accepted.
+Only [correction 1](CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_1.md) is active; it permits
+Sol to edit exactly three existing Rust test paths to close the independent-composition,
+real-open pre-KDF, and Linux filesystem/failure-invariant gaps. No Rust toolchain is
+installed yet. Sol must not execute or install anything. After reviewer acceptance, the
+owner will be asked to install the pinned user-level Rust toolchain under `/home/lars`;
+Luna will then resolve `Cargo.lock` and execute the separately authorized expected-red
+command. Large build/cache/temp trees may not use `/tmp`.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

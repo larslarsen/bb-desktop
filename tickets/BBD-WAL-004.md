@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: AUTHORIZED — TEST SOURCE ONLY
+Status: REVIEW CORRECTION 1 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -72,12 +72,17 @@ Encryption uses the following exact composition:
    bytes exactly as entered (UTF-8, no Unicode normalization), and 32-byte output.
 2. HKDF-SHA-256 expands that output with no second salt and an unambiguous,
    length-delimited info value containing `BitBook wallet vault key v1`, asset,
-   network, and raw 16-byte account id.
+   network, and raw 16-byte account id. The v1 framing is frozen: `frame(x)` is a
+   four-byte unsigned big-endian byte length followed by the exact bytes of `x`.
+   `info` is `frame("BitBook wallet vault key v1") || frame(asset ASCII) ||
+   frame(network ASCII) || frame(raw account id)`.
 3. XChaCha20-Poly1305 encrypts in place with a fresh 24-byte OS-random nonce.
-   Additional authenticated data is an unambiguous, length-delimited encoding of
-   format/version/account/asset/network/epoch and every KDF/AEAD algorithm and cost
-   field except salt, nonce, and ciphertext. Salt and nonce are bound by including
-   them in the AAD immediately after that fixed header.
+   Additional authenticated data uses the same `frame` operation in this exact order:
+   format ASCII, version canonical decimal ASCII, raw account id, asset ASCII, network
+   ASCII, epoch canonical decimal ASCII, KDF algorithm ASCII, KDF version canonical
+   decimal ASCII, `m_cost_kib` canonical decimal ASCII, `t_cost` canonical decimal
+   ASCII, `p_cost` canonical decimal ASCII, AEAD algorithm ASCII, raw salt, then raw
+   nonce. Salt and nonce are therefore bound immediately after the fixed header.
 4. Passphrase, Argon2 output, HKDF output, and plaintext buffers use secret wrappers
    and are explicitly zeroized on success, error, cancel, lock, replacement, and
    drop. Ciphertext, salt, nonce, account id, network, and epoch are not secret.
@@ -87,6 +92,33 @@ or epoch must not decrypt. Social identity is not a valid vault domain or payloa
 source. There is no compatibility downgrade, parameter negotiation, weak-profile
 import, or fallback cipher in v1. Future tuning requires a new reviewed format
 version and migration ticket.
+
+### Reviewer-fixed independent composition vector
+
+The full deterministic vector uses account `00112233445566778899aabbccddeeff`, ZEC
+testnet, epoch 7, passphrase `synthetic-vault-passphrase`, plaintext
+`CANARY_WAL004_OPAQUE_SECRET`, salt byte `0x42` repeated 16 times, and nonce byte `0x24`
+repeated 24 times. It was computed independently from the future Rust production code
+with the already-cached Go `golang.org/x/crypto` v0.54.0 Argon2id and XChaCha20-Poly1305
+implementations plus HKDF-SHA-256, offline with module downloads disabled. Intermediate
+hex values are:
+
+```text
+info   = 0000001b426974426f6f6b2077616c6c6574207661756c74206b6579207631000000035a45430000000b7a65632d746573746e65740000001000112233445566778899aabbccddeeff
+aad    = 00000014626974626f6f6b2d77616c6c65742d7661756c7400000001310000001000112233445566778899aabbccddeeff000000035a45430000000b7a65632d746573746e65740000000137000000086172676f6e3269640000000231390000000536353533360000000133000000013100000011786368616368613230706f6c7931333035000000104242424242424242424242424242424200000018242424242424242424242424242424242424242424242424
+argon = f27d8dca61ccefab7a2c04b87bc68d6947ac8d963b45a9ad75556f9932eb2917
+key    = 142e48008e3e99568fbbdb4c4534bc67f9666fe4853e6b57c1517be00b24f320
+cipher = bbded4ad52a2df769e56cffc856392bf69c5183c66a22b4ac6f8d77e0e8383df5bbca243bbbea5ca68c750
+```
+
+The exact canonical envelope is this single JSON line followed by one LF:
+
+```json
+{"format":"bitbook-wallet-vault","version":1,"account_id":"00112233445566778899aabbccddeeff","asset":"ZEC","network":"zec-testnet","epoch":"7","kdf":{"algorithm":"argon2id","version":19,"m_cost_kib":65536,"t_cost":3,"p_cost":1,"salt_b64":"QkJCQkJCQkJCQkJCQkJCQg"},"aead":{"algorithm":"xchacha20poly1305","nonce_b64":"JCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk","ciphertext_b64":"u97UrVKi33aeVs/8hWOSv2nFGDxmoitKxvjXfg6Dg99bvKJDu76lymjHUA"}}
+```
+
+The deterministic test compares every envelope byte to this independent value; comparing
+two calls to the same production function is not a vector.
 
 ## Persistence, backup, and rollback contract
 
@@ -207,6 +239,24 @@ does not exist. No production source, `Cargo.lock`, toolchain file, `deny.toml`,
 script, policy implementation, workflow, SBOM validator, JavaScript broker boundary,
 Electron, renderer, inherited source, evidence, documentation, Git, GitHub, install,
 network, command execution, cleanup, or unlisted path is authorized for Sol.
+
+## Reviewer correction 1
+
+The initial source drop is retained uncommitted and is not accepted yet. The correction
+actor may edit only `wallet-broker/tests/vault_crypto.rs`,
+`wallet-broker/tests/vault_format.rs`, and `wallet-broker/tests/vault_store.rs` under
+`docs/handoff/CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_1.md`.
+
+The correction must replace the self-referential deterministic check with the exact
+independent vector above; route KDF work observation through the actual `open_vault_bytes`
+path so malformed cost/algorithm fields prove zero KDF calls and a valid envelope proves
+one; add a real Linux filesystem boundary test under `target/wal004-scratch` for actual
+`0700` directory, `0600` active file, regular-file/no-symlink behavior, and explicit
+nonrecursive cleanup; and make fault tests distinguish failures before atomic replacement
+from directory-sync failure. Before replacement the old active bytes must remain exact.
+After replacement but before successful directory sync the active entry must be one
+complete authenticated old or new envelope, never absent, empty, or partial. Recovery
+failure must preserve the exact active bytes and any complete recoverable staging bytes.
 
 ## Required test groups
 
