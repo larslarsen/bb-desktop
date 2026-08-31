@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 6 TEST ACCEPTED — FINAL GREEN INTEGRATION AUTHORIZED
+State: ALL LOCAL GATES GREEN — RUSTSEC NETWORK RESUME AUTHORIZED
 
-Review: [BBD-WAL-004-TEST-SOURCE-REVIEW-02.md](../testing/BBD-WAL-004-TEST-SOURCE-REVIEW-02.md)
+Evidence: [BBD-WAL-004-GREEN-RUN-06.md](../testing/BBD-WAL-004-GREEN-RUN-06.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_GREEN_6.md](CODEX_LUNA_BBD_WAL_004_GREEN_6.md)
+Active handoff: [CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md](CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -65,8 +65,10 @@ native compile and RustSec audit. Sol's exact three corrections are accepted in 
 review 06. GREEN_5 repeated all functional gates successfully and production passed
 Clippy; Clippy then found four compatibility warnings only in the independent-vector
 test. Sol's one-test correction is reviewer-accepted with every vector byte and
-assertion unchanged. Luna now repeats the complete gate and integrates only on exact
-green. Post-commit falsification and CI security/SBOM results remain required.
+assertion unchanged. GREEN_6 passed every local functional, lint, and native compile
+gate. Only RustSec's advisory-database refresh was denied outbound network. Luna may
+resume that exact audit with network access and integrate only on a clean result.
+Post-commit falsification and CI security/SBOM results remain required.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

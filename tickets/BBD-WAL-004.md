@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CORRECTION 6 TEST ACCEPTED — FINAL GREEN INTEGRATION AUTHORIZED
+Status: ALL LOCAL GATES GREEN — RUSTSEC NETWORK RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -376,6 +376,11 @@ assertion. Production is frozen.
 Correction 6 is accepted in test source review 02. Luna owns the complete final gate and
 integration under `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_6.md`. Production remains
 frozen and no further source/test change is authorized.
+
+GREEN_6 passed the full local functional, Clippy, and native compile surface. The final
+RustSec command was blocked only while fetching its advisory database. The exact
+read-only network resume and integration contract is
+`docs/handoff/CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md`.
 
 ## Required test groups
 
