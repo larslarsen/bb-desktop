@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: DEPENDENCY/CUSTODY GATE ACCEPTED — FIXTURE AND EXPECTED RED AUTHORIZED
+State: FIRST FIXTURE RUN REJECTED — REORG GENERATOR CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_04.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_04.md)
+[CODEX_SOL_BBD_WAL_006_FIXTURE_REORG_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_FIXTURE_REORG_CORRECTION_01.md)
+
+Fixture-generation review:
+[BBD-WAL-006-FIXTURE-GENERATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-GENERATION-REVIEW-01.md)
 
 Accepted dependency correction gate review:
 [BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-REVIEW-02.md](../testing/BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-REVIEW-02.md)
@@ -105,9 +108,10 @@ nine accepted frozen-production API diagnostics. Sol's exact `vault.rs` compatib
 drop is reviewer-accepted at 759 lines and SHA-256
 `89d8ada8ad7050910a92a9daa38f9d93a18b86c4b7d1bde7a7e9b4a8adf8b62b`.
 The dependency/custody commands passed and were integrated at `6f0a5305`; the corrected
-supply-chain inventory is complete at `7ee9eb4e` and reviewer-accepted. Luna may run only
-the deterministic fixture/expected-red slice in the active handoff. ZEC production
-remains frozen.
+supply-chain inventory is complete at `7ee9eb4e` and reviewer-accepted. The first fixture
+run exposed a test-only misuse of upstream wallet rewind before scan; no fixture/evidence
+was created. Sol may edit only the fixture builder's reorg construction under the active
+handoff. All execution and ZEC production remain frozen.
 
 No ZEC production source or policy implementation is authorized. The sole production
 exception is the accepted `vault.rs` AEAD API compatibility edit in the active gate.

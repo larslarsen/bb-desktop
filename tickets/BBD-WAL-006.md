@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: DEPENDENCY/CUSTODY GATE ACCEPTED — FIXTURE AND EXPECTED RED AUTHORIZED
+Status: FIRST FIXTURE RUN REJECTED — REORG GENERATOR CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
