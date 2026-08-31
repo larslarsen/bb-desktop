@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: DEPENDENCY CORRECTION GATE PASSED — REVIEW REQUIRED
+State: DEPENDENCY GATE EVIDENCE INCOMPLETE — INVENTORY ADDENDUM AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_CORRECTION_GATE_01.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_CORRECTION_GATE_01.md)
+[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_INVENTORY_ADDENDUM_01.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_INVENTORY_ADDENDUM_01.md)
+
+Dependency correction gate review:
+[BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-REVIEW-01.md](../testing/BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-REVIEW-01.md)
 
 AEAD API production-source review:
 [BBD-WAL-006-AEAD-API-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-AEAD-API-PRODUCTION-SOURCE-REVIEW-01.md)
@@ -98,8 +101,9 @@ The exact locked/offline custody target then exited 101 with zero tests and only
 nine accepted frozen-production API diagnostics. Sol's exact `vault.rs` compatibility
 drop is reviewer-accepted at 759 lines and SHA-256
 `89d8ada8ad7050910a92a9daa38f9d93a18b86c4b7d1bde7a7e9b4a8adf8b62b`.
-Luna may run and integrate only the dependency/custody gate in the active handoff.
-ZEC tests and fixtures remain frozen.
+The dependency/custody commands passed and were integrated at `6f0a5305`, but the
+evidence omits exact feature/license/build-script/proc-macro inventories. Luna may run
+only the metadata addendum in the active handoff. ZEC tests and fixtures remain frozen.
 
 No ZEC production source or policy implementation is authorized. The sole production
 exception is the accepted `vault.rs` AEAD API compatibility edit in the active gate.
