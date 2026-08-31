@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE PRODUCTION SOURCE AUTHORIZED
+State: PHASE-C STORE PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_01.md)
+[CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_CORRECTION_01.md)
+
+Store production source review:
+[BBD-WAL-006-STORE-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-STORE-PRODUCTION-SOURCE-REVIEW-01.md)
 
 Accepted address gate result review:
 [BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md)
@@ -356,9 +359,10 @@ authorized only for bounded evidence and exact eight-path integration; all broad
 frozen.
 
 The address vertical and final evidence are accepted at
-`432e69c0443dd5233609d578b43d5a43d83d2c3d`. Sol is authorized only for the four-path
-`zec_store` production-source handoff. Address test/source outside those paths, scan,
-preparation, handle hygiene, broader ZEC feature/source policy, and execution remain frozen.
+`432e69c0443dd5233609d578b43d5a43d83d2c3d`. Store Source Review 01 rejected execution and
+authorizes Sol only for the two-file correction handoff. Address source, `zec.rs`, `fixture.rs`,
+all tests, scan, preparation, handle hygiene, broader ZEC feature/source policy, and execution
+remain frozen.
 
 No broader tests, falsification, live endpoint, mainnet, signing, proving, extraction,
 broadcast, hardware, Electron, package, SBOM, or other-repository work is authorized in this
