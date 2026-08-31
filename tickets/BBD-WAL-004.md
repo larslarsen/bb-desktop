@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: FUNCTIONAL GREEN — CORRECTION 5 CLIPPY SOURCE AUTHORIZED
+Status: CORRECTION 5 SOURCE ACCEPTED — FINAL GREEN INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -363,6 +363,10 @@ and all 78 Rust tests. Its all-features Clippy gate found only the three
 behavior-equivalent idiom warnings frozen in `docs/testing/BBD-WAL-004-GREEN-RUN-04.md`.
 Sol may edit only `store.rs` and `vault.rs` under the exact Correction 5 handoff; no test
 change is authorized.
+
+Correction 5 is reviewer-accepted in source review 06. Luna owns the complete final gate
+and integration under `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_5.md`; falsification and
+triggered CI security/SBOM gates remain required afterward.
 
 ## Required test groups
 
