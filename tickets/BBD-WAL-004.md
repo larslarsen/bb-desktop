@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CORRECTION 5 SOURCE ACCEPTED — FINAL GREEN INTEGRATION AUTHORIZED
+Status: PRODUCTION CLIPPY GREEN — CORRECTION 6 TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -367,6 +367,11 @@ change is authorized.
 Correction 5 is reviewer-accepted in source review 06. Luna owns the complete final gate
 and integration under `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_5.md`; falsification and
 triggered CI security/SBOM gates remain required afterward.
+
+GREEN_5 passed every functional gate and production Clippy. Clippy then found only four
+deprecated/idiom warnings in the independent vector test. Correction 6 authorizes Sol to
+update that one test to the same pinned APIs without changing any vector byte, input, or
+assertion. Production is frozen.
 
 ## Required test groups
 

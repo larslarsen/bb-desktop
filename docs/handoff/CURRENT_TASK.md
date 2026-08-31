@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 5 SOURCE ACCEPTED — FINAL GREEN INTEGRATION AUTHORIZED
+State: PRODUCTION CLIPPY GREEN — CORRECTION 6 TEST SOURCE AUTHORIZED
 
-Review: [BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-06.md](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-06.md)
+Evidence: [BBD-WAL-004-GREEN-RUN-05.md](../testing/BBD-WAL-004-GREEN-RUN-05.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_GREEN_5.md](CODEX_LUNA_BBD_WAL_004_GREEN_5.md)
+Active handoff: [CODEX_SOL_BBD_WAL_004_CORRECTION_6_TEST.md](CODEX_SOL_BBD_WAL_004_CORRECTION_6_TEST.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -62,8 +62,10 @@ formatter contingency, build, Node/security suites, zero-vulnerability npm audit
 all 78 Rust tests passed. All-features Clippy then identified exactly three denied
 behavior-equivalent idiom warnings in `store.rs` and `vault.rs`; Luna stopped before the
 native compile and RustSec audit. Sol's exact three corrections are accepted in source
-review 06. Luna now repeats the complete gate and integrates only on exact green.
-Post-commit falsification and triggered CI security/SBOM results remain required.
+review 06. GREEN_5 repeated all functional gates successfully and production passed
+Clippy; Clippy then found four compatibility warnings only in the independent-vector
+test. Sol may edit that one test without changing its expected bytes or semantics.
+Integration, post-commit falsification, and CI security/SBOM results remain required.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
