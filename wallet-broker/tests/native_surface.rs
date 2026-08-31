@@ -233,6 +233,57 @@ fn invalid_passphrase_lengths_wipe_before_unlock_or_restore_custody() {
     }
 }
 
+fn assert_invalid_utf8_passphrase_rejected(restore: bool) {
+    const INVALID_UTF8: &[u8] = &[0xf0, 0x28, 0x8c, 0x28];
+    let mut controller = controller();
+    let mut surface = Surface {
+        passphrase: Some(SecretBytes::new(INVALID_UTF8.to_vec()).unwrap()),
+        confirmed: true,
+        ..Surface::default()
+    };
+    let mut dialog = Dialog {
+        selected: Some(BACKUP_PATH.to_owned()),
+        ..Dialog::default()
+    };
+    let action = if restore {
+        NativeAction::Restore
+    } else {
+        NativeAction::Unlock { account_id: ACCOUNT.to_owned() }
+    };
+
+    assert_eq!(
+        controller
+            .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+            .unwrap_err()
+            .code(),
+        "LOCKED"
+    );
+    assert_eq!(
+        surface.results,
+        vec![SurfaceResult::Error("Wallet locked".to_owned())]
+    );
+    assert!(controller.custody().calls.is_empty());
+    assert!(controller.custody().passphrase_lengths.is_empty());
+    assert!(!controller.custody().restored);
+    assert!(surface.restore.is_none());
+    assert!(!surface.results.contains(&SurfaceResult::Success));
+    assert!(controller.wipe_observer().0.iter().any(|wipe| {
+        wipe.label == "native-passphrase"
+            && wipe.length == INVALID_UTF8.len()
+            && wipe.all_zero
+    }));
+}
+
+#[test]
+fn invalid_utf8_unlock_passphrase_wipes_before_custody() {
+    assert_invalid_utf8_passphrase_rejected(false);
+}
+
+#[test]
+fn invalid_utf8_restore_passphrase_wipes_before_custody_or_commit() {
+    assert_invalid_utf8_passphrase_rejected(true);
+}
+
 #[test]
 fn password_prompt_is_masked_noncopyable_and_bounded() {
     let mut controller = controller();

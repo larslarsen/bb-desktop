@@ -1833,6 +1833,8 @@ test('WAL-004 Rust source inventory is exported closed and enumerated by reposit
   }).filter((entry) => entry.isFile() && entry.name.endsWith('.rs'))
     .map((entry) => `wallet-broker/src/${entry.name}`);
   policy.checkRustWalletSourceInventory(actual);
+  const freshCheckoutOrder = [...WAL004_RUST_SOURCE_PATHS].sort();
+  policy.checkRustWalletSourceInventory(freshCheckoutOrder);
   assertRejects(
     () => policy.checkRustWalletSourceInventory(WAL004_RUST_SOURCE_PATHS.slice(1)),
     /Rust|source|inventory|missing/i
@@ -1843,6 +1845,19 @@ test('WAL-004 Rust source inventory is exported closed and enumerated by reposit
       'wallet-broker/src/extra.rs',
     ]),
     /Rust|source|inventory|extra|unknown/i
+  );
+  assertRejects(
+    () => policy.checkRustWalletSourceInventory([
+      ...WAL004_RUST_SOURCE_PATHS,
+      WAL004_RUST_SOURCE_PATHS[0],
+    ]),
+    /Rust|source|inventory|duplicate/i
+  );
+  const malformed = [...WAL004_RUST_SOURCE_PATHS];
+  malformed[3] = null;
+  assertRejects(
+    () => policy.checkRustWalletSourceInventory(malformed),
+    /Rust|source|inventory|malformed|string/i
   );
 
   const repositoryChecker = policy.checkRepository.toString();

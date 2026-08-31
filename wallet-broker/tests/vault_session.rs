@@ -121,6 +121,87 @@ fn invalid_account_unlock_is_schema_and_wipes_supplied_material() {
 }
 
 #[test]
+fn global_lock_events_ignore_malformed_account_but_scoped_events_reject_it() {
+    const MALFORMED_ACCOUNT: &str = "../CANARY_WAL004_NOT_AN_ACCOUNT";
+    const MATERIAL_LENGTH: usize = b"CANARY_WAL004_IN_MEMORY_SPEND_MATERIAL".len();
+    for event in [
+        SessionEvent::AppBackgrounded,
+        SessionEvent::ScreenLocked,
+        SessionEvent::BrokerQuit,
+        SessionEvent::BrokerRestarted,
+    ] {
+        let mut sessions = manager(81_000);
+        unlock(&mut sessions, ACCOUNT_A);
+        unlock(&mut sessions, ACCOUNT_B);
+
+        sessions.handle(MALFORMED_ACCOUNT, event).unwrap();
+        assert!(!sessions.is_unlocked(ACCOUNT_A), "{event:?} left account A unlocked");
+        assert!(!sessions.is_unlocked(ACCOUNT_B), "{event:?} left account B unlocked");
+        let wipes: Vec<&WipeEvent> = sessions
+            .wipe_observer()
+            .0
+            .iter()
+            .filter(|wipe| {
+                wipe.label == "session-spend-material"
+                    && wipe.length == MATERIAL_LENGTH
+                    && wipe.all_zero
+            })
+            .collect();
+        assert_eq!(wipes.len(), 2, "{event:?} did not wipe both sessions");
+    }
+
+    for event in [
+        SessionEvent::NativeAuthorizationSucceeded,
+        SessionEvent::StatusPolled,
+        SessionEvent::AccountsListed,
+        SessionEvent::SnapshotPublished,
+        SessionEvent::SyncEvent,
+        SessionEvent::BackupPathBrowsed,
+        SessionEvent::NativeAuthorizationFailed,
+        SessionEvent::NativeAuthorizationCancelled,
+        SessionEvent::ManualLock,
+        SessionEvent::OperationErrored,
+        SessionEvent::AccountReplaced,
+        SessionEvent::RestoreSucceeded,
+    ] {
+        let mut sessions = manager(82_000);
+        unlock(&mut sessions, ACCOUNT_A);
+        assert_eq!(
+            sessions.handle(MALFORMED_ACCOUNT, event).unwrap_err().code(),
+            "SCHEMA",
+            "{event:?} accepted a malformed account"
+        );
+        assert!(sessions.is_unlocked(ACCOUNT_A));
+        assert!(sessions.wipe_observer().0.is_empty());
+    }
+}
+
+#[test]
+fn clock_failure_during_unlock_explicitly_wipes_supplied_material() {
+    const MATERIAL: &[u8] = b"CANARY_WAL004_CLOCK_FAILURE_MATERIAL";
+    let mut sessions = manager(91_000);
+    sessions.clock_mut().fail = Some(ClockError::Unavailable);
+
+    assert_eq!(
+        sessions
+            .unlock(
+                ACCOUNT_A,
+                SecretBytes::new(MATERIAL.to_vec()).unwrap(),
+            )
+            .unwrap_err()
+            .code(),
+        "TIMEOUT"
+    );
+    assert!(!sessions.is_unlocked(ACCOUNT_A));
+    assert_eq!(sessions.authorization_deadline(ACCOUNT_A), None);
+    assert!(sessions.wipe_observer().0.iter().any(|wipe| {
+        wipe.label == "session-spend-material"
+            && wipe.length == MATERIAL.len()
+            && wipe.all_zero
+    }));
+}
+
+#[test]
 fn polling_sync_backup_browsing_and_failed_or_cancelled_prompts_never_extend() {
     for event in [
         SessionEvent::StatusPolled,

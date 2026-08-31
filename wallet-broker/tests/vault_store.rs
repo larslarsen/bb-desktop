@@ -409,6 +409,47 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
     assert_eq!(target_mode, 0o600);
 }
 
+#[test]
+fn linux_direct_operations_reject_wrong_mode_until_descriptor_repair() {
+    let root = PathBuf::from(format!(
+        "target/wal004-scratch/mode-{}",
+        std::process::id()
+    ));
+    match fs::symlink_metadata(&root) {
+        Err(error) if error.kind() == ErrorKind::NotFound => {}
+        Ok(_) => panic!("refusing to reuse stale WAL-004 mode root: {}", root.display()),
+        Err(error) => panic!("cannot inspect WAL-004 mode root: {error}"),
+    }
+
+    fs::create_dir_all(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    let path = root.join("wrong-mode.vault");
+    fs::write(&path, NEW).unwrap();
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o644)).unwrap();
+    let path_text = path.to_str().unwrap();
+    let mut direct = LinuxStorePort::new();
+
+    let read_result = direct.read_bounded(path_text, 128 * 1024);
+    let write_result = direct.write_all(path_text, OLD);
+    let sync_result = direct.sync_file(path_text);
+    let bytes_after_rejections = fs::read(&path).unwrap();
+    let mode_after_rejections =
+        fs::symlink_metadata(&path).unwrap().permissions().mode() & 0o777;
+    let permission_result = direct.set_permissions(path_text, 0o600);
+    let repaired_mode = fs::symlink_metadata(&path).unwrap().permissions().mode() & 0o777;
+
+    fs::remove_file(&path).unwrap();
+    fs::remove_dir(&root).unwrap();
+
+    for result in [read_result.map(|_| ()), write_result, sync_result] {
+        assert_eq!(result.unwrap_err().code(), "UNAVAILABLE");
+    }
+    assert_eq!(bytes_after_rejections, NEW);
+    assert_eq!(mode_after_rejections, 0o644);
+    permission_result.unwrap();
+    assert_eq!(repaired_mode, 0o600);
+}
+
 fn candidate(epoch: u64) -> RestoreCandidate {
     RestoreCandidate {
         authenticated: true,
