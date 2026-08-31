@@ -38,10 +38,11 @@ const GITLEAKS_DIR_SCAN_CMD = 'gitleaks dir --redact=100 --no-banner .';
 const GITLEAKS_IGNORE_REL = '.gitleaksignore';
 const GITLEAKS_RATCHET_OWNER = 'Lead Engineer/Reviewer — Codex';
 const GITLEAKS_RATCHET_RATIONALE =
-  'eight inherited 2016–2018 upstream commit fingerprints only; current-tree copies are disabled and removed, never ignored';
+  'eight inherited 2016–2018 upstream fingerprints plus one reviewer-published WAL-004 synthetic-vector assignment fingerprint; current-tree copies are removed, never ignored';
 const GITLEAKS_RATCHET_REMOVAL_CONDITION =
-  'delete .gitleaksignore when a later authorized ticket removes the inherited OpenBazaar marketplace tree (js/, old root index.html, and its unused renderer entry)';
+  'remove an exact fingerprint only when an authorized history rewrite makes its commit unreachable; current-tree triggers remain relabeled, never ignored';
 const GITLEAKS_RATCHET_FINGERPRINTS = Object.freeze([
+  '12a493196bb4304750e4ae44484a7fa604b82ce4:tickets/BBD-WAL-004.md:generic-api-key:110',
   '7f6a71d6d5ec94b0d8ed02a23eddd7d1bfeaf802:index.html:generic-api-key:57',
   '988fcc3da2d2b13689fdd98e936df14e2f989709:js/models/order/Case.js:generic-api-key:107',
   'b0637a03e1eb12e4e5d49c9dfba92dcbf51a0d8c:js/utils/feedback.js:generic-api-key:8',
@@ -212,7 +213,7 @@ const WAL004_AUDIT = 'cargo +1.98.0 audit --file wallet-broker/Cargo.lock';
 const WAL004_DENY =
   'cargo +1.98.0 deny --manifest-path wallet-broker/Cargo.toml --all-features check advisories bans licenses sources';
 const WAL004_SBOM =
-  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json';
+  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json --all-features';
 const WAL004_REQUIRED_FILES = [WAL004_MANIFEST, WAL004_LOCKFILE, 'wallet-broker/src/lib.rs'];
 const WAL004_RUST_SOURCE_PATHS = [
   'wallet-broker/src/lib.rs',
@@ -1394,7 +1395,7 @@ function checkGitleaksRatchetBytes(raw) {
     throw new PolicyError('.gitleaksignore must not contain duplicate fingerprints');
   }
   if (lines.length < GITLEAKS_RATCHET_FINGERPRINTS.length) {
-    throw new PolicyError('.gitleaksignore is missing an inherited commit fingerprint');
+    throw new PolicyError('.gitleaksignore is missing a reviewed commit fingerprint');
   }
   if (lines.length > GITLEAKS_RATCHET_FINGERPRINTS.length) {
     throw new PolicyError('.gitleaksignore contains extra fingerprints');
@@ -1428,7 +1429,7 @@ function checkGitleaksRatchetBytes(raw) {
       }
     }
   }
-  throw new PolicyError('.gitleaksignore must be the exact eight lexically sorted commit fingerprints');
+  throw new PolicyError('.gitleaksignore must be the exact nine lexically sorted reviewed commit fingerprints');
 }
 
 function extractExportedFunction(source, name) {

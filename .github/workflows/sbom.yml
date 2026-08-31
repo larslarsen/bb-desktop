@@ -31,7 +31,7 @@ jobs:
       - name: Generate and validate Rust CycloneDX JSON
         run: |
           set -euo pipefail
-          cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json
+          cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json --all-features
           rust_sbom="${RUNNER_TEMP}/bitbook-wallet-broker.cdx.json"
           cp wallet-broker/bitbook-wallet-broker.cdx.json "${rust_sbom}"
           node scripts/validate-rust-sbom.js "${rust_sbom}"

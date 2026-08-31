@@ -1013,7 +1013,12 @@ test('strict nine-line reviewed Gitleaks ratchet bytes and content are enforced'
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(wrongCommit)), /wrong commit|commit/i);
 
   const wrongPath = GITLEAKS_RATCHET_FINGERPRINTS.slice();
-  wrongPath[0] = wrongPath[0].replace('index.html', 'index.htm');
+  wrongPath[0] = wrongPath[0].replace('tickets/BBD-WAL-004.md', 'tickets/BBD-WAL-004.mdx');
+  assert.notStrictEqual(
+    wrongPath[0],
+    GITLEAKS_RATCHET_FINGERPRINTS[0],
+    'wrong-path mutation must change its fingerprint'
+  );
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(wrongPath)), /wrong path|path/i);
 
   const wrongRule = GITLEAKS_RATCHET_FINGERPRINTS.slice();
@@ -1021,7 +1026,12 @@ test('strict nine-line reviewed Gitleaks ratchet bytes and content are enforced'
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(wrongRule)), /wrong rule|rule/i);
 
   const wrongLine = GITLEAKS_RATCHET_FINGERPRINTS.slice();
-  wrongLine[0] = wrongLine[0].replace(/:57$/, ':1');
+  wrongLine[0] = wrongLine[0].replace(/:110$/, ':1');
+  assert.notStrictEqual(
+    wrongLine[0],
+    GITLEAKS_RATCHET_FINGERPRINTS[0],
+    'wrong-line mutation must change its fingerprint'
+  );
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(wrongLine)), /wrong line|line/i);
 
   const unsorted = GITLEAKS_RATCHET_FINGERPRINTS.slice();
@@ -1039,7 +1049,12 @@ test('strict nine-line reviewed Gitleaks ratchet bytes and content are enforced'
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(blank)), /blank/i);
 
   const wildcard = GITLEAKS_RATCHET_FINGERPRINTS.slice();
-  wildcard[0] = wildcard[0].replace('index.html', '*');
+  wildcard[0] = wildcard[0].replace('tickets/BBD-WAL-004.md', '*');
+  assert.notStrictEqual(
+    wildcard[0],
+    GITLEAKS_RATCHET_FINGERPRINTS[0],
+    'wildcard mutation must change its fingerprint'
+  );
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(wildcard)), /wildcard/i);
 
   const secretBearing = GITLEAKS_RATCHET_FINGERPRINTS.slice();
