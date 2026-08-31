@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: TEST SOURCE CORRECTION 3 ACCEPTED — LUNA RED RESUME AUTHORIZED
+State: EXPECTED RED RECORDED — LOCK GRAPH REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -29,6 +29,8 @@ reached crates.io and exposed a real manifest contradiction: `secrecy` 0.10.3 ha
 Correction 3 is reviewer-accepted: secrecy remains exactly `=0.10.3`, defaults are off,
 no optional feature is enabled, and the policy test rejects adding `serde`. The revised
 accepted hashes are in [the test-source review](../testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md).
+Expected-red evidence is recorded in
+[BBD-WAL-004-EXPECTED-RED.md](../testing/BBD-WAL-004-EXPECTED-RED.md).
 The reviewer reran the Node source-first suite with the unchanged expected 57 `ok` and
 seven named `not ok` results.
 

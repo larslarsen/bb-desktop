@@ -65,6 +65,7 @@ const SOCIAL_PATHS = [
   'scripts/build-deb.sh',
   'scripts/build-macos.sh',
   'scripts/build-windows.ps1',
+  'wallet-broker/**',
   '.github/workflows/social.yml',
 ];
 
@@ -76,6 +77,7 @@ const SECURITY_PATHS = [
   'scripts/validate-sbom.js',
   'package.json',
   'package-lock.json',
+  'wallet-broker/**',
   '.github/workflows/**',
   '.gitleaksignore',
   'js/utils/metrics.js',
@@ -1542,6 +1544,208 @@ test('wallet boundary source policy allows only reviewed built-ins and forbids l
   for (const [rel, source] of forbidden) assertRejects(
     () => policy.checkWalletBoundarySource(source, rel),
     /wallet|boundary|forbidden|allowlist|listener|generic|module|capability|spawn|ipc/i
+  );
+});
+
+const WAL004_MANIFEST = 'wallet-broker/Cargo.toml';
+const WAL004_LOCKFILE = 'wallet-broker/Cargo.lock';
+const WAL004_TOOLCHAIN = '1.98.0';
+const WAL004_PLATFORM = 'linux';
+const WAL004_ROUTINE_TEST =
+  'cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --no-default-features';
+const WAL004_FMT = 'cargo +1.98.0 fmt --manifest-path wallet-broker/Cargo.toml --check';
+const WAL004_CLIPPY =
+  'cargo +1.98.0 clippy --manifest-path wallet-broker/Cargo.toml --locked --all-targets --all-features -- -D warnings';
+const WAL004_NATIVE_CHECK =
+  'cargo +1.98.0 check --manifest-path wallet-broker/Cargo.toml --locked --features native-ui --test native_surface';
+const CARGO_AUDIT_VERSION = '0.22.2';
+const CARGO_DENY_VERSION = '0.20.2';
+const CARGO_CYCLONEDX_VERSION = '0.5.9';
+const WAL004_AUDIT = 'cargo +1.98.0 audit --file wallet-broker/Cargo.lock';
+const WAL004_DENY =
+  'cargo +1.98.0 deny --manifest-path wallet-broker/Cargo.toml --all-features check advisories bans licenses sources';
+const WAL004_SBOM =
+  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json';
+const WAL004_DIRECT_DEPENDENCIES = {
+  argon2: { version: '=0.6.0', default_features: false, features: ['alloc'], optional: false },
+  base64ct: { version: '=1.8.3', default_features: false, features: ['alloc'], optional: false },
+  chacha20poly1305: { version: '=0.11.0', default_features: false, features: ['alloc'], optional: false },
+  eframe: {
+    version: '=0.36.1', default_features: false,
+    features: ['default_fonts', 'glow', 'wayland', 'x11'], optional: true,
+  },
+  getrandom: { version: '=0.4.3', default_features: false, features: ['std'], optional: false },
+  hkdf: { version: '=0.13.0', default_features: false, features: [], optional: false },
+  rfd: {
+    version: '=0.17.2', default_features: false,
+    features: ['xdg-portal', 'wayland'], optional: true,
+  },
+  secrecy: { version: '=0.10.3', default_features: false, features: [], optional: false },
+  serde: {
+    version: '=1.0.229', default_features: false, features: ['alloc', 'derive'], optional: false,
+  },
+  serde_json: { version: '=1.0.151', default_features: false, features: ['alloc'], optional: false },
+  sha2: { version: '=0.11.0', default_features: false, features: [], optional: false },
+  zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
+};
+
+test('WAL-004 Rust test-harness manifest pins the exact toolchain, dependencies, and native features', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  assert.strictEqual(policy.WAL004_TOOLCHAIN, WAL004_TOOLCHAIN);
+  assert.strictEqual(policy.WAL004_PLATFORM, WAL004_PLATFORM);
+  assert.deepStrictEqual(policy.WAL004_DIRECT_DEPENDENCIES, WAL004_DIRECT_DEPENDENCIES);
+  assert.strictEqual(typeof policy.checkWalletBrokerManifest, 'function');
+  policy.checkWalletBrokerManifest(manifestText, { requireLibrary: false, requireLockfile: false });
+  for (const [from, to] of [
+    ['rust-version = "1.98.0"', 'rust-version = "1.97.0"'],
+    ['version = "=0.6.0"', 'version = "0.6"'],
+    ['version = "=0.11.0"', 'version = "=0.10.0"'],
+    ['default-features = false', 'default-features = true'],
+    [
+      'secrecy = { version = "=0.10.3", default-features = false }',
+      'secrecy = { version = "=0.10.3", default-features = false, features = ["serde"] }',
+    ],
+    ['"default_fonts", "glow", "wayland", "x11"', '"default_fonts", "glow", "persistence", "wayland", "x11"'],
+    ['"xdg-portal", "wayland"', '"xdg-portal", "tokio", "wayland"'],
+    ['default = []', 'default = ["native-ui"]'],
+    ['publish = false', 'publish = true'],
+  ]) {
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(replaceOnce(manifestText, from, to), {
+        requireLibrary: false, requireLockfile: false,
+      }),
+      /wallet|rust|manifest|dependency|feature|pin|native/i
+    );
+  }
+  for (const addition of [
+    '\nreqwest = "=0.13.0"\n',
+    '\ntokio = "=1.0.0"\n',
+    '\nkeyring = "=3.0.0"\n',
+    '\nzcash_client_backend = "=0.20.0"\n',
+    '\nmonero = { git = "https://example.invalid/monero" }\n',
+  ]) {
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(`${manifestText}${addition}`, {
+        requireLibrary: false, requireLockfile: false,
+      }),
+      /wallet|dependency|network|coin|keyring|git|manifest/i
+    );
+  }
+});
+
+test('WAL-004 Rust first-party source policy forbids unsafe and unreviewed authority', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkRustWalletSource, 'function');
+  policy.checkRustWalletSource(
+    'use zeroize::Zeroize; pub fn wipe(bytes: &mut [u8]) { bytes.zeroize(); }',
+    'wallet-broker/src/vault.rs'
+  );
+  for (const source of [
+    'unsafe fn touch_secret() {}',
+    'unsafe { core::ptr::read(ptr) }',
+    'extern "C" { fn wallet(); }',
+    'use std::net::TcpListener;',
+    'use std::os::unix::net::UnixListener;',
+    'use reqwest::Client;',
+    'use tokio::net::TcpStream;',
+    'use keyring::Entry;',
+    'use zcash_client_backend::data_api;',
+    'use monero::Wallet;',
+    'std::env::temp_dir()',
+    'Command::new("curl")',
+  ]) {
+    assertRejects(
+      () => policy.checkRustWalletSource(source, 'wallet-broker/src/synthetic.rs'),
+      /wallet|rust|unsafe|network|listener|coin|keyring|temp|process|authority/i
+    );
+  }
+});
+
+test('WAL-004 exact Rust test build lint and native compile commands are reserved', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(policy.WAL004_ROUTINE_TEST, WAL004_ROUTINE_TEST);
+  assert.strictEqual(policy.WAL004_FMT, WAL004_FMT);
+  assert.strictEqual(policy.WAL004_CLIPPY, WAL004_CLIPPY);
+  assert.strictEqual(policy.WAL004_NATIVE_CHECK, WAL004_NATIVE_CHECK);
+  assert.deepStrictEqual(policy.WAL004_REQUIRED_FILES, [
+    WAL004_MANIFEST,
+    WAL004_LOCKFILE,
+    'wallet-broker/src/lib.rs',
+  ]);
+});
+
+test('WAL-004 routine Linux CI is single-platform, locked, package-free, and path-filtered', () => {
+  const policy = loadPolicy();
+  const social = loadWorkflows(policy).social;
+  for (const [, paths] of assertedTriggerPaths(social, 'social')) {
+    assert.ok(paths.includes('wallet-broker/**'));
+  }
+  const routine = [];
+  for (const [, job, step] of policy.iterSteps(social.data)) {
+    if (!job.if) {
+      assert.strictEqual(job['runs-on'], 'ubuntu-latest');
+      routine.push(...policy.stepRunLines(step));
+    }
+  }
+  assert.ok(routine.includes(WAL004_ROUTINE_TEST));
+  assert.ok(!routine.some((line) => /package:|cargo\s+install|native-ui.*run/.test(line)));
+  const missing = replaceOnce(social.text, `      - run: ${WAL004_ROUTINE_TEST}\n`, '');
+  assertRejects(() => policy.checkSocialWorkflow(missing), /wallet|rust|cargo|test/i);
+});
+
+test('WAL-004 RustSec and cargo-deny gates use exact tool versions and locked inputs', () => {
+  const policy = loadPolicy();
+  const security = loadWorkflows(policy).security;
+  for (const [, paths] of assertedTriggerPaths(security, 'security')) {
+    assert.ok(paths.includes('wallet-broker/**'));
+  }
+  assert.strictEqual(policy.CARGO_AUDIT_VERSION, CARGO_AUDIT_VERSION);
+  assert.strictEqual(policy.CARGO_DENY_VERSION, CARGO_DENY_VERSION);
+  assert.strictEqual(policy.CARGO_CYCLONEDX_VERSION, CARGO_CYCLONEDX_VERSION);
+  assert.strictEqual(policy.WAL004_AUDIT, WAL004_AUDIT);
+  assert.strictEqual(policy.WAL004_DENY, WAL004_DENY);
+  for (const required of [
+    `cargo install cargo-audit --version ${CARGO_AUDIT_VERSION} --locked`,
+    `cargo install cargo-deny --version ${CARGO_DENY_VERSION} --locked`,
+    WAL004_AUDIT,
+    WAL004_DENY,
+  ]) assert.ok(security.text.includes(required), `security workflow omits ${required}`);
+  assertRejects(
+    () => policy.checkSecurityWorkflow(replaceOnce(security.text, CARGO_AUDIT_VERSION, 'latest')),
+    /cargo-audit|RustSec|version|pin/i
+  );
+  assertRejects(
+    () => policy.checkSecurityWorkflow(replaceOnce(security.text, '--all-features check advisories bans licenses sources', 'check advisories')),
+    /cargo-deny|bans|licenses|sources|features/i
+  );
+});
+
+test('WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX JSON artifacts', () => {
+  const policy = loadPolicy();
+  const sbom = loadWorkflows(policy).sbom;
+  assert.strictEqual(policy.WAL004_SBOM, WAL004_SBOM);
+  assert.ok(sbom.text.includes(`cargo install cargo-cyclonedx --version ${CARGO_CYCLONEDX_VERSION} --locked`));
+  assert.ok(sbom.text.includes(WAL004_SBOM));
+  assert.ok(sbom.text.includes('node scripts/validate-sbom.js'));
+  assert.ok(sbom.text.includes('node scripts/validate-rust-sbom.js'));
+  const uploadPaths = [];
+  for (const [, , step] of policy.iterSteps(sbom.data)) {
+    if (String(step.uses || '').startsWith('actions/upload-artifact@')) {
+      uploadPaths.push(step.with && step.with.path);
+    }
+  }
+  assert.deepStrictEqual(uploadPaths.sort(), [
+    '${{ runner.temp }}/bitbook-desktop.cdx.json',
+    '${{ runner.temp }}/bitbook-wallet-broker.cdx.json',
+  ]);
+  assertRejects(
+    () => policy.checkSbomWorkflow(replaceOnce(sbom.text, 'node scripts/validate-rust-sbom.js', 'echo skip-rust-validation')),
+    /Rust|wallet|CycloneDX|validate/i
+  );
+  assertRejects(
+    () => policy.checkSbomWorkflow(replaceOnce(sbom.text, WAL004_SBOM, `${WAL004_SBOM} --all-features=false`)),
+    /Rust|wallet|CycloneDX|feature|exact/i
   );
 });
 

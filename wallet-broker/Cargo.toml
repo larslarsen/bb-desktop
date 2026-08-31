@@ -1,0 +1,48 @@
+[package]
+name = "bitbook-wallet-broker"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98.0"
+publish = false
+
+[features]
+default = []
+native-ui = ["dep:eframe", "dep:rfd"]
+
+[dependencies]
+argon2 = { version = "=0.6.0", default-features = false, features = ["alloc"] }
+base64ct = { version = "=1.8.3", default-features = false, features = ["alloc"] }
+chacha20poly1305 = { version = "=0.11.0", default-features = false, features = ["alloc"] }
+eframe = { version = "=0.36.1", optional = true, default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
+getrandom = { version = "=0.4.3", default-features = false, features = ["std"] }
+hkdf = { version = "=0.13.0", default-features = false }
+rfd = { version = "=0.17.2", optional = true, default-features = false, features = ["xdg-portal", "wayland"] }
+secrecy = { version = "=0.10.3", default-features = false }
+serde = { version = "=1.0.229", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "=1.0.151", default-features = false, features = ["alloc"] }
+sha2 = { version = "=0.11.0", default-features = false }
+zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }
+
+[[test]]
+name = "vault_crypto"
+path = "tests/vault_crypto.rs"
+
+[[test]]
+name = "vault_format"
+path = "tests/vault_format.rs"
+
+[[test]]
+name = "vault_store"
+path = "tests/vault_store.rs"
+
+[[test]]
+name = "vault_session"
+path = "tests/vault_session.rs"
+
+[[test]]
+name = "native_surface"
+path = "tests/native_surface.rs"
+
+[[test]]
+name = "secret_hygiene"
+path = "tests/secret_hygiene.rs"
