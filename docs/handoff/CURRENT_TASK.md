@@ -48,7 +48,9 @@ regressions are structurally compatible and non-vacuous. Only Luna's
 [Correction 1 expected-red handoff](CODEX_LUNA_BBD_WAL_004_CORRECTION_1_RED.md) is active.
 Luna may execute the exact offline headless commands, record evidence, and commit only
 the five accepted tests plus its evidence/state update. No production correction is
-authorized. `/tmp` remains forbidden for substantial Rust state.
+authorized. The installed toolchain is correct at 1.98.0; Luna must invoke it through
+the absolute rustup proxy recorded in its handoff because its shell does not inherit the
+Cargo bin path. `/tmp` remains forbidden for substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

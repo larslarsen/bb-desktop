@@ -21,8 +21,11 @@ against frozen rejected production drop 01. This is an expected-red run, not a s
 repair. Do not edit production, policy implementation, workflows, manifests, lockfile,
 fixtures, test source, ticket, roadmap, or this handoff.
 
-Official user-level Rust and Cargo must both report exactly `1.98.0`. All Cargo work is
-offline, locked, no-default-features, and disk-backed under the repository's ignored
+Official user-level Rust and Cargo must both report exactly `1.98.0`. The agent shell
+does not inherit `/home/lars/.cargo/bin` in `PATH`, so every invocation must use the
+absolute rustup proxy `/home/lars/.cargo/bin/rustup run 1.98.0`; a plain `rustc` or
+`cargo` command is not an installation check. All Cargo work is offline, locked,
+no-default-features, and disk-backed under the repository's ignored
 `wallet-broker/target`; do not use `/tmp` or create another target/cache.
 
 ## Immutable preflight
@@ -59,12 +62,12 @@ Stop on any mismatch or extra path.
 Run and capture exit status/output for these commands separately, in this order:
 
 ```text
-rustc --version
-cargo --version
-cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test vault_store
-cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test vault_session
-cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test native_surface
-cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test secret_hygiene
+/home/lars/.cargo/bin/rustup run 1.98.0 rustc --version
+/home/lars/.cargo/bin/rustup run 1.98.0 cargo --version
+/home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test vault_store
+/home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test vault_session
+/home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test native_surface
+/home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test secret_hygiene
 node test/securityPolicy.node.js
 ```
 
