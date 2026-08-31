@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: REVIEW CORRECTION 3 — CODEX SOL TEST SOURCE ONLY
+State: TEST SOURCE CORRECTION 3 ACCEPTED — LUNA RED RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -26,12 +26,18 @@ matched every accepted byte and added only the authorized root `.gitignore` line
 reached crates.io and exposed a real manifest contradiction: `secrecy` 0.10.3 has no
 `alloc` feature. No `Cargo.lock`, evidence, staging, commit, or push was created.
 
-Only [Correction 3](CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_3.md) is active. Codex Sol may
-edit exactly `wallet-broker/Cargo.toml` and `test/securityPolicy.node.js` to remove the
-nonexistent secrecy feature while preserving the exact version/default-off contract and
-add the feature-regression mutation. All other accepted test bytes and Luna's uncommitted
-`.gitignore` line are frozen. The existing Luna red handoff is paused until reviewer
-acceptance and a durable resume handoff. Large build/cache/temp trees may not use `/tmp`.
+Correction 3 is reviewer-accepted: secrecy remains exactly `=0.10.3`, defaults are off,
+no optional feature is enabled, and the policy test rejects adding `serde`. The revised
+accepted hashes are in [the test-source review](../testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md).
+The reviewer reran the Node source-first suite with the unchanged expected 57 `ok` and
+seven named `not ok` results.
+
+Only [Luna resume 01](CODEX_LUNA_BBD_WAL_004_RED_RESUME_01.md) is active. It begins from
+the exact uncommitted root `.gitignore` `target/` line plus the nine accepted test paths,
+retries lock resolution with approved crates.io access and disk-backed temp/target paths,
+then records/integrates expected red if and only if every stop condition passes. No
+`Cargo.lock` exists yet. Production remains unauthorized and `/tmp` remains forbidden for
+large build/cache/temp state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

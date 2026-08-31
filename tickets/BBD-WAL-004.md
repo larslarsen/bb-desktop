@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: REVIEW CORRECTION 3 AUTHORIZED — TEST SOURCE ONLY
+Status: TEST SOURCE CORRECTION 3 ACCEPTED — LUNA RED RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -293,6 +293,12 @@ to an empty feature list, and adds a manifest mutation proving that enabling `se
 rejected. Defaults remain disabled. No version substitution, new dependency, production
 source, lockfile, or other test change is authorized. The exact handoff is
 `docs/handoff/CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_3.md`.
+
+Correction 3 is reviewer-accepted at manifest SHA-256
+`278c26e3354fca0af5c3b456f8ecdf07defac032b8eb648d8992d3b369feedd7` and Node policy
+test SHA-256 `5f8d79fef4176dac6f8f4e912c4056b70c65062e9d14cf29091d413091ca5c12`.
+The exact resolution/expected-red resume is
+`docs/handoff/CODEX_LUNA_BBD_WAL_004_RED_RESUME_01.md`. Production remains unauthorized.
 
 ## Required test groups
 

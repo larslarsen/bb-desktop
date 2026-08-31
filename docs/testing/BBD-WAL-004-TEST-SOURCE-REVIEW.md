@@ -4,13 +4,13 @@ Reviewer: Lead Engineer/Reviewer — Codex XHigh
 
 Governance HEAD at review: `679b15ef`
 
-Result: **SUPERSEDED BY CORRECTION 3; PRODUCTION NOT AUTHORIZED**
+Result: **CORRECTION 3 ACCEPTED FOR EXPECTED RED; PRODUCTION NOT AUTHORIZED**
 
 ## Accepted uncommitted paths
 
 | Path | Lines | SHA-256 |
 | --- | ---: | --- |
-| `wallet-broker/Cargo.toml` | 48 | `92316dcd56dbd4413536ef3156c72fa35bcc188c1a07c6f6c4eb774ed472dd21` |
+| `wallet-broker/Cargo.toml` | 48 | `278c26e3354fca0af5c3b456f8ecdf07defac032b8eb648d8992d3b369feedd7` |
 | `wallet-broker/tests/vault_crypto.rs` | 325 | `98306e4fe254ce07f78a75f832701c64a9333111b593fb30a4ba95bf01b1bac1` |
 | `wallet-broker/tests/vault_format.rs` | 320 | `7bd7754ea8c17d0d6f0981e82e4627c020839c29fcddbe7026be65ecf8d34877` |
 | `wallet-broker/tests/vault_store.rs` | 464 | `5e002b440e220ed5dae0170e2e8077c4d8027fb90ff51b9dd2fb18640c167454` |
@@ -18,7 +18,7 @@ Result: **SUPERSEDED BY CORRECTION 3; PRODUCTION NOT AUTHORIZED**
 | `wallet-broker/tests/native_surface.rs` | 293 | `a2fe135d054256ec4eae2350e2f72c8672e533aa2afaae5056c4efa6d52773c9` |
 | `wallet-broker/tests/secret_hygiene.rs` | 181 | `c3f73e3e087dab13f7300483859b8671b748dbf750c6672157977e84aad8d590` |
 | `wallet-broker/tests/fixtures/vault-v1.json` | 1 | `022f7dc640ef36071c7b4de6347fec4b0b84560a8cbab781403a9eaceaea37e4` |
-| `test/securityPolicy.node.js` | 1,774 | `c36cb5f75dc74f8b15f177534180990b7b4db4192a4106f8aaadc0d72f94a04d` |
+| `test/securityPolicy.node.js` | 1,778 | `5f8d79fef4176dac6f8f4e912c4056b70c65062e9d14cf29091d413091ca5c12` |
 
 The Rust inventory is 67 tests: crypto 11, format 11, store 19, session 9, native
 surface 9, and secret hygiene 8. The Node policy inventory is 64 tests: 58 accepted
@@ -81,6 +81,8 @@ own expected-red evidence and Git integration after the owner toolchain gate.
 After the owner installed Rust/Cargo 1.98.0, the first approved crates.io resolution
 proved that the accepted manifest's `secrecy = 0.10.3` `alloc` feature does not exist.
 Cargo exited 101 before creating `Cargo.lock`; no red test ran. The path hashes above are
-therefore a superseded pre-resolution snapshot. Correction 3 is limited to the manifest
-secrecy feature declaration and its Node policy expectation/regression. A replacement
-accepted hash set will be recorded after that source correction is reviewed.
+the replacement accepted set after Correction 3 removed only the nonexistent feature,
+changed the policy expectation to an empty feature list, and added a mutation proving
+that optional `serde` is rejected. Defaults remain disabled and the exact version is
+unchanged. The reviewer reran `node test/securityPolicy.node.js`: exit 1, 57 `ok`, and the
+same seven expected `not ok` names. Luna resume 01 is authorized to retry resolution.
