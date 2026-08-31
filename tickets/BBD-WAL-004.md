@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: ALL LOCAL GATES GREEN — RUSTSEC NETWORK RESUME AUTHORIZED
+Status: PRODUCTION GREEN INTEGRATED — ISOLATED FALSIFICATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -381,6 +381,12 @@ GREEN_6 passed the full local functional, Clippy, and native compile surface. Th
 RustSec command was blocked only while fetching its advisory database. The exact
 read-only network resume and integration contract is
 `docs/handoff/CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md`.
+
+RustSec completed cleanly and Luna integrated production at
+`0e42fb4b477cfe76757ed207d3a561270b9e9efe`. The full green review is
+`docs/testing/BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md`. Luna now owns the seven exact
+temporary mutations/restorations under `docs/handoff/CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md`.
+No production change is authorized.
 
 ## Required test groups
 

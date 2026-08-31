@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: PRODUCTION GREEN INTEGRATED — FALSIFICATION AND CI SECURITY/SBOM GATES PENDING
+State: PRODUCTION GREEN INTEGRATED — ISOLATED FALSIFICATION AUTHORIZED
 
-Evidence: [BBD-WAL-004-GREEN.md](../testing/BBD-WAL-004-GREEN.md)
+Review: [BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md](../testing/BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md](CODEX_LUNA_BBD_WAL_004_AUDIT_RESUME.md)
+Active handoff: [CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md](CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -65,10 +65,12 @@ native compile and RustSec audit. Sol's exact three corrections are accepted in 
 review 06. GREEN_5 repeated all functional gates successfully and production passed
 Clippy; Clippy then found four compatibility warnings only in the independent-vector
 test. Sol's one-test correction is reviewer-accepted with every vector byte and
-assertion unchanged. GREEN_6 passed every local functional, lint, and native compile
-gate. Only RustSec's advisory-database refresh was denied outbound network. Luna may
-resume that exact audit with network access and integrate only on a clean result.
-Post-commit falsification and CI security/SBOM results remain required.
+assertion unchanged. GREEN_6 passed every functional, lint, and native compile gate.
+RustSec then loaded 1,226 advisories and found no vulnerability in 327 locked crates.
+Luna integrated and pushed production commit `0e42fb4b477cfe76757ed207d3a561270b9e9efe`;
+GitHub Social client run `33357371137` passed with package jobs skipped. The seven exact
+isolated falsifications are now active. Manual non-packaging security/SBOM workflows
+remain reviewer gates after falsification.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
