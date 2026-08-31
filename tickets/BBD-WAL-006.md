@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: DEPENDENCY RESOLUTION/CUSTODY GATE AUTHORIZED
+Status: SECOND DEPENDENCY TEST CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -270,8 +270,12 @@ UI features. Lock resolution proved that the accepted WAL-004 `hkdf = 0.13.0` an
 required by the fixed Zcash graph. The separately reviewed, test-first correction may
 move only those two direct custody dependencies to exact, defaults-off stable
 `hkdf = 0.12.4` and `sha2 = 0.10.9`; the existing RFC 5869 and deterministic envelope
-vectors must remain byte-exact. See
-`docs/testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-01.md`. The fixture builder may
+vectors must remain byte-exact. Resolution then proved direct `argon2 = 0.6.0` cannot
+coexist with Zcash's exact prerelease digest line; the same test-first exception may move
+only Argon2 to exact, defaults-off stable `argon2 = 0.5.3`, with the RFC 9106 and envelope
+vectors byte-exact. See
+`docs/testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-01.md` and
+`docs/testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-02.md`. The fixture builder may
 refer to future generated paths, but Sol does not generate or commit fixture output.
 
 No production source, existing WAL-004 Rust test, fixture output, `Cargo.lock`, `deny.toml`,

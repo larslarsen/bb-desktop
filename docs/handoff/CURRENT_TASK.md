@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: DEPENDENCY MANIFEST/POLICY SOURCE ACCEPTED — RESOLUTION GATE AUTHORIZED
+State: SECOND DEPENDENCY CONTRADICTION — ARGON2 TEST CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_01.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_01.md)
+[CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_02.md](CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_02.md)
+
+Second dependency-resolution review:
+[BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-02.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-02.md)
 
 Dependency production-source review:
 [BBD-WAL-006-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md)
@@ -47,13 +50,14 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The corrected test is committed with all 73 cases retained, and its expected red is
-accepted. Sol changed exactly the authorized two manifest version literals and four
-matching production-policy literals; reviewer-accepted hashes are recorded above. Luna
-may now prove policy progression, resolve and inventory the graph, run the complete
-11-test existing custody crypto target, and integrate only the correction/lock/evidence
-paths under the active handoff. The six Rust tests and fixture paths remain frozen.
-Phase-B fixture generation remains suspended until XHigh reviews this gate.
+The first corrected test/red and manifest/policy source are accepted. Luna proved the
+production map now matches, then the next lock attempt stopped before mutation on a
+second published same-line conflict: direct `argon2 0.6.0` pulls stable `digest 0.11`
+through `blake2 0.11`, while fixed Zcash `bip32` requires exact prerelease
+`digest 0.11.0-pre.9`. Sol may change only the Node test-side Argon2 expectation and its
+exact mutations under the active handoff. Manifest, production policy, Rust source/tests,
+lockfile, fixtures, execution, evidence, integration, and Git are frozen. Phase-B fixture
+generation remains suspended.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
