@@ -1,36 +1,34 @@
 # Current Task
 
-Ticket: BBD-WAL-004
+Ticket: BBD-WAL-006
 
-State: COMPLETE — REVIEWER ACCEPTED
+State: TEST SOURCE AUTHORIZED — NO EXECUTION OR PRODUCTION
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Active handoff: NONE — NO DESKTOP IMPLEMENTATION AUTHORIZED
+Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Encrypted custody production commit:
-`0e42fb4b477cfe76757ed207d3a561270b9e9efe`
+Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`), not yet authorized
 
-Custody falsification evidence commit:
-`e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
+Source baseline: `363c0046`
 
-CI-gate correction commit:
-`482650d5fe1e2a0d311040a7a811143afcbdd934`
+Active handoff:
+[CODEX_SOL_BBD_WAL_006_TESTS.md](CODEX_SOL_BBD_WAL_006_TESTS.md)
 
-Final acceptance:
-[BBD-WAL-004-CI-GATE-ACCEPTANCE.md](../testing/BBD-WAL-004-CI-GATE-ACCEPTANCE.md)
+Architecture:
+[BBD-WAL-006-UPSTREAM-REVIEW.md](../architecture/BBD-WAL-006-UPSTREAM-REVIEW.md)
 
-BBD-WAL-004 is complete. The encrypted custody core passed its complete local functional,
-lint, native compile, dependency, RustSec, security-policy, test, audit, and seven-case
-falsification gates. The final CI correction passed local policy/build/npm/audit and both
-pinned Gitleaks modes, its isolated fail-open falsification, Social client CI, the manual
-Security workflow, and the manual dual npm/Rust all-features CycloneDX workflow.
+Ticket: [BBD-WAL-006.md](../../tickets/BBD-WAL-006.md)
 
-No platform package build was run or is required. No further desktop source, test,
-workflow, policy, wallet, evidence, Git, or GitHub action is authorized until a new
-reviewer ticket and handoff are published.
+BBD-WAL-004 remains complete and reviewer-accepted at `e8894a44`. BBGO-PAY-001 remains
+complete in `../bb-go` at production `6bbb0629` and final evidence `801f5d55`.
 
-Grok Build is available for the independent `../bb-go` exchange-rate/provider ticket.
-That work must proceed only under the `bb-go` repository's own governance, baseline,
-ticket, tests, and durable handoff. `../go-ipfs` is deprecated and receives no wallet
-work.
+Only the eight exact Phase-A test/manifest paths in the active Sol handoff may change.
+No dependency resolution, fixture generation, test execution, production source,
+`Cargo.lock`, workflow, packaging, SBOM, Electron, daemon, wallet/node/device, evidence,
+Git, or GitHub action is authorized for the source actor. XHigh must accept the exact test
+drop before a separate Luna expected-red handoff exists.
+
+This slice is offline and synthetic. It chooses no public ZEC endpoint or Tor policy and
+cannot sign, prove, extract, broadcast, move funds, or operate on mainnet. `../go-ipfs`
+is deprecated and receives no wallet work.
