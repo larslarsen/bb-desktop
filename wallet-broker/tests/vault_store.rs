@@ -385,9 +385,28 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
     assert_eq!(store.read_active(SECOND_ACCOUNT).unwrap_err().code(), "UNAVAILABLE");
 
     drop(store);
+    let symlink_text = symlink_path.to_str().unwrap();
+    let mut direct = LinuxStorePort::new();
+    let read_result = direct.read_bounded(symlink_text, 128 * 1024);
+    let write_result = direct.write_all(symlink_text, OLD);
+    let permission_result = direct.set_permissions(symlink_text, 0o644);
+    let sync_result = direct.sync_file(symlink_text);
+    let target_bytes = fs::read(&active_path).unwrap();
+    let target_mode = fs::symlink_metadata(&active_path).unwrap().permissions().mode() & 0o777;
     fs::remove_file(&symlink_path).unwrap();
     fs::remove_file(&active_path).unwrap();
     fs::remove_dir(&root).unwrap();
+
+    for result in [
+        read_result.map(|_| ()),
+        write_result,
+        permission_result,
+        sync_result,
+    ] {
+        assert_eq!(result.unwrap_err().code(), "UNAVAILABLE");
+    }
+    assert_eq!(target_bytes, NEW);
+    assert_eq!(target_mode, 0o600);
 }
 
 fn candidate(epoch: u64) -> RestoreCandidate {

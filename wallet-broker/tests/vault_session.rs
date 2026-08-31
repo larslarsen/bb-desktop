@@ -76,6 +76,51 @@ fn only_successful_native_authorization_resets_idle_deadline() {
 }
 
 #[test]
+fn late_native_authorization_at_existing_deadline_times_out_and_wipes() {
+    let started = 41_000;
+    let mut sessions = manager(started);
+    unlock(&mut sessions, ACCOUNT_A);
+    sessions.clock_mut().now = started + AUTHORIZATION_IDLE_MILLIS;
+
+    assert_eq!(
+        sessions
+            .handle(ACCOUNT_A, SessionEvent::NativeAuthorizationSucceeded)
+            .unwrap_err()
+            .code(),
+        "TIMEOUT"
+    );
+    assert!(!sessions.is_unlocked(ACCOUNT_A));
+    let wipe = sessions.wipe_observer().0.last().unwrap();
+    assert_eq!(wipe.label, "session-spend-material");
+    assert!(wipe.length > 0 && wipe.all_zero);
+}
+
+#[test]
+fn invalid_account_unlock_is_schema_and_wipes_supplied_material() {
+    const INVALID_ACCOUNT: &str = "00112233445566778899AABBCCDDEEFF";
+    const MATERIAL: &[u8] = b"CANARY_WAL004_INVALID_ACCOUNT_MATERIAL";
+    let mut sessions = manager(73_000);
+
+    assert_eq!(
+        sessions
+            .unlock(
+                INVALID_ACCOUNT,
+                SecretBytes::new(MATERIAL.to_vec()).unwrap(),
+            )
+            .unwrap_err()
+            .code(),
+        "SCHEMA"
+    );
+    assert!(!sessions.is_unlocked(INVALID_ACCOUNT));
+    assert_eq!(sessions.authorization_deadline(INVALID_ACCOUNT), None);
+    assert!(sessions.wipe_observer().0.iter().any(|event| {
+        event.label == "session-spend-material"
+            && event.length == MATERIAL.len()
+            && event.all_zero
+    }));
+}
+
+#[test]
 fn polling_sync_backup_browsing_and_failed_or_cancelled_prompts_never_extend() {
     for event in [
         SessionEvent::StatusPolled,

@@ -151,6 +151,89 @@ fn export_and_restore_are_also_rejected_from_every_nonnative_origin() {
 }
 
 #[test]
+fn invalid_unlock_and_export_accounts_fail_before_native_authority_moves() {
+    for invalid_account in [
+        "",
+        "00112233445566778899AABBCCDDEEFF",
+        "00112233445566778899aabbccddeefg",
+        "00112233445566778899aabbccddee",
+        "../112233445566778899aabbccddeeff",
+    ] {
+        for export in [false, true] {
+            let action = if export {
+                NativeAction::Export { account_id: invalid_account.to_owned() }
+            } else {
+                NativeAction::Unlock { account_id: invalid_account.to_owned() }
+            };
+            let mut controller = controller();
+            let mut surface = Surface {
+                passphrase: Some(SecretBytes::new(b"synthetic-passphrase".to_vec()).unwrap()),
+                ..Surface::default()
+            };
+            let mut dialog =
+                Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+
+            assert_eq!(
+                controller
+                    .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+                    .unwrap_err()
+                    .code(),
+                "SCHEMA"
+            );
+            assert!(surface.prompt.is_none());
+            assert_eq!(dialog.save_calls + dialog.open_calls, 0);
+            assert!(controller.custody().calls.is_empty());
+            assert!(!controller.custody().restored);
+        }
+    }
+}
+
+#[test]
+fn invalid_passphrase_lengths_wipe_before_unlock_or_restore_custody() {
+    for length in [0, 1_025] {
+        for restore in [false, true] {
+            let mut controller = controller();
+            let mut surface = Surface {
+                passphrase: Some(SecretBytes::new(vec![b'p'; length]).unwrap()),
+                confirmed: true,
+                ..Surface::default()
+            };
+            let mut dialog = Dialog {
+                selected: Some(BACKUP_PATH.to_owned()),
+                ..Dialog::default()
+            };
+            let action = if restore {
+                NativeAction::Restore
+            } else {
+                NativeAction::Unlock { account_id: ACCOUNT.to_owned() }
+            };
+
+            assert_eq!(
+                controller
+                    .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+                    .unwrap_err()
+                    .code(),
+                "LOCKED",
+                "length {length} restore={restore}"
+            );
+            assert!(controller.custody().calls.is_empty());
+            assert!(controller.custody().passphrase_lengths.is_empty());
+            assert!(!controller.custody().restored);
+            assert!(surface.restore.is_none());
+            assert_eq!(
+                surface.results,
+                vec![SurfaceResult::Error("Wallet locked".to_owned())]
+            );
+            assert!(controller.wipe_observer().0.iter().any(|event| {
+                event.label == "native-passphrase"
+                    && event.length == length
+                    && event.all_zero
+            }));
+        }
+    }
+}
+
+#[test]
 fn password_prompt_is_masked_noncopyable_and_bounded() {
     let mut controller = controller();
     let mut surface = Surface {

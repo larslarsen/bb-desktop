@@ -59,6 +59,85 @@ fn debug_display_errors_logs_snapshots_and_evidence_omit_secret_canaries() {
 }
 
 #[test]
+fn diagnostic_operations_and_codes_are_closed_to_exact_reviewed_values() {
+    const ACCOUNT: &str = "00112233445566778899aabbccddeeff";
+    for operation in [
+        "vault.seal",
+        "vault.open",
+        "vault.store",
+        "vault.export",
+        "vault.restore",
+        "session.lock",
+        "native.unlock",
+        "native.export",
+        "native.restore",
+    ] {
+        DiagnosticEvent::new(operation, ACCOUNT, "LOCKED").unwrap();
+    }
+    for code in [
+        "ENTROPY",
+        "LOCKED",
+        "SCHEMA",
+        "LIMIT",
+        "WRONG_NETWORK",
+        "ACCOUNT_BUSY",
+        "NOT_FOUND",
+        "ALREADY_EXISTS",
+        "UNAVAILABLE",
+        "REPLAY",
+        "STATE_CORRUPT",
+        "TIMEOUT",
+        "UNAUTH",
+    ] {
+        DiagnosticEvent::new("vault.open", ACCOUNT, code).unwrap();
+    }
+
+    assert_eq!(
+        DiagnosticEvent::new("vault.unknown", ACCOUNT, "LOCKED")
+            .unwrap_err()
+            .code(),
+        "SCHEMA"
+    );
+    assert_eq!(
+        DiagnosticEvent::new("vault.open", ACCOUNT, "UNKNOWN")
+            .unwrap_err()
+            .code(),
+        "SCHEMA"
+    );
+}
+
+#[test]
+fn diagnostic_fields_reject_malformed_accounts_and_secret_canaries() {
+    const ACCOUNT: &str = "00112233445566778899aabbccddeeff";
+    for account in [
+        "",
+        "00112233445566778899AABBCCDDEEFF",
+        "00112233445566778899aabbccddeefg",
+        "00112233445566778899aabbccddee",
+        "../112233445566778899aabbccddeeff",
+    ] {
+        assert_eq!(
+            DiagnosticEvent::new("vault.open", account, "LOCKED")
+                .unwrap_err()
+                .code(),
+            "SCHEMA"
+        );
+    }
+
+    for result in [
+        DiagnosticEvent::new("CANARY_WAL004_SECRET_OPERATION", ACCOUNT, "LOCKED"),
+        DiagnosticEvent::new(
+            "vault.open",
+            "CANARY_WAL004_SECRET_ACCOUNT_ID",
+            "LOCKED",
+        ),
+        DiagnosticEvent::new("vault.open", ACCOUNT, "CANARY_WAL004_SECRET_CODE"),
+    ] {
+        assert_eq!(result.unwrap_err().code(), "SCHEMA");
+    }
+}
+
+#[test]
 fn successful_operation_reports_actual_post_wipe_zeroes() {
     let log = SharedWipes::default();
     let mut observer = log.clone();

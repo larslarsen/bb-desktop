@@ -7,6 +7,7 @@ const path = require('path');
 const repoRoot = path.resolve(__dirname, '..');
 const policyPath = path.join(repoRoot, 'scripts', 'security-policy.js');
 const sbomValidatorPath = path.join(repoRoot, 'scripts', 'validate-sbom.js');
+const rustSbomValidatorPath = path.join(repoRoot, 'scripts', 'validate-rust-sbom.js');
 
 const CHECKOUT_SHA = '3d3c42e5aac5ba805825da76410c181273ba90b1';
 const CHECKOUT_TAG = 'v7.0.1';
@@ -62,6 +63,7 @@ const SOCIAL_PATHS = [
   'package-lock.json',
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   'scripts/build-deb.sh',
   'scripts/build-macos.sh',
   'scripts/build-windows.ps1',
@@ -75,9 +77,11 @@ const SECURITY_PATHS = [
   'test/**',
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   'package.json',
   'package-lock.json',
   'wallet-broker/**',
+  'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
   'js/utils/metrics.js',
@@ -96,12 +100,14 @@ const FORBIDDEN_DOC_PATHS = [
 const REQUIRED_PATHS = [
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   '.github/workflows/social.yml',
   '.github/workflows/security.yml',
   '.github/workflows/sbom.yml',
   'test/electronSecurity.node.js',
   'test/securityPolicy.node.js',
   '.gitleaksignore',
+  'deny.toml',
 ];
 
 const ELECTRON_TEST_CMD = 'node test/electronSecurity.node.js';
@@ -124,6 +130,14 @@ function loadSbomValidator() {
     'required validator scripts/validate-sbom.js does not exist'
   );
   return require(sbomValidatorPath);
+}
+
+function loadRustSbomValidator() {
+  assert.ok(
+    fs.existsSync(rustSbomValidatorPath),
+    'required validator scripts/validate-rust-sbom.js does not exist'
+  );
+  return require(rustSbomValidatorPath);
 }
 
 function loadWorkflows(policy) {
@@ -1588,6 +1602,31 @@ const WAL004_DIRECT_DEPENDENCIES = {
   sha2: { version: '=0.11.0', default_features: false, features: [], optional: false },
   zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
 };
+const WAL004_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/lib.rs',
+  'wallet-broker/src/vault.rs',
+  'wallet-broker/src/store.rs',
+  'wallet-broker/src/session.rs',
+  'wallet-broker/src/native.rs',
+  'wallet-broker/src/native_ui.rs',
+  'wallet-broker/src/hygiene.rs',
+];
+const WAL004_ALLOWED_LICENSES = [
+  'MIT',
+  'Apache-2.0',
+  'Apache-2.0 WITH LLVM-exception',
+  'BSD-2-Clause',
+  'BSD-3-Clause',
+  'BSL-1.0',
+  'ISC',
+  'Zlib',
+  '0BSD',
+  'Unlicense',
+  'Unicode-3.0',
+  'OFL-1.1',
+  'Ubuntu-font-1.0',
+];
+const WAL004_DIRECT_COMPONENTS = Object.freeze(Object.keys(WAL004_DIRECT_DEPENDENCIES));
 
 test('WAL-004 Rust test-harness manifest pins the exact toolchain, dependencies, and native features', () => {
   const policy = loadPolicy();
@@ -1747,6 +1786,227 @@ test('WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX J
     () => policy.checkSbomWorkflow(replaceOnce(sbom.text, WAL004_SBOM, `${WAL004_SBOM} --all-features=false`)),
     /Rust|wallet|CycloneDX|feature|exact/i
   );
+});
+
+test('WAL-004 policy and validator changes trigger every applicable routine workflow', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  const requiredByWorkflow = [
+    [
+      'social',
+      workflows.social,
+      policy.checkSocialWorkflow,
+      ['scripts/validate-rust-sbom.js'],
+    ],
+    [
+      'security',
+      workflows.security,
+      policy.checkSecurityWorkflow,
+      ['scripts/validate-rust-sbom.js', 'deny.toml'],
+    ],
+  ];
+
+  for (const [name, workflow, checker, required] of requiredByWorkflow) {
+    for (const [triggerName, paths] of assertedTriggerPaths(workflow, name)) {
+      for (const rel of required) {
+        assert.ok(paths.includes(rel), `${name} ${triggerName} omits ${rel}`);
+        const mutatedData = JSON.parse(JSON.stringify(workflow.data));
+        mutatedData.on[triggerName].paths = mutatedData.on[triggerName].paths
+          .filter((candidate) => candidate !== rel);
+        assertRejects(
+          () => checker.call(policy, workflow.text, mutatedData),
+          /path|Rust|SBOM|deny|wallet/i
+        );
+      }
+    }
+  }
+  assert.deepStrictEqual(Object.keys(workflows.sbom.data.on), ['workflow_dispatch']);
+});
+
+test('WAL-004 Rust source inventory is exported closed and enumerated by repository policy', () => {
+  const policy = loadPolicy();
+  assert.deepStrictEqual(policy.WAL004_RUST_SOURCE_PATHS, WAL004_RUST_SOURCE_PATHS);
+  assert.strictEqual(typeof policy.checkRustWalletSourceInventory, 'function');
+
+  const actual = fs.readdirSync(path.join(repoRoot, 'wallet-broker', 'src'), {
+    withFileTypes: true,
+  }).filter((entry) => entry.isFile() && entry.name.endsWith('.rs'))
+    .map((entry) => `wallet-broker/src/${entry.name}`);
+  policy.checkRustWalletSourceInventory(actual);
+  assertRejects(
+    () => policy.checkRustWalletSourceInventory(WAL004_RUST_SOURCE_PATHS.slice(1)),
+    /Rust|source|inventory|missing/i
+  );
+  assertRejects(
+    () => policy.checkRustWalletSourceInventory([
+      ...WAL004_RUST_SOURCE_PATHS,
+      'wallet-broker/src/extra.rs',
+    ]),
+    /Rust|source|inventory|extra|unknown/i
+  );
+
+  const repositoryChecker = policy.checkRepository.toString();
+  assert.match(repositoryChecker, /readdirSync/);
+  assert.match(repositoryChecker, /checkRustWalletSourceInventory/);
+  assert.match(repositoryChecker, /for\s*\(const rel of WAL004_RUST_SOURCE_PATHS\)/);
+});
+
+test('WAL-004 vault and native source policy requires reviewed secret and path primitives', () => {
+  const policy = loadPolicy();
+  const reviewedVault = [
+    'use base64ct::{Base64Unpadded, Encoding};',
+    'use secrecy::{ExposeSecret, ExposeSecretMut, SecretSlice};',
+    'use zeroize::Zeroize;',
+    'pub fn reviewed(secret: &mut SecretSlice<u8>) {',
+    '  let _ = Base64Unpadded::encode_string(secret.expose_secret());',
+    '  secret.expose_secret_mut().zeroize();',
+    '}',
+  ].join('\n');
+  policy.checkRustWalletSource(reviewedVault, 'wallet-broker/src/vault.rs');
+  for (const primitive of [
+    'Base64Unpadded',
+    'Encoding',
+    'SecretSlice',
+    'ExposeSecret',
+    'ExposeSecretMut',
+  ]) {
+    const mutated = reviewedVault.replaceAll(primitive, `Removed${primitive}`);
+    assert.notStrictEqual(mutated, reviewedVault, `mutation target missing: ${primitive}`);
+    assertRejects(
+      () => policy.checkRustWalletSource(
+        mutated,
+        'wallet-broker/src/vault.rs'
+      ),
+      /base64|secrecy|secret|primitive|vault/i
+    );
+  }
+  for (const helper of ['encode_base64', 'decode_base64']) {
+    assertRejects(
+      () => policy.checkRustWalletSource(
+        `${reviewedVault}\nfn ${helper}(_bytes: &[u8]) {}`,
+        'wallet-broker/src/vault.rs'
+      ),
+      /base64|handwritten|helper|vault/i
+    );
+  }
+
+  const reviewedNativePath = 'let selected = path.to_str().ok_or_else(NativeError::locked)?;';
+  policy.checkRustWalletSource(reviewedNativePath, 'wallet-broker/src/native_ui.rs');
+  assertRejects(
+    () => policy.checkRustWalletSource(
+      'let selected = path.to_string_lossy().into_owned();',
+      'wallet-broker/src/native_ui.rs'
+    ),
+    /path|lossy|UTF-8|native/i
+  );
+
+  policy.checkRustWalletSource(
+    fs.readFileSync(path.join(repoRoot, 'wallet-broker/src/vault.rs'), 'utf8'),
+    'wallet-broker/src/vault.rs'
+  );
+  policy.checkRustWalletSource(
+    fs.readFileSync(path.join(repoRoot, 'wallet-broker/src/native_ui.rs'), 'utf8'),
+    'wallet-broker/src/native_ui.rs'
+  );
+});
+
+test('WAL-004 cargo-deny policy is exact fail-closed and has no bypass lists', () => {
+  const policy = loadPolicy();
+  const denyText = fs.readFileSync(path.join(repoRoot, 'deny.toml'), 'utf8');
+  assert.deepStrictEqual(policy.WAL004_ALLOWED_LICENSES, WAL004_ALLOWED_LICENSES);
+  assert.strictEqual(typeof policy.checkWalletBrokerDenyPolicy, 'function');
+  policy.checkWalletBrokerDenyPolicy(denyText);
+
+  const mutations = [
+    ['ignore = []', 'ignore = ["RUSTSEC-0000-0000"]'],
+    ['yanked = "deny"', 'yanked = "warn"'],
+    ['  "MIT",\n', ''],
+    ['  "MIT",\n', '  "MIT",\n  "GPL-3.0-only",\n'],
+    ['exceptions = []', 'exceptions = [{ allow = ["GPL-3.0-only"], name = "synthetic" }]'],
+    ['multiple-versions = "warn"', 'multiple-versions = "allow"'],
+    ['wildcards = "deny"', 'wildcards = "allow"'],
+    ['skip = []', 'skip = [{ name = "synthetic", version = "=1.0.0" }]'],
+    ['skip-tree = []', 'skip-tree = [{ name = "synthetic", depth = 1 }]'],
+    ['unknown-registry = "deny"', 'unknown-registry = "allow"'],
+    ['unknown-git = "deny"', 'unknown-git = "allow"'],
+    [
+      'allow-registry = ["https://github.com/rust-lang/crates.io-index"]',
+      'allow-registry = ["https://github.com/rust-lang/crates.io-index", "https://example.invalid/index"]',
+    ],
+    ['allow-git = []', 'allow-git = ["https://example.invalid/repository"]'],
+  ];
+  for (const [from, to] of mutations) {
+    assertRejects(
+      () => policy.checkWalletBrokerDenyPolicy(replaceOnce(denyText, from, to)),
+      /deny|advisory|yanked|license|exception|duplicate|wildcard|skip|registry|git|source/i
+    );
+  }
+  assertRejects(
+    () => policy.checkWalletBrokerDenyPolicy(
+      replaceOnce(denyText, 'ignore = []', 'ignore = []\nvulnerability = "allow"')
+    ),
+    /deny|advisory|deprecated|vulnerability/i
+  );
+});
+
+test('WAL-004 Rust SBOM validator accepts only a complete broker CycloneDX graph', () => {
+  const validator = loadRustSbomValidator();
+  assert.deepStrictEqual(validator.DIRECT_COMPONENTS, WAL004_DIRECT_COMPONENTS);
+  const componentRefs = WAL004_DIRECT_COMPONENTS.map((name) => `pkg:cargo/${name}@1.0.0`);
+  const rootRef = 'pkg:cargo/bitbook-wallet-broker@0.1.0';
+  const document = {
+    bomFormat: 'CycloneDX',
+    specVersion: '1.6',
+    metadata: {
+      component: {
+        type: 'application',
+        name: 'bitbook-wallet-broker',
+        version: '0.1.0',
+        'bom-ref': rootRef,
+        purl: rootRef,
+      },
+    },
+    components: WAL004_DIRECT_COMPONENTS.map((name, index) => ({
+      type: 'library',
+      name,
+      version: '1.0.0',
+      'bom-ref': componentRefs[index],
+      purl: componentRefs[index],
+    })),
+    dependencies: [
+      { ref: rootRef, dependsOn: componentRefs },
+      ...componentRefs.map((ref) => ({ ref, dependsOn: [] })),
+    ],
+  };
+  validator.validateRustCycloneDxDocument(document);
+
+  const desktopRoot = JSON.parse(JSON.stringify(document));
+  desktopRoot.metadata.component.name = 'bitbook-desktop';
+  desktopRoot.metadata.component.purl = 'pkg:npm/bitbook-desktop@0.1.0';
+  assertRejects(
+    () => validator.validateRustCycloneDxDocument(desktopRoot),
+    /Rust|broker|npm|root/i
+  );
+  for (const malformed of [
+    null,
+    {},
+    Object.assign({}, document, { components: [] }),
+    Object.assign({}, document, { dependencies: [] }),
+  ]) {
+    assertRejects(
+      () => validator.validateRustCycloneDxDocument(malformed),
+      /Rust|SBOM|CycloneDX|metadata|component|dependencies|graph/i
+    );
+  }
+  for (const omitted of WAL004_DIRECT_COMPONENTS) {
+    const incomplete = Object.assign({}, document, {
+      components: document.components.filter((component) => component.name !== omitted),
+    });
+    assertRejects(
+      () => validator.validateRustCycloneDxDocument(incomplete),
+      /Rust|SBOM|direct|component|omit/i
+    );
+  }
 });
 
 function run() {
