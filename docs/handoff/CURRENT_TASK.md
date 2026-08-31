@@ -1,8 +1,8 @@
 # Current Task
 
-Ticket: BBD-WAL-003
+Ticket: BBD-WAL-004
 
-State: COMPLETE — REVIEWER ACCEPTED
+State: AUTHORIZED — CODEX SOL TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -10,59 +10,31 @@ Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `d472785ab896bb5d1367c4117ffd659a9a8512ae`
+Source baseline: `abdd2b1980cbe8c5483a26b08b7ae43c82ae420b`
 
-[BBD-WAL-003](../../tickets/BBD-WAL-003.md) is the only authorized implementation task
-in this repository. Its accepted test source and expected-red evidence are preserved at
-commit `a8a70a520ad0a02696086f1f8e79d198ef98f72e`. Before issuing any production handoff,
-the reviewer found that the inherited exact three-suite `npm test` assertion conflicts
-with the new requirement to include `npm run test:wallet-broker`. Sol Correction 04 is
-reviewer-accepted at 1,574 lines and SHA-256
-`1414a32cb114b1467c9d39bbcbf02228aa185857b0ccc304cd4356be9a02507b`.
-The Luna Correction 04 policy-red handoff executed the corrected policy suite and
-recorded its exact 53-pass/5-fail result in
-[the correction evidence](../testing/BBD-WAL-003-CORRECTION-04-EXPECTED-RED.md). The
-reviewer accepts that gate. The local-green targeted and broader checks are recorded in
-[the local-green evidence](../testing/BBD-WAL-003-LOCAL-GREEN.md) and
-[the falsification evidence](../testing/BBD-WAL-003-FALSIFICATION.md). Only
-[the Sol production handoff](CODEX_SOL_BBD_WAL_003_PRODUCTION.md) authored the eight named
-production/package/workflow/policy paths without execution. The reviewer rejected that
-drop before execution because the real supervisor does not normalize the two accepted
-no-payload Electron calls to the broker's required empty parameter object. Only
-[Production Correction 01](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_01.md) edited only
-`wallet-broker/supervisor.js` to close that mismatch. The reviewer accepts the exact
-eight-path source hash set recorded in
-[the Luna green handoff](CODEX_LUNA_BBD_WAL_003_GREEN.md). Luna stopped on its first
-targeted command at 10 protocol passes / 1 handshake failure; no later command ran. The
-numeric child PID was accepted through regex string coercion. Only
-[Production Correction 02](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_02.md) may add
-explicit string guards for the same validation defect family in protocol, supervisor, and
-Electron main. Its guards are accepted, but review found the exported session-hash
-function still coerces its four PID/nonce inputs. Only
-[Production Correction 03](CODEX_SOL_BBD_WAL_003_PRODUCTION_CORRECTION_03.md) may close
-that final protocol-only boundary. Its exact protocol source is reviewer-accepted at 340
-lines and SHA-256
-`79b0ac8bdd1dc6f4d54793dd1137ae72172688412eefbbe853f1cc421be630f4`.
-[Green Resume 01](CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md) completed the full local
-gate sequence and integrated production at
-`584019e9a89022d77b4bbb6710c2b7670e42d95b`. GitHub Social client run `33342988248`
-passed its routine check with all package jobs skipped. Only
-[the Luna falsification handoff](CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md) performed the
-three isolated negative mutations, exact restorations, evidence commit, and push. Those
-gates passed exactly and the reviewer accepts BBD-WAL-003 in
-[`BBD-WAL-003-ACCEPTANCE.md`](../testing/BBD-WAL-003-ACCEPTANCE.md). Native binary, Rust
-install, wallet, node, network service, hardware, and device work remain unauthorized
-outside later tickets.
+[BBD-WAL-004](../../tickets/BBD-WAL-004.md) is the only authorized implementation
+ticket in this repository. The owner resolved architecture Q10 in favor of a minimal
+native authorization window running inside the Rust wallet-broker process. It owns
+software unlock, backup/restore, and later authoritative payment confirmation. A
+broker-invoked native file picker may select backup paths. Electron never owns the
+window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
+hardware devices confirm independently when capable.
 
-BBD-WAL-002 is complete and reviewer-accepted at implementation commit
-`62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
-`d472785ab896bb5d1367c4117ffd659a9a8512ae`; GitHub Social client run
-`33338667462` passed. Its accepted contract and fixtures are protected inputs.
+Only [the Sol test-source handoff](CODEX_SOL_BBD_WAL_004_TESTS.md) may create the exact
+nine test-harness/test/fixture paths named there. No Rust toolchain is installed yet.
+Sol must not execute or install anything. After reviewer acceptance, the owner will be
+asked to install the pinned user-level Rust toolchain under `/home/lars`; Luna will then
+resolve `Cargo.lock` and execute the separately authorized expected-red command. Large
+build/cache/temp trees may not use `/tmp`.
 
-The wallet roadmap routes this trust-boundary ticket to Sol, the independent bb-go
-payment protocol ticket to Grok Build when available, and later mechanical UI work to
-Codex Spark. `go-ipfs` is deprecated and receives no wallet work.
+BBD-WAL-003 is complete and reviewer-accepted at production commit
+`584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
+`2e7e1599b6aee9aa5034d8854ac08bd54eadfe1e`, and acceptance commit
+`abdd2b1980cbe8c5483a26b08b7ae43c82ae420b`. GitHub Social client run
+`33342988248` passed with package jobs skipped. Its secure Electron/future-broker
+boundary remains a frozen input; it does not ship a wallet or native broker.
 
-Next strong-model candidate: define the test-first BBD-WAL-004 custody/lock/recovery
-ticket for Codex Sol. Grok Build remains queued for BBGO-PAY-001 at or after 19:53 PDT;
-Codex Spark remains reserved for the later mechanical UI tickets.
+The independent `../bb-go` BBGO-PAY-001 ticket remains queued for Grok Build at or after
+2026-08-30 19:53 PDT under its own durable handoff. Codex Spark remains reserved for
+later mechanical UI/view-model work. `../go-ipfs` is deprecated and receives no wallet
+work.

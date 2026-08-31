@@ -10,8 +10,8 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 | Priority | Ticket | Source actor | Why that actor | Start condition |
 | --- | --- | --- | --- | --- |
-| P0 active | BBD-WAL-003 | Principal Dev — Codex Sol, High | Electron/native-process trust boundary, authenticated session transcript, spawn ordering, and fail-closed IPC | WAL-002 accepted; satisfied |
-| P1 | BBD-WAL-004 | Codex Sol, High | Software custody, native unlock/backup, encrypted persistence, and zeroization | WAL-003 accepted |
+| P0 complete | BBD-WAL-003 | Principal Dev — Codex Sol, High | Electron/native-process trust boundary, authenticated session transcript, spawn ordering, and fail-closed IPC | Reviewer-accepted at `abdd2b19` |
+| P1 active | BBD-WAL-004 | Codex Sol, High | Software custody, owner-selected in-broker native unlock/backup surface, encrypted persistence, and zeroization | WAL-003 accepted; test source authorized |
 | P1 cross-repo | BBGO-PAY-001 | Sr Dev — Grok Build, High | The reviewer-frozen WAL-002 JCS/signature semantics make this bounded daemon protocol work; no wallet or rate authority | May proceed in `../bb-go` while desktop has a different active ticket |
 | P2 | BBD-RATE-001 | Grok Build, High | Bounded untrusted-provider parser/worker and deterministic aggregation after the process split exists | WAL-003 accepted |
 | P2 | BBD-WAL-005 | Codex Spark, High for mechanical UI/view-model slices; reviewer re-routes any security-sensitive slice | Sanitized preview, fixed capability labels, and state wiring are mechanical only after broker and payment schemas are fixed | WAL-003 and BBGO-PAY-001 contracts accepted |
@@ -44,3 +44,7 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 The model queue does not decide XMR wallet-rpc distribution, a default ZEC light endpoint,
 ZEC compact-block IP privacy/Tor policy, or unbound payment requests. Those choices are
 separate owner gates. Payer-bound requests remain the v1 baseline.
+
+Broker native toolkit Q10 is resolved: the owner selected a minimal native window inside
+the Rust broker, with broker-invoked native file dialogs and no v1 OS credential agent.
+Electron never owns unlock, backup, or payment confirmation.

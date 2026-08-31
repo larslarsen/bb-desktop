@@ -50,6 +50,13 @@ Fixed owner decisions that this review does not reopen:
 - `../go-ipfs` is deprecated and out of scope.
 - Chromium's sandbox stays enabled in packaged apps. Device access must not be
   used as a reason to disable it.
+- The broker authorization surface is a minimal native window running inside
+  the Rust wallet-broker process. It owns software-wallet passphrase entry,
+  backup/restore, and the authoritative payment confirmation. Electron never
+  owns or embeds that window. Hardware devices still perform their own
+  independent confirmation when their capabilities allow it. A broker-started
+  native OS file picker may select backup paths; a separate OS credential agent
+  is not the v1 unlock design.
 
 Current desktop facts this design extends rather than replaces:
 
@@ -227,7 +234,7 @@ Product consequences, normative in this review:
 | --- | --- | --- | --- | --- |
 | Social renderer | `social/` | Untrusted (XSS, hostile post/chat/profile content, compromised peer JSON) | Display of non-secret wallet status, sanitized non-authoritative Pay previews, and optional approximate fiat already returned by allowlisted IPC | Seeds, spend keys, view keys, passphrases, backup bytes, PCZT with signing material, raw signer material, USB, generic RPC, `ipcRenderer`, confirm/unlock/broadcast authority, outbound rate HTTP, treating fiat as `amount_atomic` |
 | Electron main supervisor | `social-main.js` plus small new supervisor modules | Privileged for windowing and child spawn; **not** a wallet; **not** an authorization surface; **not** a rate oracle | Child stdio handles (broker pipes and **separate** quote-worker pipes), packaged-binary pins, allowlist dispatch, cancel, forwarding of sanitized `RateSnapshotV1` as display-only | Confirm, unlock credentials, backup bytes, transaction construction, key decrypt, coin libraries, forwarding of unknown methods, broadcast, mixing broker and quote handles, sending wallet context to the quote worker |
-| Broker native authorization surface | in-process in the wallet broker, or a broker-controlled OS credential agent | Authoritative for software confirm, onboard, unlock, and backup; still below a hardware device that independently displays a field | User-visible prepared review image; passphrase entry into broker memory; optional **explicitly approximate** sanitized `RateSnapshotV1` overlay that cannot change `amount_atomic` or fee | Social HTML, renderer origin, daemon `connect-src`, remote content, Electron-delivered secrets, rate fetch, using quotes in prepare/sign/broadcast |
+| Broker native authorization surface | owner-selected minimal window in-process in the wallet broker; broker may invoke an OS file picker | Authoritative for software confirm, onboard, unlock, and backup; still below a hardware device that independently displays a field | User-visible prepared review image; passphrase entry into broker memory; optional **explicitly approximate** sanitized `RateSnapshotV1` overlay that cannot change `amount_atomic` or fee | Social HTML, renderer origin, daemon `connect-src`, remote content, Electron-delivered secrets, rate fetch, using quotes in prepare/sign/broadcast |
 | Wallet broker | new native sidecar in this repo | Spend/view authority for software accounts; coordinator for hardware/watch-only; owner of authorization | Encrypted software secrets, viewing material, durable intents, adapter state, prepared artifacts | Listening TCP/UDS/named-pipe/HTTP wallet API; logs of secrets; auto-broadcast after crash; social identity keys; product/generic wallet HTTP; **rate fetch in the trusted spend core**; quote-worker handles; treating fiat as spend authority |
 | Quote worker | new least-privileged desktop child in this repo | Untrusted for payment value; trusted only to not hold wallet or social secrets | Fixed asset-ID / quote-currency queries; bounded provider HTTP; normalized `RateSnapshotV1` | Wallet IPC handle, wallet files, device access, social identity, broker session, account IDs, addresses, balances, peer IDs, memos, payment amounts, request IDs, API keys, telemetry, OB1 endpoints |
 | ZEC compact-block service | user-configured light server | Untrusted chain service | Compact blocks | Viewing keys, spend authority, payment-request contents |
@@ -745,7 +752,7 @@ Supervisor → broker, after handshake. Electron is never the confirm caller.
 | `account.createSoftware` | broker native surface after onboarding confirm | Creates locked software account |
 | `account.importWatchOnly` | broker native surface | Watch-only; never spend |
 | `account.attachHardware` | broker native surface | Probe device; persist fingerprint + caps |
-| `account.unlock` | broker native surface, or broker-controlled OS credential agent | Software unlock; timeout |
+| `account.unlock` | broker native surface | Software unlock; timeout |
 | `account.lock` | supervisor idle / native surface | Zeroize software spend material in process |
 | `account.exportBackup` | broker native surface | Encrypted backup bytes; never to Electron |
 | `receiver.fresh` | supervisor for payee request | Fresh private receiver bound to `request_id` |
@@ -893,9 +900,8 @@ sign(prepared, auth) -> SignedTx
 verify(signed, intent_hash) -> ok | INTENT_MISMATCH
 ```
 
-`auth` is `software_unlock` collected by the broker native surface (or
-broker-controlled OS credential agent) or `device_session`. It is never a
-seed, passphrase, or PIN from Electron.
+`auth` is `software_unlock` collected by the broker native surface or
+`device_session`. It is never a seed, passphrase, or PIN from Electron.
 
 ### 6.3 Prepare / review / sign / verify / broadcast
 
@@ -1212,9 +1218,9 @@ Deriving any domain from any other is forbidden (T21).
   the data key; it does not replace account isolation. An OS keychain used
   for unlock must be started by the **broker**, not by Electron.
 - Distinct files per account. No global "wallet.dat" mixing ZEC and XMR.
-- Passphrase entry only on the broker native surface or broker-controlled OS
-  credential agent. Never in the social page, never in Electron HTML, never
-  in HTTP.
+- Passphrase entry only on the owner-selected broker native surface. Never in
+  the social page, never in Electron HTML, never in HTTP. A later OS keychain
+  may wrap a data key but does not become the v1 passphrase-entry surface.
 
 ### 10.3 Hardware-derived accounts
 
@@ -2105,7 +2111,7 @@ and cannot construct or move funds.
 | --- | --- | --- | --- | --- |
 | 1 | BBD-WAL-002 | bb-desktop | Common contract: primitives, NU6.3 capability matrix (v6, Orchard, Ironwood receive/spend, PCZT version, migration flag), prepare-before-confirm intent machine including crash_recovery, JCS golden vectors for PaymentRequestV1/status/intent_hash including strict TimestampV1 calendar and explicit bidi/format-control failures, Node oracle matching committed hashes, fake ZEC+XMR adapters, fake software/hardware/watch-only signers, secret canaries. Existing Node toolchain only. **Rates are not a required field**; Pay fixtures pass with no `RateSnapshotV1` | Electron UI; Rust install; coin crates; network; devices; wallets; nodes; real keys; constructing or moving funds; **quote worker / provider HTTP / making a rate mandatory** |
 | 2 | BBD-WAL-003 | bb-desktop | Supervisor spawn, packaged-binary verify, inherited anonymous pipes, session transcript binding, **allowlisted social preload without confirm/unlock/backup/broadcast**, amend BBD-SEC-001 tests from "no IPC" to "fail-closed allowlist", broker method allowlist, native-confirm stub owned by broker | Electron confirm window; keys in main; generic invoke; UDS/named-pipe listeners; secrets in argv/env; transaction construction; mixing quote-worker handles into the broker pipe |
-| 3 | BBD-WAL-004 | bb-desktop | Encrypted software custody, lock/unlock on broker native surface or broker-controlled OS credential agent, backup/restore on broker surface, zeroize hooks, domain separation tests | Renderer or Electron passphrase fields; seed display in social page; backup bytes in Electron |
+| 3 | BBD-WAL-004 | bb-desktop | Encrypted software custody, lock/unlock on the owner-selected in-broker native surface, broker-invoked backup/restore file dialogs, zeroize hooks, domain separation tests | Renderer or Electron passphrase fields; seed display in social page; backup bytes in Electron |
 | 4 | BBD-WAL-005 | bb-desktop | Pay snapshot gating, sanitized Electron preview, Trezor-transparent ineligibility, Orchard-pool `MIGRATION_REQUIRED` gating, receiver.fresh for payee path. Optional `fiat_estimate` may be absent | Electron confirm; bb-go protocol implementation (spec/fixtures only); requiring quotes for Pay |
 | 5 | BBD-RATE-001 | bb-desktop | Quote worker + `RateQueryV1`/`RateSnapshotV1`, pinned replaceable providers, recorded-fixture parsers, aggregation (absent-not-zero, disagreement visible, median only inside bound), decimal conversion, query/log canary, Pay still works with every source down. Before user-visible wallet UX | Network in ordinary tests; API keys; wallet IPC/files/devices/identity/amounts in the worker; fee or `amount_atomic` mutation from quotes; OB1 ticker path; P2P price oracle; implementation inside WAL-002 |
 | 6 | BBGO-PAY-001 | bb-go | Transport + social-sign of JCS PaymentRequestV1 and status events; must match WAL-002 golden hashes; wallet-free **and rate-free** daemon remains; no coin libraries | Broker IPC; spend; product wallet HTTP; `/ob/exchangerates`; rate fetch |
@@ -2162,11 +2168,14 @@ confirm; privacy implications (linking peer ID to tx) need an owner yes/no.
 review requires non-mainnet until BBD-WAL-012. Owner should confirm packaged
 unsigned test artifacts stay testnet/stagenet.
 
-**Q10. Broker native toolkit.** Minimal in-process native window in the
-Rust sidecar versus a broker-controlled OS credential/file-dialog agent for
-unlock/backup, with a still-broker-owned payment confirm surface. Engineering
-must not move confirm into Electron while Q10 is open. WAL-003 may stub the
-surface.
+**Q10. Broker native toolkit — RESOLVED 2026-08-30.** The owner selected a
+minimal in-process native window in the Rust sidecar for unlock, backup/restore,
+and payment confirmation. The broker may invoke a native OS file picker for a
+backup path, but Electron does not mediate it and a separate OS credential agent
+is not the v1 unlock design. Hardware confirmation remains on the device when
+supported. WAL-004 implements only the custody/lock/backup portion; later
+payment tickets reuse the same broker-owned surface and may not move Confirm
+into Electron.
 
 **Q11. Quote providers and quote currency.** A later provider ticket may
 evaluate CoinPaprika, CoinGecko public, and direct Kraken market data
@@ -2255,7 +2264,7 @@ implementation that only models "a ZEC hot wallet" fails the contract tests.
 | Where the broker lives | `bb-desktop` Rust native sidecar; not `bb-go`, not renderer, not inherited OB wallet, not a Go sidecar, not a zallet process |
 | Why Rust | Maintained librustzcash/PCZT/v6/Ironwood stack in-process; secrets out of V8/npm; toolchain cost accepted |
 | Spend authority | Wallet broker + hardware devices; never Electron (including main-owned HTML), never `bb-go`, never product/generic HTTP |
-| Authorization surface | Broker-owned native confirm/onboard/unlock/backup, or broker-controlled OS credential agent; hardware confirm on device; Electron may preview and cancel only |
+| Authorization surface | Owner-selected minimal native window runs in the Rust broker for onboard/unlock/backup and authoritative payment confirmation; a broker-invoked OS file picker may select backup paths; no v1 OS credential agent; hardware confirms independently on device; Electron may preview and cancel only |
 | IPC | Inherited anonymous bidirectional pipes/handles; packaged-binary verify; transcript bound to both pids+nonces; no secret in argv/env; protocol pipe ≠ diagnostics; no UDS/named-pipe/TCP/HTTP listener |
 | Confirm / broadcast | Prepare exact ReviewImage (fee + bound) before confirm; one broker confirm authorizes sign→verify→broadcast; cancel/expiry rechecked after sign and before broadcast; crash recovery reconfirms; no Electron `intent.broadcast` |
 | Canonical encoding | RFC 8785 JCS + domain-separated SHA-256 for PaymentRequestV1, status events, and intent_hash; closed schema; fail-closed unknown fields; TimestampV1 **shape plus strict Gregorian calendar, year 2020–2100, round-trip equality**; NFC memo; **explicit** bidi formatting/isolate and listed format-control rejection (not implied by C0/C1); independent Go/Rust/Node golden hashes |
