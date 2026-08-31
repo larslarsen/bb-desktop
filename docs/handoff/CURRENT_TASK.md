@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS EVIDENCE/INTEGRATION AUTHORIZED
+State: PHASE-C ADDRESS GATE COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -20,6 +20,8 @@ Active handoff:
 
 Accepted address gate result review:
 [BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md)
+
+[BBD-WAL-006-ADDRESS-GATE-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-01.md)
 
 Completed address gate resume 03:
 [CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md)
