@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD PIN CORRECTION EXPECTED RED RECORDED — REVIEW REQUIRED
+State: AEAD EXPECTED RED ACCEPTED — MANIFEST/POLICY CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_AEAD_TEST_RED_01.md](CODEX_LUNA_BBD_WAL_006_AEAD_TEST_RED_01.md)
+[CODEX_SOL_BBD_WAL_006_AEAD_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_AEAD_PRODUCTION_CORRECTION_01.md)
+
+AEAD expected-red review:
+[BBD-WAL-006-AEAD-TEST-RED-REVIEW-01.md](../testing/BBD-WAL-006-AEAD-TEST-RED-REVIEW-01.md)
 
 AEAD test-source review:
 [BBD-WAL-006-AEAD-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-AEAD-TEST-SOURCE-REVIEW-01.md)
@@ -65,12 +68,12 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The Argon2 correction is accepted. The third lock attempt stopped before mutation on the
-AEAD/crypto-common contradiction. Sol's one-path AEAD test correction is accepted at
-2,388 lines and SHA-256
-`29cbe64a0a217a9a94eca23c52126b06174b79c547f512d8191282c0e00a4573`, retaining all
-73 tests. Luna may run only its focused expected red. Manifest, production policy, Rust
-source/tests, lockfile, fixtures, and broader execution remain frozen.
+The AEAD correction test is committed with all 73 cases. Luna's focused run failed only
+on production `chacha20poly1305 =0.11.0` versus test `=0.10.1` before manifest logic;
+reviewer acceptance is linked above. Sol may change only the manifest AEAD version and
+two matching production-policy literals. Test source, other custody/Zcash declarations,
+Rust source/tests, lockfile, fixtures, execution, evidence, integration, and Git remain
+frozen.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
