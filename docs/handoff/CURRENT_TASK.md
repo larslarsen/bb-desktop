@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-A TEST SOURCE ACCEPTED — FIXTURE AND EXPECTED RED AUTHORIZED
+State: PHASE-A FORMATTING REJECTED — FORMATTER DIFF CAPTURE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,7 +16,7 @@ Test-source review:
 [BBD-WAL-006-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-TEST-SOURCE-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED.md)
+[CODEX_LUNA_BBD_WAL_006_FORMAT_CAPTURE_01.md](CODEX_LUNA_BBD_WAL_006_FORMAT_CAPTURE_01.md)
 
 Architecture:
 [BBD-WAL-006-UPSTREAM-REVIEW.md](../architecture/BBD-WAL-006-UPSTREAM-REVIEW.md)
@@ -26,11 +26,12 @@ Ticket: [BBD-WAL-006.md](../../tickets/BBD-WAL-006.md)
 BBD-WAL-004 remains complete and reviewer-accepted at `e8894a44`. BBGO-PAY-001 remains
 complete in `../bb-go` at production `6bbb0629` and final evidence `801f5d55`.
 
-The exact eight uncommitted Phase-A test/manifest hashes in the review are accepted.
-Only Luna may integrate them, resolve and inventory the crates.io graph, run the
-upstream-only fixture target, freeze its exact synthetic local-consensus bytes, run the
-named Node and Rust expected-red commands, record evidence, and perform the corresponding
-Git commit/push under the active handoff.
+The exact eight uncommitted Phase-A test/manifest hashes passed semantic source review,
+but the first authorized `cargo fmt --check` exited 1. No dependency resolution, test,
+fixture, source mutation, integration, evidence, or Git operation followed. Luna may
+only recapture the complete read-only formatter diff under the active correction handoff.
+Sol must apply any accepted mechanical correction without executing a formatter; XHigh
+must review new exact hashes before Phase B can resume.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
