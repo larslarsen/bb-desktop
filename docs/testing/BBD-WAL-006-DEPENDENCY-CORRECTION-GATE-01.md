@@ -55,7 +55,29 @@ Pre/post hashes:
 The six ZEC tests remain at their accepted format-correction hashes.
 
 ## Supply-chain metadata inventory addendum
-SHA-256 `634e62b34362f9c042ddba8688fc540c1baaa793e2094d32d94ffb1131d86cee`).
+
+Addendum timestamp: 2026-08-31T13:32:11-07:00 (America/Los_Angeles)
+
+Protected governance parent: `a9bcc070`
+
+The exact locked/offline metadata command was:
+
+```text
+env TMPDIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-tmp CARGO_TARGET_DIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-cargo /home/lars/.cargo/bin/cargo +1.98.0 metadata --manifest-path wallet-broker/Cargo.toml --locked --offline --format-version 1 > wallet-broker/target/wal006-metadata-inventory.json
+```
+
+Result: exit `0`. Capture path: `wallet-broker/target/wal006-metadata-inventory.json`;
+1,305,072 bytes; SHA-256
+`634e62b34362f9c042ddba8688fc540c1baaa793e2094d32d94ffb1131d86cee`.
+
+The six direct Zcash lock checksums are:
+
+- `zcash_client_backend 0.24.0`: `07ad58d8ca5daacbc089bf82ec09e45cf2a8be40adeb40b9399b16545c81a528`
+- `zcash_client_sqlite 0.22.0`: `dd92e4334619b1e3f67019254049318ec0d0240a3c15d853bdf2ac4bba597078`
+- `pczt 0.9.3`: `a5592f4f3eba7f9344cc423f45b6e65911e0630c9b89968d5a20792aadd5a0eb`
+- `zcash_primitives 0.30.1`: `403d5be1e96339534be098e3377fb8a78d68ca7585b1780133d884b810277418`
+- `zcash_protocol 0.10.5`: `314329b91ec4bbb517441840e47d0b2029bf0b946f086980c96c889c2d92dc5d`
+- `zcash_keys 0.16.1`: `def800f128e459eedebc900f36f408eaf0687634128dcf64ecfeaeebc3e16c14`
 
 The six required query outputs were:
 
