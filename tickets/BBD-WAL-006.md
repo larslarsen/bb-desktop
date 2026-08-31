@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: AEAD API TEST CONSTRUCTOR CORRECTION AUTHORIZED
+Status: AEAD API TEST SOURCE CORRECTION ACCEPTED — EXPECTED RED 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

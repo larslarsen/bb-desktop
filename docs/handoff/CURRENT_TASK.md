@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD API RED REJECTED — TEST CONSTRUCTOR CORRECTION AUTHORIZED
+State: AEAD API TEST SOURCE CORRECTION ACCEPTED — EXPECTED RED 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_02.md](CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_02.md)
+[CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_02.md](CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_02.md)
+
+Complete AEAD API test-source review:
+[BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-02.md)
 
 API red/correction review:
 [BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-05.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-05.md)
@@ -81,10 +84,13 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
 The corrected graph resolved. Luna's first API expected-red run was rejected because
-stable AEAD 0.10 also requires GenericArray slice constructors; no evidence/integration
-followed. Sol may change only the independent vector test's nonce constructor/reference
-under the active handoff. Production, manifest, policy, lock, ZEC tests, fixtures,
-execution, evidence, integration, and Git remain frozen.
+the reviewer contract omitted stable AEAD 0.10's GenericArray slice-constructor errors;
+no evidence/integration followed. Sol completed the independent vector test correction,
+which XHigh accepted at 394 lines and SHA-256
+`a83bc4d1bf30201ad8c9bfa09556e8bae029b8eefebf2eeeab4db5fed03e561b`.
+Luna may run only the exact locked/offline custody target under the active handoff.
+Production, manifest, policy, lock, ZEC tests, fixtures, and all other execution remain
+frozen.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
