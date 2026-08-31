@@ -41,10 +41,11 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ```
 
 The second run verified the existing output byte-for-byte and performed no wallet
-rewind. Generated output and frozen files are equal for every path (`cmp`), the
-manifest is 8,708 bytes, and all generated/frozen files are private (`0600`; the
-two directories are `0700`). The frozen inventory is exactly the following 16
-files; each row records the manifest linkage/scenario and frozen bytes/hash.
+rewind. The ignored generated output had `0600` files and two `0700` directories;
+the frozen bytes were identical, and committed fixture entries are regular
+non-executable files (Git mode `100644`). The manifest is 8,708 bytes. The frozen
+inventory is exactly the following 16 files; each row records the manifest
+linkage/scenario and frozen bytes/hash.
 
 | Path | Manifest linkage/scenario | Bytes | SHA-256 |
 | --- | --- | ---: | --- |
@@ -69,7 +70,7 @@ The manifest links canonical heights 100–107, a common height-106 parent for t
 two height-107 branches, and all listed closed corruption/discontinuity scenarios.
 It contains no extra file, symlink, secret, mnemonic, mainnet, endpoint, or URL
 text. Generator versions are zcash_client_backend 0.24.0, zcash_client_sqlite
-0.22.0, zcash_pczt 0.9.3, zcash_primitives 0.30.1, zcash_protocol 0.10.5, and
+0.22.0, pczt 0.9.3, zcash_primitives 0.30.1, zcash_protocol 0.10.5, and
 zcash_keys 0.16.1.
 
 ## Expected-red results
