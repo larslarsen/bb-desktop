@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: PRODUCTION GREEN INTEGRATED — ISOLATED FALSIFICATION AUTHORIZED
+Status: CASE 1 PAIRING CORRECTED — ISOLATED FALSIFICATION RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -387,6 +387,11 @@ RustSec completed cleanly and Luna integrated production at
 `docs/testing/BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md`. Luna now owns the seven exact
 temporary mutations/restorations under `docs/handoff/CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md`.
 No production change is authorized.
+
+Falsification Run 01 stopped safely because its first mutation and test traversed
+different zeroization paths. Source restored exactly. The corrected handoff pairs
+`wipe_with` with the decrypt-unwind guard test, then resumes unchanged cases 2–7. This
+does not authorize a production or test-source change.
 
 ## Required test groups
 

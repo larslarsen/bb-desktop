@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: PRODUCTION GREEN INTEGRATED — ISOLATED FALSIFICATION AUTHORIZED
+State: CASE 1 PAIRING CORRECTED — ISOLATED FALSIFICATION RESUME AUTHORIZED
 
-Review: [BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md](../testing/BBD-WAL-004-GREEN-INTEGRATION-REVIEW.md)
+Evidence: [BBD-WAL-004-FALSIFICATION-RUN-01.md](../testing/BBD-WAL-004-FALSIFICATION-RUN-01.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md](CODEX_LUNA_BBD_WAL_004_FALSIFICATION.md)
+Active handoff: [CODEX_LUNA_BBD_WAL_004_FALSIFICATION_2.md](CODEX_LUNA_BBD_WAL_004_FALSIFICATION_2.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -68,9 +68,11 @@ test. Sol's one-test correction is reviewer-accepted with every vector byte and
 assertion unchanged. GREEN_6 passed every functional, lint, and native compile gate.
 RustSec then loaded 1,226 advisories and found no vulnerability in 327 locked crates.
 Luna integrated and pushed production commit `0e42fb4b477cfe76757ed207d3a561270b9e9efe`;
-GitHub Social client run `33357371137` passed with package jobs skipped. The seven exact
-isolated falsifications are now active. Manual non-packaging security/SBOM workflows
-remain reviewer gates after falsification.
+GitHub Social client run `33357371137` passed with package jobs skipped. Falsification
+Run 01 restored cleanly after the reviewer paired a `wipe_with` mutation with the
+unrelated `SecretBytes::drop` test. The corrected resume targets the decrypt-unwind path
+that actually traverses `wipe_with`, then continues cases 2–7. Manual non-packaging
+security/SBOM workflows remain reviewer gates after falsification.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

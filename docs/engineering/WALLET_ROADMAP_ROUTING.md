@@ -11,7 +11,7 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 | Priority | Ticket | Source actor | Why that actor | Start condition |
 | --- | --- | --- | --- | --- |
 | P0 complete | BBD-WAL-003 | Principal Dev — Codex Sol, High | Electron/native-process trust boundary, authenticated session transcript, spawn ordering, and fail-closed IPC | Reviewer-accepted at `abdd2b19` |
-| P1 active | BBD-WAL-004 | Codex Sol, High | Software custody, owner-selected in-broker native unlock/backup surface, encrypted persistence, and zeroization | Production green integrated; seven isolated falsifications active |
+| P1 active | BBD-WAL-004 | Codex Sol, High | Software custody, owner-selected in-broker native unlock/backup surface, encrypted persistence, and zeroization | Case 1 pairing corrected; isolated falsification resume active |
 | P1 cross-repo | BBGO-PAY-001 | Sr Dev — Grok Build, High | The reviewer-frozen WAL-002 JCS/signature semantics make this bounded daemon protocol work; no wallet or rate authority | May proceed in `../bb-go` while desktop has a different active ticket |
 | P2 | BBD-RATE-001 | Grok Build, High | Bounded untrusted-provider parser/worker and deterministic aggregation after the process split exists | WAL-003 accepted |
 | P2 | BBD-WAL-005 | Codex Spark, High for mechanical UI/view-model slices; reviewer re-routes any security-sensitive slice | Sanitized preview, fixed capability labels, and state wiring are mechanical only after broker and payment schemas are fixed | WAL-003 and BBGO-PAY-001 contracts accepted |
