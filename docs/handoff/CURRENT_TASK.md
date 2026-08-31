@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD API TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+State: AEAD API RED REJECTED — TEST CONSTRUCTOR CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_01.md](CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_01.md)
+[CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_02.md](CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_02.md)
+
+API red/correction review:
+[BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-05.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-05.md)
 
 AEAD API test-source review:
 [BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-01.md)
@@ -77,13 +80,11 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The corrected graph resolved and tree/metadata commands passed. Sol's two-edit test
-compatibility correction is accepted at 394 lines and SHA-256
-`9bc3fe14718cd5ecdec5da3e8416f46356b88e28bf2f56db9ee9407cd0f71b6d`, retaining all
-11 tests and exact vectors. Luna may run only the locked/offline custody target and
-integrate the test/evidence/current-task paths on the exact frozen production import
-failure. Production, manifest, policy, lock, ZEC tests, fixtures, and broader execution
-remain frozen.
+The corrected graph resolved. Luna's first API expected-red run was rejected because
+stable AEAD 0.10 also requires GenericArray slice constructors; no evidence/integration
+followed. Sol may change only the independent vector test's nonce constructor/reference
+under the active handoff. Production, manifest, policy, lock, ZEC tests, fixtures,
+execution, evidence, integration, and Git remain frozen.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
