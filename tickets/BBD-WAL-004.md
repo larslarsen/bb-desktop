@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: REVIEW CORRECTION 2 AUTHORIZED — TEST SOURCE ONLY
+Status: TEST SOURCE ACCEPTED — OWNER RUST TOOLCHAIN INSTALL REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -273,6 +273,11 @@ moves into `VaultStore`. The test changes that shared fault control from `FileSy
 `wallet-broker/tests/vault_store.rs` under
 `docs/handoff/CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_2.md`; every other accepted
 Correction 1 byte and assertion remains unchanged.
+
+Correction 2 is reviewer-accepted. The final fake uses test-owned shared fault state;
+`VaultStore::port_mut()` is absent and not part of the future API. The exact accepted
+test-source path hashes and review evidence are recorded in
+`docs/testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md`. Production remains unauthorized.
 
 ## Required test groups
 

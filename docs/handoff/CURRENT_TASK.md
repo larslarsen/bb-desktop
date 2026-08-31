@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: REVIEW CORRECTION 2 — CODEX SOL TEST SOURCE ONLY
+State: TEST SOURCE ACCEPTED — OWNER RUST TOOLCHAIN INSTALL REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -20,16 +20,17 @@ broker-invoked native file picker may select backup paths. Electron never owns t
 window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
 hardware devices confirm independently when capable.
 
-The initial Sol drop and Correction 1 are complete but remain uncommitted and are not
-reviewer-accepted. Correction 1 closed the independent-composition, real-open pre-KDF,
-and Linux filesystem/failure-invariant gaps. Only
-[correction 2](CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_2.md) is active; it permits Sol to
-edit only `wallet-broker/tests/vault_store.rs` to replace a proposed production-mutating
-port accessor with test-owned shared fault control. No Rust toolchain is installed yet.
-Sol must not execute or install anything. After reviewer acceptance, the owner will be
-asked to install the pinned user-level Rust toolchain under `/home/lars`; Luna will then
-resolve `Cargo.lock` and execute the separately authorized expected-red command. Large
-build/cache/temp trees may not use `/tmp`.
+The initial Sol drop plus Corrections 1 and 2 are reviewer-accepted at the exact hashes in
+[the test-source review](../testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md). The nine accepted
+paths remain unstaged and uncommitted. No production source is authorized.
+
+Rust and Cargo are not installed. The owner must first install official rustup with the
+minimal pinned Rust 1.98.0 toolchain under `/home/lars`, using a disk-backed temporary
+directory under `/home/lars/.cache` and no root. After that explicit owner action,
+[the Luna expected-red handoff](CODEX_LUNA_BBD_WAL_004_RED.md) authorizes lockfile
+resolution, exact red execution/evidence, and Git integration. Until the owner reports
+the installation complete, Luna must not act. Large build/cache/temp trees may not use
+`/tmp`.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
