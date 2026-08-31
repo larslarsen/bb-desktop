@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: PRODUCTION CORRECTION 1 REJECTED — CORRECTION 2 TEST SOURCE AUTHORIZED
+State: CORRECTION 2 TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md)
 
@@ -49,10 +49,12 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Only Sol's four-path
-[Correction 2 test-source handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_2_TESTS.md) is active.
-All production bytes remain frozen. No source repair, execution, Git integration, or push
-is authorized until reviewer test-source acceptance. `/tmp` remains forbidden for
+Sol's four-path Correction 2 test source is reviewer-accepted in
+[BBD-WAL-004-CORRECTION-2-TEST-SOURCE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-TEST-SOURCE-REVIEW.md).
+Only Luna's exact
+[Correction 2 expected-red handoff](CODEX_LUNA_BBD_WAL_004_CORRECTION_2_RED.md) is active.
+All production bytes remain frozen. No source repair is authorized; Luna may integrate
+only exact behavioral red with all prior tests green. `/tmp` remains forbidden for
 substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
