@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 1 EXPECTED RED RECORDED — PRODUCTION CORRECTION REQUIRED
+State: CORRECTION 1 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md)
 
@@ -43,16 +43,16 @@ diagnostics are not closed, direct Linux port operations follow symlinks, rfd co
 paths lossily, reviewed secrecy/Base64 dependencies are unused, and relevant policy
 files/source inventory can evade the intended checks.
 
-Sol's five-path Correction 1 test source is reviewer-accepted in
-[BBD-WAL-004-CORRECTION-1-TEST-SOURCE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-1-TEST-SOURCE-REVIEW.md).
-All 3,381 lines and hashes match, all 15 production hashes remain frozen, and the new
-regressions are structurally compatible and non-vacuous. Only Luna's
-[Correction 1 expected-red handoff](CODEX_LUNA_BBD_WAL_004_CORRECTION_1_RED.md) is active.
-Luna may execute the exact offline headless commands, record evidence, and commit only
-the five accepted tests plus its evidence/state update. No production correction is
-authorized. The installed toolchain is correct at 1.98.0; Luna must invoke it through
-the absolute rustup proxy recorded in its handoff because its shell does not inherit the
-Cargo bin path. `/tmp` remains forbidden for substantial Rust state.
+Sol's five-path Correction 1 test source and Luna's exact expected-red evidence are
+reviewer-accepted. The review is frozen in
+[BBD-WAL-004-CORRECTION-1-RED-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-1-RED-REVIEW.md):
+53 Rust tests reached execution with exactly seven intended failures; all 64 Node cases
+ran with five intended policy failures and the bounded SBOM validator case already green.
+Only Sol's nine-path
+[Correction 1 production handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_1_PRODUCTION.md) is
+active. Tests, dependencies, lockfile, deny file, SBOM validator, package file, manual
+SBOM workflow, Git, and execution remain frozen. Luna integrates only after reviewer
+source acceptance. `/tmp` remains forbidden for substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
