@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SUPPORT-DEPENDENCY TEST ACCEPTED — FOCUSED RED AUTHORIZED
+Status: SUPPORT-DEPENDENCY MANIFEST/POLICY SOURCE AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -328,7 +328,10 @@ policy implementation, and ZEC production remain frozen.
 
 The test source is accepted at SHA-256
 `f8340ae965a1f59e27594153cd3c9f3eca5ee1d8a78ed0a9a685faf6f1dc2647`.
-Luna may run only the focused expected-red handoff before any manifest change.
+Its expected red is accepted at `1f24a221`. Sol may now edit only `Cargo.toml` and the
+narrow manifest-policy implementation under
+`docs/handoff/CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md`. Lockfile and
+ZEC Rust production remain frozen.
 
 ### Phase C2 — address production source (future, separate handoff)
 

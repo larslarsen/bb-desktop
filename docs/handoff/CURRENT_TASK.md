@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY EXPECTED RED RECORDED — REVIEW REQUIRED
+State: SUPPORT-DEPENDENCY MANIFEST/POLICY SOURCE AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,15 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md)
+
+Accepted support-dependency expected-red review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-RED-REVIEW-01.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-RED-REVIEW-01.md)
+
+Support-dependency expected-red evidence:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-EXPECTED-RED-01.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-EXPECTED-RED-01.md)
+
+Completed support-dependency red handoff:
 [CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_RED_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_RED_01.md)
 
 Support-dependency test source review:
@@ -189,8 +198,10 @@ every acceptance command remain unauthorized.
 
 That one-file test is reviewer-accepted at 2,454 lines and SHA-256
 `f8340ae965a1f59e27594153cd3c9f3eca5ee1d8a78ed0a9a685faf6f1dc2647`.
-Luna is authorized only to capture and integrate the focused support-dependency expected
-red. The frozen implementation boundaries above remain unchanged.
+Its exact 66/8 expected red is accepted at integration `1f24a221`. Sol is authorized
+only to add the two exact manifest pins and their narrow manifest-policy enforcement.
+The lockfile, ZEC Rust production, feature/source policy, execution, evidence, and Git
+remain frozen to Sol.
 
 No ZEC production is currently authorized. Policy implementation remains frozen. The
 prior production exception remains the accepted
