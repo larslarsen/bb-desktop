@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 1 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
+State: PRODUCTION CORRECTION 1 REJECTED — CORRECTION 2 TEST SOURCE AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-1-EXPECTED-RED.md)
 
@@ -43,16 +43,17 @@ diagnostics are not closed, direct Linux port operations follow symlinks, rfd co
 paths lossily, reviewed secrecy/Base64 dependencies are unused, and relevant policy
 files/source inventory can evade the intended checks.
 
-Sol's five-path Correction 1 test source and Luna's exact expected-red evidence are
-reviewer-accepted. The review is frozen in
-[BBD-WAL-004-CORRECTION-1-RED-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-1-RED-REVIEW.md):
-53 Rust tests reached execution with exactly seven intended failures; all 64 Node cases
-ran with five intended policy failures and the bounded SBOM validator case already green.
-Only Sol's nine-path
-[Correction 1 production handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_1_PRODUCTION.md) is
-active. Tests, dependencies, lockfile, deny file, SBOM validator, package file, manual
-SBOM workflow, Git, and execution remain frozen. Luna integrates only after reviewer
-source acceptance. `/tmp` remains forbidden for substantial Rust state.
+Correction 1 expected red remains accepted, but Sol's nine-path production correction is
+rejected in
+[production source review 02](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-02.md).
+Static review found global lock events suppressible by malformed account input, missing
+unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
+custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
+Only Sol's four-path
+[Correction 2 test-source handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_2_TESTS.md) is active.
+All production bytes remain frozen. No source repair, execution, Git integration, or push
+is authorized until reviewer test-source acceptance. `/tmp` remains forbidden for
+substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
