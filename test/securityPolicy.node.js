@@ -1602,7 +1602,7 @@ const WAL004_DENY =
 const WAL004_SBOM =
   'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json --all-features';
 const WAL004_DIRECT_DEPENDENCIES = {
-  argon2: { version: '=0.6.0', default_features: false, features: ['alloc'], optional: false },
+  argon2: { version: '=0.5.3', default_features: false, features: ['alloc'], optional: false },
   base64ct: { version: '=1.8.3', default_features: false, features: ['alloc'], optional: false },
   chacha20poly1305: { version: '=0.11.0', default_features: false, features: ['alloc'], optional: false },
   eframe: {
@@ -1659,6 +1659,14 @@ test('WAL-004 Rust test-harness manifest pins the exact toolchain, dependencies,
   policy.checkWalletBrokerManifest(manifestText, { requireLibrary: false, requireLockfile: false });
   for (const [fromLine, toLine] of [
     [
+      'argon2 = { version = "=0.5.3", default-features = false, features = ["alloc"] }',
+      'argon2 = { version = "=0.6.0", default-features = false, features = ["alloc"] }',
+    ],
+    [
+      'argon2 = { version = "=0.5.3", default-features = false, features = ["alloc"] }',
+      'argon2 = { version = "0.5", default-features = false, features = ["alloc"] }',
+    ],
+    [
       'hkdf = { version = "=0.12.4", default-features = false }',
       'hkdf = { version = "=0.13.0", default-features = false }',
     ],
@@ -1693,7 +1701,6 @@ test('WAL-004 Rust test-harness manifest pins the exact toolchain, dependencies,
   }
   for (const [from, to] of [
     ['rust-version = "1.98.0"', 'rust-version = "1.97.0"'],
-    ['version = "=0.6.0"', 'version = "0.6"'],
     ['version = "=0.11.0"', 'version = "=0.10.0"'],
     ['default-features = false', 'default-features = true'],
     [
