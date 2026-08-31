@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD API PRODUCTION SOURCE ACCEPTED — DEPENDENCY CORRECTION GATE AUTHORIZED
+State: DEPENDENCY CORRECTION GATE PASSED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -122,3 +122,6 @@ AEAD API correction expected-red 02 evidence:
 
 Argon2 correction expected-red evidence:
 [BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md)
+
+Dependency correction gate evidence:
+[BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-01.md](../testing/BBD-WAL-006-DEPENDENCY-CORRECTION-GATE-01.md)

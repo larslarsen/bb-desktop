@@ -2,7 +2,7 @@ use core::fmt;
 
 use argon2::{Algorithm, Argon2, Params, Version};
 use base64ct::{Base64Unpadded, Encoding};
-use chacha20poly1305::aead::{AeadInOut, KeyInit};
+use chacha20poly1305::aead::{AeadInPlace, KeyInit};
 use chacha20poly1305::{Tag, XChaCha20Poly1305, XNonce};
 use hkdf::Hkdf;
 use secrecy::{ExposeSecret, ExposeSecretMut, SecretSlice};
@@ -479,9 +479,9 @@ pub fn seal_vault(
         let aad = vault_aad(metadata, &salt, &nonce);
         plaintext_scratch = plaintext.expose(|bytes| bytes.to_vec());
         let cipher = XChaCha20Poly1305::new_from_slice(&key).map_err(|_| VaultError::locked())?;
-        let cipher_nonce = XNonce::try_from(nonce.as_slice()).map_err(|_| VaultError::locked())?;
+        let cipher_nonce = XNonce::from_slice(nonce.as_slice());
         let tag = cipher
-            .encrypt_inout_detached(&cipher_nonce, &aad, plaintext_scratch.as_mut_slice().into())
+            .encrypt_in_place_detached(cipher_nonce, &aad, plaintext_scratch.as_mut_slice())
             .map_err(|_| VaultError::locked())?;
         let mut ciphertext = core::mem::take(&mut plaintext_scratch);
         ciphertext.extend_from_slice(tag.as_ref());
@@ -534,11 +534,10 @@ pub fn open_vault_bytes(
             .ok_or_else(VaultError::locked)?;
         let tag_bytes = plaintext.split_off(tag_at);
         let cipher = XChaCha20Poly1305::new_from_slice(&key).map_err(|_| VaultError::locked())?;
-        let cipher_nonce =
-            XNonce::try_from(envelope.nonce.as_slice()).map_err(|_| VaultError::locked())?;
-        let tag = Tag::try_from(tag_bytes.as_slice()).map_err(|_| VaultError::locked())?;
+        let cipher_nonce = XNonce::from_slice(envelope.nonce.as_slice());
+        let tag = Tag::from_slice(tag_bytes.as_slice());
         cipher
-            .decrypt_inout_detached(&cipher_nonce, &aad, plaintext.as_mut_slice().into(), &tag)
+            .decrypt_in_place_detached(cipher_nonce, &aad, plaintext.as_mut_slice(), tag)
             .map_err(|_| VaultError::locked())?;
         SecretBytes::new(core::mem::take(&mut plaintext))
     })();

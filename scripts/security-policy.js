@@ -240,15 +240,15 @@ const WAL004_ALLOWED_LICENSES = [
   'Ubuntu-font-1.0',
 ];
 const WAL004_DIRECT_DEPENDENCIES = {
-  argon2: { version: '=0.6.0', default_features: false, features: ['alloc'], optional: false },
+  argon2: { version: '=0.5.3', default_features: false, features: ['alloc'], optional: false },
   base64ct: { version: '=1.8.3', default_features: false, features: ['alloc'], optional: false },
-  chacha20poly1305: { version: '=0.11.0', default_features: false, features: ['alloc'], optional: false },
+  chacha20poly1305: { version: '=0.10.1', default_features: false, features: ['alloc'], optional: false },
   eframe: {
     version: '=0.36.1', default_features: false,
     features: ['default_fonts', 'glow', 'wayland', 'x11'], optional: true,
   },
   getrandom: { version: '=0.4.3', default_features: false, features: ['std'], optional: false },
-  hkdf: { version: '=0.13.0', default_features: false, features: [], optional: false },
+  hkdf: { version: '=0.12.4', default_features: false, features: [], optional: false },
   rfd: {
     version: '=0.17.2', default_features: false,
     features: ['xdg-portal', 'wayland'], optional: true,
@@ -258,7 +258,7 @@ const WAL004_DIRECT_DEPENDENCIES = {
     version: '=1.0.229', default_features: false, features: ['alloc', 'derive'], optional: false,
   },
   serde_json: { version: '=1.0.151', default_features: false, features: ['alloc'], optional: false },
-  sha2: { version: '=0.11.0', default_features: false, features: [], optional: false },
+  sha2: { version: '=0.10.9', default_features: false, features: [], optional: false },
   zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
 };
 
@@ -1815,17 +1815,17 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     }
   }
   const expectedDependencies = [
-    'argon2 = { version = "=0.6.0", default-features = false, features = ["alloc"] }',
+    'argon2 = { version = "=0.5.3", default-features = false, features = ["alloc"] }',
     'base64ct = { version = "=1.8.3", default-features = false, features = ["alloc"] }',
-    'chacha20poly1305 = { version = "=0.11.0", default-features = false, features = ["alloc"] }',
+    'chacha20poly1305 = { version = "=0.10.1", default-features = false, features = ["alloc"] }',
     'eframe = { version = "=0.36.1", optional = true, default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }',
     'getrandom = { version = "=0.4.3", default-features = false, features = ["std"] }',
-    'hkdf = { version = "=0.13.0", default-features = false }',
+    'hkdf = { version = "=0.12.4", default-features = false }',
     'rfd = { version = "=0.17.2", optional = true, default-features = false, features = ["xdg-portal", "wayland"] }',
     'secrecy = { version = "=0.10.3", default-features = false }',
     'serde = { version = "=1.0.229", default-features = false, features = ["alloc", "derive"] }',
     'serde_json = { version = "=1.0.151", default-features = false, features = ["alloc"] }',
-    'sha2 = { version = "=0.11.0", default-features = false }',
+    'sha2 = { version = "=0.10.9", default-features = false }',
     'zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }',
   ];
   const dependencyBlock = manifestText.split('[dependencies]\n')[1];
