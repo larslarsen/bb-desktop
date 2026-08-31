@@ -2,21 +2,24 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS GATE COMPLETE — REVIEW REQUIRED
+State: PHASE-C STORE PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Accepted correction actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `8af5db0b9f7238f22f62cf4148ddd095e9d948b2`
+Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
+
+Accepted address integration review:
+[BBD-WAL-006-ADDRESS-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-INTEGRATION-REVIEW-01.md)
 
 Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_ADDRESS_EVIDENCE_INTEGRATION_01.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_EVIDENCE_INTEGRATION_01.md)
+[CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_STORE_PRODUCTION_01.md)
 
 Accepted address gate result review:
 [BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md)
@@ -352,12 +355,15 @@ Phase-C policy groups. Result Review 01 accepts the retained output without reru
 authorized only for bounded evidence and exact eight-path integration; all broader work remains
 frozen.
 
-No ZEC production is currently authorized. Broader ZEC feature/source policy remains
-frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
-API compatibility edit.
-No broader tests,
-falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
-Electron, package, SBOM, or other-repository work is authorized in this phase.
+The address vertical and final evidence are accepted at
+`432e69c0443dd5233609d578b43d5a43d83d2c3d`. Sol is authorized only for the four-path
+`zec_store` production-source handoff. Address test/source outside those paths, scan,
+preparation, handle hygiene, broader ZEC feature/source policy, and execution remain frozen.
+
+No broader tests, falsification, live endpoint, mainnet, signing, proving, extraction,
+broadcast, hardware, Electron, package, SBOM, or other-repository work is authorized in this
+phase. The prior production exception remains the accepted integrated `vault.rs` AEAD API
+compatibility edit.
 
 This slice remains offline and synthetic. `../go-ipfs` is deprecated and receives no
 wallet work.
