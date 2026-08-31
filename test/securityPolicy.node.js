@@ -1678,7 +1678,7 @@ test('WAL-004 Rust first-party source policy forbids unsafe and unreviewed autho
   assert.strictEqual(typeof policy.checkRustWalletSource, 'function');
   policy.checkRustWalletSource(
     'use zeroize::Zeroize; pub fn wipe(bytes: &mut [u8]) { bytes.zeroize(); }',
-    'wallet-broker/src/vault.rs'
+    'wallet-broker/src/synthetic.rs'
   );
   for (const source of [
     'unsafe fn touch_secret() {}',

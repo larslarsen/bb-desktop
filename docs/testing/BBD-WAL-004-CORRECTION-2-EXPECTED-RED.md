@@ -61,3 +61,19 @@ All 15 frozen production paths remained byte-identical before and after executio
 `.github/workflows/social.yml` `c2d7e2cca231d6b55b7403e756b39e2855421c5407d10fb2146d7493650f96a3`;
 `.github/workflows/security.yml` `64421f333299861103fdd8d3eee0df35414a40e45b5eef4f05d83cd1ebe3159a`;
 `.github/workflows/sbom.yml` `8407f00fc0ed9ad7bd88c726d64e5cd02a61922653991f9cf4b7cf8bea528824`.
+
+## Node-only rerun — 2026-08-30 (PDT)
+
+The accepted one-line fixture correction was verified at 2,053 lines with SHA-256
+`cf167b1bd27b28e7c59db438af5a06304fd16506fb6056904e8dbe5215222ee2`. The sole
+authorized command `node test/securityPolicy.node.js` exited 1 after all 65 cases:
+62 `ok`, 3 intended `not ok`.
+
+The only failures were `committed workflows satisfy the fail-closed checker`,
+`strict eight-line inherited Gitleaks ratchet bytes and content are enforced`, and
+`WAL-004 Rust source inventory is exported closed and enumerated by repository policy`.
+Each fails because the same exact seven Rust source paths are rejected when filesystem
+enumeration order differs from the policy order. The generic `WAL-004 Rust first-party
+source policy forbids unsafe and unreviewed authority` test is green after its accepted
+synthetic positive-control fixture correction. No canary, exception, setup issue,
+unrelated error, or production-path change occurred.
