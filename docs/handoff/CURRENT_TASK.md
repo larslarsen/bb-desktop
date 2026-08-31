@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 2 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION REQUIRED
+State: CORRECTION 2 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md)
 
@@ -51,13 +51,12 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Correction 2 Rust red is reviewer-accepted. Sol's one-line generic Node fixture correction
-is accepted in
-[BBD-WAL-004-CORRECTION-2-NODE-FIXTURE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-NODE-FIXTURE-REVIEW.md).
-Only Luna's [Node-only red rerun](CODEX_LUNA_BBD_WAL_004_CORRECTION_2_NODE_RERUN.md) is
-active. Exact acceptance is 62 green and three repository callers red on the same source-
-inventory ordering defect. Production remains frozen; policy weakening and source repair
-are not authorized.
+Correction 2 expected red is reviewer-accepted in
+[BBD-WAL-004-CORRECTION-2-RED-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-RED-REVIEW.md):
+five exact Rust failures with 41 prior cases green, and three Node repository callers red
+on the same inventory-order defect with 62 cases green. Only Sol's four-path
+[Correction 2 production handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_2_PRODUCTION.md) is
+active. All other production, tests, dependencies, workflows, and Git remain frozen.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

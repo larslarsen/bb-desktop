@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CORRECTION 2 RUST RED ACCEPTED — NODE RED RERUN AUTHORIZED
+Status: CORRECTION 2 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
