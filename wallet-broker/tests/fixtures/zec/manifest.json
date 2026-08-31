@@ -1,0 +1,238 @@
+{
+  "format": "bitbook-zec-compact-fixture",
+  "version": 1,
+  "generator": {
+    "zcash_client_backend": "0.24.0",
+    "zcash_client_sqlite": "0.22.0",
+    "pczt": "0.9.3",
+    "zcash_primitives": "0.30.1",
+    "zcash_protocol": "0.10.5",
+    "zcash_keys": "0.16.1"
+  },
+  "network": {
+    "discriminator": "zec-local",
+    "birthday_height": 100,
+    "checkpoint_height": 99,
+    "overwinter": 1,
+    "sapling": 100,
+    "blossom": 100,
+    "heartwood": 100,
+    "canopy": 100,
+    "nu5": 100,
+    "nu6": 100,
+    "nu6_1": 100,
+    "nu6_2": 100,
+    "nu6_3": 102
+  },
+  "expected": {
+    "orchard_only_receiver": "uregtest1a7mkafdn9c87xywjnyup65uker8tx3y72r9f6elcfm6uh263c9s6smcw6xm5m8k8eythcreuyqktp9z7mtpcd6jsm5xw7skgdcfjx84z",
+    "orchard_migration_required_zat": 40000000,
+    "ironwood_spendable_zat": 150000000,
+    "reorg_victim_ironwood_pending_zat": 30000000,
+    "reorg_replacement_ironwood_pending_zat": 120000000,
+    "confirmation_height": 106,
+    "nu6_3_branch_id_hex": "37a5165b",
+    "prepared_transaction_version": 6
+  },
+  "files": [
+    {
+      "name": "blocks/canonical-000100.compact",
+      "byte_length": 270,
+      "sha256": "a228cae6189ccbff51ed901e641dd59916beb223ff7244359a0d3b334fcaad06",
+      "block_height": 100,
+      "block_hash": "e3302d928ad0cd0e2d23696a8bce0c53b7eda63b5167480a0003941935b909ee",
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "scenario_labels": [
+        "pre-nu6.3-older-orchard"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000101.compact",
+      "byte_length": 74,
+      "sha256": "6ef47b02e1324b31b6187b4c96e396f23b20f988f5693deb6caca3fe4d4b1195",
+      "block_height": 101,
+      "block_hash": "6dff97d6447ea48052db6f5fcd7668cee86b48ed21b4e5d03a01f7aba7a9dcd9",
+      "previous_hash": "e3302d928ad0cd0e2d23696a8bce0c53b7eda63b5167480a0003941935b909ee",
+      "scenario_labels": [
+        "pre-nu6.3"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000102.compact",
+      "byte_length": 74,
+      "sha256": "8826eacd4aa8d68b5c7cbcd8dc4afbf13ec74cafeea30ce3d4ae590773e0a964",
+      "block_height": 102,
+      "block_hash": "5803491d49c5ae30f1965b5825c46ae907147e8db39ae377e11547875f18d0f6",
+      "previous_hash": "6dff97d6447ea48052db6f5fcd7668cee86b48ed21b4e5d03a01f7aba7a9dcd9",
+      "scenario_labels": [
+        "nu6.3-activation"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000103.compact",
+      "byte_length": 270,
+      "sha256": "b0f51ef571fda2516ecd6982e9523e7567a9d38236bc81a07df56cc3b510fe64",
+      "block_height": 103,
+      "block_hash": "f7d277ab137de8bc6040d010e0eba8cdb64488ae3dd935485ac9ac26724a0169",
+      "previous_hash": "5803491d49c5ae30f1965b5825c46ae907147e8db39ae377e11547875f18d0f6",
+      "scenario_labels": [
+        "post-nu6.3-unrelated-output"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000104.compact",
+      "byte_length": 272,
+      "sha256": "514f9ebea982e455dcf81576a4f6dd5a144d7399a9af61bbb2497dc7b66f72fb",
+      "block_height": 104,
+      "block_hash": "6870074e651127e658148a52fd8e84847146376408d2beee9db3da0dddd86cd0",
+      "previous_hash": "f7d277ab137de8bc6040d010e0eba8cdb64488ae3dd935485ac9ac26724a0169",
+      "scenario_labels": [
+        "post-nu6.3-incoming-ironwood-pending"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000105.compact",
+      "byte_length": 76,
+      "sha256": "74319b469c52e1b6ab876ef04fbf4b38b1b65aaa11c630c37aa52a9f6ace957a",
+      "block_height": 105,
+      "block_hash": "465651143b8417424e2e3aca54f72b2c832d5db18fda55ec0b861a643935caa9",
+      "previous_hash": "6870074e651127e658148a52fd8e84847146376408d2beee9db3da0dddd86cd0",
+      "scenario_labels": [
+        "post-nu6.3-confirmation-depth"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000106.compact",
+      "byte_length": 76,
+      "sha256": "5cfe279807dbf3cb88d4e6b470b5f5c8f24c59b91f9836248b2e9c5ba9dd8a45",
+      "block_height": 106,
+      "block_hash": "2ec85d98f12eb00c284f70b62f321b9865facfedc731b8606eb5e653045f18dd",
+      "previous_hash": "465651143b8417424e2e3aca54f72b2c832d5db18fda55ec0b861a643935caa9",
+      "scenario_labels": [
+        "post-nu6.3-incoming-ironwood-confirmed"
+      ]
+    },
+    {
+      "name": "blocks/canonical-000107.compact",
+      "byte_length": 272,
+      "sha256": "7ae90de483f9d2f0628be98c9129ac36dc6427c70bb62e74b2faae1fecbf1bf6",
+      "block_height": 107,
+      "block_hash": "ddd4a167649a2a7a70d69a53a13283e8b1b4244eb61fc01a71f85ceaba07185c",
+      "previous_hash": "2ec85d98f12eb00c284f70b62f321b9865facfedc731b8606eb5e653045f18dd",
+      "scenario_labels": [
+        "one-block-reorg-recognized-victim"
+      ]
+    },
+    {
+      "name": "blocks/reorg-replacement-000107.compact",
+      "byte_length": 272,
+      "sha256": "503565aeb51f7065a5a614d14cd4e8045fb865b84e480db3ae63ef4a0de800e9",
+      "block_height": 107,
+      "block_hash": "2911e5430fc953009cb010aaf5cd4a4e9cae9b5624dc2e7d44d5ad387d8f79a7",
+      "previous_hash": "2ec85d98f12eb00c284f70b62f321b9865facfedc731b8606eb5e653045f18dd",
+      "scenario_labels": [
+        "one-block-reorg",
+        "replacement-ironwood"
+      ]
+    },
+    {
+      "name": "blocks/discontinuity-wrong-prev-000107.compact",
+      "byte_length": 272,
+      "sha256": "2db71f38015ca0071c462c61a7bbce080da09319e89398db6d711fc3c927c168",
+      "block_height": 107,
+      "block_hash": "ddd4a167649a2a7a70d69a53a13283e8b1b4244eb61fc01a71f85ceaba07185c",
+      "previous_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+      "scenario_labels": [
+        "discontinuity",
+        "wrong-previous-hash"
+      ]
+    },
+    {
+      "name": "blocks/discontinuity-height-gap-000109.compact",
+      "byte_length": 272,
+      "sha256": "b0eaaf0ba0a881a6ba7fe33def1418e25a62e308a2c1de7922c77b08fc107213",
+      "block_height": 109,
+      "block_hash": "ddd4a167649a2a7a70d69a53a13283e8b1b4244eb61fc01a71f85ceaba07185c",
+      "previous_hash": "2ec85d98f12eb00c284f70b62f321b9865facfedc731b8606eb5e653045f18dd",
+      "scenario_labels": [
+        "discontinuity",
+        "height-gap"
+      ]
+    },
+    {
+      "name": "blocks/impossible-tree-state-000107.compact",
+      "byte_length": 268,
+      "sha256": "67017418f42edaf876ef19df78a495823773b1494d258319f59de3880d294ef0",
+      "block_height": 107,
+      "block_hash": "ddd4a167649a2a7a70d69a53a13283e8b1b4244eb61fc01a71f85ceaba07185c",
+      "previous_hash": "2ec85d98f12eb00c284f70b62f321b9865facfedc731b8606eb5e653045f18dd",
+      "scenario_labels": [
+        "corruption",
+        "impossible-tree-state"
+      ]
+    },
+    {
+      "name": "blocks/truncated-000107.compact",
+      "byte_length": 271,
+      "sha256": "0edc2de6333f781ebace3f4cd5480c64946fa76c9b583336de3962e4f885d174",
+      "block_height": null,
+      "block_hash": null,
+      "previous_hash": null,
+      "scenario_labels": [
+        "truncation"
+      ]
+    },
+    {
+      "name": "blocks/malformed.compact",
+      "byte_length": 1,
+      "sha256": "76be8b528d0075f7aae98d6fa57a6d3c83ae480a8469e668d7b0af968995ac71",
+      "block_height": null,
+      "block_hash": null,
+      "previous_hash": null,
+      "scenario_labels": [
+        "malformed"
+      ]
+    },
+    {
+      "name": "blocks/corrupt-wire-type-000107.compact",
+      "byte_length": 272,
+      "sha256": "bbfd9bbe5d5f91f3dde5ea436c75378d4a3cdf1174edd90e37f5734e1bf609d4",
+      "block_height": null,
+      "block_hash": null,
+      "previous_hash": null,
+      "scenario_labels": [
+        "corruption",
+        "invalid-protobuf-wire-type"
+      ]
+    }
+  ],
+  "scenarios": {
+    "canonical": [
+      "blocks/canonical-000100.compact",
+      "blocks/canonical-000101.compact",
+      "blocks/canonical-000102.compact",
+      "blocks/canonical-000103.compact",
+      "blocks/canonical-000104.compact",
+      "blocks/canonical-000105.compact",
+      "blocks/canonical-000106.compact",
+      "blocks/canonical-000107.compact"
+    ],
+    "replay": [
+      "blocks/canonical-000100.compact",
+      "blocks/canonical-000101.compact",
+      "blocks/canonical-000102.compact",
+      "blocks/canonical-000103.compact",
+      "blocks/canonical-000104.compact",
+      "blocks/canonical-000105.compact",
+      "blocks/canonical-000106.compact",
+      "blocks/canonical-000107.compact"
+    ],
+    "discontinuity": "blocks/discontinuity-wrong-prev-000107.compact",
+    "height_gap": "blocks/discontinuity-height-gap-000109.compact",
+    "one_block_reorg": "blocks/reorg-replacement-000107.compact",
+    "truncation": "blocks/truncated-000107.compact",
+    "malformed": "blocks/malformed.compact",
+    "corruption": "blocks/corrupt-wire-type-000107.compact",
+    "impossible_tree_state": "blocks/impossible-tree-state-000107.compact"
+  }
+}
