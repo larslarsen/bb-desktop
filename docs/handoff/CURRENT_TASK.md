@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS PRODUCTION SOURCE REAUTHORIZED
+State: PHASE-C ADDRESS PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_CORRECTION_01.md)
+
+Address production source review 02:
+[BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-02.md)
+
+Resumed address production handoff:
 [CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_RESUME_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_RESUME_01.md)
 
 Accepted final support-dependency gate review:
@@ -250,9 +256,13 @@ integrated. Luna is authorized only to correct that evidence sentence/current st
 ZEC source remains frozen.
 
 The evidence-only correction is integrated at `8af5db0b`; the final gate is accepted.
-Sol is reauthorized to implement only the six-path `zec_address` vertical under the
-active resume handoff. Scan, preparation, handle hygiene, broader ZEC policy, execution,
-evidence, integration, and Git remain frozen.
+Sol produced the six-path `zec_address` vertical under the resume handoff. Source Review
+02 rejected execution because the drop violates the `Eq`/`Hash` contract for local schedules,
+does not yet close and revalidate the extension schema/binding in the issuance transaction,
+does not revalidate the complete fixed path chain on later database operations, and retains
+closed-manifest fields without warnings-denied lint treatment. Sol is authorized only for the
+three-path correction handoff. Scan, preparation, handle hygiene, broader ZEC policy,
+execution, evidence, integration, and Git remain frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
