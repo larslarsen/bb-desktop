@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS TEST-ROOT CORRECTION AUTHORIZED
+State: PHASE-C ADDRESS SOURCE GATE RESUMED 03
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md)
+
+Accepted address test-root correction review:
+[BBD-WAL-006-ADDRESS-TEST-ROOT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-TEST-ROOT-CORRECTION-REVIEW-01.md)
+
+Completed address test-root correction:
 [CODEX_SOL_BBD_WAL_006_ADDRESS_TEST_ROOT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_TEST_ROOT_CORRECTION_01.md)
 
 Address gate test stop review:
@@ -326,6 +332,10 @@ The fresh formatter and warnings-denied library Clippy passed. The eight-test ad
 stopped at 4/4 because parallel tests raced while creating the shared state ancestor and losers
 received `AlreadyExists`. No Node or integration ran. Sol is authorized only for the one-file,
 race-safe test-root correction; execution remains frozen.
+
+Sol completed the one-file atomic ancestor correction. Its source review accepts the 389-line
+test-support path and 1,854-line six-path total. Luna must restart the complete gate from the
+formatter; no prior result is reused. All other Phase-C source and policy remain frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
