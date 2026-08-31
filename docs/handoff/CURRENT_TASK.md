@@ -2,9 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 2 EXPECTED RED RECORDED — PRODUCTION CORRECTION REQUIRED
+State: CORRECTION 2 RUST RED ACCEPTED — NODE TEST FIXTURE CORRECTION AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md)
+
+Integration review: [BBD-WAL-004-CORRECTION-2-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-004-CORRECTION-2-INTEGRATION-REVIEW-01.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -49,13 +51,13 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Sol's four-path Correction 2 test source is reviewer-accepted in
-[BBD-WAL-004-CORRECTION-2-TEST-SOURCE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-TEST-SOURCE-REVIEW.md).
-Only Luna's exact
-[Correction 2 expected-red handoff](CODEX_LUNA_BBD_WAL_004_CORRECTION_2_RED.md) is active.
-All production bytes remain frozen. No source repair is authorized; Luna may integrate
-only exact behavioral red with all prior tests green. `/tmp` remains forbidden for
-substantial Rust state.
+Correction 2 Rust red is reviewer-accepted: all three binaries compiled and exactly five
+new behavioral cases failed with every prior Rust case green. Node red is not accepted:
+three failures are the intended inventory defect, while one older generic positive
+fixture incorrectly identifies synthetic source as `vault.rs` and collides with the new
+vault-specific policy. Only Sol's one-line
+[Node fixture correction](CODEX_SOL_BBD_WAL_004_CORRECTION_2_NODE_FIXTURE.md) is active.
+Production remains frozen; policy weakening and source repair are not authorized.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
