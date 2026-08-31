@@ -28,10 +28,11 @@ const GITLEAKS_DIR_SCAN_CMD = 'gitleaks dir --redact=100 --no-banner .';
 const GITLEAKS_IGNORE_REL = '.gitleaksignore';
 const GITLEAKS_RATCHET_OWNER = 'Lead Engineer/Reviewer — Codex';
 const GITLEAKS_RATCHET_RATIONALE =
-  'eight inherited 2016–2018 upstream commit fingerprints only; current-tree copies are disabled and removed, never ignored';
+  'eight inherited 2016–2018 upstream fingerprints plus one reviewer-published WAL-004 synthetic-vector assignment fingerprint; current-tree copies are removed, never ignored';
 const GITLEAKS_RATCHET_REMOVAL_CONDITION =
-  'delete .gitleaksignore when a later authorized ticket removes the inherited OpenBazaar marketplace tree (js/, old root index.html, and its unused renderer entry)';
+  'remove an exact fingerprint only when an authorized history rewrite makes its commit unreachable; current-tree triggers remain relabeled, never ignored';
 const GITLEAKS_RATCHET_FINGERPRINTS = [
+  '12a493196bb4304750e4ae44484a7fa604b82ce4:tickets/BBD-WAL-004.md:generic-api-key:110',
   '7f6a71d6d5ec94b0d8ed02a23eddd7d1bfeaf802:index.html:generic-api-key:57',
   '988fcc3da2d2b13689fdd98e936df14e2f989709:js/models/order/Case.js:generic-api-key:107',
   'b0637a03e1eb12e4e5d49c9dfba92dcbf51a0d8c:js/utils/feedback.js:generic-api-key:8',
@@ -964,11 +965,11 @@ test('routine social check keeps offline syntax and Node tests only', () => {
   assert.ok(!commands.some((line) => /package:|npm ci|electronegativity|cyclonedx|gitleaks/.test(line)));
 });
 
-test('strict eight-line inherited Gitleaks ratchet bytes and content are enforced', () => {
+test('strict nine-line reviewed Gitleaks ratchet bytes and content are enforced', () => {
   const policy = loadPolicy();
   const lexical = [...GITLEAKS_RATCHET_FINGERPRINTS].sort();
   assert.deepStrictEqual(GITLEAKS_RATCHET_FINGERPRINTS, lexical);
-  assert.strictEqual(GITLEAKS_RATCHET_FINGERPRINTS.length, 8);
+  assert.strictEqual(GITLEAKS_RATCHET_FINGERPRINTS.length, 9);
   assert.strictEqual(policy.GITLEAKS_RATCHET_OWNER, GITLEAKS_RATCHET_OWNER);
   assert.strictEqual(policy.GITLEAKS_RATCHET_RATIONALE, GITLEAKS_RATCHET_RATIONALE);
   assert.strictEqual(policy.GITLEAKS_RATCHET_REMOVAL_CONDITION, GITLEAKS_RATCHET_REMOVAL_CONDITION);
@@ -979,7 +980,12 @@ test('strict eight-line inherited Gitleaks ratchet bytes and content are enforce
   policy.checkGitleaksRatchetBytes(committed);
   policy.checkRepository(repoRoot);
 
-  const missing = GITLEAKS_RATCHET_FINGERPRINTS.slice(0, 7);
+  const ticketText = fs.readFileSync(path.join(repoRoot, 'tickets', 'BBD-WAL-004.md'), 'utf8');
+  const vectorHex = '142e48008e3e99568fbbdb4c4534bc67f9666fe4853e6b57c1517be00b24f320';
+  assert.ok(ticketText.includes(`expand = ${vectorHex}`));
+  assert.ok(!ticketText.includes(`${'key'}    = ${vectorHex}`));
+
+  const missing = GITLEAKS_RATCHET_FINGERPRINTS.slice(0, 8);
   assertRejects(() => policy.checkGitleaksRatchetBytes(ratchetBytes(missing)), /missing/i);
 
   const extra = GITLEAKS_RATCHET_FINGERPRINTS.concat([
@@ -1579,7 +1585,7 @@ const WAL004_AUDIT = 'cargo +1.98.0 audit --file wallet-broker/Cargo.lock';
 const WAL004_DENY =
   'cargo +1.98.0 deny --manifest-path wallet-broker/Cargo.toml --all-features check advisories bans licenses sources';
 const WAL004_SBOM =
-  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json';
+  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json --all-features';
 const WAL004_DIRECT_DEPENDENCIES = {
   argon2: { version: '=0.6.0', default_features: false, features: ['alloc'], optional: false },
   base64ct: { version: '=1.8.3', default_features: false, features: ['alloc'], optional: false },
@@ -1783,7 +1789,11 @@ test('WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX J
     /Rust|wallet|CycloneDX|validate/i
   );
   assertRejects(
-    () => policy.checkSbomWorkflow(replaceOnce(sbom.text, WAL004_SBOM, `${WAL004_SBOM} --all-features=false`)),
+    () => policy.checkSbomWorkflow(replaceOnce(
+      sbom.text,
+      WAL004_SBOM,
+      WAL004_SBOM.slice(0, -' --all-features'.length)
+    )),
     /Rust|wallet|CycloneDX|feature|exact/i
   );
 });

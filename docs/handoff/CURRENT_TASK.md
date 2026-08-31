@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CI GATE TEST SOURCE ACCEPTED — LUNA CORRECTED EXPECTED RED AUTHORIZED
+State: CI GATE EXPECTED RED RECORDED — PRODUCTION CORRECTION REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -17,6 +17,8 @@ Reviewed CI baseline: `e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 Production commit: `0e42fb4b477cfe76757ed207d3a561270b9e9efe`
 
 Active handoff: [CODEX_LUNA_BBD_WAL_004_CI_GATE_RED.md](CODEX_LUNA_BBD_WAL_004_CI_GATE_RED.md)
+
+Expected-red evidence: [BBD-WAL-004-CI-GATE-EXPECTED-RED.md](../testing/BBD-WAL-004-CI-GATE-EXPECTED-RED.md)
 
 The encrypted custody core is locally green, integrated, pushed, and independently
 falsified by all seven required temporary mutations. GitHub Social client run
@@ -36,9 +38,9 @@ invalid evidence. Luna stopped without changing, staging, committing, or pushing
 durable record is
 [BBD-WAL-004-CI-GATE-RED-RUN-01.md](../testing/BBD-WAL-004-CI-GATE-RED-RUN-01.md).
 
-Luna may now run only the corrected full custom-runner expected-red command, require 66
-`ok` and the exact three intended `not ok` results, record evidence, and integrate the
-test source under the amended active handoff. Production policy, workflows,
+The corrected full custom-runner expected-red command produced 66 `ok` and the exact
+three intended `not ok` results. Production remains unauthorized pending reviewer
+handoff. Production policy, workflows,
 `.gitleaksignore`, the live ticket label, broad tests, scanners, and all wallet source
 remain frozen until the reviewer accepts the red evidence and publishes a separate
 production handoff.
