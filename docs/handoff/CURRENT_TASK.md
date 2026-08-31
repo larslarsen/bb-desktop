@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: PRODUCTION DROP 01 REJECTED — CORRECTION 1 TEST SOURCE AUTHORIZED
+State: CORRECTION 1 TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -41,11 +41,14 @@ diagnostics are not closed, direct Linux port operations follow symlinks, rfd co
 paths lossily, reviewed secrecy/Base64 dependencies are unused, and relevant policy
 files/source inventory can evade the intended checks.
 
-Only [Correction 1 test source](CODEX_SOL_BBD_WAL_004_CORRECTION_1_TESTS.md) is active.
-Sol may edit exactly five test paths and must leave every uncommitted production byte at
-its reported hash. No production correction, test execution, integration, staging, Git,
-or push is authorized yet. After reviewer acceptance, Luna will demonstrate expected red
-against the frozen flawed source. `/tmp` remains forbidden for substantial Rust state.
+Sol's five-path Correction 1 test source is reviewer-accepted in
+[BBD-WAL-004-CORRECTION-1-TEST-SOURCE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-1-TEST-SOURCE-REVIEW.md).
+All 3,381 lines and hashes match, all 15 production hashes remain frozen, and the new
+regressions are structurally compatible and non-vacuous. Only Luna's
+[Correction 1 expected-red handoff](CODEX_LUNA_BBD_WAL_004_CORRECTION_1_RED.md) is active.
+Luna may execute the exact offline headless commands, record evidence, and commit only
+the five accepted tests plus its evidence/state update. No production correction is
+authorized. `/tmp` remains forbidden for substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
