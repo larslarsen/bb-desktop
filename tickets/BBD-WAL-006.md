@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SECOND DEPENDENCY TEST CORRECTION AUTHORIZED
+Status: ARGON2 CORRECTION TEST RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

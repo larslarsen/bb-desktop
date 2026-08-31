@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SECOND DEPENDENCY CONTRADICTION — ARGON2 TEST CORRECTION AUTHORIZED
+State: ARGON2 TEST SOURCE ACCEPTED — FOCUSED EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_02.md](CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_02.md)
+[CODEX_LUNA_BBD_WAL_006_ARGON2_TEST_RED_01.md](CODEX_LUNA_BBD_WAL_006_ARGON2_TEST_RED_01.md)
+
+Argon2 test-source review:
+[BBD-WAL-006-ARGON2-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-ARGON2-TEST-SOURCE-REVIEW-01.md)
 
 Second dependency-resolution review:
 [BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-02.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-02.md)
@@ -50,14 +53,13 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The first corrected test/red and manifest/policy source are accepted. Luna proved the
-production map now matches, then the next lock attempt stopped before mutation on a
-second published same-line conflict: direct `argon2 0.6.0` pulls stable `digest 0.11`
-through `blake2 0.11`, while fixed Zcash `bip32` requires exact prerelease
-`digest 0.11.0-pre.9`. Sol may change only the Node test-side Argon2 expectation and its
-exact mutations under the active handoff. Manifest, production policy, Rust source/tests,
-lockfile, fixtures, execution, evidence, integration, and Git are frozen. Phase-B fixture
-generation remains suspended.
+The first corrected test/red and manifest/policy source are accepted. The second lock
+attempt stopped before mutation on the published Argon2/digest contradiction. Sol's
+one-path Argon2 test correction is now accepted at 2,381 lines and SHA-256
+`636eeae934dd3691a9a214275c40c4701feec07aa03ed868c4fa7cd3c5f8bd77`, retaining all
+73 cases. Luna may run only the focused WAL-004 manifest-policy test and integrate its
+exact expected red. Manifest, production policy, Rust source/tests, lockfile, fixtures,
+and all broader execution remain frozen. Phase-B fixture generation remains suspended.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
