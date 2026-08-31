@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: DEPENDENCY RESOLUTION/CUSTODY GATE RESUMED
+Status: AEAD API TEST COMPATIBILITY CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

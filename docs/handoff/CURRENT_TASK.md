@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD SOURCE ACCEPTED — DEPENDENCY RESOLUTION GATE RESUMED
+State: GRAPH RESOLVED — AEAD API TEST CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_RESUME_03.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_RESUME_03.md)
+[CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_AEAD_API_TEST_CORRECTION_01.md)
+
+Resolved-graph/API review:
+[BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-04.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-04.md)
 
 AEAD production-source review:
 [BBD-WAL-006-AEAD-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-AEAD-PRODUCTION-SOURCE-REVIEW-01.md)
@@ -71,11 +74,14 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The AEAD test/red is accepted and committed. Sol changed only the direct manifest AEAD
-version and its two matching production-policy literals; accepted hashes are linked
-above. Luna may resume the exact resolution/custody gate with the added stable AEAD 0.10
-graph requirements. Six Rust tests and all fixtures remain frozen. Fixture generation
-remains suspended pending XHigh review of a successful graph and 11-test custody gate.
+The corrected graph resolved and all tree/metadata commands passed. The lockfile is now
+5,367 lines at SHA-256
+`bf9a36a70c96afe3c0b68355f082342c3e625e4764782228be9f4663b635cd83`. The 11-test
+custody command reached compilation and stopped only because stable AEAD 0.10 exposes
+`AeadInPlace`, while accepted test/production source imports `AeadInOut`. Sol may change
+only the independent vector test's trait/method compatibility under the active handoff.
+Production, manifest, policy, lock, ZEC tests, fixtures, execution, evidence, integration,
+and Git remain frozen.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
