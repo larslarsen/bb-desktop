@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: LOCK GRAPH ACCEPTED — SOL PRODUCTION AUTHORIZED
+Status: PRODUCTION DROP 01 REJECTED — CORRECTION 1 TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -316,6 +316,21 @@ The sole active source handoff is
 production paths and may not execute commands or use Git. The committed tests, fixture,
 and lockfile are immutable. Luna will receive a separate integration/green/falsification
 handoff only after reviewer source-drop inspection.
+
+## Production source review 01
+
+Sol completed the bounded 15-path production drop without executing commands beyond the
+authorized final line/hash report. The drop remains uncommitted. Reviewer source review
+rejected it before integration for seven security gaps: expired-session revival,
+incomplete native/session input validation, open diagnostic fields, direct Linux port
+symlink following, lossy native path conversion, unused reviewed secrecy/Base64
+primitives, and incomplete policy/validator trigger and source-inventory enforcement.
+
+The exact findings and frozen source hashes are in
+`docs/testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-01.md`. The sole active actor is Sol
+under `docs/handoff/CODEX_SOL_BBD_WAL_004_CORRECTION_1_TESTS.md`, editing only five test
+paths. The flawed production drop must remain unchanged until those regressions are
+reviewed and demonstrated red. Production correction and integration remain unauthorized.
 
 ## Required test groups
 

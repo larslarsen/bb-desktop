@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: LOCK GRAPH ACCEPTED — SOL PRODUCTION AUTHORIZED
+State: PRODUCTION DROP 01 REJECTED — CORRECTION 1 TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -33,11 +33,19 @@ sources, no duplicate crypto primitive, no forbidden browser/web/wgpu/network ru
 reviewed build scripts and licenses, and a clean pinned RustSec scan of all 327 lockfile
 records. The new crate must declare the repository's MIT license during production.
 
-Only [the Sol production handoff](CODEX_SOL_BBD_WAL_004_PRODUCTION.md) is active. Sol
-authors the bounded production source and policy drop but executes no commands and uses
-no Git. The committed tests, fixture, and lockfile remain immutable. Luna integration,
-green, broader security/SBOM acceptance, falsification, evidence, commit, and push are
-not yet authorized. `/tmp` remains forbidden for substantial Rust state.
+Sol completed the exact 15-path production source/policy drop, but it remains uncommitted
+and is rejected pending test-first correction. The reviewer findings are frozen in
+[production source review 01](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-01.md):
+late authorization can revive expiry, native/session validation is incomplete,
+diagnostics are not closed, direct Linux port operations follow symlinks, rfd converts
+paths lossily, reviewed secrecy/Base64 dependencies are unused, and relevant policy
+files/source inventory can evade the intended checks.
+
+Only [Correction 1 test source](CODEX_SOL_BBD_WAL_004_CORRECTION_1_TESTS.md) is active.
+Sol may edit exactly five test paths and must leave every uncommitted production byte at
+its reported hash. No production correction, test execution, integration, staging, Git,
+or push is authorized yet. After reviewer acceptance, Luna will demonstrate expected red
+against the frozen flawed source. `/tmp` remains forbidden for substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
