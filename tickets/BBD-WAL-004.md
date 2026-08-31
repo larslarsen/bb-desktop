@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: FUNCTIONAL GREEN — CORRECTION 4 NATIVE/CRYPTO API SOURCE AUTHORIZED
+Status: CORRECTION 4 SOURCE ACCEPTED — COMPLETE GREEN INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -346,6 +346,12 @@ authorized. Sol may edit only `wallet-broker/src/native_ui.rs` and
 preserve the exact native interaction, v1 cryptographic composition, detached postfix
 tag wire bytes, independent vector, error normalization, and wipe behavior. Integration,
 Git, and a complete rerun remain Luna-owned after reviewer source acceptance.
+
+Correction 4 is reviewer-accepted in
+`docs/testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md`. The exact complete green and
+integration contract is `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_3.md`. Acceptance
+still requires the separate post-commit falsification evidence and reviewer acceptance
+of the naturally triggered security and SBOM workflow gates.
 
 ## Required test groups
 
