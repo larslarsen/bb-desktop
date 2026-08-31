@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD API EXPECTED RED 02 RECORDED — REVIEW REQUIRED
+State: AEAD API EXPECTED RED 02 ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_02.md](CODEX_LUNA_BBD_WAL_006_AEAD_API_TEST_RED_02.md)
+[CODEX_SOL_BBD_WAL_006_AEAD_API_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_AEAD_API_PRODUCTION_CORRECTION_01.md)
+
+AEAD API expected-red review:
+[BBD-WAL-006-AEAD-API-TEST-RED-REVIEW-02.md](../testing/BBD-WAL-006-AEAD-API-TEST-RED-REVIEW-02.md)
 
 Complete AEAD API test-source review:
 [BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-AEAD-API-TEST-SOURCE-REVIEW-02.md)
@@ -88,15 +91,17 @@ the reviewer contract omitted stable AEAD 0.10's GenericArray slice-constructor 
 no evidence/integration followed. Sol completed the independent vector test correction,
 which XHigh accepted at 394 lines and SHA-256
 `a83bc4d1bf30201ad8c9bfa09556e8bae029b8eefebf2eeeab4db5fed03e561b`.
-Luna may run only the exact locked/offline custody target under the active handoff.
-Production, manifest, policy, lock, ZEC tests, fixtures, and all other execution remain
-frozen.
+The exact locked/offline custody target then exited 101 with zero tests and only the
+nine accepted frozen-production API diagnostics. Sol may change only
+`wallet-broker/src/vault.rs` under the active handoff. Manifest, policy, lock, ZEC tests,
+fixtures, execution, evidence, integration, and Git remain frozen.
 
-No production source or policy implementation is authorized. XHigh must accept the
-resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
-separate Phase-C source handoff exists. No broader tests, falsification, live endpoint,
-mainnet, signing, proving, extraction, broadcast, hardware, Electron, package, SBOM, or
-other-repository work is authorized in this phase.
+No ZEC production source or policy implementation is authorized. The sole production
+exception is the exact `vault.rs` AEAD API compatibility edit in the active handoff.
+XHigh must accept the resolved graph, fixture bytes/provenance, and exact expected-red
+evidence before a separate Phase-C ZEC source handoff exists. No broader tests,
+falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
+Electron, package, SBOM, or other-repository work is authorized in this phase.
 
 This slice remains offline and synthetic. `../go-ipfs` is deprecated and receives no
 wallet work.
