@@ -2148,7 +2148,15 @@ const WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES = [
   'tx-extractor',
   'zcp-builder',
 ];
-const WAL006_ALLOWED_RUST_SOURCE_PATHS = [];
+const WAL006_ALLOWED_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/zec.rs',
+  'wallet-broker/src/zec/address.rs',
+  'wallet-broker/src/zec/fixture.rs',
+  'wallet-broker/src/zec/prepare.rs',
+  'wallet-broker/src/zec/scan.rs',
+  'wallet-broker/src/zec/store.rs',
+  'wallet-broker/src/zec/test_support.rs',
+];
 
 test('WAL-006 manifest requires six exact defaults-off pins and the minimum direct feature union', () => {
   const policy = loadPolicy();
@@ -2286,7 +2294,7 @@ test('WAL-006 feature policy distinguishes compiled upstream PCZT capability fro
   }
 });
 
-test('WAL-006 Rust ZEC product source inventory remains empty during test-only Phase A', () => {
+test('WAL-006 requires the exact bounded Phase-C ZEC production inventory', () => {
   const policy = loadPolicy();
   assert.deepStrictEqual(policy.WAL006_ALLOWED_RUST_SOURCE_PATHS, WAL006_ALLOWED_RUST_SOURCE_PATHS);
   assert.strictEqual(typeof policy.checkWal006RustSourceInventory, 'function');
@@ -2303,16 +2311,21 @@ test('WAL-006 Rust ZEC product source inventory remains empty during test-only P
     }
   };
   collectRustSources(sourceRoot, '');
-  const actual = rustSources.filter((relative) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(relative));
-  assert.deepStrictEqual(actual, []);
+  const actual = rustSources
+    .filter((relative) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(relative))
+    .sort();
+  assert.deepStrictEqual(actual, WAL006_ALLOWED_RUST_SOURCE_PATHS);
   policy.checkWal006RustSourceInventory(actual);
   for (const unlisted of [
-    'wallet-broker/src/zec.rs',
     'wallet-broker/src/zec_network.rs',
+    'wallet-broker/src/zec/network.rs',
     'wallet-broker/src/zec/raw.rs',
+    'wallet-broker/src/zec/sign.rs',
   ]) {
     assertRejects(
-      () => policy.checkWal006RustSourceInventory([unlisted]),
+      () => policy.checkWal006RustSourceInventory(
+        [...WAL006_ALLOWED_RUST_SOURCE_PATHS, unlisted].sort()
+      ),
       /WAL-006|Zcash|source|inventory|unlisted|extra/i
     );
   }
