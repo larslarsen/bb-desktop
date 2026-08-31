@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-31T13:14:31-07:00 (America/Los_Angeles)
 
-Protected governance parent: `c5a05b32`
+Protected governance parent: `eb3ec101`
 
 The exact locked/offline command was run once:
 
