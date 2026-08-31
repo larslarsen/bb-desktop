@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CI GATE GREEN RUN 01 — TEST FIXTURE CORRECTION AUTHORIZED
+Status: CI GATE TEST FIXTURE ACCEPTED — LUNA GREEN RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -506,6 +506,11 @@ assumption. The exact diagnosis is
 `docs/testing/BBD-WAL-004-CI-GATE-GREEN-RUN-01.md`. Sol may edit only
 `test/securityPolicy.node.js` under the exact Correction 01 handoff. All accepted
 production bytes, integration, later commands, Git, and GitHub remain frozen.
+
+The exact test-fixture correction is reviewer-accepted in
+`docs/testing/BBD-WAL-004-CI-GATE-TEST-FIXTURE-REVIEW-01.md`. Luna may resume the amended
+green handoff, including the isolated wrong-path-check falsification/restoration, then the
+unchanged local gates, integration, push, and manual non-packaging workflows.
 
 ## Stop conditions
 

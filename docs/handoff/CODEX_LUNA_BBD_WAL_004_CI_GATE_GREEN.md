@@ -15,7 +15,7 @@ review/evidence file, the complete accepted test and three production paths,
 ## Preflight
 
 Require `HEAD == origin/master` at the governance parent, clean index, and exactly these
-three unstaged production paths:
+four unstaged accepted paths:
 
 - `.gitleaksignore` — 9 lines —
   `1e239ec10a1f2ccf59711258fe514f827727e984ca063a6a685ab325313b563b`
@@ -23,10 +23,10 @@ three unstaged production paths:
   `affe15ea73706becb6156409afae80ce44076641915457a9e2b9399207ed558f`
 - `.github/workflows/sbom.yml` — 51 lines —
   `dae5c48985ee9d70ccb06c33483fd13fa1f5351e431d251f6b878d31818a933e`
+- `test/securityPolicy.node.js` — 2,078 lines —
+  `99caa3f428f808cb53260cffadd4e5e8de7c556a9996075c26e77ab4a6adde47`
 
-Also require accepted `test/securityPolicy.node.js` SHA-256
-`6b48023598984d91499466869533cf5c4b2d3b6a697cac567753f225dc044493`,
-the ticket vector under `expand =`, no same-hex `key    =` live label, and
+Require the ticket vector under `expand =`, no same-hex `key    =` live label, and
 `git diff --check` success. Stop on any extra path, index entry, line/hash mismatch,
 or unintended diff.
 
@@ -36,12 +36,34 @@ Verify its archive is exactly 8,230,402 bytes with SHA-256
 `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`.
 Do not install, move, delete, or clean the tool.
 
-## Exact local green gate
+## Corrected-fixture falsification
+
+First run `node test/securityPolicy.node.js`. It must exit 0 with all 69 cases green.
+Then use `apply_patch` to temporarily remove only this exact production block from
+`scripts/security-policy.js`:
+
+```text
+      if (actual.filePath !== wanted.filePath) {
+        throw new PolicyError('.gitleaksignore has a wrong path fingerprint');
+      }
+```
+
+Run `node test/securityPolicy.node.js` once. It must exit 1 with exactly 68 `ok`, one
+`not ok`, and final summary `1 security policy test(s) failed`. The sole failure must be
+`strict nine-line reviewed Gitleaks ratchet bytes and content are enforced` because the
+wrong-path mutation is accepted. Restore the exact block immediately with inverse
+`apply_patch`, require `scripts/security-policy.js` SHA-256
+`affe15ea73706becb6156409afae80ce44076641915457a9e2b9399207ed558f`,
+then rerun `node test/securityPolicy.node.js` and require all 69 cases green.
+
+Any other failure, no failure, restore mismatch, extra diff, or file change is a stop
+condition. Do not commit the temporary mutation or use Git restore/reset/checkout.
+
+## Remaining exact local green gate
 
 Run separately and in this order, recording output and exit status:
 
 ```text
-node test/securityPolicy.node.js
 node scripts/security-policy.js
 npm run build
 npm test
@@ -51,7 +73,7 @@ target/security-tools/gitleaks-v8.30.1/gitleaks dir --redact=100 --no-banner .
 git diff --check
 ```
 
-Every command must exit 0. The direct policy file must report all 69 cases green. The
+Every remaining command must exit 0. The direct policy file must report success. The
 complete npm suite must retain Electron security 19, security policy 69, wallet contract
 48, broker protocol 11, supervisor 11, and preload 6 with no failure. Npm audit must
 report zero vulnerabilities. Both pinned Gitleaks modes must report no unsuppressed
@@ -68,12 +90,13 @@ SBOM generator and is the real generated-document proof.
 
 If and only if every local result is exact, create only
 `docs/testing/BBD-WAL-004-CI-GATE-GREEN.md` with the governance parent, versions,
-commands/statuses, exact counts, scanner results, accepted pre/post hashes, no-secret
-statement, and confirmation that no package build or Rust/wallet path ran. Update only
+commands/statuses, exact green and falsification counts, restoration hash, scanner
+results, accepted pre/post hashes, no-secret statement, and confirmation that no package
+build or Rust/wallet path ran. Update only
 `docs/handoff/CURRENT_TASK.md` to `CI GATE LOCAL GREEN INTEGRATED — MANUAL WORKFLOWS
 RUNNING` and link the local evidence.
 
-Run `git diff --check`. Stage only the three accepted production paths, local evidence,
+Run `git diff --check`. Stage only the four accepted source/test paths, local evidence,
 and `CURRENT_TASK.md`; inspect staged names/diff. Commit once as:
 
 ```text

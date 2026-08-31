@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CI GATE GREEN RUN 01 — SOL TEST FIXTURE CORRECTION AUTHORIZED
+State: CI GATE TEST FIXTURE ACCEPTED — LUNA GREEN RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,28 +16,28 @@ Reviewed CI baseline: `e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 
 Expected-red commit: `61d2a239a89384885a95cf353f4d3ccc319670a7`
 
-Active handoff: [CODEX_SOL_BBD_WAL_004_CI_GATE_TESTS_CORRECTION_01.md](CODEX_SOL_BBD_WAL_004_CI_GATE_TESTS_CORRECTION_01.md)
+Active handoff: [CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md](CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md)
 
 The encrypted custody core is locally green, integrated, pushed, and independently
 falsified by all seven required temporary mutations. GitHub Social client run
 `33357371137` passed with package jobs skipped.
 
 The accepted CI-gate regression source produced the exact 66-green/3-red result. Sol's
-exact three-file Gitleaks-policy and all-features SBOM correction remains reviewer-
-accepted and unstaged with hashes frozen in
-[BBD-WAL-004-CI-GATE-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-PRODUCTION-SOURCE-REVIEW-01.md).
+three-file Gitleaks-policy and all-features SBOM correction remains reviewer-accepted and
+unstaged with hashes frozen in the production source review.
 
-Green Run 01 preflight passed, then the first policy command produced 68 `ok` and one
-`not ok`. The exact diagnosis is
-[BBD-WAL-004-CI-GATE-GREEN-RUN-01.md](../testing/BBD-WAL-004-CI-GATE-GREEN-RUN-01.md):
-three old mutation fixtures still targeted the former index-0 `index.html:57` entry, so
-they became no-ops after the new `tickets/BBD-WAL-004.md:110` entry was inserted first.
-Luna stopped before any other command, edit, integration, Git, or GitHub action.
+Green Run 01 stopped at 68-green/1-red because three retained ratchet mutation fixtures
+became no-ops after the new ticket fingerprint was inserted at array index 0. The durable
+diagnosis is [BBD-WAL-004-CI-GATE-GREEN-RUN-01.md](../testing/BBD-WAL-004-CI-GATE-GREEN-RUN-01.md).
+Sol's exact test-only correction is accepted in
+[BBD-WAL-004-CI-GATE-TEST-FIXTURE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-TEST-FIXTURE-REVIEW-01.md).
+It targets the new ticket path/line and proves all three replacements are non-vacuous.
 
-Sol may now edit only `test/securityPolicy.node.js` to make the wrong-path, wrong-line,
-and wildcard mutations target the new first fingerprint and explicitly prove each
-mutation is non-vacuous. The three accepted production paths and every other path remain
-frozen. Luna receives no resume authority until reviewer test-source acceptance.
+Luna may now resume the amended complete green handoff with exactly four unstaged paths.
+It first proves all 69 policy cases green, temporarily removes only the production
+wrong-path rejection, proves the corrected strict test is the sole failure, restores the
+exact source hash, and then continues the local gates, integration, push, and only the
+manual non-packaging Security/SBOM workflows. Final reviewer acceptance remains pending.
 
 No platform package build is authorized or required. Grok Build remains available and
 queued for the independent `../bb-go` exchange-rate/provider work after this desktop
