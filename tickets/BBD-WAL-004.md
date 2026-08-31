@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CI GATE EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
+Status: CI GATE PRODUCTION SOURCE ACCEPTED — LUNA GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -490,6 +490,14 @@ current production policy/workflow/ignore/ticket state for those intended reason
 
 Production policy, workflow, ignore, ticket-label correction, integration, evidence,
 tests, scanners, Git, and GitHub remain unauthorized until separate reviewer handoffs.
+
+The exact 66-green/3-red evidence is reviewer-accepted. The reviewer changed only the
+live synthetic-vector label from `key    =` to `expand =` with every vector byte intact.
+Sol's exact three-path policy/ignore/SBOM workflow drop is accepted in
+`docs/testing/BBD-WAL-004-CI-GATE-PRODUCTION-SOURCE-REVIEW-01.md`. Luna may now run the
+bounded local green gate, integrate and push only that exact drop, and dispatch only the
+manual Security and SBOM workflows under
+`docs/handoff/CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md`. Packaging remains excluded.
 
 ## Stop conditions
 
