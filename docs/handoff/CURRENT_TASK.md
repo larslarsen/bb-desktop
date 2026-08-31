@@ -8,7 +8,10 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
+Authorized integration actor: Jr Dev — Hermes
+
+Jr Dev routing:
+[HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 

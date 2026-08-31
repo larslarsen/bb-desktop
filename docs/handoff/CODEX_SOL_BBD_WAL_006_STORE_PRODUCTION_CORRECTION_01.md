@@ -64,4 +64,4 @@ or any other execution. Stop if either authorized file is insufficient.
 
 Report both final line counts and SHA-256 hashes; the closed fault API; stored-state validation;
 upstream migration proof; SQLite durability ordering; inspection bounds; protected hashes; and
-any concern. Luna remains the only execution/integration actor after reviewer acceptance.
+any concern. Hermes remains the only execution/integration actor after reviewer acceptance.

@@ -202,5 +202,5 @@ delete, clean, move, stage, commit, or push anything.
 When complete, stop and report every changed path with line count and SHA-256; the exact schema
 versions and inventory; read-only preflight ordering; migration/transaction/fault behavior;
 Linux metadata validation and any closed test seam; SQLite inspection/canary design; allocation
-bound behavior; and every concern. Luna—not Sol—will inspect the drop, run formatting/compile/
+bound behavior; and every concern. Hermes—not Sol—will inspect the drop, run formatting/compile/
 tests, write evidence, and own all Git operations.

@@ -6,7 +6,7 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Test and production source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
+Integration actor: Jr Dev — Hermes
 
 Source baseline: `e8894a442b970a856bee3f92de9de1e94aa0ee7c`
 
@@ -109,7 +109,7 @@ paths, wrong hash/length, wrong network, and unsupported manifest version fail b
 scan.
 
 Fixture generation is a test-only upstream oracle. It writes only beneath the explicit
-disk-backed `wallet-broker/target/wal006-fixture-build` directory. Codex Luna freezes the
+disk-backed `wallet-broker/target/wal006-fixture-build` directory. Hermes freezes the
 result into the exact committed fixture paths only after hash/manifest review. Production
 source cannot call the generator.
 

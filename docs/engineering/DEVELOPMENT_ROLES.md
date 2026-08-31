@@ -22,10 +22,11 @@ only and changes no client code, package, native artifact, or acceptance state.
   corrective, and other senior source and test-source work after the reviewer fixes the
   sensitive semantics. It does not execute tests, integrate, maintain records, or use
   Git.
-- **Jr Dev — Codex Luna:** uses `gpt-5.6-luna`. It owns source-drop integration, test and
-  acceptance-command execution,
+- **Jr Dev — Hermes:** uses the locally installed Hermes Agent. It owns source-drop
+  integration, test and acceptance-command execution,
   implementation/evidence records, and the corresponding Git, commit, and push work. It
-  does not design or author tests.
+  does not design or author tests. Each run records its actual Hermes version, provider, and
+  model under `HERMES_JR_DEV_ROUTING.md`.
 - **Owner:** makes product decisions and relays one-way prompts, reports, repository
   hashes, URLs, and source drops. The owner is not an engineering acceptance authority.
 
@@ -36,7 +37,7 @@ only and changes no client code, package, native artifact, or acceptance state.
 3. Grok Build receives bounded senior work after security and protocol semantics are
    fixed.
 4. Codex Spark receives mechanical work whose design and semantics are already fixed.
-5. Codex Luna integrates every developer drop, runs the ticket's commands, records evidence,
+5. Hermes integrates every developer drop, runs the ticket's commands, records evidence,
    and publishes the resulting Git change.
 6. The reviewer alone accepts or rejects the result and authorizes what follows.
 
