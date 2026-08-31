@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD API TEST SOURCE CORRECTION ACCEPTED — EXPECTED RED 02 AUTHORIZED
+State: AEAD API EXPECTED RED 02 RECORDED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -106,6 +106,9 @@ Dependency correction expected-red evidence:
 
 AEAD correction expected-red evidence:
 [BBD-WAL-006-AEAD-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-AEAD-CORRECTION-EXPECTED-RED-01.md)
+
+AEAD API correction expected-red 02 evidence:
+[BBD-WAL-006-AEAD-API-CORRECTION-EXPECTED-RED-02.md](../testing/BBD-WAL-006-AEAD-API-CORRECTION-EXPECTED-RED-02.md)
 
 Argon2 correction expected-red evidence:
 [BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md)

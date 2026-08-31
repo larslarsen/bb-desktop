@@ -7,7 +7,7 @@ use bitbook_wallet_broker::vault::{
     EntropyPort, Network, SecretBytes, VAULT_FORMAT, VAULT_VERSION, VaultError, VaultMetadata,
     VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, seal_vault,
 };
-use chacha20poly1305::aead::{AeadInOut, KeyInit};
+use chacha20poly1305::aead::{AeadInPlace, KeyInit};
 use chacha20poly1305::{XChaCha20Poly1305, XNonce};
 use hkdf::Hkdf;
 use sha2::Sha256;
@@ -168,9 +168,9 @@ fn xchacha20poly1305_draft_vector_is_independent() {
         "6675747572652c2073756e73637265656e20776f756c642062652069742e"
     ));
     let cipher = XChaCha20Poly1305::new_from_slice(&key).unwrap();
-    let nonce = XNonce::try_from(nonce.as_slice()).unwrap();
+    let nonce = XNonce::from_slice(nonce.as_slice());
     let tag = cipher
-        .encrypt_inout_detached(&nonce, &aad, plaintext.as_mut_slice().into())
+        .encrypt_in_place_detached(nonce, &aad, plaintext.as_mut_slice())
         .unwrap();
     assert_eq!(
         plaintext,
