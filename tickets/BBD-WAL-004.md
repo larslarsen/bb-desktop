@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CI GATE TEST FIXTURE ACCEPTED — LUNA GREEN RESUME AUTHORIZED
+Status: CI GATE GREEN RUN 02 — CORRECTED FALSIFICATION RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -511,6 +511,12 @@ The exact test-fixture correction is reviewer-accepted in
 `docs/testing/BBD-WAL-004-CI-GATE-TEST-FIXTURE-REVIEW-01.md`. Luna may resume the amended
 green handoff, including the isolated wrong-path-check falsification/restoration, then the
 unchanged local gates, integration, push, and manual non-packaging workflows.
+
+Green Run 02 proved all 69 policy cases green, but its initial falsification removed the
+path-specific branch and the generic exact-nine check still rejected the mutation. The
+source restored exactly. The corrected handoff replaces only the branch's throw with a
+temporary fail-open return so the wrong path is genuinely accepted and the strict test
+must detect it. No production or test-source correction is authorized.
 
 ## Stop conditions
 

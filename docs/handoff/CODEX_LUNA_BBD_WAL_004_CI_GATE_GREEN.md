@@ -39,25 +39,34 @@ Do not install, move, delete, or clean the tool.
 ## Corrected-fixture falsification
 
 First run `node test/securityPolicy.node.js`. It must exit 0 with all 69 cases green.
-Then use `apply_patch` to temporarily remove only this exact production block from
-`scripts/security-policy.js`:
+Then use `apply_patch` to temporarily change only the wrong-path branch's exact throw
+statement in `scripts/security-policy.js`:
 
 ```text
-      if (actual.filePath !== wanted.filePath) {
         throw new PolicyError('.gitleaksignore has a wrong path fingerprint');
-      }
 ```
 
-Run `node test/securityPolicy.node.js` once. It must exit 1 with exactly 68 `ok`, one
-`not ok`, and final summary `1 security policy test(s) failed`. The sole failure must be
-`strict nine-line reviewed Gitleaks ratchet bytes and content are enforced` because the
-wrong-path mutation is accepted. Restore the exact block immediately with inverse
-`apply_patch`, require `scripts/security-policy.js` SHA-256
+to exactly:
+
+```text
+        return;
+```
+
+This is an intentional temporary fail-open mutation confined to the already validated
+wrong-path branch. Run `node test/securityPolicy.node.js` once. It must exit 1 with
+exactly 68 `ok`, one `not ok`, and final summary
+`1 security policy test(s) failed`. The sole failure must be
+`strict nine-line reviewed Gitleaks ratchet bytes and content are enforced` because its
+wrong-path candidate is accepted and `assertRejects` reports that no rejection occurred.
+Restore the exact throw immediately with inverse `apply_patch`, require
+`scripts/security-policy.js` SHA-256
 `affe15ea73706becb6156409afae80ce44076641915457a9e2b9399207ed558f`,
 then rerun `node test/securityPolicy.node.js` and require all 69 cases green.
 
-Any other failure, no failure, restore mismatch, extra diff, or file change is a stop
-condition. Do not commit the temporary mutation or use Git restore/reset/checkout.
+Any other failure, no failure, a fallback generic rejection, restore mismatch, extra
+diff, or file change is a stop condition. The earlier block-removal attempt and exact
+restoration are recorded in `docs/testing/BBD-WAL-004-CI-GATE-GREEN-RUN-02.md`; do not
+repeat it. Do not commit the temporary mutation or use Git restore/reset/checkout.
 
 ## Remaining exact local green gate
 
