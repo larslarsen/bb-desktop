@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: ARGON2 SOURCE ACCEPTED — DEPENDENCY RESOLUTION GATE RESUMED
+State: THIRD DEPENDENCY CONTRADICTION — AEAD TEST CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_RESUME_02.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_RESUME_02.md)
+[CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_03.md](CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_03.md)
+
+Third dependency-resolution review:
+[BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-03.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-03.md)
 
 Argon2 production-source review:
 [BBD-WAL-006-ARGON2-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-ARGON2-PRODUCTION-SOURCE-REVIEW-01.md)
@@ -59,12 +62,12 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The Argon2 correction test/red is accepted and committed. Sol changed only the manifest
-Argon2 pin and two matching production-policy literals; reviewer-accepted hashes are
-linked above. Luna may resume the exact separate resolution/custody gate with the added
-stable `argon2 0.5.3`/`blake2 0.10.6` requirements. The six Rust tests and fixtures remain
-frozen. Fixture generation remains suspended until XHigh reviews a successful graph and
-11-test custody gate.
+The Argon2 correction is accepted. Luna's next lock attempt stopped before mutation on a
+third published same-line conflict: direct `chacha20poly1305 0.11.0` requires stable
+`crypto-common 0.2`, while fixed Zcash selects exact `crypto-common 0.2.0-rc.1`. Sol may
+change only the Node test-side AEAD version expectation and exact mutations. Manifest,
+production policy, Rust source/tests, lockfile, fixtures, execution, evidence,
+integration, and Git are frozen. Fixture generation remains suspended.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
