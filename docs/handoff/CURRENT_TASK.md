@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE GATE AUTHORIZED
+State: PHASE-C STORE FORMAT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -22,7 +22,10 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_006_STORE_GATE_01.md](HERMES_BBD_WAL_006_STORE_GATE_01.md)
+[CODEX_SOL_BBD_WAL_006_STORE_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_STORE_FORMAT_CORRECTION_01.md)
+
+Store gate formatter stop review:
+[BBD-WAL-006-STORE-GATE-FORMAT-REVIEW-01.md](../testing/BBD-WAL-006-STORE-GATE-FORMAT-REVIEW-01.md)
 
 Accepted store production source review:
 [BBD-WAL-006-STORE-PRODUCTION-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-STORE-PRODUCTION-SOURCE-REVIEW-02.md)
@@ -366,9 +369,10 @@ frozen.
 
 The address vertical and final evidence are accepted at
 `432e69c0443dd5233609d578b43d5a43d83d2c3d`. Store Source Review 02 accepts the corrected
-four-path source. Hermes is authorized only for Store Gate 01 and exact-success integration.
-Source repair, all tests outside the handoff, scan, preparation, handle hygiene, broader ZEC
-feature/source policy, and other execution remain frozen.
+four-path semantics. Hermes safely stopped Store Gate 01 at formatter exit 1 and ran nothing
+later. Sol is authorized only for the three-path mechanical format correction. All other source,
+tests, scan, preparation, handle hygiene, broader ZEC feature/source policy, and execution remain
+frozen.
 
 No broader tests, falsification, live endpoint, mainnet, signing, proving, extraction,
 broadcast, hardware, Electron, package, SBOM, or other-repository work is authorized in this
