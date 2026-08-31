@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: GREEN RUN 01 BLOCKED — ONE-FILE PRODUCTION CORRECTION AUTHORIZED
+State: CORRECTION 3 SOURCE ACCEPTED — FULL GREEN RERUN AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md)
 
@@ -51,14 +51,12 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Green run 01 is recorded in
-[BBD-WAL-004-GREEN-RUN-01.md](../testing/BBD-WAL-004-GREEN-RUN-01.md). Formatting, all
-JavaScript tests/policy, and 77 of 78 Rust tests passed. The sole existing format test
-proved untrusted crossed asset/network metadata leaked typed-constructor
-`WRONG_NETWORK` instead of closed wire-schema `SCHEMA`. Only Sol's one-file
-[Correction 3 production handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_3_PRODUCTION.md) is
-active. Formatter-only Rust changes remain unstaged and must be preserved. Luna resumes
-the complete green handoff only after reviewer source acceptance.
+Correction 3 is reviewer-accepted in
+[production source review 04](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-04.md).
+Only Luna's [full green rerun](CODEX_LUNA_BBD_WAL_004_GREEN_2.md) is active. Green Run
+01's formatter-only Rust source/test state is frozen by hash and included in integration.
+Luna repeats every gate, records bounded evidence, commits the 15 production paths plus
+six formatter-only tests, and pushes only on exact green.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
