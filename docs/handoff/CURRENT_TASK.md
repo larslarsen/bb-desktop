@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS SOURCE GATE AUTHORIZED
+State: PHASE-C ADDRESS FORMAT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_ADDRESS_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_FORMAT_CORRECTION_01.md)
+
+Address gate formatter stop review:
+[BBD-WAL-006-ADDRESS-GATE-FORMAT-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-FORMAT-REVIEW-01.md)
+
+Stopped address gate:
 [CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_01.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_01.md)
 
 Accepted address production source review 03:
@@ -275,6 +281,10 @@ vertical at 1,857 lines. Luna is authorized only for the exact offline formatter
 Clippy, eight-test `zec_address`, and 69/5 partial-policy-red gate, followed on exact success by
 bounded evidence and integration. Scan, preparation, handle hygiene, broader ZEC policy, and all
 other source remain frozen.
+
+Luna's first address gate stopped at the formatter: exit 1 and only 14 mechanical hunks across
+four accepted source paths. No later command, evidence, integration, or Git ran. Sol is authorized
+only to apply the retained formatter replacements with `apply_patch`; execution remains frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
