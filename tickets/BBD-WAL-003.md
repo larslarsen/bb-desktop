@@ -1,6 +1,6 @@
 # BBD-WAL-003 — Fail-Closed Wallet Broker Boundary
 
-Status: FALSIFICATION AND CI PASSED — REVIEWER ACCEPTANCE PENDING
+Status: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -193,6 +193,8 @@ protocol-only boundary. Its exact 340-line protocol source at SHA-256
 `docs/handoff/CODEX_LUNA_BBD_WAL_003_GREEN_RESUME_01.md` completed the full local gate
 sequence and integrated production at `584019e9a89022d77b4bbb6710c2b7670e42d95b`.
 GitHub Social client run `33342988248` passed its routine check with all package jobs
-skipped. Only `docs/handoff/CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md` may now perform the
-three isolated negative mutations, exact restorations, and evidence integration. The
-ticket is not complete until reviewer acceptance of that result.
+skipped. `docs/handoff/CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md` performed the three
+isolated negative mutations, exact restorations, and evidence integration. Those gates
+passed exactly and the reviewer accepts the ticket. Final evidence is recorded in
+`docs/testing/BBD-WAL-003-ACCEPTANCE.md`; later wallet, native broker, custody, coin,
+hardware, rate, and packaging work requires separate tickets.

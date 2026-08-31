@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-003
 
-State: FALSIFICATION AND CI PASSED — REVIEWER ACCEPTANCE PENDING
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -47,10 +47,12 @@ lines and SHA-256
 gate sequence and integrated production at
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`. GitHub Social client run `33342988248`
 passed its routine check with all package jobs skipped. Only
-[the Luna falsification handoff](CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md) may perform the
-three isolated negative mutations, exact restorations, evidence commit, and push. Native
-binary, Rust install, wallet, node, network service, hardware, and device work remain
-unauthorized.
+[the Luna falsification handoff](CODEX_LUNA_BBD_WAL_003_FALSIFICATION.md) performed the
+three isolated negative mutations, exact restorations, evidence commit, and push. Those
+gates passed exactly and the reviewer accepts BBD-WAL-003 in
+[`BBD-WAL-003-ACCEPTANCE.md`](../testing/BBD-WAL-003-ACCEPTANCE.md). Native binary, Rust
+install, wallet, node, network service, hardware, and device work remain unauthorized
+outside later tickets.
 
 BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 `62ad0ceb90a96805cabff0296fd6980a739554fd` and acceptance commit
@@ -60,3 +62,7 @@ BBD-WAL-002 is complete and reviewer-accepted at implementation commit
 The wallet roadmap routes this trust-boundary ticket to Sol, the independent bb-go
 payment protocol ticket to Grok Build when available, and later mechanical UI work to
 Codex Spark. `go-ipfs` is deprecated and receives no wallet work.
+
+Next strong-model candidate: define the test-first BBD-WAL-004 custody/lock/recovery
+ticket for Codex Sol. Grok Build remains queued for BBGO-PAY-001 at or after 19:53 PDT;
+Codex Spark remains reserved for the later mechanical UI tickets.
