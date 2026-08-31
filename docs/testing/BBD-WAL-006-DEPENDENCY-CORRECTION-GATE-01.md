@@ -53,3 +53,108 @@ Pre/post hashes:
 | `wallet-broker/Cargo.lock` | 5,367 | `bf9a36a70c96afe3c0b68355f082342c3e625e4764782228be9f4663b635cd83` |
 
 The six ZEC tests remain at their accepted format-correction hashes.
+
+## Supply-chain metadata inventory addendum
+SHA-256 `634e62b34362f9c042ddba8688fc540c1baaa793e2094d32d94ffb1131d86cee`).
+
+The six required query outputs were:
+
+```text
+--- licenses
+(MIT OR Apache-2.0) AND Unicode-3.0
+Apache-2.0
+Apache-2.0 / MIT
+Apache-2.0 OR MIT
+Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
+Apache-2.0/MIT
+BSD-2-Clause OR Apache-2.0 OR MIT
+BSD-3-Clause
+CC0-1.0
+CC0-1.0 OR MIT-0 OR Apache-2.0
+MIT
+MIT OR Apache-2.0
+MIT OR Apache-2.0 OR LGPL-2.1-or-later
+MIT OR Apache-2.0 OR Zlib
+MIT/Apache-2.0
+Unlicense OR MIT
+Zlib
+Zlib OR Apache-2.0 OR MIT
+Zlib OR MIT OR Apache-2.0
+--- none-license
+--- sources
+registry+https://github.com/rust-lang/crates.io-index
+workspace
+--- zcash
+pczt	0.9.3	registry+https://github.com/rust-lang/crates.io-index	NONE	io-finalizer,orchard,prover,sapling,signer,spend-finalizer,transparent,tx-extractor,zcp-builder
+zcash_client_backend	0.24.0	registry+https://github.com/rust-lang/crates.io-index	NONE	orchard,pczt,test-dependencies,transparent-inputs,unstable-serialization,unstable-spanning-tree,zcash_proofs
+zcash_client_sqlite	0.22.0	registry+https://github.com/rust-lang/crates.io-index	NONE	orchard,test-dependencies,transparent-inputs
+zcash_keys	0.16.1	registry+https://github.com/rust-lang/crates.io-index	NONE	orchard,sapling,std,test-dependencies,transparent-inputs
+zcash_primitives	0.30.1	registry+https://github.com/rust-lang/crates.io-index	NONE	circuits,document-features,std,test-dependencies,transparent-inputs
+zcash_protocol	0.10.5	registry+https://github.com/rust-lang/crates.io-index	NONE	document-features,local-consensus,std,test-dependencies
+--- build
+anyhow	1.0.104	registry+https://github.com/rust-lang/crates.io-index
+atomic-polyfill	1.0.3	registry+https://github.com/rust-lang/crates.io-index
+crossbeam-deque	0.8.7	registry+https://github.com/rust-lang/crates.io-index
+crossbeam-epoch	0.9.20	registry+https://github.com/rust-lang/crates.io-index
+crossbeam-utils	0.8.22	registry+https://github.com/rust-lang/crates.io-index
+crunchy	0.2.4	registry+https://github.com/rust-lang/crates.io-index
+defmt	1.1.1	registry+https://github.com/rust-lang/crates.io-index
+defmt-macros	1.1.1	registry+https://github.com/rust-lang/crates.io-index
+equihash	0.3.0	registry+https://github.com/rust-lang/crates.io-index
+generic-array	0.14.7	registry+https://github.com/rust-lang/crates.io-index
+getrandom	0.4.3	registry+https://github.com/rust-lang/crates.io-index
+heapless	0.7.17	registry+https://github.com/rust-lang/crates.io-index
+indexmap	1.9.3	registry+https://github.com/rust-lang/crates.io-index
+libc	0.2.189	registry+https://github.com/rust-lang/crates.io-index
+libm	0.2.16	registry+https://github.com/rust-lang/crates.io-index
+libsqlite3-sys	0.35.0	registry+https://github.com/rust-lang/crates.io-index
+num-traits	0.2.19	registry+https://github.com/rust-lang/crates.io-index
+portable-atomic	1.15.0	registry+https://github.com/rust-lang/crates.io-index
+portable-atomic-util	0.2.7	registry+https://github.com/rust-lang/crates.io-index
+prettyplease	0.2.37	registry+https://github.com/rust-lang/crates.io-index
+proc-macro2	1.0.107	registry+https://github.com/rust-lang/crates.io-index
+quote	1.0.47	registry+https://github.com/rust-lang/crates.io-index
+radium	0.7.0	registry+https://github.com/rust-lang/crates.io-index
+rayon-core	1.13.0	registry+https://github.com/rust-lang/crates.io-index
+rustix	1.1.4	registry+https://github.com/rust-lang/crates.io-index
+rustversion	1.0.23	registry+https://github.com/rust-lang/crates.io-index
+secp256k1-sys	0.10.1	registry+https://github.com/rust-lang/crates.io-index
+serde	1.0.229	registry+https://github.com/rust-lang/crates.io-index
+serde_core	1.0.229	registry+https://github.com/rust-lang/crates.io-index
+serde_json	1.0.151	registry+https://github.com/rust-lang/crates.io-index
+syn	1.0.109	registry+https://github.com/rust-lang/crates.io-index
+thiserror	1.0.69	registry+https://github.com/rust-lang/crates.io-index
+thiserror	2.0.20	registry+https://github.com/rust-lang/crates.io-index
+wasm-bindgen	0.2.127	registry+https://github.com/rust-lang/crates.io-index
+wasm-bindgen-shared	0.2.127	registry+https://github.com/rust-lang/crates.io-index
+zcash_client_backend	0.24.0	registry+https://github.com/rust-lang/crates.io-index
+zerocopy	0.8.56	registry+https://github.com/rust-lang/crates.io-index
+zmij	1.0.23	registry+https://github.com/rust-lang/crates.io-index
+--- proc
+ambassador	0.4.2	registry+https://github.com/rust-lang/crates.io-index
+darling_macro	0.23.0	registry+https://github.com/rust-lang/crates.io-index
+defmt-macros	1.1.1	registry+https://github.com/rust-lang/crates.io-index
+derive-getters	0.5.0	registry+https://github.com/rust-lang/crates.io-index
+document-features	0.2.12	registry+https://github.com/rust-lang/crates.io-index
+getset	0.1.7	registry+https://github.com/rust-lang/crates.io-index
+jiff-static	0.2.35	registry+https://github.com/rust-lang/crates.io-index
+prost-derive	0.14.4	registry+https://github.com/rust-lang/crates.io-index
+rustversion	1.0.23	registry+https://github.com/rust-lang/crates.io-index
+serde_derive	1.0.229	registry+https://github.com/rust-lang/crates.io-index
+serde_with_macros	3.22.0	registry+https://github.com/rust-lang/crates.io-index
+thiserror-impl	1.0.69	registry+https://github.com/rust-lang/crates.io-index
+thiserror-impl	2.0.20	registry+https://github.com/rust-lang/crates.io-index
+time-macros	0.2.32	registry+https://github.com/rust-lang/crates.io-index
+tracing-attributes	0.1.31	registry+https://github.com/rust-lang/crates.io-index
+visibility	0.1.1	registry+https://github.com/rust-lang/crates.io-index
+wasm-bindgen-macro	0.2.127	registry+https://github.com/rust-lang/crates.io-index
+zerocopy-derive	0.8.56	registry+https://github.com/rust-lang/crates.io-index
+zeroize_derive	1.5.0	registry+https://github.com/rust-lang/crates.io-index
+```
+
+The none-license query returned no rows; sources are only workspace and crates.io.
+The metadata query reports `NONE` for checksums because Cargo metadata omits registry
+checksums; exact checksums remain in the committed lockfile. Zcash features are the
+accepted direct requests plus Cargo unification. Build scripts/proc macros are
+transitive registry capabilities and grant no BitBook signing, proving, extraction,
+broadcast, or live-network authority.
