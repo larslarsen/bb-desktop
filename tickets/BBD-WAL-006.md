@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SUPPORT-DEPENDENCY POLICY CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
+Status: SUPPORT-DEPENDENCY SOURCE ACCEPTED — OFFLINE GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -337,6 +337,11 @@ The first policy drop requires the whole-manifest reviewed-dependency uniqueness
 correction in
 `docs/testing/BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md` before
 execution or integration. The two manifest lines are accepted unchanged.
+
+That correction is accepted. Luna may run only
+`docs/handoff/CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md` to resolve and
+inspect the offline lock, verify the focused policy/custody gates, and integrate if
+exact. ZEC Rust production remains frozen.
 
 ### Phase C2 — address production source (future, separate handoff)
 

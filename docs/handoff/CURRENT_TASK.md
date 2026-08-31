@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY POLICY CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
+State: SUPPORT-DEPENDENCY SOURCE ACCEPTED — OFFLINE GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_01.md)
+
+Accepted support-dependency production-source review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-02.md)
+
+Completed support-dependency production correction:
 [CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_CORRECTION_01.md)
 
 Support-dependency production-source review:
@@ -204,14 +210,17 @@ every acceptance command remain unauthorized.
 
 That one-file test is reviewer-accepted at 2,454 lines and SHA-256
 `f8340ae965a1f59e27594153cd3c9f3eca5ee1d8a78ed0a9a685faf6f1dc2647`.
-Its exact 66/8 expected red is accepted at integration `1f24a221`. Sol is authorized
-only to correct the narrow manifest-policy drop's whole-manifest dependency uniqueness
-gap. The exact two-line manifest edit is accepted unchanged. The lockfile, ZEC Rust
-production, feature/source policy, execution, evidence, and Git remain frozen to Sol.
+Its exact 66/8 expected red is accepted at integration `1f24a221`. The
+support-dependency source is accepted at manifest SHA-256
+`6643435bdf59608b09e906c8b7010baf1c17bbaa785d8eb70e37039d4bb37632`
+and policy SHA-256
+`60e41a12462d77c6be875f1659e5ef8a86d2b8146bd25d37ec7777297847d767`.
+Luna is authorized only for the exact offline lock/policy/custody gate. ZEC Rust
+production and broader feature/source policy remain frozen.
 
-No ZEC production is currently authorized. Policy implementation remains frozen. The
-prior production exception remains the accepted
-integrated `vault.rs` AEAD API compatibility edit.
+No ZEC production is currently authorized. Broader ZEC feature/source policy remains
+frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
+API compatibility edit.
 No broader tests,
 falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
 Electron, package, SBOM, or other-repository work is authorized in this phase.
