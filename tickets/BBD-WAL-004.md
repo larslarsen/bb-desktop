@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CORRECTION 3 SOURCE ACCEPTED — FULL GREEN RERUN AUTHORIZED
+Status: FUNCTIONAL GREEN — CORRECTION 4 NATIVE/CRYPTO API SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -331,6 +331,21 @@ The exact findings and frozen source hashes are in
 under `docs/handoff/CODEX_SOL_BBD_WAL_004_CORRECTION_1_TESTS.md`, editing only five test
 paths. The flawed production drop must remain unchanged until those regressions are
 reviewed and demonstrated red. Production correction and integration remain unauthorized.
+
+## Production correction 4
+
+Green Run 02 passed formatting, the complete Node/build/security surface, and all 78
+Rust behavioral tests, including the independent cryptographic vector. The denied-
+warning all-features Clippy gate then exposed pinned API drift only: `eframe` 0.36.1
+requires `App::ui`, while `aead` 0.6.1 uses `AeadInOut` and checked array conversion.
+
+The compile/lint failure is the regression proof; no behavioral test change is needed or
+authorized. Sol may edit only `wallet-broker/src/native_ui.rs` and
+`wallet-broker/src/vault.rs` under
+`docs/handoff/CODEX_SOL_BBD_WAL_004_CORRECTION_4_PRODUCTION.md`. The correction must
+preserve the exact native interaction, v1 cryptographic composition, detached postfix
+tag wire bytes, independent vector, error normalization, and wipe behavior. Integration,
+Git, and a complete rerun remain Luna-owned after reviewer source acceptance.
 
 ## Required test groups
 
