@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: FIXTURE REORG FORMAT CORRECTION ACCEPTED — FIXTURE/RED RESUME AUTHORIZED
+State: FIXTURE/EXPECTED RED RESULTS ACCEPTED — EVIDENCE INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_06.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_06.md)
+[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_EVIDENCE_INTEGRATION_01.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_EVIDENCE_INTEGRATION_01.md)
+
+Fixture/expected-red result review:
+[BBD-WAL-006-FIXTURE-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-REVIEW-01.md)
 
 Fixture reorg format-correction review:
 [BBD-WAL-006-FIXTURE-REORG-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-REORG-FORMAT-CORRECTION-REVIEW-01.md)
@@ -124,8 +127,10 @@ and SHA-256 `4b1efec59f81761e2c713587c0a4f3e7b8c545f7b85cc35c90949c5dedbca4bc`.
 The formatter found one mechanical wrap before execution; Sol's exact correction is
 reviewer-accepted at SHA-256
 `40cc2b56132b42a765c86482e9915b0422adc0154c1e2edcfda4623760ec5d09`.
-Luna may run only the formatter and fixture/expected-red resume. ZEC production remains
-frozen.
+The formatter, two fixture runs, exact freeze, and Node red succeeded. The focused Rust
+red contained only the absent production `zec` module, classified as `E0433` and `E0432`;
+the reviewer accepts the result without rerun. Luna may integrate only the accepted
+tests/fixture/evidence under the active handoff. ZEC production remains frozen.
 
 No ZEC production source or policy implementation is authorized. The sole production
 exception is the accepted `vault.rs` AEAD API compatibility edit in the active gate.
