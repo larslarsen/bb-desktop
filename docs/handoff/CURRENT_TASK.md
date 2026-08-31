@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS SOURCE GATE RESUMED 02
+State: PHASE-C ADDRESS TEST-ROOT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_ADDRESS_TEST_ROOT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_TEST_ROOT_CORRECTION_01.md)
+
+Address gate test stop review:
+[BBD-WAL-006-ADDRESS-GATE-TEST-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-TEST-REVIEW-01.md)
+
+Stopped address gate resume 02:
 [CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_02.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_02.md)
 
 Accepted address Clippy-correction review:
@@ -315,6 +321,11 @@ authorized only to delete those two no-op statements; all execution remains froz
 Sol deleted exactly the two diagnosed statements. The correction review accepts the 204-line
 address source and 1,839-line six-path total. Luna must restart the complete gate from the
 formatter; no earlier result is reused. All other Phase-C source and policy remain frozen.
+
+The fresh formatter and warnings-denied library Clippy passed. The eight-test address target then
+stopped at 4/4 because parallel tests raced while creating the shared state ancestor and losers
+received `AlreadyExists`. No Node or integration ran. Sol is authorized only for the one-file,
+race-safe test-root correction; execution remains frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
