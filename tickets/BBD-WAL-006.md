@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: FIXTURE/EXPECTED RED RESULTS ACCEPTED — EVIDENCE INTEGRATION AUTHORIZED
+Status: PHASE-C POLICY-TEST TRANSITION AUTHORIZED — PRODUCTION FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -250,7 +250,7 @@ policy and cannot substitute for runtime behavior.
 
 ## Test-first phases and current authorization
 
-### Phase A — test source only (authorized now)
+### Phase A — test source only (complete)
 
 Sol may create or edit exactly:
 
@@ -288,7 +288,7 @@ workflow, package file, Electron/Node production, policy implementation, evidenc
 documentation, scratch data, execution, install, dependency resolution, network, Git,
 GitHub, cleanup, wallet/node/device, or unlisted path is authorized for Sol.
 
-### Phase B — fixture generation and expected red (not yet authorized)
+### Phase B — fixture generation and expected red (complete and accepted)
 
 After XHigh accepts exact Phase-A hashes, a Luna handoff will resolve the graph, review
 the lock/feature/license/build-script diff, run the upstream-only fixture builder into
@@ -298,15 +298,27 @@ first focused adapter test must fail for an absent `bitbook_wallet_broker::zec` 
 not because the fixture is missing, the manifest is invalid, the test does not compile
 against its documented upstream APIs, or an assertion is tautological.
 
-No production source is authorized by expected red. XHigh must accept the fixture and
-red evidence first.
+The fixture and expected-red record are accepted and integrated at `accac440`. No
+production source was authorized by that red.
 
-### Phase C — production source (future, separate handoff)
+### Phase C0 — production-inventory policy test (authorized now)
 
-The likely bounded production paths are `wallet-broker/src/zec.rs` and a small
-`wallet-broker/src/zec/` subtree plus `wallet-broker/src/lib.rs`; exact paths will be
-enumerated only after test review. The test actor may not pre-create stubs, mocks,
-`compile_error!`, ignored tests, conditional skips, or test-only alternate production.
+The committed Node test still encodes the completed Phase-A requirement that ZEC
+production source remain empty. Sol may edit only `test/securityPolicy.node.js` under
+`docs/handoff/CODEX_SOL_BBD_WAL_006_PHASE_C_POLICY_TESTS.md` to replace that empty
+expectation with the exact bounded Phase-C inventory. Luna will capture a new focused
+expected red before any production byte is authorized. Policy implementation and all
+production source remain frozen.
+
+### Phase C1 — address production source (future, separate handoff)
+
+The exact complete bounded production inventory is `wallet-broker/src/zec.rs` plus
+`wallet-broker/src/zec/{address,fixture,prepare,scan,store,test_support}.rs`, with
+`wallet-broker/src/lib.rs` limited to exposing `pub mod zec;`. The first production
+slice will be the address target and only its real fixture/store foundation. A separate
+handoff will enumerate that slice after XHigh accepts the Phase-C0 test hash and red.
+The test actor may not pre-create stubs, mocks, `compile_error!`, ignored tests,
+conditional skips, or test-only alternate production.
 
 ## Planned commands and acceptance
 

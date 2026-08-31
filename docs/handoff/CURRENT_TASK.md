@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: FIXTURE AND EXPECTED RED RECORDED — REVIEW REQUIRED
+State: PHASE-C POLICY-TEST TRANSITION AUTHORIZED — PRODUCTION FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -10,7 +10,13 @@ Accepted correction actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `363c0046`
+Source baseline: `accac4407041f14079211a1e9eeb7047d862922a`
+
+Accepted fixture/expected-red integration review:
+[BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
+
+Active handoff:
+[CODEX_SOL_BBD_WAL_006_PHASE_C_POLICY_TESTS.md](CODEX_SOL_BBD_WAL_006_PHASE_C_POLICY_TESTS.md)
 
 Test-source review:
 [BBD-WAL-006-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-TEST-SOURCE-REVIEW-01.md)
@@ -18,7 +24,7 @@ Test-source review:
 Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
-Active handoff:
+Completed fixture evidence-integration handoff:
 [CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_EVIDENCE_INTEGRATION_01.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_EVIDENCE_INTEGRATION_01.md)
 
 [BBD-WAL-006-EXPECTED-RED-01.md](../testing/BBD-WAL-006-EXPECTED-RED-01.md)
@@ -106,7 +112,7 @@ Ticket: [BBD-WAL-006.md](../../tickets/BBD-WAL-006.md)
 BBD-WAL-004 remains complete and reviewer-accepted at `e8894a44`. BBGO-PAY-001 remains
 complete in `../bb-go` at production `6bbb0629` and final evidence `801f5d55`.
 
-The exact eight uncommitted Phase-A test/manifest paths passed semantic source review and
+The exact Phase-A test/manifest paths passed semantic source review and
 the corrected formatter gate exited 0. The next lock-resolution command stopped before
 lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
@@ -131,13 +137,18 @@ reviewer-accepted at SHA-256
 `40cc2b56132b42a765c86482e9915b0422adc0154c1e2edcfda4623760ec5d09`.
 The formatter, two fixture runs, exact freeze, and Node red succeeded. The focused Rust
 red contained only the absent production `zec` module, classified as `E0433` and `E0432`;
-the reviewer accepts the result without rerun. Luna may integrate only the accepted
-tests/fixture/evidence under the active handoff. ZEC production remains frozen.
+the reviewer accepts the result without rerun. The fixture and evidence are integrated
+at `accac440`; the tracked worktree/index are clean and `HEAD == origin/master` there.
+
+The committed Node policy test still requires an empty ZEC production inventory because
+that was the correct Phase-A contract. Sol is authorized to change only that test to the
+exact seven-path Phase-C inventory. Luna must capture the resulting focused expected red
+before any ZEC production source is authorized. The first later production slice will be
+the complete `zec_address` vertical with its real storage and fixture foundation.
 
 No ZEC production source or policy implementation is authorized. The sole production
-exception is the accepted `vault.rs` AEAD API compatibility edit in the active gate.
-XHigh must accept the resolved graph, fixture bytes/provenance, and exact expected-red
-evidence before a separate Phase-C ZEC source handoff exists. No broader tests,
+exception remains the accepted integrated `vault.rs` AEAD API compatibility edit.
+No broader tests,
 falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
 Electron, package, SBOM, or other-repository work is authorized in this phase.
 
