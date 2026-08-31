@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: PHASE-C ADDRESS PRODUCTION SOURCE AUTHORIZED
+Status: SUPPORT-DEPENDENCY TEST SOURCE AUTHORIZED — PRODUCTION FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -315,7 +315,18 @@ The deterministic ordering correction is accepted at SHA-256
 only the focused Node expected-red handoff. Production and policy implementation remain
 frozen until XHigh accepts its evidence.
 
-### Phase C1 — address production source (authorized now)
+### Phase C1 — support-dependency correction (test source authorized now)
+
+The first address source attempt changed no file. It proved that official wallet schema
+initialization requires a named `rand_core::RngCore` implementation and the broker-owned
+atomic extension schema requires direct SQLite APIs. The exact test-first correction is
+`rand_core = 0.6.4` with defaults off/`std` only and `rusqlite = 0.37.0` with defaults
+off/no direct features. Both are already locked transitively. Sol may edit only
+`test/securityPolicy.node.js` under
+`docs/handoff/CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_TESTS_01.md`; manifest, lockfile,
+policy implementation, and ZEC production remain frozen.
+
+### Phase C2 — address production source (future, separate handoff)
 
 The exact complete bounded production inventory is `wallet-broker/src/zec.rs` plus
 `wallet-broker/src/zec/{address,fixture,prepare,scan,store,test_support}.rs`, with

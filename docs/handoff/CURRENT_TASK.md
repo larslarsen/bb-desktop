@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS PRODUCTION SOURCE AUTHORIZED
+State: SUPPORT-DEPENDENCY TEST SOURCE AUTHORIZED — PRODUCTION FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_TESTS_01.md](CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_TESTS_01.md)
+
+Address production stop review:
+[BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-01.md)
+
+Stopped address production handoff:
 [CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_01.md)
 
 Accepted Phase-C policy expected-red review:
@@ -165,13 +171,16 @@ at `accac440`; the tracked worktree/index are clean and `HEAD == origin/master` 
 
 The Phase-C Node policy transition is accepted and integrated at 2,401 lines and SHA-256
 `19b7948bfa2c7f9b29426133bdda1630abfade5f1c438c7367e5c6dacd32688b`.
-Its focused expected red is accepted at integration `c6605497`. Sol is authorized to
-author only the complete `zec_address` vertical and its real storage/fixture foundation
-under the active handoff. Scan, preparation, handle hygiene, policy implementation,
-source integration, and every acceptance command remain unauthorized.
+Its focused expected red is accepted at integration `c6605497`. The first address-source
+attempt changed no file and stopped because the official SQLite migrator requires a
+direct `rand_core::RngCore` implementation and the broker extension transaction requires
+direct SQLite APIs. Sol is authorized only to add the exact failing policy test for
+already-locked `rand_core = 0.6.4` and `rusqlite = 0.37.0`. Manifest, lockfile, ZEC
+production, scan, preparation, handle hygiene, policy implementation, integration, and
+every acceptance command remain unauthorized.
 
-No ZEC production beyond the exact address-source paths is authorized. Policy
-implementation remains frozen. The prior production exception remains the accepted
+No ZEC production is currently authorized. Policy implementation remains frozen. The
+prior production exception remains the accepted
 integrated `vault.rs` AEAD API compatibility edit.
 No broader tests,
 falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
