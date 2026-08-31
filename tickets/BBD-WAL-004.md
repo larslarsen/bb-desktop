@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CI GATE PRODUCTION SOURCE ACCEPTED — LUNA GREEN AUTHORIZED
+Status: CI GATE GREEN RUN 01 — TEST FIXTURE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -498,6 +498,14 @@ Sol's exact three-path policy/ignore/SBOM workflow drop is accepted in
 bounded local green gate, integrate and push only that exact drop, and dispatch only the
 manual Security and SBOM workflows under
 `docs/handoff/CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md`. Packaging remains excluded.
+
+Green Run 01 stopped at the first command with 68 of 69 policy cases green. The sole
+failure was a retained mutation fixture that became a no-op when the new ticket
+fingerprint became index 0; the wrong-line and wildcard fixtures have the same latent
+assumption. The exact diagnosis is
+`docs/testing/BBD-WAL-004-CI-GATE-GREEN-RUN-01.md`. Sol may edit only
+`test/securityPolicy.node.js` under the exact Correction 01 handoff. All accepted
+production bytes, integration, later commands, Git, and GitHub remain frozen.
 
 ## Stop conditions
 
