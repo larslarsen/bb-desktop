@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 4 SOURCE ACCEPTED — COMPLETE GREEN INTEGRATION AUTHORIZED
+State: GREEN PREFLIGHT ACCEPTED — FORMATTER CONTINGENCY AUTHORIZED
 
-Review: [BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md)
+Evidence: [BBD-WAL-004-GREEN-RUN-03.md](../testing/BBD-WAL-004-GREEN-RUN-03.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_GREEN_3.md](CODEX_LUNA_BBD_WAL_004_GREEN_3.md)
+Active handoff: [CODEX_LUNA_BBD_WAL_004_GREEN_4.md](CODEX_LUNA_BBD_WAL_004_GREEN_4.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -57,9 +57,11 @@ Green Run 02 then passed formatting, build, all Node/security suites, and all 78
 tests. The all-features Clippy gate exposed only pinned `eframe` and RustCrypto API
 drift in two production files. Sol's exact compatibility correction is accepted in
 [production source review 05](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md).
-All production and formatter-only test state is frozen by hash. Luna now repeats every
-gate from the beginning and integrates only on exact green. Post-commit test
-falsification and triggered CI security/SBOM results remain required before acceptance.
+All production and formatter-only test state is frozen by hash. GREEN_3 preflight and
+tool versions matched exactly, but fmt check identified only three layout changes in the
+new vault API calls and Luna stopped. GREEN_4 authorizes the exact formatter operation,
+inspection, and remaining complete gate. Integration still occurs only on exact green;
+post-commit falsification and triggered CI security/SBOM results remain required.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

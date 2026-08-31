@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CORRECTION 4 SOURCE ACCEPTED — COMPLETE GREEN INTEGRATION AUTHORIZED
+Status: GREEN PREFLIGHT ACCEPTED — FORMATTER CONTINGENCY AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -352,6 +352,11 @@ Correction 4 is reviewer-accepted in
 integration contract is `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_3.md`. Acceptance
 still requires the separate post-commit falsification evidence and reviewer acceptance
 of the naturally triggered security and SBOM workflow gates.
+
+GREEN_3 preflight matched every frozen path/hash, but its first gate proposed only three
+canonical layout changes in the newly corrected vault API calls. Luna stopped as
+required. `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_4.md` authorizes the exact formatter
+contingency and resumes the complete gate without any semantic/test change.
 
 ## Required test groups
 
