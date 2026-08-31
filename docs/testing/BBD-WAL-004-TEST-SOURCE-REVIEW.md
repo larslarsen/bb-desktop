@@ -4,7 +4,7 @@ Reviewer: Lead Engineer/Reviewer — Codex XHigh
 
 Governance HEAD at review: `679b15ef`
 
-Result: **ACCEPTED FOR EXPECTED RED; PRODUCTION NOT AUTHORIZED**
+Result: **SUPERSEDED BY CORRECTION 3; PRODUCTION NOT AUTHORIZED**
 
 ## Accepted uncommitted paths
 
@@ -75,3 +75,12 @@ No secret, valid mnemonic, real address, user wallet path, mainnet material, pro
 source, lockfile, build output, root action, `/tmp` build tree, wallet, node, device, or
 network service was introduced. The test source remains uncommitted so Codex Luna can
 own expected-red evidence and Git integration after the owner toolchain gate.
+
+## Post-review resolution finding
+
+After the owner installed Rust/Cargo 1.98.0, the first approved crates.io resolution
+proved that the accepted manifest's `secrecy = 0.10.3` `alloc` feature does not exist.
+Cargo exited 101 before creating `Cargo.lock`; no red test ran. The path hashes above are
+therefore a superseded pre-resolution snapshot. Correction 3 is limited to the manifest
+secrecy feature declaration and its Node policy expectation/regression. A replacement
+accepted hash set will be recorded after that source correction is reviewed.

@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: TEST SOURCE ACCEPTED — OWNER RUST TOOLCHAIN INSTALL REQUIRED
+Status: REVIEW CORRECTION 3 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -196,7 +196,8 @@ two calls to the same production function is not a vector.
 
 The test manifest reserves Rust 1.98.0, edition 2024, and exact direct pins for the
 smallest reviewed set: RustCrypto `argon2` 0.6.0, `chacha20poly1305` 0.11.0, `hkdf`
-0.13.0, `sha2` 0.11.0, `base64ct` 1.8.3, `zeroize` 1.9.0, `secrecy` 0.10.3,
+0.13.0, `sha2` 0.11.0, `base64ct` 1.8.3, `zeroize` 1.9.0, `secrecy` 0.10.3
+with defaults disabled and no optional features,
 `getrandom` 0.4.3, `serde` 1.0.229, and `serde_json` 1.0.151. Optional native UI uses
 `eframe` 0.36.1 with defaults disabled and only `default_fonts`, `glow`, `wayland`, and
 `x11`, plus `rfd` 0.17.2 with defaults disabled and only `xdg-portal` and `wayland`.
@@ -278,6 +279,20 @@ Correction 2 is reviewer-accepted. The final fake uses test-owned shared fault s
 `VaultStore::port_mut()` is absent and not part of the future API. The exact accepted
 test-source path hashes and review evidence are recorded in
 `docs/testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md`. Production remains unauthorized.
+
+## Reviewer correction 3
+
+The first live Cargo resolution reached crates.io and rejected the manifest before a
+lockfile was created: `secrecy = 0.10.3` has no `alloc` feature. Its authoritative crate
+metadata exposes only the optional `serde` feature; allocation-backed `SecretBox`,
+`SecretSlice`, and `SecretString` are available without an optional allocation feature.
+
+The exact version remains `=0.10.3`. Correction 3 removes only the nonexistent `alloc`
+feature from `wallet-broker/Cargo.toml`, changes the Node policy expectation for secrecy
+to an empty feature list, and adds a manifest mutation proving that enabling `serde` is
+rejected. Defaults remain disabled. No version substitution, new dependency, production
+source, lockfile, or other test change is authorized. The exact handoff is
+`docs/handoff/CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_3.md`.
 
 ## Required test groups
 
