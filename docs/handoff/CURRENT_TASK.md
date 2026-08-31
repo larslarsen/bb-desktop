@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: DEPENDENCY TEST SOURCE ACCEPTED — FOCUSED EXPECTED RED AUTHORIZED
+State: DEPENDENCY PIN CORRECTION EXPECTED RED RECORDED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -58,3 +58,6 @@ other-repository work is authorized in this phase.
 
 This slice remains offline and synthetic. `../go-ipfs` is deprecated and receives no
 wallet work.
+
+Dependency correction expected-red evidence:
+[BBD-WAL-006-DEPENDENCY-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-DEPENDENCY-CORRECTION-EXPECTED-RED-01.md)

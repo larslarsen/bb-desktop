@@ -1610,7 +1610,7 @@ const WAL004_DIRECT_DEPENDENCIES = {
     features: ['default_fonts', 'glow', 'wayland', 'x11'], optional: true,
   },
   getrandom: { version: '=0.4.3', default_features: false, features: ['std'], optional: false },
-  hkdf: { version: '=0.13.0', default_features: false, features: [], optional: false },
+  hkdf: { version: '=0.12.4', default_features: false, features: [], optional: false },
   rfd: {
     version: '=0.17.2', default_features: false,
     features: ['xdg-portal', 'wayland'], optional: true,
@@ -1620,7 +1620,7 @@ const WAL004_DIRECT_DEPENDENCIES = {
     version: '=1.0.229', default_features: false, features: ['alloc', 'derive'], optional: false,
   },
   serde_json: { version: '=1.0.151', default_features: false, features: ['alloc'], optional: false },
-  sha2: { version: '=0.11.0', default_features: false, features: [], optional: false },
+  sha2: { version: '=0.10.9', default_features: false, features: [], optional: false },
   zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
 };
 const WAL004_RUST_SOURCE_PATHS = [
@@ -1657,6 +1657,40 @@ test('WAL-004 Rust test-harness manifest pins the exact toolchain, dependencies,
   assert.deepStrictEqual(policy.WAL004_DIRECT_DEPENDENCIES, WAL004_DIRECT_DEPENDENCIES);
   assert.strictEqual(typeof policy.checkWalletBrokerManifest, 'function');
   policy.checkWalletBrokerManifest(manifestText, { requireLibrary: false, requireLockfile: false });
+  for (const [fromLine, toLine] of [
+    [
+      'hkdf = { version = "=0.12.4", default-features = false }',
+      'hkdf = { version = "=0.13.0", default-features = false }',
+    ],
+    [
+      'hkdf = { version = "=0.12.4", default-features = false }',
+      'hkdf = { version = "0.12", default-features = false }',
+    ],
+    [
+      'sha2 = { version = "=0.10.9", default-features = false }',
+      'sha2 = { version = "=0.11.0", default-features = false }',
+    ],
+    [
+      'sha2 = { version = "=0.10.9", default-features = false }',
+      'sha2 = { version = "0.10", default-features = false }',
+    ],
+  ]) {
+    const from = `${fromLine}\n`;
+    const to = `${toLine}\n`;
+    assert.strictEqual(
+      manifestText.split(from).length - 1,
+      1,
+      `manifest dependency line must be unique: ${fromLine}`
+    );
+    const mutated = replaceOnce(manifestText, from, to);
+    assert.notStrictEqual(mutated, manifestText, `dependency mutation did not change ${fromLine}`);
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(mutated, {
+        requireLibrary: false, requireLockfile: false,
+      }),
+      /wallet|rust|manifest|dependency|feature|pin|native/i
+    );
+  }
   for (const [from, to] of [
     ['rust-version = "1.98.0"', 'rust-version = "1.97.0"'],
     ['version = "=0.6.0"', 'version = "0.6"'],
@@ -2047,6 +2081,268 @@ test('WAL-004 Rust SBOM validator accepts only a complete broker CycloneDX graph
       /Rust|SBOM|direct|component|omit/i
     );
   }
+});
+
+const WAL006_DIRECT_DEPENDENCIES = {
+  zcash_client_backend: {
+    version: '=0.24.0', default_features: false, features: ['pczt'], optional: false,
+  },
+  zcash_client_sqlite: {
+    version: '=0.22.0',
+    default_features: false,
+    features: ['orchard', 'test-dependencies', 'transparent-inputs'],
+    optional: false,
+  },
+  pczt: { version: '=0.9.3', default_features: false, features: [], optional: false },
+  zcash_primitives: {
+    version: '=0.30.1', default_features: false, features: [], optional: false,
+  },
+  zcash_protocol: {
+    version: '=0.10.5', default_features: false, features: ['local-consensus'], optional: false,
+  },
+  zcash_keys: {
+    version: '=0.16.1', default_features: false, features: ['orchard'], optional: false,
+  },
+};
+const WAL006_TEST_TARGETS = [
+  'zec_fixture_builder',
+  'zec_address',
+  'zec_store',
+  'zec_scan',
+  'zec_prepare',
+  'zec_hygiene',
+];
+const WAL006_FORBIDDEN_FEATURES = [
+  'sync',
+  'lightwalletd-tonic',
+  'lightwalletd-tonic-tls-webpki-roots',
+  'lightwalletd-tonic-transport',
+  'tor',
+  'zcashd-compat',
+  'zewif',
+  'non-standard-fees',
+];
+const WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES = [
+  'io-finalizer',
+  'orchard',
+  'prover',
+  'sapling',
+  'signer',
+  'spend-finalizer',
+  'transparent',
+  'transparent-inputs',
+  'tx-extractor',
+  'zcp-builder',
+];
+const WAL006_ALLOWED_RUST_SOURCE_PATHS = [];
+
+test('WAL-006 manifest requires six exact defaults-off pins and the minimum direct feature union', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  assert.deepStrictEqual(policy.WAL006_DIRECT_DEPENDENCIES, WAL006_DIRECT_DEPENDENCIES);
+  assert.deepStrictEqual(policy.WAL006_TEST_TARGETS, WAL006_TEST_TARGETS);
+  policy.checkWalletBrokerManifest(manifestText, { requireLibrary: true, requireLockfile: false });
+
+  for (const [name, expected] of Object.entries(WAL006_DIRECT_DEPENDENCIES)) {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const line = manifestText.match(new RegExp(`^${escapedName}\\s*=\\s*\\{[^\\n]+\\}$`, 'm'));
+    assert.ok(line, `manifest omits direct dependency ${name}`);
+    assert.ok(line[0].includes(`version = "${expected.version}"`));
+    assert.ok(line[0].includes('default-features = false'));
+  }
+  for (const target of WAL006_TEST_TARGETS) {
+    assert.ok(manifestText.includes(`name = "${target}"`));
+    assert.ok(manifestText.includes(`path = "tests/${target}.rs"`));
+  }
+
+  for (const name of Object.keys(WAL006_DIRECT_DEPENDENCIES)) {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const line = manifestText.match(new RegExp(`^${escapedName}\\s*=\\s*\\{[^\\n]+\\}$`, 'm'));
+    assert.ok(line, `manifest omits direct dependency ${name}`);
+    const enabledDefaults = line[0].replace('default-features = false', 'default-features = true');
+    assert.notStrictEqual(enabledDefaults, line[0]);
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(replaceOnce(manifestText, line[0], enabledDefaults), {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      /WAL-006|Zcash|dependency|default|manifest/i
+    );
+  }
+
+  for (const [from, to] of [
+    ['version = "=0.24.0"', 'version = "0.24"'],
+    ['version = "=0.22.0"', 'version = "0.22"'],
+    ['version = "=0.9.3"', 'version = "0.9"'],
+    ['version = "=0.30.1"', 'version = "0.30"'],
+    ['version = "=0.10.5"', 'version = "0.10"'],
+    ['version = "=0.16.1"', 'version = "0.16"'],
+    ['features = ["pczt"]', 'features = ["pczt", "sync"]'],
+    [
+      'features = ["orchard", "test-dependencies", "transparent-inputs"]',
+      'features = ["orchard", "test-dependencies", "transparent-inputs", "zewif"]',
+    ],
+    [
+      'pczt = { version = "=0.9.3", default-features = false }',
+      'pczt = { version = "=0.9.3", default-features = false, features = ["signer"] }',
+    ],
+    [
+      'zcash_primitives = { version = "=0.30.1", default-features = false }',
+      'zcash_primitives = { version = "=0.30.1", default-features = false, features = ["non-standard-fees"] }',
+    ],
+    ['features = ["local-consensus"]', 'features = ["local-consensus", "zcashd-compat"]'],
+    ['features = ["orchard"]', 'features = ["orchard", "zcashd-compat"]'],
+  ]) {
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(replaceOnce(manifestText, from, to), {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      /WAL-006|Zcash|dependency|feature|pin|git|default|network|manifest/i
+    );
+  }
+  const manifestPatch = `${manifestText}\n[patch.crates-io]\npczt = { git = "https://example.invalid/pczt" }\n`;
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(manifestPatch, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    /WAL-006|Zcash|patch|dependency|manifest/i
+  );
+  const gitDependency = replaceOnce(
+    manifestText,
+    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }',
+    'zcash_client_sqlite = { git = "https://example.invalid/librustzcash", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(gitDependency, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    /WAL-006|Zcash|git|dependency|manifest/i
+  );
+  for (const addition of [
+    'reqwest = "=0.13.0"',
+    'tokio = { version = "=1.0.0", features = ["net"] }',
+    'openssl = "=0.10.0"',
+  ]) {
+    const mutated = replaceOnce(
+      manifestText,
+      '[dependencies]\n',
+      `[dependencies]\n${addition}\n`
+    );
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(mutated, {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      /WAL-006|Zcash|patch|network|transport|OpenSSL|dependency|manifest/i
+    );
+  }
+});
+
+test('WAL-006 feature policy distinguishes compiled upstream PCZT capability from BitBook authority', () => {
+  const policy = loadPolicy();
+  assert.deepStrictEqual(policy.WAL006_FORBIDDEN_FEATURES, WAL006_FORBIDDEN_FEATURES);
+  assert.deepStrictEqual(
+    policy.WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+    WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES
+  );
+  assert.strictEqual(typeof policy.checkWal006ResolvedFeatures, 'function');
+  policy.checkWal006ResolvedFeatures({
+    direct: WAL006_DIRECT_DEPENDENCIES,
+    compiled_pczt_capabilities: WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+    bitbook_authority: ['receiver.fresh', 'fixture.scan', 'pczt.prepare'],
+  });
+  for (const forbidden of WAL006_FORBIDDEN_FEATURES) {
+    assertRejects(
+      () => policy.checkWal006ResolvedFeatures({
+        direct: WAL006_DIRECT_DEPENDENCIES,
+        enabled_features: [forbidden],
+        compiled_pczt_capabilities: WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+        bitbook_authority: ['receiver.fresh', 'fixture.scan', 'pczt.prepare'],
+      }),
+      /WAL-006|Zcash|feature|network|forbidden/i
+    );
+  }
+  for (const authority of ['pczt.raw', 'sign', 'prove', 'finalize', 'extract', 'broadcast', 'network.connect']) {
+    assertRejects(
+      () => policy.checkWal006ResolvedFeatures({
+        direct: WAL006_DIRECT_DEPENDENCIES,
+        compiled_pczt_capabilities: WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+        bitbook_authority: ['receiver.fresh', 'fixture.scan', 'pczt.prepare', authority],
+      }),
+      /WAL-006|Zcash|authority|sign|prove|final|extract|broadcast|network|raw/i
+    );
+  }
+});
+
+test('WAL-006 Rust ZEC product source inventory remains empty during test-only Phase A', () => {
+  const policy = loadPolicy();
+  assert.deepStrictEqual(policy.WAL006_ALLOWED_RUST_SOURCE_PATHS, WAL006_ALLOWED_RUST_SOURCE_PATHS);
+  assert.strictEqual(typeof policy.checkWal006RustSourceInventory, 'function');
+  const sourceRoot = path.join(repoRoot, 'wallet-broker', 'src');
+  const rustSources = [];
+  const collectRustSources = (directory, relative) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const childRelative = path.posix.join(relative, entry.name);
+      if (entry.isDirectory()) {
+        collectRustSources(path.join(directory, entry.name), childRelative);
+      } else if (entry.isFile() && entry.name.endsWith('.rs')) {
+        rustSources.push(`wallet-broker/src/${childRelative}`);
+      }
+    }
+  };
+  collectRustSources(sourceRoot, '');
+  const actual = rustSources.filter((relative) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(relative));
+  assert.deepStrictEqual(actual, []);
+  policy.checkWal006RustSourceInventory(actual);
+  for (const unlisted of [
+    'wallet-broker/src/zec.rs',
+    'wallet-broker/src/zec_network.rs',
+    'wallet-broker/src/zec/raw.rs',
+  ]) {
+    assertRejects(
+      () => policy.checkWal006RustSourceInventory([unlisted]),
+      /WAL-006|Zcash|source|inventory|unlisted|extra/i
+    );
+  }
+});
+
+test('WAL-006 policy rejects live-network and authority-bearing Rust snippets without denying upstream transitives', () => {
+  const policy = loadPolicy();
+  const allowed = [
+    'use zcash_keys::keys::UnifiedAddressRequest;',
+    'let request = UnifiedAddressRequest::ORCHARD;',
+    'let _prepared_handle = prepare_unsigned_ironwood_pczt(request);',
+  ].join('\n');
+  policy.checkRustWalletSource(allowed, 'wallet-broker/tests/zec_prepare.rs');
+  for (const source of [
+    'use std::net::TcpStream;',
+    'use zcash_client_backend::proto::service::compact_tx_streamer_client;',
+    'let endpoint = "https://lightwalletd.example";',
+    'pczt.sign(spending_key);',
+    'pczt.prove(proving_key);',
+    'pczt.finalize();',
+    'pczt.extract();',
+    'broadcast(raw_transaction);',
+    'Network::MainNetwork',
+  ]) {
+    assertRejects(
+      () => policy.checkRustWalletSource(source, 'wallet-broker/src/zec.rs'),
+      /WAL-006|Zcash|network|endpoint|sign|prove|final|extract|broadcast|mainnet|authority/i
+    );
+  }
+  assert.deepStrictEqual(
+    WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+    [
+      'io-finalizer',
+      'orchard',
+      'prover',
+      'sapling',
+      'signer',
+      'spend-finalizer',
+      'transparent',
+      'transparent-inputs',
+      'tx-extractor',
+      'zcp-builder',
+    ]
+  );
 });
 
 function run() {
