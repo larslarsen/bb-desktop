@@ -2118,6 +2118,14 @@ const WAL006_DIRECT_DEPENDENCIES = {
     version: '=0.16.1', default_features: false, features: ['orchard'], optional: false,
   },
 };
+const WAL006_SUPPORT_DEPENDENCIES = {
+  rand_core: {
+    version: '=0.6.4', default_features: false, features: ['std'], optional: false,
+  },
+  rusqlite: {
+    version: '=0.37.0', default_features: false, features: [], optional: false,
+  },
+};
 const WAL006_TEST_TARGETS = [
   'zec_fixture_builder',
   'zec_address',
@@ -2254,6 +2262,51 @@ test('WAL-006 manifest requires six exact defaults-off pins and the minimum dire
         requireLibrary: true, requireLockfile: false,
       }),
       /WAL-006|Zcash|patch|network|transport|OpenSSL|dependency|manifest/i
+    );
+  }
+});
+
+test('WAL-006 manifest pins the exact production support APIs for RNG and SQLite', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  const randCoreLine =
+    'rand_core = { version = "=0.6.4", default-features = false, features = ["std"] }';
+  const rusqliteLine =
+    'rusqlite = { version = "=0.37.0", default-features = false }';
+
+  for (const line of [randCoreLine, rusqliteLine]) {
+    assert.strictEqual(
+      manifestText.split(`${line}\n`).length - 1,
+      1,
+      `manifest support dependency line must be unique: ${line}`
+    );
+  }
+
+  assert.deepStrictEqual(policy.WAL006_SUPPORT_DEPENDENCIES, WAL006_SUPPORT_DEPENDENCIES);
+  policy.checkWalletBrokerManifest(manifestText, { requireLibrary: true, requireLockfile: false });
+
+  for (const [from, to] of [
+    [randCoreLine, randCoreLine.replace('version = "=0.6.4"', 'version = "0.6"')],
+    [randCoreLine, randCoreLine.replace('default-features = false', 'default-features = true')],
+    [randCoreLine, randCoreLine.replace(', features = ["std"]', '')],
+    [randCoreLine, randCoreLine.replace('["std"]', '["getrandom", "std"]')],
+    [rusqliteLine, rusqliteLine.replace('version = "=0.37.0"', 'version = "0.37"')],
+    [rusqliteLine, rusqliteLine.replace('default-features = false', 'default-features = true')],
+    [rusqliteLine, rusqliteLine.replace(' }', ', features = ["load_extension"] }')],
+    [
+      rusqliteLine,
+      rusqliteLine.replace(
+        ' }',
+        ', features = ["bundled-sqlcipher-vendored-openssl"] }'
+      ),
+    ],
+    [rusqliteLine, rusqliteLine.replace(' }', ', features = ["backup"] }')],
+  ]) {
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(replaceOnce(manifestText, from, to), {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      /support|dependency|manifest|RNG|rand_core|SQLite|rusqlite/i
     );
   }
 });
