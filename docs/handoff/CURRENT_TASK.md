@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS PRODUCTION CORRECTION AUTHORIZED
+State: PHASE-C ADDRESS SOURCE GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_01.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_01.md)
+
+Accepted address production source review 03:
+[BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-03.md](../testing/BBD-WAL-006-ADDRESS-PRODUCTION-SOURCE-REVIEW-03.md)
+
+Completed address production correction:
 [CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_CORRECTION_01.md)
 
 Address production source review 02:
@@ -263,6 +269,12 @@ does not revalidate the complete fixed path chain on later database operations, 
 closed-manifest fields without warnings-denied lint treatment. Sol is authorized only for the
 three-path correction handoff. Scan, preparation, handle hygiene, broader ZEC policy,
 execution, evidence, integration, and Git remain frozen.
+
+Sol completed the three-path correction. Source Review 03 accepts the complete six-path address
+vertical at 1,857 lines. Luna is authorized only for the exact offline formatter, production-lib
+Clippy, eight-test `zec_address`, and 69/5 partial-policy-red gate, followed on exact success by
+bounded evidence and integration. Scan, preparation, handle hygiene, broader ZEC policy, and all
+other source remain frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
