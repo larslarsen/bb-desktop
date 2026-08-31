@@ -261,6 +261,43 @@ const WAL004_DIRECT_DEPENDENCIES = {
   sha2: { version: '=0.10.9', default_features: false, features: [], optional: false },
   zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
 };
+const WAL006_DIRECT_DEPENDENCIES = {
+  zcash_client_backend: {
+    version: '=0.24.0', default_features: false, features: ['pczt'], optional: false,
+  },
+  zcash_client_sqlite: {
+    version: '=0.22.0',
+    default_features: false,
+    features: ['orchard', 'test-dependencies', 'transparent-inputs'],
+    optional: false,
+  },
+  pczt: { version: '=0.9.3', default_features: false, features: [], optional: false },
+  zcash_primitives: {
+    version: '=0.30.1', default_features: false, features: [], optional: false,
+  },
+  zcash_protocol: {
+    version: '=0.10.5', default_features: false, features: ['local-consensus'], optional: false,
+  },
+  zcash_keys: {
+    version: '=0.16.1', default_features: false, features: ['orchard'], optional: false,
+  },
+};
+const WAL006_SUPPORT_DEPENDENCIES = {
+  rand_core: {
+    version: '=0.6.4', default_features: false, features: ['std'], optional: false,
+  },
+  rusqlite: {
+    version: '=0.37.0', default_features: false, features: [], optional: false,
+  },
+};
+const WAL006_TEST_TARGETS = [
+  'zec_fixture_builder',
+  'zec_address',
+  'zec_store',
+  'zec_scan',
+  'zec_prepare',
+  'zec_hygiene',
+];
 
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
@@ -1827,6 +1864,14 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'serde_json = { version = "=1.0.151", default-features = false, features = ["alloc"] }',
     'sha2 = { version = "=0.10.9", default-features = false }',
     'zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }',
+    'zcash_client_backend = { version = "=0.24.0", default-features = false, features = ["pczt"] }',
+    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }',
+    'pczt = { version = "=0.9.3", default-features = false }',
+    'zcash_primitives = { version = "=0.30.1", default-features = false }',
+    'zcash_protocol = { version = "=0.10.5", default-features = false, features = ["local-consensus"] }',
+    'zcash_keys = { version = "=0.16.1", default-features = false, features = ["orchard"] }',
+    'rand_core = { version = "=0.6.4", default-features = false, features = ["std"] }',
+    'rusqlite = { version = "=0.37.0", default-features = false }',
   ];
   const dependencyBlock = manifestText.split('[dependencies]\n')[1];
   if (!dependencyBlock) {
@@ -1839,6 +1884,20 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
   if (JSON.stringify(actualDependencies) !== JSON.stringify(expectedDependencies)) {
     throw new PolicyError('wallet Rust manifest dependency pins or features differ from review');
   }
+  const expectedDependencyNames = new Set(
+    expectedDependencies.map((line) => line.slice(0, line.indexOf(' = ')))
+  );
+  const reviewedAssignments = manifestText
+    .split('\n')
+    .filter((line) => {
+      const assignment = line.match(/^\s*([A-Za-z0-9_-]+)\s*=/);
+      return assignment && expectedDependencyNames.has(assignment[1]);
+    });
+  if (JSON.stringify(reviewedAssignments) !== JSON.stringify(expectedDependencies)) {
+    throw new PolicyError(
+      'wallet Rust manifest dependency assignments contain a duplicate or displaced declaration'
+    );
+  }
   const tests = [...manifestText.matchAll(/\[\[test\]\]\nname = "([^"]+)"\npath = "([^"]+)"/g)]
     .map((match) => `${match[1]}:${match[2]}`);
   const expectedTests = [
@@ -1848,6 +1907,12 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'vault_session:tests/vault_session.rs',
     'native_surface:tests/native_surface.rs',
     'secret_hygiene:tests/secret_hygiene.rs',
+    'zec_fixture_builder:tests/zec_fixture_builder.rs',
+    'zec_address:tests/zec_address.rs',
+    'zec_store:tests/zec_store.rs',
+    'zec_scan:tests/zec_scan.rs',
+    'zec_prepare:tests/zec_prepare.rs',
+    'zec_hygiene:tests/zec_hygiene.rs',
   ];
   if (JSON.stringify(tests) !== JSON.stringify(expectedTests)) {
     throw new PolicyError('wallet Rust manifest integration-test targets differ from review');
@@ -1855,7 +1920,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
   if (options.requireLibrary && !manifestText.includes('license = "MIT"')) {
     throw new PolicyError('wallet Rust production manifest is incomplete');
   }
-  if (/\bgit\s*=|\*"|reqwest|tokio|keyring|zcash|monero|openssl/i.test(manifestText)) {
+  if (/\bgit\s*=|\*"|reqwest|tokio|keyring|monero|openssl/i.test(manifestText)) {
     throw new PolicyError('wallet Rust manifest contains forbidden dependency authority');
   }
 }
@@ -2207,6 +2272,9 @@ module.exports = {
   WAL004_RUST_SOURCE_PATHS,
   WAL004_ALLOWED_LICENSES,
   WAL004_DIRECT_DEPENDENCIES,
+  WAL006_DIRECT_DEPENDENCIES,
+  WAL006_SUPPORT_DEPENDENCIES,
+  WAL006_TEST_TARGETS,
   parseYaml,
   loadWorkflow,
   eventTriggers,
