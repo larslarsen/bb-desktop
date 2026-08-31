@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CASE 1 PAIRING CORRECTED — ISOLATED FALSIFICATION RESUME AUTHORIZED
+Status: FALSIFICATION GREEN — CI GATE REGRESSION TESTS AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -469,6 +469,27 @@ green:
 No cross-platform package build, native window launch, live wallet, network provider,
 hardware, node, coin adapter, real child process, signing, broadcast, or mainnet action
 is an acceptance gate.
+
+## CI gate correction 1
+
+The seven required falsifications passed and restored cleanly at
+`e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`. Manual Security run `33359184973` then
+failed only because Gitleaks classified the reviewer-published synthetic HKDF vector's
+`key    =` ticket label as a generic API key. Manual SBOM run `33359223628` generated a
+default-feature Rust document that the repository validator correctly rejected for
+omitting optional direct native dependencies `eframe` and `rfd`.
+
+The complete diagnosis and exact correction semantics are frozen in
+`docs/testing/BBD-WAL-004-CI-GATE-REVIEW-01.md`. Sol is authorized to edit only
+`test/securityPolicy.node.js` under
+`docs/handoff/CODEX_SOL_BBD_WAL_004_CI_GATE_TESTS.md`. The test-only drop must require an
+exact ninth historical fingerprint while forbidding a live/current-tree ignore, require
+the live ticket's vector label to become `expand =` without changing its hex bytes, and
+require the Rust CycloneDX command to use `--all-features`. It must fail against the
+current production policy/workflow/ignore/ticket state for those intended reasons.
+
+Production policy, workflow, ignore, ticket-label correction, integration, evidence,
+tests, scanners, Git, and GitHub remain unauthorized until separate reviewer handoffs.
 
 ## Stop conditions
 

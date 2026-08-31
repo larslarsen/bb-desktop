@@ -2,86 +2,48 @@
 
 Ticket: BBD-WAL-004
 
-State: FALSIFICATION GREEN — CI SECURITY/SBOM GATES PENDING
-
-Evidence: [BBD-WAL-004-FALSIFICATION.md](../testing/BBD-WAL-004-FALSIFICATION.md)
-
-Active handoff: NONE — REVIEWER CI GATE REVIEW
+State: CI GATE CORRECTION — SOL TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Test/source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Production baseline: `fe2fe7e78fab0012a5fa77f128716bb7262aba58`
+Reviewed baseline: `e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 
-[BBD-WAL-004](../../tickets/BBD-WAL-004.md) is the only authorized implementation
-ticket in this repository. The owner resolved architecture Q10 in favor of a minimal
-native authorization window running inside the Rust wallet-broker process. It owns
-software unlock, backup/restore, and later authoritative payment confirmation. A
-broker-invoked native file picker may select backup paths. Electron never owns the
-window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
-hardware devices confirm independently when capable.
+Production commit: `0e42fb4b477cfe76757ed207d3a561270b9e9efe`
 
-The owner installed official user-level Rust/Cargo 1.98.0. Luna integrated the exact
-accepted tests, fixture, lockfile, expected-red evidence, and ignored disk-backed target
-path at `fe2fe7e78fab0012a5fa77f128716bb7262aba58`; `HEAD == origin/master`. The Node
-source-first suite has 57 `ok` and the seven exact expected `not ok` results. The named
-Rust vector test reaches compilation and fails solely at the absent future broker crate.
+Falsification evidence commit: `e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 
-The reviewer accepted the complete lock graph in
-[BBD-WAL-004-LOCK-GRAPH-REVIEW.md](../testing/BBD-WAL-004-LOCK-GRAPH-REVIEW.md): 38
-headless and 172 Linux all-features package/version pairs, crates.io-only checksummed
-sources, no duplicate crypto primitive, no forbidden browser/web/wgpu/network runtime,
-reviewed build scripts and licenses, and a clean pinned RustSec scan of all 327 lockfile
-records. The new crate must declare the repository's MIT license during production.
+Active handoff: [CODEX_SOL_BBD_WAL_004_CI_GATE_TESTS.md](CODEX_SOL_BBD_WAL_004_CI_GATE_TESTS.md)
 
-Sol completed the exact 15-path production source/policy drop, but it remains uncommitted
-and is rejected pending test-first correction. The reviewer findings are frozen in
-[production source review 01](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-01.md):
-late authorization can revive expiry, native/session validation is incomplete,
-diagnostics are not closed, direct Linux port operations follow symlinks, rfd converts
-paths lossily, reviewed secrecy/Base64 dependencies are unused, and relevant policy
-files/source inventory can evade the intended checks.
+The encrypted custody core is locally green, integrated, pushed, and independently
+falsified by all seven required temporary mutations. GitHub Social client run
+`33357371137` passed with package jobs skipped.
 
-Correction 1 expected red remains accepted, but Sol's nine-path production correction is
-rejected in
-[production source review 02](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-02.md).
-Static review found global lock events suppressible by malformed account input, missing
-unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
-custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Correction 3 is reviewer-accepted in
-[production source review 04](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-04.md).
-Green Run 02 then passed formatting, build, all Node/security suites, and all 78 Rust
-tests. The all-features Clippy gate exposed only pinned `eframe` and RustCrypto API
-drift in two production files. Sol's exact compatibility correction is accepted in
-[production source review 05](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md).
-All production and formatter-only test state is frozen by hash. GREEN_4's exact
-formatter contingency, build, Node/security suites, zero-vulnerability npm audit, and
-all 78 Rust tests passed. All-features Clippy then identified exactly three denied
-behavior-equivalent idiom warnings in `store.rs` and `vault.rs`; Luna stopped before the
-native compile and RustSec audit. Sol's exact three corrections are accepted in source
-review 06. GREEN_5 repeated all functional gates successfully and production passed
-Clippy; Clippy then found four compatibility warnings only in the independent-vector
-test. Sol's one-test correction is reviewer-accepted with every vector byte and
-assertion unchanged. GREEN_6 passed every functional, lint, and native compile gate.
-RustSec then loaded 1,226 advisories and found no vulnerability in 327 locked crates.
-Luna integrated and pushed production commit `0e42fb4b477cfe76757ed207d3a561270b9e9efe`;
-GitHub Social client run `33357371137` passed with package jobs skipped. Falsification
-Run 01 restored cleanly after the reviewer paired a `wipe_with` mutation with the
-unrelated `SecretBytes::drop` test. The corrected resume targets the decrypt-unwind path
-that actually traverses `wipe_with`, then continues cases 2–7. Manual non-packaging
-security/SBOM workflows remain reviewer gates after falsification.
+The two manual non-packaging acceptance workflows found two bounded gate defects at the
+falsification commit. Security run `33359184973` passed every npm, Node policy, RustSec,
+cargo-deny, and installation step, then Gitleaks reported only the reviewer-published
+synthetic HKDF vector under the live `key    =` label in the WAL-004 ticket. SBOM run
+`33359223628` passed npm SBOM validation, then the Rust validator rejected a
+default-feature-only document because it omitted optional direct native components
+`eframe` and `rfd`.
 
-BBD-WAL-003 is complete and reviewer-accepted at production commit
-`584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
-`2e7e1599b6aee9aa5034d8854ac08bd54eadfe1e`, and acceptance commit
-`abdd2b1980cbe8c5483a26b08b7ae43c82ae420b`. GitHub Social client run
-`33342988248` passed with package jobs skipped. Its secure Electron/future-broker
-boundary remains a frozen input; it does not ship a wallet or native broker.
+The authoritative review is
+[BBD-WAL-004-CI-GATE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-REVIEW-01.md). Sol may
+now edit only `test/securityPolicy.node.js` to require the exact ninth historical
+Gitleaks fingerprint, a repaired live ticket label with unchanged vector bytes, and an
+all-features Rust SBOM command. Sol does not execute commands or use Git. Production,
+policy, workflows, `.gitleaksignore`, the live ticket label, integration, expected-red
+execution, evidence, Git, and GitHub remain frozen pending reviewer inspection.
 
-The independent `../bb-go` BBGO-PAY-001 ticket remains queued for Grok Build at or after
-2026-08-30 19:53 PDT under its own durable handoff. Codex Spark remains reserved for
-later mechanical UI/view-model work. `../go-ipfs` is deprecated and receives no wallet
-work.
+After test-source acceptance, Luna will integrate the test-only drop and record the
+expected two-test red result. A later separate Sol production handoff will be bounded to
+the exact policy/workflow/ignore correction. The reviewer owns the one-word governance
+ticket relabel. Final acceptance requires both local Gitleaks modes and fresh successful
+manual Security and SBOM runs; it does not require any platform package build.
+
+Grok Build is available and remains queued for the independent `../bb-go`
+exchange-rate/provider work after this desktop security correction. `../go-ipfs` is
+deprecated and receives no wallet work.
