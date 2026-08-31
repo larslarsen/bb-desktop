@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: GREEN PREFLIGHT ACCEPTED — FORMATTER CONTINGENCY AUTHORIZED
+Status: FUNCTIONAL GREEN — CORRECTION 5 CLIPPY SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -357,6 +357,12 @@ GREEN_3 preflight matched every frozen path/hash, but its first gate proposed on
 canonical layout changes in the newly corrected vault API calls. Luna stopped as
 required. `docs/handoff/CODEX_LUNA_BBD_WAL_004_GREEN_4.md` authorizes the exact formatter
 contingency and resumes the complete gate without any semantic/test change.
+
+GREEN_4 passed formatting, build, Node/security suites, a zero-vulnerability npm audit,
+and all 78 Rust tests. Its all-features Clippy gate found only the three
+behavior-equivalent idiom warnings frozen in `docs/testing/BBD-WAL-004-GREEN-RUN-04.md`.
+Sol may edit only `store.rs` and `vault.rs` under the exact Correction 5 handoff; no test
+change is authorized.
 
 ## Required test groups
 

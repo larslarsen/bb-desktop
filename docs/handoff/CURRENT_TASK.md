@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: GREEN PREFLIGHT ACCEPTED — FORMATTER CONTINGENCY AUTHORIZED
+State: FUNCTIONAL GREEN — CORRECTION 5 CLIPPY SOURCE AUTHORIZED
 
-Evidence: [BBD-WAL-004-GREEN-RUN-03.md](../testing/BBD-WAL-004-GREEN-RUN-03.md)
+Evidence: [BBD-WAL-004-GREEN-RUN-04.md](../testing/BBD-WAL-004-GREEN-RUN-04.md)
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_GREEN_4.md](CODEX_LUNA_BBD_WAL_004_GREEN_4.md)
+Active handoff: [CODEX_SOL_BBD_WAL_004_CORRECTION_5_PRODUCTION.md](CODEX_SOL_BBD_WAL_004_CORRECTION_5_PRODUCTION.md)
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -57,11 +57,13 @@ Green Run 02 then passed formatting, build, all Node/security suites, and all 78
 tests. The all-features Clippy gate exposed only pinned `eframe` and RustCrypto API
 drift in two production files. Sol's exact compatibility correction is accepted in
 [production source review 05](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-05.md).
-All production and formatter-only test state is frozen by hash. GREEN_3 preflight and
-tool versions matched exactly, but fmt check identified only three layout changes in the
-new vault API calls and Luna stopped. GREEN_4 authorizes the exact formatter operation,
-inspection, and remaining complete gate. Integration still occurs only on exact green;
-post-commit falsification and triggered CI security/SBOM results remain required.
+All production and formatter-only test state is frozen by hash. GREEN_4's exact
+formatter contingency, build, Node/security suites, zero-vulnerability npm audit, and
+all 78 Rust tests passed. All-features Clippy then identified exactly three denied
+behavior-equivalent idiom warnings in `store.rs` and `vault.rs`; Luna stopped before the
+native compile and RustSec audit. Sol is authorized for only those three source
+corrections. Integration, post-commit falsification, and triggered CI security/SBOM
+results remain required.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
