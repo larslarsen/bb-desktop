@@ -54,9 +54,13 @@ fn idle_timeout_is_exactly_fifteen_minutes_and_locks_at_boundary() {
     sessions.clock_mut().now += 1;
     sessions.check_deadlines().unwrap();
     assert!(!sessions.is_unlocked(ACCOUNT_A));
-    assert!(sessions.wipe_observer().0.iter().any(|event| {
-        event.label == "session-spend-material" && event.all_zero
-    }));
+    assert!(
+        sessions
+            .wipe_observer()
+            .0
+            .iter()
+            .any(|event| { event.label == "session-spend-material" && event.all_zero })
+    );
 }
 
 #[test]
@@ -114,9 +118,7 @@ fn invalid_account_unlock_is_schema_and_wipes_supplied_material() {
     assert!(!sessions.is_unlocked(INVALID_ACCOUNT));
     assert_eq!(sessions.authorization_deadline(INVALID_ACCOUNT), None);
     assert!(sessions.wipe_observer().0.iter().any(|event| {
-        event.label == "session-spend-material"
-            && event.length == MATERIAL.len()
-            && event.all_zero
+        event.label == "session-spend-material" && event.length == MATERIAL.len() && event.all_zero
     }));
 }
 
@@ -135,8 +137,14 @@ fn global_lock_events_ignore_malformed_account_but_scoped_events_reject_it() {
         unlock(&mut sessions, ACCOUNT_B);
 
         sessions.handle(MALFORMED_ACCOUNT, event).unwrap();
-        assert!(!sessions.is_unlocked(ACCOUNT_A), "{event:?} left account A unlocked");
-        assert!(!sessions.is_unlocked(ACCOUNT_B), "{event:?} left account B unlocked");
+        assert!(
+            !sessions.is_unlocked(ACCOUNT_A),
+            "{event:?} left account A unlocked"
+        );
+        assert!(
+            !sessions.is_unlocked(ACCOUNT_B),
+            "{event:?} left account B unlocked"
+        );
         let wipes: Vec<&WipeEvent> = sessions
             .wipe_observer()
             .0
@@ -167,7 +175,10 @@ fn global_lock_events_ignore_malformed_account_but_scoped_events_reject_it() {
         let mut sessions = manager(82_000);
         unlock(&mut sessions, ACCOUNT_A);
         assert_eq!(
-            sessions.handle(MALFORMED_ACCOUNT, event).unwrap_err().code(),
+            sessions
+                .handle(MALFORMED_ACCOUNT, event)
+                .unwrap_err()
+                .code(),
             "SCHEMA",
             "{event:?} accepted a malformed account"
         );
@@ -184,10 +195,7 @@ fn clock_failure_during_unlock_explicitly_wipes_supplied_material() {
 
     assert_eq!(
         sessions
-            .unlock(
-                ACCOUNT_A,
-                SecretBytes::new(MATERIAL.to_vec()).unwrap(),
-            )
+            .unlock(ACCOUNT_A, SecretBytes::new(MATERIAL.to_vec()).unwrap(),)
             .unwrap_err()
             .code(),
         "TIMEOUT"
@@ -195,9 +203,7 @@ fn clock_failure_during_unlock_explicitly_wipes_supplied_material() {
     assert!(!sessions.is_unlocked(ACCOUNT_A));
     assert_eq!(sessions.authorization_deadline(ACCOUNT_A), None);
     assert!(sessions.wipe_observer().0.iter().any(|wipe| {
-        wipe.label == "session-spend-material"
-            && wipe.length == MATERIAL.len()
-            && wipe.all_zero
+        wipe.label == "session-spend-material" && wipe.length == MATERIAL.len() && wipe.all_zero
     }));
 }
 
@@ -218,7 +224,10 @@ fn polling_sync_backup_browsing_and_failed_or_cancelled_prompts_never_extend() {
         sessions.handle(ACCOUNT_A, event).unwrap();
         sessions.clock_mut().now += 1;
         sessions.check_deadlines().unwrap();
-        assert!(!sessions.is_unlocked(ACCOUNT_A), "{event:?} extended authorization");
+        assert!(
+            !sessions.is_unlocked(ACCOUNT_A),
+            "{event:?} extended authorization"
+        );
     }
 }
 
@@ -237,7 +246,10 @@ fn every_forced_lock_event_wipes_spend_material() {
         let mut sessions = manager(5_000);
         unlock(&mut sessions, ACCOUNT_A);
         sessions.handle(ACCOUNT_A, event).unwrap();
-        assert!(!sessions.is_unlocked(ACCOUNT_A), "{event:?} left session unlocked");
+        assert!(
+            !sessions.is_unlocked(ACCOUNT_A),
+            "{event:?} left session unlocked"
+        );
         let wipe = sessions.wipe_observer().0.last().unwrap();
         assert_eq!(wipe.label, "session-spend-material");
         assert!(wipe.length > 0 && wipe.all_zero);
@@ -251,7 +263,9 @@ fn separate_accounts_have_isolated_deadlines_and_wipes() {
     sessions.clock_mut().now = 100_000;
     unlock(&mut sessions, ACCOUNT_B);
     sessions.clock_mut().now = 100_001;
-    sessions.handle(ACCOUNT_A, SessionEvent::ManualLock).unwrap();
+    sessions
+        .handle(ACCOUNT_A, SessionEvent::ManualLock)
+        .unwrap();
     assert!(!sessions.is_unlocked(ACCOUNT_A));
     assert!(sessions.is_unlocked(ACCOUNT_B));
     sessions.clock_mut().now = 100_000 + AUTHORIZATION_IDLE_MILLIS;

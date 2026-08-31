@@ -3,11 +3,11 @@
 
 use argon2::{Algorithm, Argon2, AssociatedData, ParamsBuilder, Version};
 use bitbook_wallet_broker::vault::{
-    AEAD_ALGORITHM, ARGON2_M_COST_KIB, ARGON2_P_COST, ARGON2_T_COST, ARGON2_VERSION,
-    Asset, EntropyPort, Network, SecretBytes, VAULT_FORMAT, VAULT_VERSION, VaultError,
-    VaultMetadata, VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, seal_vault,
+    AEAD_ALGORITHM, ARGON2_M_COST_KIB, ARGON2_P_COST, ARGON2_T_COST, ARGON2_VERSION, Asset,
+    EntropyPort, Network, SecretBytes, VAULT_FORMAT, VAULT_VERSION, VaultError, VaultMetadata,
+    VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, seal_vault,
 };
-use chacha20poly1305::aead::{AeadInPlace, KeyInit};
+use chacha20poly1305::aead::{AeadInOut, KeyInit};
 use chacha20poly1305::{XChaCha20Poly1305, XNonce};
 use hkdf::Hkdf;
 use sha2::Sha256;
@@ -16,7 +16,9 @@ fn hex(value: &str) -> Vec<u8> {
     assert_eq!(value.len() % 2, 0);
     value
         .as_bytes()
-        .chunks_exact(2)
+        .as_chunks::<2>()
+        .0
+        .iter()
         .map(|pair| {
             let text = core::str::from_utf8(pair).unwrap();
             u8::from_str_radix(text, 16).unwrap()
@@ -59,7 +61,9 @@ impl EntropyPort for FixedEntropy {
         self.calls.push((label, output.len()));
         match label {
             "vault-salt" if output.len() == self.salt.len() => output.copy_from_slice(&self.salt),
-            "vault-nonce" if output.len() == self.nonce.len() => output.copy_from_slice(&self.nonce),
+            "vault-nonce" if output.len() == self.nonce.len() => {
+                output.copy_from_slice(&self.nonce)
+            }
             _ => return Err(VaultError::entropy()),
         }
         Ok(())
@@ -69,8 +73,8 @@ impl EntropyPort for FixedEntropy {
 fn metadata(epoch: u64) -> VaultMetadata {
     VaultMetadata::new(
         [
-            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-            0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd,
+            0xee, 0xff,
         ],
         Asset::Zec,
         Network::ZecTestnet,
@@ -123,13 +127,8 @@ fn rfc9106_argon2id_v19_vector_is_independent() {
         .data(associated);
     let params = builder.build().unwrap();
     let secret = [0x03; 8];
-    let argon2 = Argon2::new_with_secret(
-        &secret,
-        Algorithm::Argon2id,
-        Version::V0x13,
-        params,
-    )
-    .unwrap();
+    let argon2 =
+        Argon2::new_with_secret(&secret, Algorithm::Argon2id, Version::V0x13, params).unwrap();
     let mut output = [0u8; 32];
     argon2
         .hash_password_into(&[0x01; 32], &[0x02; 16], &mut output)
@@ -169,8 +168,9 @@ fn xchacha20poly1305_draft_vector_is_independent() {
         "6675747572652c2073756e73637265656e20776f756c642062652069742e"
     ));
     let cipher = XChaCha20Poly1305::new_from_slice(&key).unwrap();
+    let nonce = XNonce::try_from(nonce.as_slice()).unwrap();
     let tag = cipher
-        .encrypt_in_place_detached(XNonce::from_slice(&nonce), &aad, &mut plaintext)
+        .encrypt_inout_detached(&nonce, &aad, plaintext.as_mut_slice().into())
         .unwrap();
     assert_eq!(
         plaintext,
@@ -201,22 +201,45 @@ fn deterministic_entropy_produces_one_stable_envelope_and_is_fully_openable() {
     let mut passphrase = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
     let mut work = Work::default();
     let mut wipes = Wipes::default();
-    let opened = open_vault_bytes(expected.as_bytes(), &mut passphrase, &mut work, &mut wipes).unwrap();
+    let opened =
+        open_vault_bytes(expected.as_bytes(), &mut passphrase, &mut work, &mut wipes).unwrap();
     assert_eq!(work.kdf_calls, 1);
     opened.expose(|bytes| assert_eq!(bytes, b"CANARY_WAL004_OPAQUE_SECRET"));
 }
 
 #[test]
 fn fresh_entropy_randomizes_both_salt_and_nonce_and_changes_ciphertext() {
-    let mut entropy_a = FixedEntropy { salt: [1; 16], nonce: [2; 24], calls: Vec::new() };
-    let mut entropy_b = FixedEntropy { salt: [3; 16], nonce: [4; 24], calls: Vec::new() };
+    let mut entropy_a = FixedEntropy {
+        salt: [1; 16],
+        nonce: [2; 24],
+        calls: Vec::new(),
+    };
+    let mut entropy_b = FixedEntropy {
+        salt: [3; 16],
+        nonce: [4; 24],
+        calls: Vec::new(),
+    };
     let mut wipes = Wipes::default();
     let mut pass_a = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
     let mut pass_b = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
     let mut plain_a = SecretBytes::new(b"CANARY_WAL004_OPAQUE_SECRET".to_vec()).unwrap();
     let mut plain_b = SecretBytes::new(b"CANARY_WAL004_OPAQUE_SECRET".to_vec()).unwrap();
-    let a = seal_vault(&metadata(8), &mut pass_a, &mut plain_a, &mut entropy_a, &mut wipes).unwrap();
-    let b = seal_vault(&metadata(8), &mut pass_b, &mut plain_b, &mut entropy_b, &mut wipes).unwrap();
+    let a = seal_vault(
+        &metadata(8),
+        &mut pass_a,
+        &mut plain_a,
+        &mut entropy_a,
+        &mut wipes,
+    )
+    .unwrap();
+    let b = seal_vault(
+        &metadata(8),
+        &mut pass_b,
+        &mut plain_b,
+        &mut entropy_b,
+        &mut wipes,
+    )
+    .unwrap();
     assert_ne!(a.salt(), b.salt());
     assert_ne!(a.nonce(), b.nonce());
     assert_ne!(a.ciphertext(), b.ciphertext());
@@ -224,20 +247,44 @@ fn fresh_entropy_randomizes_both_salt_and_nonce_and_changes_ciphertext() {
 
 #[test]
 fn passphrases_are_exact_utf8_bytes_without_unicode_normalization() {
-    let mut entropy_a = FixedEntropy { salt: [5; 16], nonce: [6; 24], calls: Vec::new() };
-    let mut entropy_b = FixedEntropy { salt: [5; 16], nonce: [6; 24], calls: Vec::new() };
+    let mut entropy_a = FixedEntropy {
+        salt: [5; 16],
+        nonce: [6; 24],
+        calls: Vec::new(),
+    };
+    let mut entropy_b = FixedEntropy {
+        salt: [5; 16],
+        nonce: [6; 24],
+        calls: Vec::new(),
+    };
     let mut wipes = Wipes::default();
     let mut composed = SecretBytes::new("synthetic-\u{00e9}".as_bytes().to_vec()).unwrap();
     let mut decomposed = SecretBytes::new("synthetic-e\u{0301}".as_bytes().to_vec()).unwrap();
     let mut plain_a = SecretBytes::new(b"CANARY_WAL004_OPAQUE_SECRET".to_vec()).unwrap();
     let mut plain_b = SecretBytes::new(b"CANARY_WAL004_OPAQUE_SECRET".to_vec()).unwrap();
-    let a = seal_vault(&metadata(8), &mut composed, &mut plain_a, &mut entropy_a, &mut wipes).unwrap();
-    let b = seal_vault(&metadata(8), &mut decomposed, &mut plain_b, &mut entropy_b, &mut wipes).unwrap();
+    let a = seal_vault(
+        &metadata(8),
+        &mut composed,
+        &mut plain_a,
+        &mut entropy_a,
+        &mut wipes,
+    )
+    .unwrap();
+    let b = seal_vault(
+        &metadata(8),
+        &mut decomposed,
+        &mut plain_b,
+        &mut entropy_b,
+        &mut wipes,
+    )
+    .unwrap();
     assert_ne!(a.ciphertext(), b.ciphertext());
     let mut wrong_form = SecretBytes::new("synthetic-e\u{0301}".as_bytes().to_vec()).unwrap();
     let mut work = Work::default();
     assert_eq!(
-        open_vault_bytes(a.as_bytes(), &mut wrong_form, &mut work, &mut wipes).unwrap_err().code(),
+        open_vault_bytes(a.as_bytes(), &mut wrong_form, &mut work, &mut wipes)
+            .unwrap_err()
+            .code(),
         "LOCKED"
     );
 }
@@ -246,12 +293,18 @@ fn passphrases_are_exact_utf8_bytes_without_unicode_normalization() {
 fn authenticated_domain_mutations_all_fail_locked() {
     let original = sealed(9);
     let replacements = [
-        ("00112233445566778899aabbccddeeff", "10112233445566778899aabbccddeeff"),
+        (
+            "00112233445566778899aabbccddeeff",
+            "10112233445566778899aabbccddeeff",
+        ),
         ("\"network\":\"zec-testnet\"", "\"network\":\"zec-regtest\""),
         ("\"epoch\":\"9\"", "\"epoch\":\"10\""),
     ];
     for (from, to) in replacements {
-        let mutated = String::from_utf8(original.clone()).unwrap().replacen(from, to, 1).into_bytes();
+        let mutated = String::from_utf8(original.clone())
+            .unwrap()
+            .replacen(from, to, 1)
+            .into_bytes();
         let mut passphrase = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
         let mut work = Work::default();
         let mut wipes = Wipes::default();
@@ -267,12 +320,17 @@ fn salt_nonce_and_ciphertext_mutations_fail_closed() {
         let mut text = String::from_utf8(original.clone()).unwrap();
         let value_start = text.find(&format!("\"{field}\":\"")).unwrap() + field.len() + 4;
         let byte = text.as_bytes()[value_start];
-        text.replace_range(value_start..value_start + 1, if byte == b'A' { "B" } else { "A" });
+        text.replace_range(
+            value_start..value_start + 1,
+            if byte == b'A' { "B" } else { "A" },
+        );
         let mut passphrase = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
         let mut work = Work::default();
         let mut wipes = Wipes::default();
         assert_eq!(
-            open_vault_bytes(text.as_bytes(), &mut passphrase, &mut work, &mut wipes).unwrap_err().code(),
+            open_vault_bytes(text.as_bytes(), &mut passphrase, &mut work, &mut wipes)
+                .unwrap_err()
+                .code(),
             "LOCKED"
         );
     }
@@ -281,15 +339,25 @@ fn salt_nonce_and_ciphertext_mutations_fail_closed() {
 #[test]
 fn zec_xmr_and_social_domain_substitution_cannot_open() {
     let zec = sealed(12);
-    let xmr = String::from_utf8(zec.clone()).unwrap()
-        .replace("\"asset\":\"ZEC\",\"network\":\"zec-testnet\"", "\"asset\":\"XMR\",\"network\":\"xmr-stagenet\"")
+    let xmr = String::from_utf8(zec.clone())
+        .unwrap()
+        .replace(
+            "\"asset\":\"ZEC\",\"network\":\"zec-testnet\"",
+            "\"asset\":\"XMR\",\"network\":\"xmr-stagenet\"",
+        )
         .into_bytes();
     let mut passphrase = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
     let mut work = Work::default();
     let mut wipes = Wipes::default();
-    assert_eq!(open_vault_bytes(&xmr, &mut passphrase, &mut work, &mut wipes).unwrap_err().code(), "LOCKED");
+    assert_eq!(
+        open_vault_bytes(&xmr, &mut passphrase, &mut work, &mut wipes)
+            .unwrap_err()
+            .code(),
+        "LOCKED"
+    );
 
-    let social = String::from_utf8(zec).unwrap()
+    let social = String::from_utf8(zec)
+        .unwrap()
         .replace("bitbook-wallet-vault", "bitbook-social-identity")
         .into_bytes();
     let mut passphrase = SecretBytes::new(b"synthetic-vault-passphrase".to_vec()).unwrap();
@@ -310,7 +378,8 @@ fn wrong_passphrase_and_corrupt_tag_have_identical_public_failure() {
     let mut wrong_work = Work::default();
     let mut corrupt_work = Work::default();
     let mut wipes = Wipes::default();
-    let wrong_error = open_vault_bytes(&envelope, &mut wrong, &mut wrong_work, &mut wipes).unwrap_err();
+    let wrong_error =
+        open_vault_bytes(&envelope, &mut wrong, &mut wrong_work, &mut wipes).unwrap_err();
     let corrupt_error = open_vault_bytes(
         corrupt.as_bytes(),
         &mut correct,

@@ -1,6 +1,6 @@
 use bitbook_wallet_broker::native::{
-    ActionOrigin, CustodyPort, FileDialogPort, NativeAction, NativeController,
-    NativeError, NativeSurfacePort, PasswordPrompt, RestoreMetadata, SurfaceResult,
+    ActionOrigin, CustodyPort, FileDialogPort, NativeAction, NativeController, NativeError,
+    NativeSurfacePort, PasswordPrompt, RestoreMetadata, SurfaceResult,
 };
 use bitbook_wallet_broker::vault::{SecretBytes, WipeEvent, WipeObserver};
 
@@ -17,7 +17,10 @@ struct Surface {
 }
 
 impl NativeSurfacePort for Surface {
-    fn prompt_password(&mut self, prompt: PasswordPrompt) -> Result<Option<SecretBytes>, NativeError> {
+    fn prompt_password(
+        &mut self,
+        prompt: PasswordPrompt,
+    ) -> Result<Option<SecretBytes>, NativeError> {
         self.prompt = Some(prompt);
         Ok(self.passphrase.take())
     }
@@ -60,10 +63,18 @@ struct Custody {
 }
 
 impl CustodyPort for Custody {
-    fn unlock(&mut self, account_id: &str, passphrase: &mut SecretBytes) -> Result<(), NativeError> {
+    fn unlock(
+        &mut self,
+        account_id: &str,
+        passphrase: &mut SecretBytes,
+    ) -> Result<(), NativeError> {
         self.calls.push(format!("unlock:{account_id}"));
         self.passphrase_lengths.push(passphrase.len());
-        if self.fail_locked { Err(NativeError::locked()) } else { Ok(()) }
+        if self.fail_locked {
+            Err(NativeError::locked())
+        } else {
+            Ok(())
+        }
     }
 
     fn export_encrypted(&mut self, account_id: &str, path: &str) -> Result<(), NativeError> {
@@ -86,7 +97,11 @@ impl CustodyPort for Custody {
         })
     }
 
-    fn commit_restore(&mut self, path: &str, expected: &RestoreMetadata) -> Result<(), NativeError> {
+    fn commit_restore(
+        &mut self,
+        path: &str,
+        expected: &RestoreMetadata,
+    ) -> Result<(), NativeError> {
         self.calls.push(format!("commit:{path}:{}", expected.epoch));
         self.restored = true;
         Ok(())
@@ -108,7 +123,11 @@ fn controller() -> NativeController<Custody, Wipes> {
 
 #[test]
 fn unlock_is_accepted_only_from_native_surface_origin() {
-    for origin in [ActionOrigin::Electron, ActionOrigin::BrokerProtocol, ActionOrigin::Http] {
+    for origin in [
+        ActionOrigin::Electron,
+        ActionOrigin::BrokerProtocol,
+        ActionOrigin::Http,
+    ] {
         let mut controller = controller();
         let mut surface = Surface {
             passphrase: Some(SecretBytes::new(b"synthetic-passphrase".to_vec()).unwrap()),
@@ -117,7 +136,14 @@ fn unlock_is_accepted_only_from_native_surface_origin() {
         let mut dialog = Dialog::default();
         assert_eq!(
             controller
-                .execute(origin, NativeAction::Unlock { account_id: ACCOUNT.to_owned() }, &mut surface, &mut dialog)
+                .execute(
+                    origin,
+                    NativeAction::Unlock {
+                        account_id: ACCOUNT.to_owned()
+                    },
+                    &mut surface,
+                    &mut dialog
+                )
                 .unwrap_err()
                 .code(),
             "UNAUTH"
@@ -128,20 +154,34 @@ fn unlock_is_accepted_only_from_native_surface_origin() {
 
 #[test]
 fn export_and_restore_are_also_rejected_from_every_nonnative_origin() {
-    for origin in [ActionOrigin::Electron, ActionOrigin::BrokerProtocol, ActionOrigin::Http] {
+    for origin in [
+        ActionOrigin::Electron,
+        ActionOrigin::BrokerProtocol,
+        ActionOrigin::Http,
+    ] {
         for action in [
-            NativeAction::Export { account_id: ACCOUNT.to_owned() },
+            NativeAction::Export {
+                account_id: ACCOUNT.to_owned(),
+            },
             NativeAction::Restore,
         ] {
             let mut controller = controller();
             let mut surface = Surface {
-                passphrase: Some(SecretBytes::new(b"synthetic-restore-passphrase".to_vec()).unwrap()),
+                passphrase: Some(
+                    SecretBytes::new(b"synthetic-restore-passphrase".to_vec()).unwrap(),
+                ),
                 confirmed: true,
                 ..Surface::default()
             };
-            let mut dialog = Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+            let mut dialog = Dialog {
+                selected: Some(BACKUP_PATH.to_owned()),
+                ..Dialog::default()
+            };
             assert_eq!(
-                controller.execute(origin, action, &mut surface, &mut dialog).unwrap_err().code(),
+                controller
+                    .execute(origin, action, &mut surface, &mut dialog)
+                    .unwrap_err()
+                    .code(),
                 "UNAUTH"
             );
             assert!(controller.custody().calls.is_empty());
@@ -161,21 +201,32 @@ fn invalid_unlock_and_export_accounts_fail_before_native_authority_moves() {
     ] {
         for export in [false, true] {
             let action = if export {
-                NativeAction::Export { account_id: invalid_account.to_owned() }
+                NativeAction::Export {
+                    account_id: invalid_account.to_owned(),
+                }
             } else {
-                NativeAction::Unlock { account_id: invalid_account.to_owned() }
+                NativeAction::Unlock {
+                    account_id: invalid_account.to_owned(),
+                }
             };
             let mut controller = controller();
             let mut surface = Surface {
                 passphrase: Some(SecretBytes::new(b"synthetic-passphrase".to_vec()).unwrap()),
                 ..Surface::default()
             };
-            let mut dialog =
-                Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+            let mut dialog = Dialog {
+                selected: Some(BACKUP_PATH.to_owned()),
+                ..Dialog::default()
+            };
 
             assert_eq!(
                 controller
-                    .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+                    .execute(
+                        ActionOrigin::NativeSurface,
+                        action,
+                        &mut surface,
+                        &mut dialog
+                    )
                     .unwrap_err()
                     .code(),
                 "SCHEMA"
@@ -205,12 +256,19 @@ fn invalid_passphrase_lengths_wipe_before_unlock_or_restore_custody() {
             let action = if restore {
                 NativeAction::Restore
             } else {
-                NativeAction::Unlock { account_id: ACCOUNT.to_owned() }
+                NativeAction::Unlock {
+                    account_id: ACCOUNT.to_owned(),
+                }
             };
 
             assert_eq!(
                 controller
-                    .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+                    .execute(
+                        ActionOrigin::NativeSurface,
+                        action,
+                        &mut surface,
+                        &mut dialog
+                    )
                     .unwrap_err()
                     .code(),
                 "LOCKED",
@@ -225,9 +283,7 @@ fn invalid_passphrase_lengths_wipe_before_unlock_or_restore_custody() {
                 vec![SurfaceResult::Error("Wallet locked".to_owned())]
             );
             assert!(controller.wipe_observer().0.iter().any(|event| {
-                event.label == "native-passphrase"
-                    && event.length == length
-                    && event.all_zero
+                event.label == "native-passphrase" && event.length == length && event.all_zero
             }));
         }
     }
@@ -248,12 +304,19 @@ fn assert_invalid_utf8_passphrase_rejected(restore: bool) {
     let action = if restore {
         NativeAction::Restore
     } else {
-        NativeAction::Unlock { account_id: ACCOUNT.to_owned() }
+        NativeAction::Unlock {
+            account_id: ACCOUNT.to_owned(),
+        }
     };
 
     assert_eq!(
         controller
-            .execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog)
+            .execute(
+                ActionOrigin::NativeSurface,
+                action,
+                &mut surface,
+                &mut dialog
+            )
             .unwrap_err()
             .code(),
         "LOCKED"
@@ -268,9 +331,7 @@ fn assert_invalid_utf8_passphrase_rejected(restore: bool) {
     assert!(surface.restore.is_none());
     assert!(!surface.results.contains(&SurfaceResult::Success));
     assert!(controller.wipe_observer().0.iter().any(|wipe| {
-        wipe.label == "native-passphrase"
-            && wipe.length == INVALID_UTF8.len()
-            && wipe.all_zero
+        wipe.label == "native-passphrase" && wipe.length == INVALID_UTF8.len() && wipe.all_zero
     }));
 }
 
@@ -295,7 +356,9 @@ fn password_prompt_is_masked_noncopyable_and_bounded() {
     controller
         .execute(
             ActionOrigin::NativeSurface,
-            NativeAction::Unlock { account_id: ACCOUNT.to_owned() },
+            NativeAction::Unlock {
+                account_id: ACCOUNT.to_owned(),
+            },
             &mut surface,
             &mut dialog,
         )
@@ -315,13 +378,24 @@ fn cancel_or_window_close_wipes_passphrase_and_performs_no_partial_action() {
         let mut controller = controller();
         let passphrase = SecretBytes::new(b"CANARY_WAL004_CANCELLED_PASSWORD".to_vec()).unwrap();
         let action = if closed {
-            NativeAction::WindowClosed { pending_passphrase: passphrase }
+            NativeAction::WindowClosed {
+                pending_passphrase: passphrase,
+            }
         } else {
-            NativeAction::UnlockCancelled { pending_passphrase: passphrase }
+            NativeAction::UnlockCancelled {
+                pending_passphrase: passphrase,
+            }
         };
         let mut surface = Surface::default();
         let mut dialog = Dialog::default();
-        controller.execute(ActionOrigin::NativeSurface, action, &mut surface, &mut dialog).unwrap();
+        controller
+            .execute(
+                ActionOrigin::NativeSurface,
+                action,
+                &mut surface,
+                &mut dialog,
+            )
+            .unwrap();
         assert!(controller.custody().calls.is_empty());
         assert!(controller.wipe_observer().0.iter().any(|event| {
             event.label == "native-passphrase" && event.length > 0 && event.all_zero
@@ -333,18 +407,26 @@ fn cancel_or_window_close_wipes_passphrase_and_performs_no_partial_action() {
 fn export_exchanges_only_a_path_with_dialog_and_ciphertext_stays_in_core() {
     let mut controller = controller();
     let mut surface = Surface::default();
-    let mut dialog = Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+    let mut dialog = Dialog {
+        selected: Some(BACKUP_PATH.to_owned()),
+        ..Dialog::default()
+    };
     controller
         .execute(
             ActionOrigin::NativeSurface,
-            NativeAction::Export { account_id: ACCOUNT.to_owned() },
+            NativeAction::Export {
+                account_id: ACCOUNT.to_owned(),
+            },
             &mut surface,
             &mut dialog,
         )
         .unwrap();
     assert_eq!(dialog.save_calls, 1);
     assert_eq!(dialog.open_calls, 0);
-    assert_eq!(controller.custody().calls, vec![format!("export:{ACCOUNT}:{BACKUP_PATH}")]);
+    assert_eq!(
+        controller.custody().calls,
+        vec![format!("export:{ACCOUNT}:{BACKUP_PATH}")]
+    );
     assert!(surface.restore.is_none());
     assert_eq!(surface.results, vec![SurfaceResult::Success]);
 }
@@ -357,14 +439,25 @@ fn restore_authenticates_before_metadata_and_requires_explicit_confirmation() {
         confirmed: true,
         ..Surface::default()
     };
-    let mut dialog = Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+    let mut dialog = Dialog {
+        selected: Some(BACKUP_PATH.to_owned()),
+        ..Dialog::default()
+    };
     controller
-        .execute(ActionOrigin::NativeSurface, NativeAction::Restore, &mut surface, &mut dialog)
+        .execute(
+            ActionOrigin::NativeSurface,
+            NativeAction::Restore,
+            &mut surface,
+            &mut dialog,
+        )
         .unwrap();
-    assert_eq!(controller.custody().calls, vec![
-        format!("inspect:{BACKUP_PATH}"),
-        format!("commit:{BACKUP_PATH}:9"),
-    ]);
+    assert_eq!(
+        controller.custody().calls,
+        vec![
+            format!("inspect:{BACKUP_PATH}"),
+            format!("commit:{BACKUP_PATH}:9"),
+        ]
+    );
     assert_eq!(controller.custody().passphrase_lengths, vec![28]);
     assert!(surface.prompt.is_some());
     assert!(controller.custody().restored);
@@ -379,11 +472,22 @@ fn restore_cancel_never_commits_or_changes_active_state() {
         confirmed: false,
         ..Surface::default()
     };
-    let mut dialog = Dialog { selected: Some(BACKUP_PATH.to_owned()), ..Dialog::default() };
+    let mut dialog = Dialog {
+        selected: Some(BACKUP_PATH.to_owned()),
+        ..Dialog::default()
+    };
     controller
-        .execute(ActionOrigin::NativeSurface, NativeAction::Restore, &mut surface, &mut dialog)
+        .execute(
+            ActionOrigin::NativeSurface,
+            NativeAction::Restore,
+            &mut surface,
+            &mut dialog,
+        )
         .unwrap();
-    assert_eq!(controller.custody().calls, vec![format!("inspect:{BACKUP_PATH}")]);
+    assert_eq!(
+        controller.custody().calls,
+        vec![format!("inspect:{BACKUP_PATH}")]
+    );
     assert!(!controller.custody().restored);
     assert_eq!(surface.results, vec![SurfaceResult::Cancelled]);
 }
@@ -391,7 +495,10 @@ fn restore_cancel_never_commits_or_changes_active_state() {
 #[test]
 fn native_error_text_is_closed_and_secret_free() {
     let mut controller = NativeController::new(
-        Custody { fail_locked: true, ..Custody::default() },
+        Custody {
+            fail_locked: true,
+            ..Custody::default()
+        },
         Wipes::default(),
     );
     let mut surface = Surface {
@@ -399,15 +506,22 @@ fn native_error_text_is_closed_and_secret_free() {
         ..Surface::default()
     };
     let mut dialog = Dialog::default();
-    assert!(controller
-        .execute(
-            ActionOrigin::NativeSurface,
-            NativeAction::Unlock { account_id: ACCOUNT.to_owned() },
-            &mut surface,
-            &mut dialog,
-        )
-        .is_err());
-    assert_eq!(surface.results, vec![SurfaceResult::Error("Wallet locked".to_owned())]);
+    assert!(
+        controller
+            .execute(
+                ActionOrigin::NativeSurface,
+                NativeAction::Unlock {
+                    account_id: ACCOUNT.to_owned()
+                },
+                &mut surface,
+                &mut dialog,
+            )
+            .is_err()
+    );
+    assert_eq!(
+        surface.results,
+        vec![SurfaceResult::Error("Wallet locked".to_owned())]
+    );
     assert!(!format!("{:?}", surface.results).contains("CANARY"));
 }
 
@@ -422,6 +536,9 @@ fn generic_unlock_backup_and_future_payment_confirmation_methods_are_absent() {
         "signer.sign",
         "tx.broadcast",
     ] {
-        assert_eq!(NativeAction::from_method(method).unwrap_err().code(), "SCHEMA");
+        assert_eq!(
+            NativeAction::from_method(method).unwrap_err().code(),
+            "SCHEMA"
+        );
     }
 }

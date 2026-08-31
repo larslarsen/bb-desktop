@@ -7,8 +7,8 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use bitbook_wallet_broker::store::{
-    FULL_DIRECTORY_ROLLBACK_RESIDUAL, EntryInfo, EntryKind, FaultPoint, RestoreCandidate,
-    LinuxStorePort, RestoreContext, RestoreDecision, StoreError, StorePort, VaultStore,
+    EntryInfo, EntryKind, FULL_DIRECTORY_ROLLBACK_RESIDUAL, FaultPoint, LinuxStorePort,
+    RestoreCandidate, RestoreContext, RestoreDecision, StoreError, StorePort, VaultStore,
     evaluate_restore, next_epoch,
 };
 use bitbook_wallet_broker::vault::{EntropyPort, VaultError};
@@ -69,7 +69,14 @@ impl FakePort {
     fn install(&mut self, path: &str, kind: EntryKind, mode: u32, bytes: &[u8]) {
         self.entries.insert(
             path.to_owned(),
-            (EntryInfo { kind, mode, len: bytes.len() as u64 }, bytes.to_vec()),
+            (
+                EntryInfo {
+                    kind,
+                    mode,
+                    len: bytes.len() as u64,
+                },
+                bytes.to_vec(),
+            ),
         );
     }
 }
@@ -121,16 +128,30 @@ impl StorePort for FakePort {
 
     fn write_all(&mut self, path: &str, bytes: &[u8]) -> Result<(), StoreError> {
         self.record(FaultPoint::Write, format!("write:{path}:{}", bytes.len()))?;
-        assert!(!bytes.windows(SECRET_CANARY.len()).any(|part| part == SECRET_CANARY));
-        let entry = self.entries.get_mut(path).ok_or_else(StoreError::not_found)?;
+        assert!(
+            !bytes
+                .windows(SECRET_CANARY.len())
+                .any(|part| part == SECRET_CANARY)
+        );
+        let entry = self
+            .entries
+            .get_mut(path)
+            .ok_or_else(StoreError::not_found)?;
         entry.1 = bytes.to_vec();
         entry.0.len = bytes.len() as u64;
         Ok(())
     }
 
     fn set_permissions(&mut self, path: &str, mode: u32) -> Result<(), StoreError> {
-        self.record(FaultPoint::Permission, format!("permission:{path}:{mode:o}"))?;
-        self.entries.get_mut(path).ok_or_else(StoreError::not_found)?.0.mode = mode;
+        self.record(
+            FaultPoint::Permission,
+            format!("permission:{path}:{mode:o}"),
+        )?;
+        self.entries
+            .get_mut(path)
+            .ok_or_else(StoreError::not_found)?
+            .0
+            .mode = mode;
         Ok(())
     }
 
@@ -140,7 +161,10 @@ impl StorePort for FakePort {
 
     fn replace_atomic(&mut self, staging: &str, active: &str) -> Result<(), StoreError> {
         self.record(FaultPoint::Replace, format!("replace:{staging}:{active}"))?;
-        let staged = self.entries.remove(staging).ok_or_else(StoreError::not_found)?;
+        let staged = self
+            .entries
+            .remove(staging)
+            .ok_or_else(StoreError::not_found)?;
         self.entries.insert(active.to_owned(), staged);
         Ok(())
     }
@@ -158,8 +182,16 @@ fn store(port: FakePort) -> VaultStore<FakePort> {
 fn private_directory_and_active_file_modes_are_exact() {
     let mut store = store(FakePort::default());
     store.initialize().unwrap();
-    store.write_active(ACCOUNT, NEW, &mut Entropy::default()).unwrap();
-    assert!(store.port().calls.iter().any(|call| call == "directory:target/wal004-scratch:700"));
+    store
+        .write_active(ACCOUNT, NEW, &mut Entropy::default())
+        .unwrap();
+    assert!(
+        store
+            .port()
+            .calls
+            .iter()
+            .any(|call| call == "directory:target/wal004-scratch:700")
+    );
     assert!(store.port().calls.iter().any(|call| call.contains(":600")));
     let active = store.port().entries.get(&FakePort::active_path()).unwrap();
     assert_eq!(active.0.mode, 0o600);
@@ -170,10 +202,24 @@ fn private_directory_and_active_file_modes_are_exact() {
 fn write_order_is_exclusive_complete_synced_atomic_and_directory_synced() {
     let mut store = store(FakePort::default());
     store.initialize().unwrap();
-    store.write_active(ACCOUNT, NEW, &mut Entropy::default()).unwrap();
+    store
+        .write_active(ACCOUNT, NEW, &mut Entropy::default())
+        .unwrap();
     let calls = &store.port().calls;
-    let positions = ["create:", "permission:", "write:", "file-sync:", "replace:", "directory-sync:"]
-        .map(|prefix| calls.iter().position(|call| call.starts_with(prefix)).unwrap());
+    let positions = [
+        "create:",
+        "permission:",
+        "write:",
+        "file-sync:",
+        "replace:",
+        "directory-sync:",
+    ]
+    .map(|prefix| {
+        calls
+            .iter()
+            .position(|call| call.starts_with(prefix))
+            .unwrap()
+    });
     assert!(positions.windows(2).all(|pair| pair[0] < pair[1]));
     assert!(calls.last().unwrap().starts_with("release:"));
 }
@@ -187,20 +233,38 @@ fn every_write_fault_reports_failure_and_never_installs_partial_plaintext() {
         FaultPoint::FileSync,
         FaultPoint::Replace,
     ] {
-        let mut port = FakePort { fail: FaultState::armed(point), ..FakePort::default() };
+        let mut port = FakePort {
+            fail: FaultState::armed(point),
+            ..FakePort::default()
+        };
         port.install(&FakePort::active_path(), EntryKind::Regular, 0o600, OLD);
         let mut store = store(port);
         let result = store.write_active(ACCOUNT, NEW, &mut Entropy::default());
         assert!(result.is_err(), "{point:?} incorrectly reported success");
         assert_eq!(
-            store.port().entries.get(&FakePort::active_path()).unwrap().1,
+            store
+                .port()
+                .entries
+                .get(&FakePort::active_path())
+                .unwrap()
+                .1,
             OLD,
             "{point:?} changed the active bytes before replacement"
         );
         assert!(!store.port().held.iter().any(|held| held == ACCOUNT));
-        assert!(store.port().calls.iter().any(|call| call == &format!("release:{ACCOUNT}")));
+        assert!(
+            store
+                .port()
+                .calls
+                .iter()
+                .any(|call| call == &format!("release:{ACCOUNT}"))
+        );
         for (_, bytes) in store.port().entries.values() {
-            assert!(!bytes.windows(SECRET_CANARY.len()).any(|part| part == SECRET_CANARY));
+            assert!(
+                !bytes
+                    .windows(SECRET_CANARY.len())
+                    .any(|part| part == SECRET_CANARY)
+            );
         }
     }
 }
@@ -209,15 +273,38 @@ fn every_write_fault_reports_failure_and_never_installs_partial_plaintext() {
 fn failure_during_recovery_remains_fail_closed_with_recoverable_staging() {
     let staging = format!("{ROOT}/.{ACCOUNT}.0101010101010101.stage");
     let fault = FaultState::armed(FaultPoint::FileSync);
-    let mut port = FakePort { fail: fault.clone(), ..FakePort::default() };
+    let mut port = FakePort {
+        fail: fault.clone(),
+        ..FakePort::default()
+    };
     port.install(&FakePort::active_path(), EntryKind::Regular, 0o600, OLD);
     let mut store = store(port);
-    assert!(store.write_active(ACCOUNT, NEW, &mut Entropy::default()).is_err());
-    assert_eq!(store.port().entries.get(&FakePort::active_path()).unwrap().1, OLD);
+    assert!(
+        store
+            .write_active(ACCOUNT, NEW, &mut Entropy::default())
+            .is_err()
+    );
+    assert_eq!(
+        store
+            .port()
+            .entries
+            .get(&FakePort::active_path())
+            .unwrap()
+            .1,
+        OLD
+    );
     assert_eq!(store.port().entries.get(&staging).unwrap().1, NEW);
     fault.set(FaultPoint::Replace);
     assert!(store.recover_account(ACCOUNT).is_err());
-    assert_eq!(store.port().entries.get(&FakePort::active_path()).unwrap().1, OLD);
+    assert_eq!(
+        store
+            .port()
+            .entries
+            .get(&FakePort::active_path())
+            .unwrap()
+            .1,
+        OLD
+    );
     assert_eq!(store.port().entries.get(&staging).unwrap().1, NEW);
     assert!(!store.port().held.iter().any(|held| held == ACCOUNT));
 }
@@ -230,12 +317,27 @@ fn directory_sync_failure_reports_failure_with_one_complete_active_value() {
     };
     port.install(&FakePort::active_path(), EntryKind::Regular, 0o600, OLD);
     let mut store = store(port);
-    assert!(store.write_active(ACCOUNT, NEW, &mut Entropy::default()).is_err());
-    let active = &store.port().entries.get(&FakePort::active_path()).unwrap().1;
+    assert!(
+        store
+            .write_active(ACCOUNT, NEW, &mut Entropy::default())
+            .is_err()
+    );
+    let active = &store
+        .port()
+        .entries
+        .get(&FakePort::active_path())
+        .unwrap()
+        .1;
     assert!(active.as_slice() == OLD || active.as_slice() == NEW);
     assert!(!active.is_empty());
     assert!(!store.port().held.iter().any(|held| held == ACCOUNT));
-    assert!(store.port().calls.iter().any(|call| call == &format!("release:{ACCOUNT}")));
+    assert!(
+        store
+            .port()
+            .calls
+            .iter()
+            .any(|call| call == &format!("release:{ACCOUNT}"))
+    );
 }
 
 #[test]
@@ -250,8 +352,17 @@ fn reader_rejects_symlink_fifo_directory_device_and_oversize_before_allocation()
         let mut port = FakePort::default();
         port.install(&FakePort::active_path(), kind, 0o600, OLD);
         let mut store = store(port);
-        assert_eq!(store.read_active(ACCOUNT).unwrap_err().code(), "UNAVAILABLE");
-        assert!(!store.port().calls.iter().any(|call| call.starts_with("read:")));
+        assert_eq!(
+            store.read_active(ACCOUNT).unwrap_err().code(),
+            "UNAVAILABLE"
+        );
+        assert!(
+            !store
+                .port()
+                .calls
+                .iter()
+                .any(|call| call.starts_with("read:"))
+        );
     }
     let mut port = FakePort::default();
     port.install(
@@ -262,7 +373,13 @@ fn reader_rejects_symlink_fifo_directory_device_and_oversize_before_allocation()
     );
     let mut store = store(port);
     assert_eq!(store.read_active(ACCOUNT).unwrap_err().code(), "LIMIT");
-    assert!(!store.port().calls.iter().any(|call| call.starts_with("read:")));
+    assert!(
+        !store
+            .port()
+            .calls
+            .iter()
+            .any(|call| call.starts_with("read:"))
+    );
 }
 
 #[test]
@@ -288,7 +405,10 @@ fn staging_collision_is_not_reused_or_truncated() {
     port.install(&collision, EntryKind::Regular, 0o600, OLD);
     let mut store = store(port);
     assert_eq!(
-        store.write_active(ACCOUNT, NEW, &mut Entropy::default()).unwrap_err().code(),
+        store
+            .write_active(ACCOUNT, NEW, &mut Entropy::default())
+            .unwrap_err()
+            .code(),
         "ACCOUNT_BUSY"
     );
     assert_eq!(store.port().entries.get(&collision).unwrap().1, OLD);
@@ -300,12 +420,21 @@ fn concurrent_update_of_one_account_is_busy_but_other_accounts_are_isolated() {
     port.held.push(ACCOUNT.to_owned());
     let mut store = store(port);
     assert_eq!(
-        store.write_active(ACCOUNT, NEW, &mut Entropy::default()).unwrap_err().code(),
+        store
+            .write_active(ACCOUNT, NEW, &mut Entropy::default())
+            .unwrap_err()
+            .code(),
         "ACCOUNT_BUSY"
     );
-    assert!(store
-        .write_active("ffeeddccbbaa99887766554433221100", NEW, &mut Entropy::default())
-        .is_ok());
+    assert!(
+        store
+            .write_active(
+                "ffeeddccbbaa99887766554433221100",
+                NEW,
+                &mut Entropy::default()
+            )
+            .is_ok()
+    );
 }
 
 #[test]
@@ -313,13 +442,29 @@ fn export_is_ciphertext_only_exclusive_and_never_self_overwrites() {
     let mut port = FakePort::default();
     port.install(&FakePort::active_path(), EntryKind::Regular, 0o600, NEW);
     let mut store = store(port);
-    store.export_encrypted(ACCOUNT, "target/wal004-scratch/export.vault").unwrap();
-    assert_eq!(store.port().entries.get("target/wal004-scratch/export.vault").unwrap().1, NEW);
+    store
+        .export_encrypted(ACCOUNT, "target/wal004-scratch/export.vault")
+        .unwrap();
+    assert_eq!(
+        store
+            .port()
+            .entries
+            .get("target/wal004-scratch/export.vault")
+            .unwrap()
+            .1,
+        NEW
+    );
     assert!(!store.port().entries.values().any(|entry| {
-        entry.1.windows(SECRET_CANARY.len()).any(|part| part == SECRET_CANARY)
+        entry
+            .1
+            .windows(SECRET_CANARY.len())
+            .any(|part| part == SECRET_CANARY)
     }));
     assert_eq!(
-        store.export_encrypted(ACCOUNT, &FakePort::active_path()).unwrap_err().code(),
+        store
+            .export_encrypted(ACCOUNT, &FakePort::active_path())
+            .unwrap_err()
+            .code(),
         "SCHEMA"
     );
 }
@@ -349,19 +494,28 @@ fn directory_and_file_permission_mismatch_fail_before_read_or_replace() {
     let mut port = FakePort::default();
     port.install(&FakePort::active_path(), EntryKind::Regular, 0o644, OLD);
     let mut store = store(port);
-    assert_eq!(store.read_active(ACCOUNT).unwrap_err().code(), "UNAVAILABLE");
-    assert!(!store.port().calls.iter().any(|call| call.starts_with("read:")));
+    assert_eq!(
+        store.read_active(ACCOUNT).unwrap_err().code(),
+        "UNAVAILABLE"
+    );
+    assert!(
+        !store
+            .port()
+            .calls
+            .iter()
+            .any(|call| call.starts_with("read:"))
+    );
 }
 
 #[test]
 fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
-    let root = PathBuf::from(format!(
-        "target/wal004-scratch/os-{}",
-        std::process::id()
-    ));
+    let root = PathBuf::from(format!("target/wal004-scratch/os-{}", std::process::id()));
     match fs::symlink_metadata(&root) {
         Err(error) if error.kind() == ErrorKind::NotFound => {}
-        Ok(_) => panic!("refusing to reuse stale WAL-004 OS boundary root: {}", root.display()),
+        Ok(_) => panic!(
+            "refusing to reuse stale WAL-004 OS boundary root: {}",
+            root.display()
+        ),
         Err(error) => panic!("cannot inspect WAL-004 OS boundary root: {error}"),
     }
 
@@ -369,7 +523,9 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
     let symlink_path = root.join(format!("{SECOND_ACCOUNT}.vault"));
     let mut store = VaultStore::new(root.clone(), LinuxStorePort::new()).unwrap();
     store.initialize().unwrap();
-    store.write_active(ACCOUNT, NEW, &mut Entropy::default()).unwrap();
+    store
+        .write_active(ACCOUNT, NEW, &mut Entropy::default())
+        .unwrap();
 
     let directory = fs::symlink_metadata(&root).unwrap();
     assert!(directory.file_type().is_dir());
@@ -381,8 +537,16 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
     assert_eq!(active.permissions().mode() & 0o777, 0o600);
 
     symlink(active_path.file_name().unwrap(), &symlink_path).unwrap();
-    assert!(fs::symlink_metadata(&symlink_path).unwrap().file_type().is_symlink());
-    assert_eq!(store.read_active(SECOND_ACCOUNT).unwrap_err().code(), "UNAVAILABLE");
+    assert!(
+        fs::symlink_metadata(&symlink_path)
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
+    assert_eq!(
+        store.read_active(SECOND_ACCOUNT).unwrap_err().code(),
+        "UNAVAILABLE"
+    );
 
     drop(store);
     let symlink_text = symlink_path.to_str().unwrap();
@@ -392,7 +556,11 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
     let permission_result = direct.set_permissions(symlink_text, 0o644);
     let sync_result = direct.sync_file(symlink_text);
     let target_bytes = fs::read(&active_path).unwrap();
-    let target_mode = fs::symlink_metadata(&active_path).unwrap().permissions().mode() & 0o777;
+    let target_mode = fs::symlink_metadata(&active_path)
+        .unwrap()
+        .permissions()
+        .mode()
+        & 0o777;
     fs::remove_file(&symlink_path).unwrap();
     fs::remove_file(&active_path).unwrap();
     fs::remove_dir(&root).unwrap();
@@ -411,13 +579,13 @@ fn linux_store_enforces_real_modes_regular_files_and_symlink_rejection() {
 
 #[test]
 fn linux_direct_operations_reject_wrong_mode_until_descriptor_repair() {
-    let root = PathBuf::from(format!(
-        "target/wal004-scratch/mode-{}",
-        std::process::id()
-    ));
+    let root = PathBuf::from(format!("target/wal004-scratch/mode-{}", std::process::id()));
     match fs::symlink_metadata(&root) {
         Err(error) if error.kind() == ErrorKind::NotFound => {}
-        Ok(_) => panic!("refusing to reuse stale WAL-004 mode root: {}", root.display()),
+        Ok(_) => panic!(
+            "refusing to reuse stale WAL-004 mode root: {}",
+            root.display()
+        ),
         Err(error) => panic!("cannot inspect WAL-004 mode root: {error}"),
     }
 
@@ -433,8 +601,7 @@ fn linux_direct_operations_reject_wrong_mode_until_descriptor_repair() {
     let write_result = direct.write_all(path_text, OLD);
     let sync_result = direct.sync_file(path_text);
     let bytes_after_rejections = fs::read(&path).unwrap();
-    let mode_after_rejections =
-        fs::symlink_metadata(&path).unwrap().permissions().mode() & 0o777;
+    let mode_after_rejections = fs::symlink_metadata(&path).unwrap().permissions().mode() & 0o777;
     let permission_result = direct.set_permissions(path_text, 0o600);
     let repaired_mode = fs::symlink_metadata(&path).unwrap().permissions().mode() & 0o777;
 
@@ -478,19 +645,36 @@ fn restore_authenticates_before_metadata_or_confirmation_is_released() {
 #[test]
 fn first_restore_and_higher_epoch_each_require_explicit_native_confirmation() {
     let first = RestoreContext::empty(ACCOUNT, "ZEC", "zec-testnet");
-    assert_eq!(evaluate_restore(&first, &candidate(9), false).unwrap(), RestoreDecision::Cancelled);
-    assert_eq!(evaluate_restore(&first, &candidate(9), true).unwrap(), RestoreDecision::Replace);
+    assert_eq!(
+        evaluate_restore(&first, &candidate(9), false).unwrap(),
+        RestoreDecision::Cancelled
+    );
+    assert_eq!(
+        evaluate_restore(&first, &candidate(9), true).unwrap(),
+        RestoreDecision::Replace
+    );
 
     let existing = RestoreContext::authenticated(ACCOUNT, "ZEC", "zec-testnet", 8);
-    assert_eq!(evaluate_restore(&existing, &candidate(9), false).unwrap(), RestoreDecision::Cancelled);
-    assert_eq!(evaluate_restore(&existing, &candidate(9), true).unwrap(), RestoreDecision::Replace);
+    assert_eq!(
+        evaluate_restore(&existing, &candidate(9), false).unwrap(),
+        RestoreDecision::Cancelled
+    );
+    assert_eq!(
+        evaluate_restore(&existing, &candidate(9), true).unwrap(),
+        RestoreDecision::Replace
+    );
 }
 
 #[test]
 fn stale_and_equal_restore_epochs_are_refused_even_when_confirmed() {
     let existing = RestoreContext::authenticated(ACCOUNT, "ZEC", "zec-testnet", 9);
     for epoch in [1, 8, 9] {
-        assert_eq!(evaluate_restore(&existing, &candidate(epoch), true).unwrap_err().code(), "REPLAY");
+        assert_eq!(
+            evaluate_restore(&existing, &candidate(epoch), true)
+                .unwrap_err()
+                .code(),
+            "REPLAY"
+        );
     }
 }
 
@@ -498,14 +682,29 @@ fn stale_and_equal_restore_epochs_are_refused_even_when_confirmed() {
 fn restore_rejects_account_asset_network_mismatch_and_corrupt_current_state() {
     let existing = RestoreContext::authenticated(ACCOUNT, "ZEC", "zec-testnet", 8);
     for changed in [
-        RestoreCandidate { account_id: "ffeeddccbbaa99887766554433221100".to_owned(), ..candidate(9) },
-        RestoreCandidate { asset: "XMR".to_owned(), network: "xmr-stagenet".to_owned(), ..candidate(9) },
-        RestoreCandidate { network: "zec-regtest".to_owned(), ..candidate(9) },
+        RestoreCandidate {
+            account_id: "ffeeddccbbaa99887766554433221100".to_owned(),
+            ..candidate(9)
+        },
+        RestoreCandidate {
+            asset: "XMR".to_owned(),
+            network: "xmr-stagenet".to_owned(),
+            ..candidate(9)
+        },
+        RestoreCandidate {
+            network: "zec-regtest".to_owned(),
+            ..candidate(9)
+        },
     ] {
         assert!(evaluate_restore(&existing, &changed, true).is_err());
     }
     let corrupt = RestoreContext::corrupt(ACCOUNT, "ZEC", "zec-testnet");
-    assert_eq!(evaluate_restore(&corrupt, &candidate(9), true).unwrap_err().code(), "STATE_CORRUPT");
+    assert_eq!(
+        evaluate_restore(&corrupt, &candidate(9), true)
+            .unwrap_err()
+            .code(),
+        "STATE_CORRUPT"
+    );
 }
 
 #[test]
@@ -520,5 +719,8 @@ fn full_directory_rollback_is_explicitly_residual_not_claimed_solved() {
 fn successful_replacement_epoch_is_checked_and_strictly_increments() {
     assert_eq!(next_epoch(None).unwrap(), 1);
     assert_eq!(next_epoch(Some(7)).unwrap(), 8);
-    assert_eq!(next_epoch(Some(u64::MAX)).unwrap_err().code(), "STATE_CORRUPT");
+    assert_eq!(
+        next_epoch(Some(u64::MAX)).unwrap_err().code(),
+        "STATE_CORRUPT"
+    );
 }

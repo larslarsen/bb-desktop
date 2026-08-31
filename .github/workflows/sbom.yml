@@ -20,16 +20,32 @@ jobs:
 
       - run: npm ci
       - run: npm audit --audit-level=low
-      - name: Generate and validate CycloneDX JSON
+      - run: rustup toolchain install 1.98.0 --profile minimal
+      - run: cargo install cargo-cyclonedx --version 0.5.9 --locked
+      - name: Generate and validate npm CycloneDX JSON
         run: |
           set -euo pipefail
           sbom="${RUNNER_TEMP}/bitbook-desktop.cdx.json"
           npx --yes @cyclonedx/cyclonedx-npm@6.0.1 --output-format JSON --output-file "${sbom}"
           node scripts/validate-sbom.js "${sbom}"
-      - name: Upload CycloneDX document
+      - name: Generate and validate Rust CycloneDX JSON
+        run: |
+          set -euo pipefail
+          cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json
+          rust_sbom="${RUNNER_TEMP}/bitbook-wallet-broker.cdx.json"
+          cp wallet-broker/bitbook-wallet-broker.cdx.json "${rust_sbom}"
+          node scripts/validate-rust-sbom.js "${rust_sbom}"
+      - name: Upload npm CycloneDX document
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: bitbook-desktop-cdx
           path: ${{ runner.temp }}/bitbook-desktop.cdx.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload Rust CycloneDX document
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: bitbook-wallet-broker-cdx
+          path: ${{ runner.temp }}/bitbook-wallet-broker.cdx.json
           retention-days: 14
           if-no-files-found: error

@@ -1,7 +1,7 @@
 use bitbook_wallet_broker::vault::{
-    MAX_ENVELOPE_BYTES, MAX_PASSPHRASE_BYTES, MAX_PLAINTEXT_BYTES, Asset, Network,
-    SecretBytes, VaultError, VaultInputs, VaultMetadata, VaultWorkObserver, WipeEvent,
-    WipeObserver, open_vault_bytes, parse_vault,
+    Asset, MAX_ENVELOPE_BYTES, MAX_PASSPHRASE_BYTES, MAX_PLAINTEXT_BYTES, Network, SecretBytes,
+    VaultError, VaultInputs, VaultMetadata, VaultWorkObserver, WipeEvent, WipeObserver,
+    open_vault_bytes, parse_vault,
 };
 
 const FIXTURE: &[u8] = include_bytes!("fixtures/vault-v1.json");
@@ -62,7 +62,10 @@ fn golden_vault_fixture_is_exact_canonical_bytes() {
 fn canonical_fixture_round_trips_byte_for_byte() {
     let envelope = parse(FIXTURE).unwrap();
     assert_eq!(envelope.to_bytes(), FIXTURE);
-    assert_eq!(envelope.metadata().account_id_hex(), "00112233445566778899aabbccddeeff");
+    assert_eq!(
+        envelope.metadata().account_id_hex(),
+        "00112233445566778899aabbccddeeff"
+    );
     assert_eq!(envelope.metadata().asset(), Asset::Zec);
     assert_eq!(envelope.metadata().network(), Network::ZecTestnet);
     assert_eq!(envelope.metadata().epoch(), 7);
@@ -139,7 +142,10 @@ fn every_unknown_duplicate_missing_and_reordered_field_is_rejected() {
         (",\"salt_b64\":\"AAAAAAAAAAAAAAAAAAAAAA\"", ""),
         ("\"algorithm\":\"xchacha20poly1305\",", ""),
         ("\"nonce_b64\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",", ""),
-        (",\"ciphertext_b64\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"", ""),
+        (
+            ",\"ciphertext_b64\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"",
+            "",
+        ),
     ] {
         rows.push(replace_once(FIXTURE, field, replacement));
     }
@@ -151,15 +157,27 @@ fn every_unknown_duplicate_missing_and_reordered_field_is_rejected() {
 #[test]
 fn wrong_json_types_and_noncanonical_epoch_are_rejected() {
     for bytes in [
-        replace_once(FIXTURE, "\"format\":\"bitbook-wallet-vault\"", "\"format\":null"),
+        replace_once(
+            FIXTURE,
+            "\"format\":\"bitbook-wallet-vault\"",
+            "\"format\":null",
+        ),
         replace_once(FIXTURE, "\"version\":1", "\"version\":\"1\""),
-        replace_once(FIXTURE, "\"account_id\":\"00112233445566778899aabbccddeeff\"", "\"account_id\":1"),
+        replace_once(
+            FIXTURE,
+            "\"account_id\":\"00112233445566778899aabbccddeeff\"",
+            "\"account_id\":1",
+        ),
         replace_once(FIXTURE, "\"asset\":\"ZEC\"", "\"asset\":[]"),
         replace_once(FIXTURE, "\"network\":\"zec-testnet\"", "\"network\":false"),
         replace_once(FIXTURE, "\"epoch\":\"7\"", "\"epoch\":7"),
         replace_once(FIXTURE, "\"epoch\":\"7\"", "\"epoch\":\"0\""),
         replace_once(FIXTURE, "\"epoch\":\"7\"", "\"epoch\":\"07\""),
-        replace_once(FIXTURE, "\"epoch\":\"7\"", "\"epoch\":\"18446744073709551616\""),
+        replace_once(
+            FIXTURE,
+            "\"epoch\":\"7\"",
+            "\"epoch\":\"18446744073709551616\"",
+        ),
         replace_once(FIXTURE, "\"m_cost_kib\":65536", "\"m_cost_kib\":\"65536\""),
         replace_once(FIXTURE, "\"version\":19", "\"version\":\"19\""),
         replace_once(FIXTURE, "\"t_cost\":3", "\"t_cost\":\"3\""),
@@ -170,7 +188,11 @@ fn wrong_json_types_and_noncanonical_epoch_are_rejected() {
             "\"algorithm\":\"xchacha20poly1305\"",
             "\"algorithm\":false",
         ),
-        replace_once(FIXTURE, "\"salt_b64\":\"AAAAAAAAAAAAAAAAAAAAAA\"", "\"salt_b64\":[]"),
+        replace_once(
+            FIXTURE,
+            "\"salt_b64\":\"AAAAAAAAAAAAAAAAAAAAAA\"",
+            "\"salt_b64\":[]",
+        ),
         replace_once(
             FIXTURE,
             "\"nonce_b64\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"",
@@ -207,9 +229,21 @@ fn noncanonical_json_bom_crlf_trailing_and_invalid_utf8_are_rejected() {
 #[test]
 fn base64_is_unpadded_unspaced_and_exact_length() {
     for bytes in [
-        replace_once(FIXTURE, "AAAAAAAAAAAAAAAAAAAAAA\"", "AAAAAAAAAAAAAAAAAAAAAA=\""),
-        replace_once(FIXTURE, "AAAAAAAAAAAAAAAAAAAAAA\"", " AAAAAAAAAAAAAAAAAAAAAA\""),
-        replace_once(FIXTURE, "AAAAAAAAAAAAAAAAAAAAAA\"", "AAAAAAAAAAAAAAAAAAAAA\""),
+        replace_once(
+            FIXTURE,
+            "AAAAAAAAAAAAAAAAAAAAAA\"",
+            "AAAAAAAAAAAAAAAAAAAAAA=\"",
+        ),
+        replace_once(
+            FIXTURE,
+            "AAAAAAAAAAAAAAAAAAAAAA\"",
+            " AAAAAAAAAAAAAAAAAAAAAA\"",
+        ),
+        replace_once(
+            FIXTURE,
+            "AAAAAAAAAAAAAAAAAAAAAA\"",
+            "AAAAAAAAAAAAAAAAAAAAA\"",
+        ),
         replace_once(
             FIXTURE,
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"",
@@ -226,7 +260,11 @@ fn asset_network_and_account_id_are_closed() {
     for bytes in [
         replace_once(FIXTURE, "\"asset\":\"ZEC\"", "\"asset\":\"BTC\""),
         replace_once(FIXTURE, "zec-testnet", "xmr-stagenet"),
-        replace_once(FIXTURE, "00112233445566778899aabbccddeeff", "00112233445566778899AABBCCDDEEFF"),
+        replace_once(
+            FIXTURE,
+            "00112233445566778899aabbccddeeff",
+            "00112233445566778899AABBCCDDEEFF",
+        ),
         replace_once(FIXTURE, "00112233445566778899aabbccddeeff", "00112233"),
     ] {
         assert_eq!(parse(&bytes).unwrap_err().code(), "SCHEMA");
@@ -244,7 +282,10 @@ fn every_kdf_and_aead_parameter_downgrade_is_rejected_before_kdf() {
         ("\"t_cost\":3", "\"t_cost\":4"),
         ("\"p_cost\":1", "\"p_cost\":0"),
         ("\"p_cost\":1", "\"p_cost\":8"),
-        ("\"algorithm\":\"xchacha20poly1305\"", "\"algorithm\":\"chacha20poly1305\""),
+        (
+            "\"algorithm\":\"xchacha20poly1305\"",
+            "\"algorithm\":\"chacha20poly1305\"",
+        ),
     ];
     for (from, to) in rows {
         let bytes = replace_once(FIXTURE, from, to);
@@ -292,12 +333,18 @@ fn envelope_limit_is_checked_before_body_allocation() {
     assert_eq!(MAX_ENVELOPE_BYTES, 128 * 1_024);
     let mut exact_work = WorkLog::default();
     let exact = vec![b' '; MAX_ENVELOPE_BYTES];
-    assert_eq!(parse_vault(&exact, &mut exact_work).unwrap_err().code(), "SCHEMA");
+    assert_eq!(
+        parse_vault(&exact, &mut exact_work).unwrap_err().code(),
+        "SCHEMA"
+    );
     assert_eq!(exact_work.allocations, vec![MAX_ENVELOPE_BYTES]);
 
     let mut over_work = WorkLog::default();
     let over = vec![b' '; MAX_ENVELOPE_BYTES + 1];
-    assert_eq!(parse_vault(&over, &mut over_work).unwrap_err().code(), "LIMIT");
+    assert_eq!(
+        parse_vault(&over, &mut over_work).unwrap_err().code(),
+        "LIMIT"
+    );
     assert!(over_work.allocations.is_empty());
     assert_eq!(over_work.kdf_calls, 0);
 }
@@ -306,15 +353,21 @@ fn envelope_limit_is_checked_before_body_allocation() {
 fn metadata_constructor_rejects_zero_epoch_and_crossed_networks() {
     let id = [0x11; 16];
     assert_eq!(
-        VaultMetadata::new(id, Asset::Zec, Network::ZecTestnet, 0).unwrap_err().code(),
+        VaultMetadata::new(id, Asset::Zec, Network::ZecTestnet, 0)
+            .unwrap_err()
+            .code(),
         "SCHEMA"
     );
     assert_eq!(
-        VaultMetadata::new(id, Asset::Zec, Network::XmrStagenet, 1).unwrap_err().code(),
+        VaultMetadata::new(id, Asset::Zec, Network::XmrStagenet, 1)
+            .unwrap_err()
+            .code(),
         "WRONG_NETWORK"
     );
     assert_eq!(
-        VaultMetadata::new(id, Asset::Xmr, Network::ZecRegtest, 1).unwrap_err().code(),
+        VaultMetadata::new(id, Asset::Xmr, Network::ZecRegtest, 1)
+            .unwrap_err()
+            .code(),
         "WRONG_NETWORK"
     );
 }

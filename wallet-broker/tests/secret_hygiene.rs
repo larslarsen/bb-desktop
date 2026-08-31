@@ -2,12 +2,10 @@ use std::cell::RefCell;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::rc::Rc;
 
-use bitbook_wallet_broker::hygiene::{
-    DiagnosticEvent, SecretOperation, run_secret_operation,
-};
+use bitbook_wallet_broker::hygiene::{DiagnosticEvent, SecretOperation, run_secret_operation};
 use bitbook_wallet_broker::vault::{
-    EntropyPort, SecretBytes, VaultError, VaultMetadata, WipeEvent, WipeObserver,
-    Asset, Network, seal_vault,
+    Asset, EntropyPort, Network, SecretBytes, VaultError, VaultMetadata, WipeEvent, WipeObserver,
+    seal_vault,
 };
 
 const SECRET: &[u8] = b"CANARY_WAL004_SECRET_BYTES_7f3a";
@@ -36,16 +34,25 @@ impl EntropyPort for Entropy {
 }
 
 fn assert_all_zero(log: &SharedWipes, label: &str, length: usize) {
-    assert!(log.0.borrow().iter().any(|event| {
-        event.label == label && event.length == length && event.all_zero
-    }), "missing post-zeroize observation for {label}");
+    assert!(
+        log.0
+            .borrow()
+            .iter()
+            .any(|event| { event.label == label && event.length == length && event.all_zero }),
+        "missing post-zeroize observation for {label}"
+    );
 }
 
 #[test]
 fn debug_display_errors_logs_snapshots_and_evidence_omit_secret_canaries() {
     let secret = SecretBytes::new(SECRET.to_vec()).unwrap();
     let error = VaultError::locked();
-    let diagnostic = DiagnosticEvent::new("vault.open", "00112233445566778899aabbccddeeff", error.code()).unwrap();
+    let diagnostic = DiagnosticEvent::new(
+        "vault.open",
+        "00112233445566778899aabbccddeeff",
+        error.code(),
+    )
+    .unwrap();
     let observable = format!(
         "debug={secret:?};display={};error={error:?};diagnostic={diagnostic:?};snapshot={:?};evidence={:?}",
         secret,
@@ -55,7 +62,10 @@ fn debug_display_errors_logs_snapshots_and_evidence_omit_secret_canaries() {
     assert!(!observable.contains("CANARY"));
     assert!(!observable.contains("7f3a"));
     assert!(!observable.contains("4c2d"));
-    assert_eq!(diagnostic.field_names(), ["operation", "account_id", "code"]);
+    assert_eq!(
+        diagnostic.field_names(),
+        ["operation", "account_id", "code"]
+    );
 }
 
 #[test]
@@ -126,11 +136,7 @@ fn diagnostic_fields_reject_malformed_accounts_and_secret_canaries() {
 
     for result in [
         DiagnosticEvent::new("CANARY_WAL004_SECRET_OPERATION", ACCOUNT, "LOCKED"),
-        DiagnosticEvent::new(
-            "vault.open",
-            "CANARY_WAL004_SECRET_ACCOUNT_ID",
-            "LOCKED",
-        ),
+        DiagnosticEvent::new("vault.open", "CANARY_WAL004_SECRET_ACCOUNT_ID", "LOCKED"),
         DiagnosticEvent::new("vault.open", ACCOUNT, "CANARY_WAL004_SECRET_CODE"),
     ] {
         assert_eq!(result.unwrap_err().code(), "SCHEMA");
@@ -192,12 +198,9 @@ fn panic_unwind_zeroizes_secret_before_control_returns() {
 fn observed_secret_drop_reports_post_wipe_state_not_predeclared_success() {
     let log = SharedWipes::default();
     {
-        let _secret = SecretBytes::new_observed(
-            SECRET.to_vec(),
-            "drop-secret",
-            Box::new(log.clone()),
-        )
-        .unwrap();
+        let _secret =
+            SecretBytes::new_observed(SECRET.to_vec(), "drop-secret", Box::new(log.clone()))
+                .unwrap();
     }
     assert_all_zero(&log, "drop-secret", SECRET.len());
 }
@@ -222,13 +225,7 @@ fn replacing_secret_wipes_old_region_before_new_region_is_installed() {
 fn seal_success_wipes_passphrase_argon_hkdf_and_plaintext_regions() {
     let log = SharedWipes::default();
     let mut observer = log.clone();
-    let metadata = VaultMetadata::new(
-        [0x11; 16],
-        Asset::Zec,
-        Network::ZecTestnet,
-        3,
-    )
-    .unwrap();
+    let metadata = VaultMetadata::new([0x11; 16], Asset::Zec, Network::ZecTestnet, 3).unwrap();
     let mut passphrase = SecretBytes::new(PASSPHRASE.to_vec()).unwrap();
     let mut plaintext = SecretBytes::new(SECRET.to_vec()).unwrap();
     let envelope = seal_vault(
@@ -247,14 +244,31 @@ fn seal_success_wipes_passphrase_argon_hkdf_and_plaintext_regions() {
     ] {
         assert_all_zero(&log, label, length);
     }
-    assert!(!envelope.as_bytes().windows(SECRET.len()).any(|part| part == SECRET));
-    assert!(!envelope.as_bytes().windows(PASSPHRASE.len()).any(|part| part == PASSPHRASE));
+    assert!(
+        !envelope
+            .as_bytes()
+            .windows(SECRET.len())
+            .any(|part| part == SECRET)
+    );
+    assert!(
+        !envelope
+            .as_bytes()
+            .windows(PASSPHRASE.len())
+            .any(|part| part == PASSPHRASE)
+    );
 }
 
 #[test]
 fn wipe_observer_exposes_only_label_length_and_boolean() {
     assert_eq!(WipeEvent::field_names(), ["label", "length", "all_zero"]);
-    let event = WipeEvent { label: "synthetic", length: 31, all_zero: true };
-    assert_eq!(format!("{event:?}"), "WipeEvent { label: \"synthetic\", length: 31, all_zero: true }");
+    let event = WipeEvent {
+        label: "synthetic",
+        length: 31,
+        all_zero: true,
+    };
+    assert_eq!(
+        format!("{event:?}"),
+        "WipeEvent { label: \"synthetic\", length: 31, all_zero: true }"
+    );
     assert!(!format!("{event:?}").contains("CANARY"));
 }

@@ -92,9 +92,11 @@ const SOCIAL_PATHS = [
   'package-lock.json',
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   'scripts/build-deb.sh',
   'scripts/build-macos.sh',
   'scripts/build-windows.ps1',
+  'wallet-broker/**',
   '.github/workflows/social.yml',
 ];
 
@@ -104,8 +106,11 @@ const SECURITY_PATHS = [
   'test/**',
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   'package.json',
   'package-lock.json',
+  'wallet-broker/**',
+  'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
   'js/utils/metrics.js',
@@ -179,15 +184,82 @@ const SOCIAL_WORKFLOW_PATHS = [
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
   'wallet-preload.js',
-  ...SOCIAL_PATHS.slice(2),
+  ...SOCIAL_PATHS.slice(2).filter((item) => item !== 'wallet-broker/**'),
 ];
 const SECURITY_WORKFLOW_PATHS = [
   ...SECURITY_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
   'wallet-preload.js',
-  ...SECURITY_PATHS.slice(2),
+  ...SECURITY_PATHS.slice(2).filter((item) => item !== 'wallet-broker/**'),
 ];
+
+const WAL004_MANIFEST = 'wallet-broker/Cargo.toml';
+const WAL004_LOCKFILE = 'wallet-broker/Cargo.lock';
+const WAL004_TOOLCHAIN = '1.98.0';
+const WAL004_PLATFORM = 'linux';
+const WAL004_ROUTINE_TEST =
+  'cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --no-default-features';
+const WAL004_FMT = 'cargo +1.98.0 fmt --manifest-path wallet-broker/Cargo.toml --check';
+const WAL004_CLIPPY =
+  'cargo +1.98.0 clippy --manifest-path wallet-broker/Cargo.toml --locked --all-targets --all-features -- -D warnings';
+const WAL004_NATIVE_CHECK =
+  'cargo +1.98.0 check --manifest-path wallet-broker/Cargo.toml --locked --features native-ui --test native_surface';
+const CARGO_AUDIT_VERSION = '0.22.2';
+const CARGO_DENY_VERSION = '0.20.2';
+const CARGO_CYCLONEDX_VERSION = '0.5.9';
+const WAL004_AUDIT = 'cargo +1.98.0 audit --file wallet-broker/Cargo.lock';
+const WAL004_DENY =
+  'cargo +1.98.0 deny --manifest-path wallet-broker/Cargo.toml --all-features check advisories bans licenses sources';
+const WAL004_SBOM =
+  'cargo +1.98.0 cyclonedx --manifest-path wallet-broker/Cargo.toml --format json';
+const WAL004_REQUIRED_FILES = [WAL004_MANIFEST, WAL004_LOCKFILE, 'wallet-broker/src/lib.rs'];
+const WAL004_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/lib.rs',
+  'wallet-broker/src/vault.rs',
+  'wallet-broker/src/store.rs',
+  'wallet-broker/src/session.rs',
+  'wallet-broker/src/native.rs',
+  'wallet-broker/src/native_ui.rs',
+  'wallet-broker/src/hygiene.rs',
+];
+const WAL004_ALLOWED_LICENSES = [
+  'MIT',
+  'Apache-2.0',
+  'Apache-2.0 WITH LLVM-exception',
+  'BSD-2-Clause',
+  'BSD-3-Clause',
+  'BSL-1.0',
+  'ISC',
+  'Zlib',
+  '0BSD',
+  'Unlicense',
+  'Unicode-3.0',
+  'OFL-1.1',
+  'Ubuntu-font-1.0',
+];
+const WAL004_DIRECT_DEPENDENCIES = {
+  argon2: { version: '=0.6.0', default_features: false, features: ['alloc'], optional: false },
+  base64ct: { version: '=1.8.3', default_features: false, features: ['alloc'], optional: false },
+  chacha20poly1305: { version: '=0.11.0', default_features: false, features: ['alloc'], optional: false },
+  eframe: {
+    version: '=0.36.1', default_features: false,
+    features: ['default_fonts', 'glow', 'wayland', 'x11'], optional: true,
+  },
+  getrandom: { version: '=0.4.3', default_features: false, features: ['std'], optional: false },
+  hkdf: { version: '=0.13.0', default_features: false, features: [], optional: false },
+  rfd: {
+    version: '=0.17.2', default_features: false,
+    features: ['xdg-portal', 'wayland'], optional: true,
+  },
+  secrecy: { version: '=0.10.3', default_features: false, features: [], optional: false },
+  serde: {
+    version: '=1.0.229', default_features: false, features: ['alloc', 'derive'], optional: false,
+  },
+  serde_json: { version: '=1.0.151', default_features: false, features: ['alloc'], optional: false },
+  sha2: { version: '=0.11.0', default_features: false, features: [], optional: false },
+  zeroize: { version: '=1.9.0', default_features: false, features: ['alloc'], optional: false },
+};
 
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
@@ -233,12 +305,15 @@ const SUPPRESSION_PATTERNS = [
 const REQUIRED_FILES = [
   'scripts/security-policy.js',
   'scripts/validate-sbom.js',
+  'scripts/validate-rust-sbom.js',
   '.github/workflows/social.yml',
   '.github/workflows/security.yml',
   '.github/workflows/sbom.yml',
   'test/electronSecurity.node.js',
   'test/securityPolicy.node.js',
   '.gitleaksignore',
+  ...WAL004_REQUIRED_FILES,
+  'deny.toml',
 ];
 
 class Workflow {
@@ -1076,6 +1151,7 @@ function checkSocialWorkflow(text, data) {
 
   for (const command of [
     BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD, BROKER_CI_COMMAND,
+    WAL004_ROUTINE_TEST, WAL004_FMT, WAL004_CLIPPY, WAL004_NATIVE_CHECK,
   ]) {
     if (!routineCommands.includes(command)) {
       throw new PolicyError(`${name} missing command ${command}`);
@@ -1476,6 +1552,10 @@ function checkSecurityWorkflow(text, data) {
   requireCommand(data, ELECTRON_TEST_CMD);
   requireCommand(data, POLICY_TEST_CMD);
   requireCommand(data, POLICY_CHECK_CMD);
+  requireCommand(data, `cargo install cargo-audit --version ${CARGO_AUDIT_VERSION} --locked`);
+  requireCommand(data, `cargo install cargo-deny --version ${CARGO_DENY_VERSION} --locked`);
+  requireCommand(data, WAL004_AUDIT);
+  requireCommand(data, WAL004_DENY);
   checkGitleaks(data, text, name);
   checkNoPackageOrUpload(data, text, name);
   checkNoSuppression(text, data, name);
@@ -1529,21 +1609,43 @@ function checkSbomWorkflow(text, data) {
   if (!runText.includes('node scripts/validate-sbom.js')) {
     throw new PolicyError(`${name} must validate the CycloneDX document with validate-sbom.js`);
   }
+  if (!runText.includes(`cargo install cargo-cyclonedx --version ${CARGO_CYCLONEDX_VERSION} --locked`)) {
+    throw new PolicyError(`${name} must install the exact reviewed cargo-cyclonedx version`);
+  }
+  const hasExactRustSbom = iterSteps(data)
+    .some(([, , step]) => stepRunLines(step).includes(WAL004_SBOM));
+  if (!hasExactRustSbom) {
+    throw new PolicyError(`${name} must generate the exact Rust CycloneDX document`);
+  }
+  if (!runText.includes('node scripts/validate-rust-sbom.js')) {
+    throw new PolicyError(`${name} must validate the Rust CycloneDX document`);
+  }
   const uploads = sbomUploads(data);
-  if (uploads.length !== 1) {
-    throw new PolicyError(`${name} must upload exactly one artifact`);
+  if (uploads.length !== 2) {
+    throw new PolicyError(`${name} must upload exactly two validated SBOM artifacts`);
   }
-  const uploaded = uploads[0].with || {};
-  const uploadPath = uploaded.path;
-  if (typeof uploadPath !== 'string' || !uploadPath.endsWith('.cdx.json')) {
-    throw new PolicyError(`${name} must upload only a .cdx.json JSON document, not ${JSON.stringify(uploadPath)}`);
+  const paths = [];
+  for (const step of uploads) {
+    const uploaded = step.with || {};
+    const uploadPath = uploaded.path;
+    if (typeof uploadPath !== 'string' || !uploadPath.endsWith('.cdx.json')) {
+      throw new PolicyError(`${name} must upload only .cdx.json JSON documents`);
+    }
+    if (uploadPath.includes('*') || uploadPath.includes('?') || uploadPath.includes('\n')) {
+      throw new PolicyError(`${name} upload paths must each name one CycloneDX JSON file`);
+    }
+    const retention = Number.parseInt(String(uploaded['retention-days']), 10);
+    if (retention !== SBOM_RETENTION_DAYS) {
+      throw new PolicyError(`${name} upload retention-days must be ${SBOM_RETENTION_DAYS}`);
+    }
+    paths.push(uploadPath);
   }
-  if (uploadPath.includes('*') || uploadPath.includes('?') || uploadPath.includes('\n')) {
-    throw new PolicyError(`${name} upload path must be a single CycloneDX JSON file`);
-  }
-  const retention = Number.parseInt(String(uploaded['retention-days']), 10);
-  if (retention !== SBOM_RETENTION_DAYS) {
-    throw new PolicyError(`${name} upload retention-days must be ${SBOM_RETENTION_DAYS}`);
+  const expectedPaths = [
+    '${{ runner.temp }}/bitbook-desktop.cdx.json',
+    '${{ runner.temp }}/bitbook-wallet-broker.cdx.json',
+  ];
+  if (JSON.stringify(paths.sort()) !== JSON.stringify(expectedPaths)) {
+    throw new PolicyError(`${name} must upload the exact npm and Rust CycloneDX documents`);
   }
   checkNoPackageOrUploadExceptSbom(data, text, name);
   checkNoSuppression(text, data, name);
@@ -1694,6 +1796,247 @@ function checkWalletBoundarySource(source, rel) {
   }
 }
 
+function checkWalletBrokerManifest(manifestText, options = {}) {
+  if (typeof manifestText !== 'string' || !manifestText.trim()) {
+    throw new PolicyError('wallet Rust manifest is empty');
+  }
+  for (const required of [
+    'name = "bitbook-wallet-broker"',
+    'edition = "2024"',
+    'rust-version = "1.98.0"',
+    'publish = false',
+    'license = "MIT"',
+    'default = []',
+    'native-ui = ["dep:eframe", "dep:rfd"]',
+  ]) {
+    if (!manifestText.split('\n').includes(required)) {
+      throw new PolicyError(`wallet Rust manifest omits exact ${required}`);
+    }
+  }
+  const expectedDependencies = [
+    'argon2 = { version = "=0.6.0", default-features = false, features = ["alloc"] }',
+    'base64ct = { version = "=1.8.3", default-features = false, features = ["alloc"] }',
+    'chacha20poly1305 = { version = "=0.11.0", default-features = false, features = ["alloc"] }',
+    'eframe = { version = "=0.36.1", optional = true, default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }',
+    'getrandom = { version = "=0.4.3", default-features = false, features = ["std"] }',
+    'hkdf = { version = "=0.13.0", default-features = false }',
+    'rfd = { version = "=0.17.2", optional = true, default-features = false, features = ["xdg-portal", "wayland"] }',
+    'secrecy = { version = "=0.10.3", default-features = false }',
+    'serde = { version = "=1.0.229", default-features = false, features = ["alloc", "derive"] }',
+    'serde_json = { version = "=1.0.151", default-features = false, features = ["alloc"] }',
+    'sha2 = { version = "=0.11.0", default-features = false }',
+    'zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }',
+  ];
+  const dependencyBlock = manifestText.split('[dependencies]\n')[1];
+  if (!dependencyBlock) {
+    throw new PolicyError('wallet Rust manifest is missing dependencies');
+  }
+  const actualDependencies = dependencyBlock
+    .split('\n[[test]]')[0]
+    .split('\n')
+    .filter((line) => line.trim());
+  if (JSON.stringify(actualDependencies) !== JSON.stringify(expectedDependencies)) {
+    throw new PolicyError('wallet Rust manifest dependency pins or features differ from review');
+  }
+  const tests = [...manifestText.matchAll(/\[\[test\]\]\nname = "([^"]+)"\npath = "([^"]+)"/g)]
+    .map((match) => `${match[1]}:${match[2]}`);
+  const expectedTests = [
+    'vault_crypto:tests/vault_crypto.rs',
+    'vault_format:tests/vault_format.rs',
+    'vault_store:tests/vault_store.rs',
+    'vault_session:tests/vault_session.rs',
+    'native_surface:tests/native_surface.rs',
+    'secret_hygiene:tests/secret_hygiene.rs',
+  ];
+  if (JSON.stringify(tests) !== JSON.stringify(expectedTests)) {
+    throw new PolicyError('wallet Rust manifest integration-test targets differ from review');
+  }
+  if (options.requireLibrary && !manifestText.includes('license = "MIT"')) {
+    throw new PolicyError('wallet Rust production manifest is incomplete');
+  }
+  if (/\bgit\s*=|\*"|reqwest|tokio|keyring|zcash|monero|openssl/i.test(manifestText)) {
+    throw new PolicyError('wallet Rust manifest contains forbidden dependency authority');
+  }
+}
+
+function checkRustWalletSourceInventory(actual) {
+  if (!Array.isArray(actual)) {
+    throw new PolicyError('wallet Rust source inventory must be an array');
+  }
+  if (actual.some((rel) => typeof rel !== 'string' || !rel)) {
+    throw new PolicyError('wallet Rust source inventory contains a malformed path');
+  }
+  if (new Set(actual).size !== actual.length) {
+    throw new PolicyError('wallet Rust source inventory contains a duplicate path');
+  }
+  if (actual.length !== WAL004_RUST_SOURCE_PATHS.length) {
+    throw new PolicyError('wallet Rust source inventory is missing or extra');
+  }
+  const reviewed = new Set(WAL004_RUST_SOURCE_PATHS);
+  if (actual.some((rel) => !reviewed.has(rel))) {
+    throw new PolicyError('wallet Rust source inventory is missing or extra');
+  }
+}
+
+function checkRustWalletSource(source, rel) {
+  if (typeof source !== 'string' || !source.trim()) {
+    throw new PolicyError(`wallet Rust source ${rel} is empty`);
+  }
+  const screened = source.replace(/#!\[forbid\(unsafe_code\)\]/g, '');
+  const forbidden = [
+    [/\bunsafe\b/, 'unsafe'],
+    [/extern\s+"C"/, 'FFI'],
+    [/std::(?:net|os::unix::net)|TcpListener|TcpStream|UnixListener|UnixStream/, 'network listener'],
+    [/\b(?:reqwest|tokio|keyring|zcash_client_backend|monero)\b/, 'unreviewed authority'],
+    [/std::env::temp_dir\s*\(/, 'temporary-directory authority'],
+    [/\bCommand::new\s*\(/, 'process authority'],
+    [/\b(?:fetch|WebSocket)\s*\(/, 'network authority'],
+  ];
+  for (const [pattern, label] of forbidden) {
+    if (pattern.test(screened)) {
+      throw new PolicyError(`wallet Rust source ${rel} contains forbidden ${label}`);
+    }
+  }
+  if (rel === 'wallet-broker/src/vault.rs') {
+    for (const primitive of [
+      'Base64Unpadded',
+      'Encoding',
+      'SecretSlice',
+      'ExposeSecret',
+      'ExposeSecretMut',
+    ]) {
+      if (!new RegExp(`\\b${primitive}\\b`).test(source)) {
+        throw new PolicyError(`wallet Rust vault omits reviewed ${primitive} primitive`);
+      }
+    }
+    if (/\b(?:encode_base64|decode_base64)\b/.test(source)) {
+      throw new PolicyError('wallet Rust vault contains a handwritten Base64 helper');
+    }
+  }
+  if (rel === 'wallet-broker/src/native_ui.rs' && /\bto_string_lossy\b/.test(source)) {
+    throw new PolicyError('wallet native path conversion must be exact UTF-8');
+  }
+}
+
+function parseWalletBrokerDenyPolicy(text) {
+  if (typeof text !== 'string' || !text.trim()) {
+    throw new PolicyError('wallet cargo-deny policy must be nonempty text');
+  }
+  const sections = Object.create(null);
+  let section = null;
+  let pending = null;
+
+  function parseValue(raw) {
+    const value = raw.trim();
+    try {
+      if (value.startsWith('[') && value.endsWith(']')) {
+        return JSON.parse(value.replace(/,\s*]$/, ']'));
+      }
+      if (/^"(?:[^"\\]|\\.)*"$/.test(value)) {
+        return JSON.parse(value);
+      }
+      if (/^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value)) {
+        return Number(value);
+      }
+    } catch (_error) {
+      throw new PolicyError('wallet cargo-deny policy contains a malformed value');
+    }
+    throw new PolicyError('wallet cargo-deny policy contains an unsupported value');
+  }
+
+  function assign(key, raw) {
+    if (!section) {
+      throw new PolicyError('wallet cargo-deny policy contains a key outside a section');
+    }
+    if (Object.prototype.hasOwnProperty.call(sections[section], key)) {
+      throw new PolicyError(`wallet cargo-deny policy duplicates ${section}.${key}`);
+    }
+    sections[section][key] = parseValue(raw);
+  }
+
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (pending) {
+      pending.value += `\n${line}`;
+      if (line.endsWith(']')) {
+        assign(pending.key, pending.value);
+        pending = null;
+      }
+      continue;
+    }
+    if (!line || line.startsWith('#')) {
+      continue;
+    }
+    const sectionMatch = line.match(/^\[([a-z-]+)]$/);
+    if (sectionMatch) {
+      section = sectionMatch[1];
+      if (Object.prototype.hasOwnProperty.call(sections, section)) {
+        throw new PolicyError(`wallet cargo-deny policy duplicates [${section}]`);
+      }
+      sections[section] = Object.create(null);
+      continue;
+    }
+    const keyMatch = line.match(/^([a-z-]+)\s*=\s*(.+)$/);
+    if (!keyMatch) {
+      throw new PolicyError('wallet cargo-deny policy contains malformed syntax');
+    }
+    const [, key, value] = keyMatch;
+    if (value.startsWith('[') && !value.endsWith(']')) {
+      pending = { key, value };
+    } else {
+      assign(key, value);
+    }
+  }
+  if (pending) {
+    throw new PolicyError('wallet cargo-deny policy contains an unterminated array');
+  }
+  return sections;
+}
+
+function checkWalletBrokerDenyPolicy(text) {
+  const sections = parseWalletBrokerDenyPolicy(text);
+  const expectedKeys = {
+    advisories: ['version', 'yanked', 'ignore'],
+    licenses: ['version', 'confidence-threshold', 'allow', 'exceptions'],
+    bans: ['multiple-versions', 'wildcards', 'highlight', 'allow', 'deny', 'skip', 'skip-tree'],
+    sources: ['unknown-registry', 'unknown-git', 'allow-registry', 'allow-git'],
+  };
+  if (!sameSet(Object.keys(sections), Object.keys(expectedKeys))) {
+    throw new PolicyError('wallet cargo-deny policy sections differ from review');
+  }
+  for (const [name, keys] of Object.entries(expectedKeys)) {
+    if (!sameSet(Object.keys(sections[name]), keys)) {
+      throw new PolicyError(`wallet cargo-deny [${name}] contains an unknown or missing bypass key`);
+    }
+  }
+
+  const advisories = sections.advisories;
+  if (advisories.version !== 2 || advisories.yanked !== 'deny' ||
+      JSON.stringify(advisories.ignore) !== '[]') {
+    throw new PolicyError('wallet cargo-deny advisories must deny yanked crates with empty ignore');
+  }
+  const licenses = sections.licenses;
+  if (licenses.version !== 2 || licenses['confidence-threshold'] !== 0.93 ||
+      JSON.stringify(licenses.allow) !== JSON.stringify(WAL004_ALLOWED_LICENSES) ||
+      JSON.stringify(licenses.exceptions) !== '[]') {
+    throw new PolicyError('wallet cargo-deny licenses differ from the exact reviewed policy');
+  }
+  const bans = sections.bans;
+  if (bans['multiple-versions'] !== 'warn' || bans.wildcards !== 'deny' ||
+      bans.highlight !== 'all' || JSON.stringify(bans.allow) !== '[]' ||
+      JSON.stringify(bans.deny) !== '[]' || JSON.stringify(bans.skip) !== '[]' ||
+      JSON.stringify(bans['skip-tree']) !== '[]') {
+    throw new PolicyError('wallet cargo-deny bans contain a duplicate, wildcard, or skip bypass');
+  }
+  const sources = sections.sources;
+  if (sources['unknown-registry'] !== 'deny' || sources['unknown-git'] !== 'deny' ||
+      JSON.stringify(sources['allow-registry']) !==
+        JSON.stringify(['https://github.com/rust-lang/crates.io-index']) ||
+      JSON.stringify(sources['allow-git']) !== '[]') {
+    throw new PolicyError('wallet cargo-deny sources contain an unreviewed registry or git source');
+  }
+}
+
 function checkPackageJson(packageText) {
   let pkg;
   try {
@@ -1740,6 +2083,9 @@ function checkPackageJson(packageText) {
       throw new PolicyError(`package.json wallet broker build syntax omits ${command}`);
     }
   }
+  if (!buildCommands.includes('node --check scripts/validate-rust-sbom.js')) {
+    throw new PolicyError('package.json build syntax omits the Rust SBOM validator');
+  }
   if (!pkg.scripts.start || !pkg.scripts.start.includes('--no-sandbox')) {
     throw new PolicyError('package.json must preserve the labeled dev-only --no-sandbox start workaround');
   }
@@ -1768,6 +2114,21 @@ function checkRepository(root) {
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkWalletBoundarySource(fs.readFileSync(sourcePath, 'utf8'), rel);
   }
+  checkWalletBrokerManifest(fs.readFileSync(path.join(root, WAL004_MANIFEST), 'utf8'), {
+    requireLibrary: true,
+    requireLockfile: true,
+  });
+  const rustSourceDirectory = path.join(root, 'wallet-broker', 'src');
+  const actualRustSources = fs.readdirSync(rustSourceDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.rs'))
+    .map((entry) => `wallet-broker/src/${entry.name}`);
+  checkRustWalletSourceInventory(actualRustSources);
+  for (const rel of WAL004_RUST_SOURCE_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkRustWalletSource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
+  checkWalletBrokerDenyPolicy(fs.readFileSync(path.join(root, 'deny.toml'), 'utf8'));
   const social = loadWorkflow(path.join(root, '.github/workflows/social.yml'));
   const security = loadWorkflow(path.join(root, '.github/workflows/security.yml'));
   const sbom = loadWorkflow(path.join(root, '.github/workflows/sbom.yml'));
@@ -1829,6 +2190,22 @@ module.exports = {
   BROKER_IMPORT_ALLOWLISTS,
   PRELOAD_INVOKE_CHANNELS,
   PRELOAD_SUBSCRIBE_CHANNEL,
+  WAL004_TOOLCHAIN,
+  WAL004_PLATFORM,
+  WAL004_ROUTINE_TEST,
+  WAL004_FMT,
+  WAL004_CLIPPY,
+  WAL004_NATIVE_CHECK,
+  CARGO_AUDIT_VERSION,
+  CARGO_DENY_VERSION,
+  CARGO_CYCLONEDX_VERSION,
+  WAL004_AUDIT,
+  WAL004_DENY,
+  WAL004_SBOM,
+  WAL004_REQUIRED_FILES,
+  WAL004_RUST_SOURCE_PATHS,
+  WAL004_ALLOWED_LICENSES,
+  WAL004_DIRECT_DEPENDENCIES,
   parseYaml,
   loadWorkflow,
   eventTriggers,
@@ -1843,6 +2220,10 @@ module.exports = {
   checkPackageJson,
   checkWalletContractSource,
   checkWalletBoundarySource,
+  checkWalletBrokerManifest,
+  checkRustWalletSourceInventory,
+  checkRustWalletSource,
+  checkWalletBrokerDenyPolicy,
   checkRepository,
   checkGitleaksRatchetBytes,
   checkInheritedLoaderNeutralization,
