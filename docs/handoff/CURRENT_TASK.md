@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY GATE INTEGRATED — ADDRESS SOURCE REVIEW REQUIRED
+State: SUPPORT-DEPENDENCY EVIDENCE CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_EVIDENCE_CORRECTION_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_EVIDENCE_CORRECTION_01.md)
+
+Support-dependency integrated-gate review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-02.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-02.md)
+
+Completed support-dependency gate resume:
 [CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_RESUME_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_GATE_RESUME_01.md)
 
 Support-dependency gate stop review:
@@ -231,6 +237,11 @@ but did not refresh the root lock dependency list, so Luna stopped before furthe
 The resume substitutes one offline, unlocked `vault_crypto` check as the sole lock
 resolution step, then retains the exact lock-diff/feature/11-test requirements. No source
 repair or ZEC production is authorized.
+
+The resumed lock/feature/custody gate passed and integrated at `195a28fa`. Its evidence
+incorrectly says no policy changed even though the accepted manifest checker was
+integrated. Luna is authorized only to correct that evidence sentence/current state.
+ZEC source remains frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
