@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: PRODUCTION SOURCE ACCEPTED — GREEN/FALSIFICATION INTEGRATION AUTHORIZED
+Status: GREEN RUN 01 BLOCKED — ONE-FILE PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
