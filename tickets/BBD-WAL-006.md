@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: PHASE-C POLICY TEST ACCEPTED — FOCUSED RED AUTHORIZED
+Status: PHASE-C ADDRESS PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -315,13 +315,13 @@ The deterministic ordering correction is accepted at SHA-256
 only the focused Node expected-red handoff. Production and policy implementation remain
 frozen until XHigh accepts its evidence.
 
-### Phase C1 — address production source (future, separate handoff)
+### Phase C1 — address production source (authorized now)
 
 The exact complete bounded production inventory is `wallet-broker/src/zec.rs` plus
 `wallet-broker/src/zec/{address,fixture,prepare,scan,store,test_support}.rs`, with
 `wallet-broker/src/lib.rs` limited to exposing `pub mod zec;`. The first production
-slice will be the address target and only its real fixture/store foundation. A separate
-handoff will enumerate that slice after XHigh accepts the Phase-C0 test hash and red.
+slice is the address target and only its real fixture/store foundation, under
+`docs/handoff/CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_01.md`.
 The test actor may not pre-create stubs, mocks, `compile_error!`, ignored tests,
 conditional skips, or test-only alternate production.
 

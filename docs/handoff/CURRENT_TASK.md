@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C POLICY EXPECTED RED RECORDED — REVIEW REQUIRED
+State: PHASE-C ADDRESS PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -10,12 +10,21 @@ Accepted correction actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `accac4407041f14079211a1e9eeb7047d862922a`
+Source baseline: `c660549724ba5dcd30cb9f3b68909d1383d96b48`
 
 Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_01.md)
+
+Accepted Phase-C policy expected-red review:
+[BBD-WAL-006-PHASE-C-POLICY-RED-REVIEW-01.md](../testing/BBD-WAL-006-PHASE-C-POLICY-RED-REVIEW-01.md)
+
+Phase-C policy expected-red evidence:
+[BBD-WAL-006-PHASE-C-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-006-PHASE-C-POLICY-EXPECTED-RED-01.md)
+
+Completed Phase-C policy-red handoff:
 [CODEX_LUNA_BBD_WAL_006_PHASE_C_POLICY_RED_01.md](CODEX_LUNA_BBD_WAL_006_PHASE_C_POLICY_RED_01.md)
 
 Accepted Phase-C policy-test source review:
@@ -154,17 +163,16 @@ red contained only the absent production `zec` module, classified as `E0433` and
 the reviewer accepts the result without rerun. The fixture and evidence are integrated
 at `accac440`; the tracked worktree/index are clean and `HEAD == origin/master` there.
 
-The committed Node policy test still requires an empty ZEC production inventory because
-that was the correct Phase-A contract. Sol's corrected one-file Phase-C transition is
-accepted at 2,401 lines and SHA-256
+The Phase-C Node policy transition is accepted and integrated at 2,401 lines and SHA-256
 `19b7948bfa2c7f9b29426133bdda1630abfade5f1c438c7367e5c6dacd32688b`.
-Luna is authorized only to capture the focused Node expected red and integrate that test
-with evidence. No ZEC production source or policy implementation is authorized. The
-first later production slice will be the complete `zec_address` vertical with its real
-storage and fixture foundation.
+Its focused expected red is accepted at integration `c6605497`. Sol is authorized to
+author only the complete `zec_address` vertical and its real storage/fixture foundation
+under the active handoff. Scan, preparation, handle hygiene, policy implementation,
+source integration, and every acceptance command remain unauthorized.
 
-No ZEC production source or policy implementation is authorized. The sole production
-exception remains the accepted integrated `vault.rs` AEAD API compatibility edit.
+No ZEC production beyond the exact address-source paths is authorized. Policy
+implementation remains frozen. The prior production exception remains the accepted
+integrated `vault.rs` AEAD API compatibility edit.
 No broader tests,
 falsification, live endpoint, mainnet, signing, proving, extraction, broadcast, hardware,
 Electron, package, SBOM, or other-repository work is authorized in this phase.
