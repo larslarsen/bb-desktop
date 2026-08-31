@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: AEAD TEST SOURCE ACCEPTED — FOCUSED EXPECTED RED AUTHORIZED
+State: AEAD PIN CORRECTION EXPECTED RED RECORDED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -83,6 +83,9 @@ wallet work.
 
 Dependency correction expected-red evidence:
 [BBD-WAL-006-DEPENDENCY-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-DEPENDENCY-CORRECTION-EXPECTED-RED-01.md)
+
+AEAD correction expected-red evidence:
+[BBD-WAL-006-AEAD-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-AEAD-CORRECTION-EXPECTED-RED-01.md)
 
 Argon2 correction expected-red evidence:
 [BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md](../testing/BBD-WAL-006-ARGON2-CORRECTION-EXPECTED-RED-01.md)
