@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: FIXTURE REORG FORMAT GATE REJECTED — MECHANICAL CORRECTION AUTHORIZED
+State: FIXTURE REORG FORMAT CORRECTION ACCEPTED — FIXTURE/RED RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_006_FIXTURE_REORG_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_FIXTURE_REORG_FORMAT_CORRECTION_01.md)
+[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_06.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_06.md)
+
+Fixture reorg format-correction review:
+[BBD-WAL-006-FIXTURE-REORG-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-REORG-FORMAT-CORRECTION-REVIEW-01.md)
 
 Fixture reorg format review:
 [BBD-WAL-006-FIXTURE-REORG-FORMAT-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-REORG-FORMAT-REVIEW-01.md)
@@ -118,8 +121,11 @@ supply-chain inventory is complete at `7ee9eb4e` and reviewer-accepted. The firs
 run exposed a test-only misuse of upstream wallet rewind before scan; no fixture/evidence
 was created. Sol's direct parent-state reorg correction is reviewer-accepted at 928 lines
 and SHA-256 `4b1efec59f81761e2c713587c0a4f3e7b8c545f7b85cc35c90949c5dedbca4bc`.
-The formatter found one mechanical wrap before execution. Sol may apply only that exact
-wrap under the active handoff. All execution and ZEC production remain frozen.
+The formatter found one mechanical wrap before execution; Sol's exact correction is
+reviewer-accepted at SHA-256
+`40cc2b56132b42a765c86482e9915b0422adc0154c1e2edcfda4623760ec5d09`.
+Luna may run only the formatter and fixture/expected-red resume. ZEC production remains
+frozen.
 
 No ZEC production source or policy implementation is authorized. The sole production
 exception is the accepted `vault.rs` AEAD API compatibility edit in the active gate.
