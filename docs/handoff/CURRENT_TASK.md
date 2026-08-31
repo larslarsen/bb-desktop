@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: DEPENDENCY PIN EXPECTED RED ACCEPTED — MANIFEST/POLICY CORRECTION AUTHORIZED
+State: DEPENDENCY MANIFEST/POLICY SOURCE ACCEPTED — RESOLUTION GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_006_DEPENDENCY_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_DEPENDENCY_PRODUCTION_CORRECTION_01.md)
+[CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_01.md](CODEX_LUNA_BBD_WAL_006_DEPENDENCY_RESOLUTION_GATE_01.md)
+
+Dependency production-source review:
+[BBD-WAL-006-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md)
 
 Dependency expected-red review:
 [BBD-WAL-006-DEPENDENCY-TEST-RED-REVIEW-01.md](../testing/BBD-WAL-006-DEPENDENCY-TEST-RED-REVIEW-01.md)
@@ -44,15 +47,13 @@ lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
 `hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
 accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
 
-The corrected test is committed at 2,374 lines and SHA-256
-`f4f6defd5d55212c480a7a1a87d37edea85786b6125cad29467ae5e1f3480ee4`, with all 73
-cases retained. Luna's focused run failed exactly at the frozen old production map
-before manifest validation or mutation; reviewer acceptance is recorded at the link
-above. Sol may now edit only the two direct manifest pins and their four matching
-production-policy literals under the active handoff. Test source, Rust source/tests,
-lockfile, fixtures, execution, evidence, integration, and Git remain frozen. The Phase-B
-fixture resume remains suspended until reviewer acceptance of this source correction and
-a separate Luna lock-resolution/custody-vector gate.
+The corrected test is committed with all 73 cases retained, and its expected red is
+accepted. Sol changed exactly the authorized two manifest version literals and four
+matching production-policy literals; reviewer-accepted hashes are recorded above. Luna
+may now prove policy progression, resolve and inventory the graph, run the complete
+11-test existing custody crypto target, and integrate only the correction/lock/evidence
+paths under the active handoff. The six Rust tests and fixture paths remain frozen.
+Phase-B fixture generation remains suspended until XHigh reviews this gate.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a
