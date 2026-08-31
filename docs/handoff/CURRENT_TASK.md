@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-A FORMAT CORRECTION ACCEPTED — PHASE-B RESUME AUTHORIZED
+State: DEPENDENCY RESOLUTION BLOCKED — TEST-FIRST PIN CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,7 +19,10 @@ Format-correction review:
 [BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-FORMAT-CORRECTION-REVIEW-01.md)
 
 Active handoff:
-[CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_01.md](CODEX_LUNA_BBD_WAL_006_FIXTURE_RED_RESUME_01.md)
+[CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_DEPENDENCY_TEST_CORRECTION_01.md)
+
+Dependency-resolution review:
+[BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-01.md](../testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-01.md)
 
 Architecture:
 [BBD-WAL-006-UPSTREAM-REVIEW.md](../architecture/BBD-WAL-006-UPSTREAM-REVIEW.md)
@@ -29,11 +32,18 @@ Ticket: [BBD-WAL-006.md](../../tickets/BBD-WAL-006.md)
 BBD-WAL-004 remains complete and reviewer-accepted at `e8894a44`. BBGO-PAY-001 remains
 complete in `../bb-go` at production `6bbb0629` and final evidence `801f5d55`.
 
-The exact eight uncommitted Phase-A test/manifest paths passed semantic source review.
-The first authorized `cargo fmt --check` exited 1; Luna captured its complete diff and Sol
-applied only those mechanical changes without formatter execution. XHigh accepted the
-new hashes. Luna must first prove the formatter gate is now clean, then may resume the
-original lock-resolution, fixture, expected-red, evidence, and integration handoff.
+The exact eight uncommitted Phase-A test/manifest paths passed semantic source review and
+the corrected formatter gate exited 0. The next lock-resolution command stopped before
+lock mutation: Zcash's exact `bip32 0.6.0-pre.1` requires prerelease
+`hmac 0.13.0-pre.4` and `sha2 0.11.0-pre.4`, which Cargo cannot resolve beside the
+accepted stable WAL-004 `hkdf 0.13.0`/`sha2 0.11.0` graph.
+
+Sol is authorized to change only the Node test-side WAL-004 dependency expectation and
+add four exact, non-vacuous pin mutations under the active handoff. Manifest, production
+policy, Rust source/tests, lockfile, fixtures, execution, evidence, integration, and Git
+remain frozen. Luna's Phase-B resume handoff is suspended until the correction test is
+reviewed, run red, integrated, followed by a separately authorized manifest/policy
+correction and exact custody-vector gate.
 
 No production source or policy implementation is authorized. XHigh must accept the
 resolved graph, fixture bytes/provenance, and exact expected-red evidence before a

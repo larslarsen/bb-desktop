@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: TEST SOURCE AUTHORIZED
+Status: DEPENDENCY-RESOLUTION TEST CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -264,11 +264,17 @@ Sol may create or edit exactly:
 - `test/securityPolicy.node.js`
 
 The existing lockfile is read-only to Sol. The manifest adds exact dependency declarations
-and explicit test targets; it does not change package identity, Rust version, custody
-dependencies, or native UI features. The fixture builder may refer to future generated
-paths, but Sol does not generate or commit fixture output.
+and explicit test targets; it does not change package identity, Rust version, or native
+UI features. Lock resolution proved that the accepted WAL-004 `hkdf = 0.13.0` and
+`sha2 = 0.11.0` custody pins cannot coexist with the exact prerelease HMAC/SHA-2 lines
+required by the fixed Zcash graph. The separately reviewed, test-first correction may
+move only those two direct custody dependencies to exact, defaults-off stable
+`hkdf = 0.12.4` and `sha2 = 0.10.9`; the existing RFC 5869 and deterministic envelope
+vectors must remain byte-exact. See
+`docs/testing/BBD-WAL-006-DEPENDENCY-RESOLUTION-REVIEW-01.md`. The fixture builder may
+refer to future generated paths, but Sol does not generate or commit fixture output.
 
-No production source, existing WAL-004 test, fixture output, `Cargo.lock`, `deny.toml`,
+No production source, existing WAL-004 Rust test, fixture output, `Cargo.lock`, `deny.toml`,
 workflow, package file, Electron/Node production, policy implementation, evidence,
 documentation, scratch data, execution, install, dependency resolution, network, Git,
 GitHub, cleanup, wallet/node/device, or unlisted path is authorized for Sol.
