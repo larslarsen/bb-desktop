@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SUPPORT-DEPENDENCY EVIDENCE CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
+Status: PHASE-C ADDRESS PRODUCTION SOURCE REAUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -351,6 +351,10 @@ that ineffective resolution command. ZEC Rust production remains frozen.
 The resumed gate passed and integrated at `195a28fa`; one evidence sentence incorrectly
 claims no policy changed. Luna may correct only that wording under
 `docs/handoff/CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_EVIDENCE_CORRECTION_01.md`.
+
+The correction is integrated and the support gate is fully accepted at `8af5db0b`.
+Sol may resume only the address source under
+`docs/handoff/CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_RESUME_01.md`.
 
 ### Phase C2 — address production source (future, separate handoff)
 

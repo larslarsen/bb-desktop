@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY EVIDENCE CORRECTED — REVIEW REQUIRED
+State: PHASE-C ADDRESS PRODUCTION SOURCE REAUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -10,12 +10,18 @@ Accepted correction actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `c660549724ba5dcd30cb9f3b68909d1383d96b48`
+Source baseline: `8af5db0b9f7238f22f62cf4148ddd095e9d948b2`
 
 Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_RESUME_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_PRODUCTION_RESUME_01.md)
+
+Accepted final support-dependency gate review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-03.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-GATE-REVIEW-03.md)
+
+Completed support-dependency evidence correction:
 [CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_EVIDENCE_CORRECTION_01.md](CODEX_LUNA_BBD_WAL_006_SUPPORT_DEPENDENCY_EVIDENCE_CORRECTION_01.md)
 
 Support-dependency integrated-gate review:
@@ -242,6 +248,11 @@ The resumed lock/feature/custody gate passed and integrated at `195a28fa`. Its e
 incorrectly says no policy changed even though the accepted manifest checker was
 integrated. Luna is authorized only to correct that evidence sentence/current state.
 ZEC source remains frozen.
+
+The evidence-only correction is integrated at `8af5db0b`; the final gate is accepted.
+Sol is reauthorized to implement only the six-path `zec_address` vertical under the
+active resume handoff. Scan, preparation, handle hygiene, broader ZEC policy, execution,
+evidence, integration, and Git remain frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
