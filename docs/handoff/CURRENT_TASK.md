@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: SUPPORT-DEPENDENCY MANIFEST/POLICY SOURCE AUTHORIZED — ZEC SOURCE FROZEN
+State: SUPPORT-DEPENDENCY POLICY CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_CORRECTION_01.md)
+
+Support-dependency production-source review:
+[BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md)
+
+Original support-dependency production handoff:
 [CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md)
 
 Accepted support-dependency expected-red review:
@@ -199,9 +205,9 @@ every acceptance command remain unauthorized.
 That one-file test is reviewer-accepted at 2,454 lines and SHA-256
 `f8340ae965a1f59e27594153cd3c9f3eca5ee1d8a78ed0a9a685faf6f1dc2647`.
 Its exact 66/8 expected red is accepted at integration `1f24a221`. Sol is authorized
-only to add the two exact manifest pins and their narrow manifest-policy enforcement.
-The lockfile, ZEC Rust production, feature/source policy, execution, evidence, and Git
-remain frozen to Sol.
+only to correct the narrow manifest-policy drop's whole-manifest dependency uniqueness
+gap. The exact two-line manifest edit is accepted unchanged. The lockfile, ZEC Rust
+production, feature/source policy, execution, evidence, and Git remain frozen to Sol.
 
 No ZEC production is currently authorized. Policy implementation remains frozen. The
 prior production exception remains the accepted

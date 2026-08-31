@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: SUPPORT-DEPENDENCY MANIFEST/POLICY SOURCE AUTHORIZED — ZEC SOURCE FROZEN
+Status: SUPPORT-DEPENDENCY POLICY CORRECTION AUTHORIZED — ZEC SOURCE FROZEN
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -332,6 +332,11 @@ Its expected red is accepted at `1f24a221`. Sol may now edit only `Cargo.toml` a
 narrow manifest-policy implementation under
 `docs/handoff/CODEX_SOL_BBD_WAL_006_SUPPORT_DEPENDENCY_PRODUCTION_01.md`. Lockfile and
 ZEC Rust production remain frozen.
+
+The first policy drop requires the whole-manifest reviewed-dependency uniqueness
+correction in
+`docs/testing/BBD-WAL-006-SUPPORT-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md` before
+execution or integration. The two manifest lines are accepted unchanged.
 
 ### Phase C2 — address production source (future, separate handoff)
 
