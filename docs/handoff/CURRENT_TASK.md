@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS SOURCE GATE RESUMED 03
+State: PHASE-C ADDRESS EVIDENCE/INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_ADDRESS_EVIDENCE_INTEGRATION_01.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_EVIDENCE_INTEGRATION_01.md)
+
+Accepted address gate result review:
+[BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-GATE-RESULT-REVIEW-01.md)
+
+Completed address gate resume 03:
 [CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_03.md)
 
 Accepted address test-root correction review:
@@ -336,6 +342,13 @@ race-safe test-root correction; execution remains frozen.
 Sol completed the one-file atomic ancestor correction. Its source review accepts the 389-line
 test-support path and 1,854-line six-path total. Luna must restart the complete gate from the
 formatter; no prior result is reused. All other Phase-C source and policy remain frozen.
+
+The fresh formatter, warnings-denied library Clippy, and all eight address tests passed. Node
+returned 69/6 rather than the handoff's 69/5 because the reviewer omitted the direct WAL-004 source
+inventory-export group; all six failures are the exact untransitioned inventory and deferred
+Phase-C policy groups. Result Review 01 accepts the retained output without rerun. Luna is
+authorized only for bounded evidence and exact eight-path integration; all broader work remains
+frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
