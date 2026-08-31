@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: CI GATE GREEN RUN 02 — CORRECTED FALSIFICATION RESUME AUTHORIZED
+Status: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -517,6 +517,13 @@ path-specific branch and the generic exact-nine check still rejected the mutatio
 source restored exactly. The corrected handoff replaces only the branch's throw with a
 temporary fail-open return so the wrong path is genuinely accepted and the strict test
 must detect it. No production or test-source correction is authorized.
+
+The corrected falsification, complete local gates, integration, Social client run,
+manual Security workflow, and manual dual npm/Rust CycloneDX workflow all passed at
+`482650d5fe1e2a0d311040a7a811143afcbdd934`. Final reviewer acceptance is recorded in
+`docs/testing/BBD-WAL-004-CI-GATE-ACCEPTANCE.md`. BBD-WAL-004 is complete. No further
+source, test, workflow, policy, wallet, package, Git, or GitHub action is authorized by
+this ticket.
 
 ## Stop conditions
 

@@ -2,39 +2,35 @@
 
 Ticket: BBD-WAL-004
 
-State: CI GATE LOCAL GREEN INTEGRATED — MANUAL WORKFLOWS RUNNING
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Active handoff: NONE — NO DESKTOP IMPLEMENTATION AUTHORIZED
 
-Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
+Encrypted custody production commit:
+`0e42fb4b477cfe76757ed207d3a561270b9e9efe`
 
-Governance parent: the commit containing this handoff
+Custody falsification evidence commit:
+`e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 
-Expected-red commit: `61d2a239a89384885a95cf353f4d3ccc319670a7`
+CI-gate correction commit:
+`482650d5fe1e2a0d311040a7a811143afcbdd934`
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md](CODEX_LUNA_BBD_WAL_004_CI_GATE_GREEN.md)
+Final acceptance:
+[BBD-WAL-004-CI-GATE-ACCEPTANCE.md](../testing/BBD-WAL-004-CI-GATE-ACCEPTANCE.md)
 
-Local green evidence: [BBD-WAL-004-CI-GATE-GREEN.md](../testing/BBD-WAL-004-CI-GATE-GREEN.md)
+BBD-WAL-004 is complete. The encrypted custody core passed its complete local functional,
+lint, native compile, dependency, RustSec, security-policy, test, audit, and seven-case
+falsification gates. The final CI correction passed local policy/build/npm/audit and both
+pinned Gitleaks modes, its isolated fail-open falsification, Social client CI, the manual
+Security workflow, and the manual dual npm/Rust all-features CycloneDX workflow.
 
-The custody core remains green and independently falsified by its seven original
-mutations. The accepted CI-gate test and three-file production corrections remain the
-only four unstaged paths at their frozen hashes.
+No platform package build was run or is required. No further desktop source, test,
+workflow, policy, wallet, evidence, Git, or GitHub action is authorized until a new
+reviewer ticket and handoff are published.
 
-Green Run 01 exposed and stopped on three no-op mutation fixtures; Sol's exact test-only
-correction is reviewer-accepted. Green Run 02 then proved all 69 cases green. Its first
-falsification removed the path-specific rejection, but the generic exact-nine terminal
-check still rejected the bad fingerprint, so the strict test failed on a diagnostic
-mismatch rather than a real acceptance bypass. Luna restored the source exactly and
-stopped before any later gate or integration. The full record is
-[BBD-WAL-004-CI-GATE-GREEN-RUN-02.md](../testing/BBD-WAL-004-CI-GATE-GREEN-RUN-02.md).
-
-The amended throw-to-return falsification was exact, restored to the accepted hash, and
-the complete local green gate passed. The four accepted source/test paths and these
-records are integrated before the manual non-packaging Security/SBOM workflows. No
-further source/test change is authorized.
-
-No platform package build is authorized or required. Grok Build remains available and
-queued for the independent `../bb-go` exchange-rate/provider work after this desktop
-security correction. `../go-ipfs` is deprecated and receives no wallet work.
+Grok Build is available for the independent `../bb-go` exchange-rate/provider ticket.
+That work must proceed only under the `bb-go` repository's own governance, baseline,
+ticket, tests, and durable handoff. `../go-ipfs` is deprecated and receives no wallet
+work.
