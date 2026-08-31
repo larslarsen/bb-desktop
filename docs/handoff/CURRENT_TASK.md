@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C ADDRESS CLIPPY CORRECTION AUTHORIZED
+State: PHASE-C ADDRESS SOURCE GATE RESUMED 02
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_02.md](CODEX_LUNA_BBD_WAL_006_ADDRESS_GATE_RESUME_02.md)
+
+Accepted address Clippy-correction review:
+[BBD-WAL-006-ADDRESS-CLIPPY-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-ADDRESS-CLIPPY-CORRECTION-REVIEW-01.md)
+
+Completed address Clippy correction:
 [CODEX_SOL_BBD_WAL_006_ADDRESS_CLIPPY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_ADDRESS_CLIPPY_CORRECTION_01.md)
 
 Address gate Clippy stop review:
@@ -305,6 +311,10 @@ first command; no prior result is reused. All other Phase-C source and policy re
 The fresh formatter rerun passed. Warnings-denied library Clippy then stopped only on the two
 explicit drops of an upstream non-`Drop` USK. No later command or integration ran. Sol is
 authorized only to delete those two no-op statements; all execution remains frozen.
+
+Sol deleted exactly the two diagnosed statements. The correction review accepts the 204-line
+address source and 1,839-line six-path total. Luna must restart the complete gate from the
+formatter; no earlier result is reused. All other Phase-C source and policy remain frozen.
 
 No ZEC production is currently authorized. Broader ZEC feature/source policy remains
 frozen. The prior production exception remains the accepted integrated `vault.rs` AEAD
