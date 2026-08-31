@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-004
 
-State: CI GATE EXPECTED RED RECORDED — PRODUCTION CORRECTION REQUIRED
+State: CI GATE EXPECTED RED ACCEPTED — SOL PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Test/source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
@@ -16,9 +16,9 @@ Reviewed CI baseline: `e19af1a50ebc2a6b1f46e504fa02dd168358dbb0`
 
 Production commit: `0e42fb4b477cfe76757ed207d3a561270b9e9efe`
 
-Active handoff: [CODEX_LUNA_BBD_WAL_004_CI_GATE_RED.md](CODEX_LUNA_BBD_WAL_004_CI_GATE_RED.md)
+Expected-red commit: `61d2a239a89384885a95cf353f4d3ccc319670a7`
 
-Expected-red evidence: [BBD-WAL-004-CI-GATE-EXPECTED-RED.md](../testing/BBD-WAL-004-CI-GATE-EXPECTED-RED.md)
+Active handoff: [CODEX_SOL_BBD_WAL_004_CI_GATE_PRODUCTION.md](CODEX_SOL_BBD_WAL_004_CI_GATE_PRODUCTION.md)
 
 The encrypted custody core is locally green, integrated, pushed, and independently
 falsified by all seven required temporary mutations. GitHub Social client run
@@ -30,25 +30,22 @@ document omitted optional native direct dependencies under default features. The
 authoritative diagnosis is
 [BBD-WAL-004-CI-GATE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-REVIEW-01.md).
 
-Sol's exact one-file regression-test drop is reviewer-accepted in
-[BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md).
-The first expected-red command used Node's native test runner against this repository's
-custom test registry, so it exposed only one file-level failure and was rejected as
-invalid evidence. Luna stopped without changing, staging, committing, or pushing. The
-durable record is
-[BBD-WAL-004-CI-GATE-RED-RUN-01.md](../testing/BBD-WAL-004-CI-GATE-RED-RUN-01.md).
+The accepted test source and exact 66-green/3-red execution are recorded in
+[BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md),
+[BBD-WAL-004-CI-GATE-EXPECTED-RED.md](../testing/BBD-WAL-004-CI-GATE-EXPECTED-RED.md),
+and
+[BBD-WAL-004-CI-GATE-RED-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-RED-REVIEW-01.md).
+The initial invalid native-runner attempt remains durably recorded and made no change.
 
-The corrected full custom-runner expected-red command produced 66 `ok` and the exact
-three intended `not ok` results. Production remains unauthorized pending reviewer
-handoff. Production policy, workflows,
-`.gitleaksignore`, the live ticket label, broad tests, scanners, and all wallet source
-remain frozen until the reviewer accepts the red evidence and publishes a separate
-production handoff.
+The reviewer has relabeled only the live synthetic vector from `key    =` to `expand =`
+without changing its hex bytes. Sol may now edit only `.gitleaksignore`,
+`scripts/security-policy.js`, and `.github/workflows/sbom.yml` under the active handoff.
+Tests, validators, wallet source, dependencies, other workflows, execution, integration,
+evidence, Git, and GitHub remain frozen until reviewer source acceptance.
 
-After exact red, Sol will receive the bounded security/release-gate production
-correction. The reviewer owns the one-word governance ticket relabel. Final acceptance
-requires both local Gitleaks modes and fresh successful manual Security and SBOM runs;
-it does not require any platform package build.
+Final acceptance requires the local full Node/security gate, both local pinned Gitleaks
+modes, and fresh successful manual Security and SBOM runs. It does not require any
+platform package build.
 
 Grok Build is available and queued for the independent `../bb-go`
 exchange-rate/provider work after this desktop security correction. `../go-ipfs` is
