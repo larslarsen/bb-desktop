@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 2 EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
+State: PRODUCTION SOURCE ACCEPTED — GREEN/FALSIFICATION INTEGRATION AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md)
 
@@ -51,12 +51,13 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Correction 2 expected red is reviewer-accepted in
-[BBD-WAL-004-CORRECTION-2-RED-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-RED-REVIEW.md):
-five exact Rust failures with 41 prior cases green, and three Node repository callers red
-on the same inventory-order defect with 62 cases green. Only Sol's four-path
-[Correction 2 production handoff](CODEX_SOL_BBD_WAL_004_CORRECTION_2_PRODUCTION.md) is
-active. All other production, tests, dependencies, workflows, and Git remain frozen.
+Correction 2 production is reviewer-accepted in
+[production source review 03](../testing/BBD-WAL-004-PRODUCTION-SOURCE-REVIEW-03.md).
+Only Luna's exact [green/integration handoff](CODEX_LUNA_BBD_WAL_004_GREEN.md) is active.
+It owns formatting, all Node/Rust tests, clippy/all-features compile, native feature
+compile, RustSec audit, bounded evidence, the complete 15-path production commit, and
+push. Missing local cargo-deny/cyclonedx tools are not installed during this handoff;
+reviewer-owned pinned GitHub security/SBOM gates follow a successful production push.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
