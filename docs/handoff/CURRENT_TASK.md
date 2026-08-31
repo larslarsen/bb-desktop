@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: REVIEW CORRECTION 1 — CODEX SOL TEST SOURCE ONLY
+State: REVIEW CORRECTION 2 — CODEX SOL TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -20,14 +20,16 @@ broker-invoked native file picker may select backup paths. Electron never owns t
 window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
 hardware devices confirm independently when capable.
 
-The initial Sol drop is complete but remains uncommitted and is not reviewer-accepted.
-Only [correction 1](CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_1.md) is active; it permits
-Sol to edit exactly three existing Rust test paths to close the independent-composition,
-real-open pre-KDF, and Linux filesystem/failure-invariant gaps. No Rust toolchain is
-installed yet. Sol must not execute or install anything. After reviewer acceptance, the
-owner will be asked to install the pinned user-level Rust toolchain under `/home/lars`;
-Luna will then resolve `Cargo.lock` and execute the separately authorized expected-red
-command. Large build/cache/temp trees may not use `/tmp`.
+The initial Sol drop and Correction 1 are complete but remain uncommitted and are not
+reviewer-accepted. Correction 1 closed the independent-composition, real-open pre-KDF,
+and Linux filesystem/failure-invariant gaps. Only
+[correction 2](CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_2.md) is active; it permits Sol to
+edit only `wallet-broker/tests/vault_store.rs` to replace a proposed production-mutating
+port accessor with test-owned shared fault control. No Rust toolchain is installed yet.
+Sol must not execute or install anything. After reviewer acceptance, the owner will be
+asked to install the pinned user-level Rust toolchain under `/home/lars`; Luna will then
+resolve `Cargo.lock` and execute the separately authorized expected-red command. Large
+build/cache/temp trees may not use `/tmp`.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit

@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: REVIEW CORRECTION 1 AUTHORIZED — TEST SOURCE ONLY
+Status: REVIEW CORRECTION 2 AUTHORIZED — TEST SOURCE ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -257,6 +257,22 @@ from directory-sync failure. Before replacement the old active bytes must remain
 After replacement but before successful directory sync the active entry must be one
 complete authenticated old or new envelope, never absent, empty, or partial. Recovery
 failure must preserve the exact active bytes and any complete recoverable staging bytes.
+
+## Reviewer correction 2
+
+Correction 1 closes its four required behavioral gaps, but its recovery test reserves a
+public mutable `VaultStore::port_mut()` solely to change a fake fault after the store has
+been constructed. That accessor would let production callers bypass the store's ordering,
+path, permission, and synchronization invariants and is not accepted.
+
+The test fake must instead hold its fault selection in test-owned shared state (for
+example `Rc<Cell<Option<FaultPoint>>>`) whose clone remains with the test after the port
+moves into `VaultStore`. The test changes that shared fault control from `FileSync` to
+`Replace` without obtaining mutable access to the production store port. No
+`VaultStore::port_mut()` API is reserved or permitted. Correction 2 may edit only
+`wallet-broker/tests/vault_store.rs` under
+`docs/handoff/CODEX_SOL_BBD_WAL_004_TESTS_CORRECTION_2.md`; every other accepted
+Correction 1 byte and assertion remains unchanged.
 
 ## Required test groups
 
