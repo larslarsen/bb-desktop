@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CORRECTION 2 RUST RED ACCEPTED — NODE TEST FIXTURE CORRECTION AUTHORIZED
+State: CORRECTION 2 RUST RED ACCEPTED — NODE RED RERUN AUTHORIZED
 
 Evidence: [BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md](../testing/BBD-WAL-004-CORRECTION-2-EXPECTED-RED.md)
 
@@ -51,13 +51,13 @@ rejected in
 Static review found global lock events suppressible by malformed account input, missing
 unlock-input wipe observation on clock failure, invalid UTF-8 native passphrases reaching
 custody, wrong-mode descriptor operations, and filesystem-order-dependent source policy.
-Correction 2 Rust red is reviewer-accepted: all three binaries compiled and exactly five
-new behavioral cases failed with every prior Rust case green. Node red is not accepted:
-three failures are the intended inventory defect, while one older generic positive
-fixture incorrectly identifies synthetic source as `vault.rs` and collides with the new
-vault-specific policy. Only Sol's one-line
-[Node fixture correction](CODEX_SOL_BBD_WAL_004_CORRECTION_2_NODE_FIXTURE.md) is active.
-Production remains frozen; policy weakening and source repair are not authorized.
+Correction 2 Rust red is reviewer-accepted. Sol's one-line generic Node fixture correction
+is accepted in
+[BBD-WAL-004-CORRECTION-2-NODE-FIXTURE-REVIEW.md](../testing/BBD-WAL-004-CORRECTION-2-NODE-FIXTURE-REVIEW.md).
+Only Luna's [Node-only red rerun](CODEX_LUNA_BBD_WAL_004_CORRECTION_2_NODE_RERUN.md) is
+active. Exact acceptance is 62 green and three repository callers red on the same source-
+inventory ordering defect. Production remains frozen; policy weakening and source repair
+are not authorized.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
