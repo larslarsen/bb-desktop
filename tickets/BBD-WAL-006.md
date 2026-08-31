@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: DEPENDENCY GATE EVIDENCE INCOMPLETE — INVENTORY ADDENDUM AUTHORIZED
+Status: DEPENDENCY/CUSTODY GATE ACCEPTED — FIXTURE AND EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
