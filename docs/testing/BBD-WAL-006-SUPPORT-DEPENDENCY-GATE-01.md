@@ -59,7 +59,8 @@ and `165ca6e57b20e1351573e3729b958bc62f0e48025386970b6e4d29e7a7e71f3f`,
 respectively. No new package/build-script/license authority was introduced.
 
 No `wallet-broker/src/zec*` production path exists. ZEC source remains frozen;
-no fixture, test, policy, or unrelated path was changed. No network, wallet,
+No fixture, test, ZEC Rust source, policy beyond the accepted support-dependency
+manifest checker, or unrelated path was changed. No network, wallet,
 node, device, secret, or canary was used.
 
 ## Final state
