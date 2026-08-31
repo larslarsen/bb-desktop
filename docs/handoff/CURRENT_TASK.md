@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C POLICY-TEST ORDERING CORRECTION AUTHORIZED — PRODUCTION FROZEN
+State: PHASE-C POLICY TEST ACCEPTED — FOCUSED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_LUNA_BBD_WAL_006_PHASE_C_POLICY_RED_01.md](CODEX_LUNA_BBD_WAL_006_PHASE_C_POLICY_RED_01.md)
+
+Accepted Phase-C policy-test source review:
+[BBD-WAL-006-PHASE-C-POLICY-TEST-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-PHASE-C-POLICY-TEST-SOURCE-REVIEW-02.md)
+
+Completed policy-test correction handoff:
 [CODEX_SOL_BBD_WAL_006_PHASE_C_POLICY_TESTS_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_PHASE_C_POLICY_TESTS_CORRECTION_01.md)
 
 Phase-C policy-test source review:
@@ -147,12 +153,13 @@ the reviewer accepts the result without rerun. The fixture and evidence are inte
 at `accac440`; the tracked worktree/index are clean and `HEAD == origin/master` there.
 
 The committed Node policy test still requires an empty ZEC production inventory because
-that was the correct Phase-A contract. Sol's one-file Phase-C transition correctly names
-the exact seven paths, but its recursive filesystem result is not sorted before ordered
-comparison. Sol is authorized only to add that deterministic sort. Luna must capture the
-resulting focused expected red after the corrected hash is accepted and before any ZEC
-production source is authorized. The first later production slice will be the complete
-`zec_address` vertical with its real storage and fixture foundation.
+that was the correct Phase-A contract. Sol's corrected one-file Phase-C transition is
+accepted at 2,401 lines and SHA-256
+`19b7948bfa2c7f9b29426133bdda1630abfade5f1c438c7367e5c6dacd32688b`.
+Luna is authorized only to capture the focused Node expected red and integrate that test
+with evidence. No ZEC production source or policy implementation is authorized. The
+first later production slice will be the complete `zec_address` vertical with its real
+storage and fixture foundation.
 
 No ZEC production source or policy implementation is authorized. The sole production
 exception remains the accepted integrated `vault.rs` AEAD API compatibility edit.

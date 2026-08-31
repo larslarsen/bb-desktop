@@ -1,6 +1,6 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: PHASE-C POLICY-TEST ORDERING CORRECTION AUTHORIZED — PRODUCTION FROZEN
+Status: PHASE-C POLICY TEST ACCEPTED — FOCUSED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -310,9 +310,10 @@ expectation with the exact bounded Phase-C inventory. Luna will capture a new fo
 expected red before any production byte is authorized. Policy implementation and all
 production source remain frozen.
 
-The first transition drop requires the exact deterministic ordering correction recorded
-in `docs/testing/BBD-WAL-006-PHASE-C-POLICY-TEST-SOURCE-REVIEW-01.md`; Luna does not run
-the red until XHigh accepts the corrected hash.
+The deterministic ordering correction is accepted at SHA-256
+`19b7948bfa2c7f9b29426133bdda1630abfade5f1c438c7367e5c6dacd32688b`. Luna may run
+only the focused Node expected-red handoff. Production and policy implementation remain
+frozen until XHigh accepts its evidence.
 
 ### Phase C1 — address production source (future, separate handoff)
 
