@@ -1,6 +1,6 @@
 # BBD-WAL-004 — Encrypted Software Custody and Broker-Native Authorization Surface
 
-Status: TEST SOURCE CORRECTION 3 ACCEPTED — LUNA RED RESUME AUTHORIZED
+Status: LOCK GRAPH ACCEPTED — SOL PRODUCTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -299,6 +299,23 @@ Correction 3 is reviewer-accepted at manifest SHA-256
 test SHA-256 `5f8d79fef4176dac6f8f4e912c4056b70c65062e9d14cf29091d413091ca5c12`.
 The exact resolution/expected-red resume is
 `docs/handoff/CODEX_LUNA_BBD_WAL_004_RED_RESUME_01.md`. Production remains unauthorized.
+
+## Lock-graph acceptance and production authorization
+
+Luna integrated the exact expected red at
+`fe2fe7e78fab0012a5fa77f128716bb7262aba58`. The committed lockfile, Linux headless and
+all-features graphs, selected features, licenses, build scripts, duplicate versions, and
+RustSec results are reviewer-accepted in
+`docs/testing/BBD-WAL-004-LOCK-GRAPH-REVIEW.md`. The graph is crates.io-only, has no
+duplicate cryptographic primitive, excludes the forbidden UI/network features, and has
+no RustSec vulnerability. Production must add `license = "MIT"` for the workspace crate
+and the fixed fail-closed cargo-deny policy; it may not change the dependency graph.
+
+The sole active source handoff is
+`docs/handoff/CODEX_SOL_BBD_WAL_004_PRODUCTION.md`. Sol may author only its enumerated
+production paths and may not execute commands or use Git. The committed tests, fixture,
+and lockfile are immutable. Luna will receive a separate integration/green/falsification
+handoff only after reviewer source-drop inspection.
 
 ## Required test groups
 

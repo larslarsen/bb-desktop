@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: EXPECTED RED RECORDED — LOCK GRAPH REVIEW REQUIRED
+State: LOCK GRAPH ACCEPTED — SOL PRODUCTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -10,7 +10,7 @@ Source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Codex Luna (`gpt-5.6-luna`)
 
-Source baseline: `abdd2b1980cbe8c5483a26b08b7ae43c82ae420b`
+Production baseline: `fe2fe7e78fab0012a5fa77f128716bb7262aba58`
 
 [BBD-WAL-004](../../tickets/BBD-WAL-004.md) is the only authorized implementation
 ticket in this repository. The owner resolved architecture Q10 in favor of a minimal
@@ -20,26 +20,24 @@ broker-invoked native file picker may select backup paths. Electron never owns t
 window, sees a passphrase/path/backup, or gains confirm/unlock/export authority;
 hardware devices confirm independently when capable.
 
-The owner installed official user-level Rust/Cargo 1.98.0 successfully. Luna's preflight
-matched every accepted byte and added only the authorized root `.gitignore` line
-`target/`. The first sandboxed resolution failed on DNS; an approved network retry then
-reached crates.io and exposed a real manifest contradiction: `secrecy` 0.10.3 has no
-`alloc` feature. No `Cargo.lock`, evidence, staging, commit, or push was created.
+The owner installed official user-level Rust/Cargo 1.98.0. Luna integrated the exact
+accepted tests, fixture, lockfile, expected-red evidence, and ignored disk-backed target
+path at `fe2fe7e78fab0012a5fa77f128716bb7262aba58`; `HEAD == origin/master`. The Node
+source-first suite has 57 `ok` and the seven exact expected `not ok` results. The named
+Rust vector test reaches compilation and fails solely at the absent future broker crate.
 
-Correction 3 is reviewer-accepted: secrecy remains exactly `=0.10.3`, defaults are off,
-no optional feature is enabled, and the policy test rejects adding `serde`. The revised
-accepted hashes are in [the test-source review](../testing/BBD-WAL-004-TEST-SOURCE-REVIEW.md).
-Expected-red evidence is recorded in
-[BBD-WAL-004-EXPECTED-RED.md](../testing/BBD-WAL-004-EXPECTED-RED.md).
-The reviewer reran the Node source-first suite with the unchanged expected 57 `ok` and
-seven named `not ok` results.
+The reviewer accepted the complete lock graph in
+[BBD-WAL-004-LOCK-GRAPH-REVIEW.md](../testing/BBD-WAL-004-LOCK-GRAPH-REVIEW.md): 38
+headless and 172 Linux all-features package/version pairs, crates.io-only checksummed
+sources, no duplicate crypto primitive, no forbidden browser/web/wgpu/network runtime,
+reviewed build scripts and licenses, and a clean pinned RustSec scan of all 327 lockfile
+records. The new crate must declare the repository's MIT license during production.
 
-Only [Luna resume 01](CODEX_LUNA_BBD_WAL_004_RED_RESUME_01.md) is active. It begins from
-the exact uncommitted root `.gitignore` `target/` line plus the nine accepted test paths,
-retries lock resolution with approved crates.io access and disk-backed temp/target paths,
-then records/integrates expected red if and only if every stop condition passes. No
-`Cargo.lock` exists yet. Production remains unauthorized and `/tmp` remains forbidden for
-large build/cache/temp state.
+Only [the Sol production handoff](CODEX_SOL_BBD_WAL_004_PRODUCTION.md) is active. Sol
+authors the bounded production source and policy drop but executes no commands and uses
+no Git. The committed tests, fixture, and lockfile remain immutable. Luna integration,
+green, broader security/SBOM acceptance, falsification, evidence, commit, and push are
+not yet authorized. `/tmp` remains forbidden for substantial Rust state.
 
 BBD-WAL-003 is complete and reviewer-accepted at production commit
 `584019e9a89022d77b4bbb6710c2b7670e42d95b`, falsification commit
