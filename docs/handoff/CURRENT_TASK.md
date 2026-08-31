@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-004
 
-State: CI GATE TEST SOURCE ACCEPTED — LUNA EXPECTED RED AUTHORIZED
+State: CI GATE TEST SOURCE ACCEPTED — LUNA CORRECTED EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -30,8 +30,15 @@ authoritative diagnosis is
 
 Sol's exact one-file regression-test drop is reviewer-accepted in
 [BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-004-CI-GATE-TEST-SOURCE-REVIEW-01.md).
-Luna may now run only the targeted two-test expected-red command, record evidence, and
-integrate the test source under the active handoff. Production policy, workflows,
+The first expected-red command used Node's native test runner against this repository's
+custom test registry, so it exposed only one file-level failure and was rejected as
+invalid evidence. Luna stopped without changing, staging, committing, or pushing. The
+durable record is
+[BBD-WAL-004-CI-GATE-RED-RUN-01.md](../testing/BBD-WAL-004-CI-GATE-RED-RUN-01.md).
+
+Luna may now run only the corrected full custom-runner expected-red command, require 66
+`ok` and the exact three intended `not ok` results, record evidence, and integrate the
+test source under the amended active handoff. Production policy, workflows,
 `.gitleaksignore`, the live ticket label, broad tests, scanners, and all wallet source
 remain frozen until the reviewer accepts the red evidence and publishes a separate
 production handoff.

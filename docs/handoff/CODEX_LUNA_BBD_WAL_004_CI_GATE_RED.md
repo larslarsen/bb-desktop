@@ -26,34 +26,44 @@ fail against the current production policy/workflow/ignore/ticket state. Do not 
 or edit production policy, workflow, `.gitleaksignore`, ticket, tests, package files,
 wallet source, or any other implementation path.
 
-## Exact command and expected result
+## Run 01 correction
+
+The original `node --test --test-name-pattern=...` command was a reviewer error. This
+file uses the repository's custom test registry and runner, so Node's native runner
+reported only one failed file-level subprocess instead of its 69 cases. Luna stopped
+without evidence, staging, commit, push, or file change. The exact record is
+`docs/testing/BBD-WAL-004-CI-GATE-RED-RUN-01.md`. The accepted test hash is unchanged.
+
+## Exact corrected command and expected result
 
 Run exactly once:
 
 ```text
-node --test --test-name-pattern='strict nine-line reviewed Gitleaks ratchet bytes and content are enforced|WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX JSON artifacts' test/securityPolicy.node.js
+node test/securityPolicy.node.js
 ```
 
-Expected exit is 1 after discovery of all 69 policy cases: 0 pass, exactly 2 fail, and 67
-skipped by name pattern. The only executed failures must be:
+Expected exit is 1 after all 69 registered policy cases execute: exactly 66 `ok` and 3
+`not ok`. The only failures must be:
 
-1. `strict nine-line reviewed Gitleaks ratchet bytes and content are enforced`, because
+1. `checker constants match the ticketed Action and tool pins`, because the current
+   production Gitleaks constants still describe the old eight-entry ratchet;
+2. `strict nine-line reviewed Gitleaks ratchet bytes and content are enforced`, because
    the current production ratchet still has the old eight-entry rationale/content; and
-2. `WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX JSON
+3. `WAL-004 manual SBOM contains separately validated npm and Rust CycloneDX JSON
    artifacts`, because the current production command still omits `--all-features`.
 
-An exception outside those assertions, different count, unexpected pass, unrelated
-failure, signal, setup issue, or mutation of any file is unintended red: stop and report.
-Do not run the whole Node suite, npm, Rust, Cargo, formatters, builds, scanners, SBOM
-generation, GitHub workflows, installs, Electron, wallets, nodes, devices, network,
-cleanup, deletion, or any unlisted command.
+The final summary must say `3 security policy test(s) failed`. An exception outside
+those assertions, different count, unexpected pass, unrelated failure, signal, setup
+issue, or mutation of any file is unintended red: stop and report. Do not run npm,
+Rust, Cargo, formatters, builds, scanners, SBOM generation, GitHub workflows, installs,
+Electron, wallets, nodes, devices, network, cleanup, deletion, or any unlisted command.
 
 ## Evidence and Git
 
-If and only if the red result is exact, create only
+If and only if the corrected red result is exact, create only
 `docs/testing/BBD-WAL-004-CI-GATE-EXPECTED-RED.md` with the governance parent, exact
-command/exit, TAP totals, the two names/reasons, accepted test line/hash integrity, and
-confirmation that no other path changed or secret/canary appeared. Update only
+command/exit, custom-runner totals, the three names/reasons, accepted test line/hash
+integrity, and confirmation that no other path changed or secret/canary appeared. Update only
 `docs/handoff/CURRENT_TASK.md` to `CI GATE EXPECTED RED RECORDED — PRODUCTION CORRECTION
 REQUIRED`, link the evidence, and state that production remains unauthorized pending
 reviewer handoff.
@@ -66,6 +76,6 @@ test: record WAL-004 CI gate red
 ```
 
 Push `master`. Require final `HEAD == origin/master`, clean worktree, and report commit,
-evidence line count/hash, exact TAP totals/failure reasons, accepted test hash, and final
-status. Do not amend, rewrite history, force push, delete, clean, or use `/tmp`, root,
+evidence line count/hash, exact custom-runner totals/failure reasons, accepted test hash,
+and final status. Do not amend, rewrite history, force push, delete, clean, or use `/tmp`, root,
 `sudo`, globs, substitutions, variables, or unresolved destructive targets.
