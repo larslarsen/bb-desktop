@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: WAL-006 FIVE-CASE FALSIFICATION GATE AUTHORIZED
+State: WAL-006 FIVE-CASE FALSIFICATION GATE 01 COMPLETED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -13,8 +13,8 @@ Authorized integration actor: Jr Dev — Hermes, falsification/evidence integrat
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active falsification handoff:
-[HERMES_BBD_WAL_006_FALSIFICATION_GATE_01.md](HERMES_BBD_WAL_006_FALSIFICATION_GATE_01.md)
+Completed falsification gate 01:
+[BBD-WAL-006-FALSIFICATION-GATE-01.md](../testing/BBD-WAL-006-FALSIFICATION-GATE-01.md)
 
 Completed final policy integration gate 01:
 [HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md](HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md)
