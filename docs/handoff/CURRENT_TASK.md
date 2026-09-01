@@ -2,19 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE ROLLBACK PRODUCTION CORRECTION AUTHORIZED
+State: PHASE-C PREPARE ROLLBACK GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol, `wallet-broker/src/zec/store.rs` only
+Authorized source actor: none — rollback source accepted
 
-Authorized integration actor: none until source review
+Authorized integration actor: Jr Dev — Hermes, exact rollback gate only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active rollback architecture review:
-[BBD-WAL-006-PREPARE-ROLLBACK-ARCHITECTURE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-ROLLBACK-ARCHITECTURE-REVIEW-01.md)
+Active rollback gate handoff:
+[HERMES_BBD_WAL_006_PREPARE_ROLLBACK_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_ROLLBACK_GATE_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
