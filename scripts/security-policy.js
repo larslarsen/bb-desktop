@@ -303,6 +303,37 @@ const WAL006_TEST_TARGETS = [
   'zec_prepare',
   'zec_hygiene',
 ];
+const WAL006_FORBIDDEN_FEATURES = [
+  'sync',
+  'lightwalletd-tonic',
+  'lightwalletd-tonic-tls-webpki-roots',
+  'lightwalletd-tonic-transport',
+  'tor',
+  'zcashd-compat',
+  'zewif',
+  'non-standard-fees',
+];
+const WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES = [
+  'io-finalizer',
+  'orchard',
+  'prover',
+  'sapling',
+  'signer',
+  'spend-finalizer',
+  'transparent',
+  'transparent-inputs',
+  'tx-extractor',
+  'zcp-builder',
+];
+const WAL006_ALLOWED_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/zec.rs',
+  'wallet-broker/src/zec/address.rs',
+  'wallet-broker/src/zec/fixture.rs',
+  'wallet-broker/src/zec/prepare.rs',
+  'wallet-broker/src/zec/scan.rs',
+  'wallet-broker/src/zec/store.rs',
+  'wallet-broker/src/zec/test_support.rs',
+];
 
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
@@ -1941,12 +1972,100 @@ function checkRustWalletSourceInventory(actual) {
   if (new Set(actual).size !== actual.length) {
     throw new PolicyError('wallet Rust source inventory contains a duplicate path');
   }
-  if (actual.length !== WAL004_RUST_SOURCE_PATHS.length) {
+  const legacy = actual.length === WAL004_RUST_SOURCE_PATHS.length &&
+    sameSet(actual, WAL004_RUST_SOURCE_PATHS);
+  const withWal006 = [...WAL004_RUST_SOURCE_PATHS, 'wallet-broker/src/zec.rs'];
+  const extended = actual.length === withWal006.length && sameSet(actual, withWal006);
+  if (!legacy && !extended) {
     throw new PolicyError('wallet Rust source inventory is missing or extra');
   }
-  const reviewed = new Set(WAL004_RUST_SOURCE_PATHS);
-  if (actual.some((rel) => !reviewed.has(rel))) {
-    throw new PolicyError('wallet Rust source inventory is missing or extra');
+}
+
+function checkWal006ResolvedFeatures(resolved) {
+  const expectedKeys = [
+    'direct',
+    'compiled_pczt_capabilities',
+    'bitbook_authority',
+  ];
+  if (resolved && Object.prototype.hasOwnProperty.call(resolved, 'enabled_features')) {
+    expectedKeys.push('enabled_features');
+  }
+  if (!resolved || typeof resolved !== 'object' || Array.isArray(resolved) ||
+      Object.getPrototypeOf(resolved) !== Object.prototype ||
+      !sameSet(Object.keys(resolved), expectedKeys)) {
+    throw new PolicyError('WAL-006 Zcash resolved-feature contract must be a closed object');
+  }
+
+  const direct = resolved.direct;
+  if (!direct || typeof direct !== 'object' || Array.isArray(direct) ||
+      Object.getPrototypeOf(direct) !== Object.prototype ||
+      !sameSet(Object.keys(direct), Object.keys(WAL006_DIRECT_DEPENDENCIES))) {
+    throw new PolicyError('WAL-006 Zcash direct dependency contract differs from review');
+  }
+  for (const [name, expected] of Object.entries(WAL006_DIRECT_DEPENDENCIES)) {
+    const actual = direct[name];
+    if (!actual || typeof actual !== 'object' || Array.isArray(actual) ||
+        Object.getPrototypeOf(actual) !== Object.prototype ||
+        !sameSet(Object.keys(actual), Object.keys(expected)) ||
+        actual.version !== expected.version ||
+        actual.default_features !== expected.default_features ||
+        actual.optional !== expected.optional ||
+        !Array.isArray(actual.features) ||
+        new Set(actual.features).size !== actual.features.length ||
+        !sameSet(actual.features, expected.features)) {
+      throw new PolicyError(`WAL-006 Zcash direct dependency ${name} differs from review`);
+    }
+  }
+
+  const enabled = resolved.enabled_features === undefined ? [] : resolved.enabled_features;
+  if (!Array.isArray(enabled) || enabled.some((feature) => typeof feature !== 'string' || !feature) ||
+      new Set(enabled).size !== enabled.length) {
+    throw new PolicyError('WAL-006 Zcash enabled-feature inventory is malformed or duplicated');
+  }
+  const reviewedFeatures = new Set([
+    ...Object.values(WAL006_DIRECT_DEPENDENCIES).flatMap((dependency) => dependency.features),
+    ...WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+  ]);
+  for (const feature of enabled) {
+    if (WAL006_FORBIDDEN_FEATURES.includes(feature)) {
+      throw new PolicyError(`WAL-006 Zcash feature ${feature} is forbidden network authority`);
+    }
+    if (!reviewedFeatures.has(feature)) {
+      throw new PolicyError(`WAL-006 Zcash feature ${feature} is unknown`);
+    }
+  }
+
+  const compiled = resolved.compiled_pczt_capabilities;
+  if (!Array.isArray(compiled) || compiled.some((item) => typeof item !== 'string' || !item) ||
+      new Set(compiled).size !== compiled.length ||
+      compiled.length !== WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES.length ||
+      !sameSet(compiled, WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES)) {
+    throw new PolicyError('WAL-006 compiled PCZT capability inventory differs from review');
+  }
+
+  const authority = resolved.bitbook_authority;
+  const expectedAuthority = ['receiver.fresh', 'fixture.scan', 'pczt.prepare'];
+  if (!Array.isArray(authority) || authority.some((item) => typeof item !== 'string' || !item) ||
+      new Set(authority).size !== authority.length ||
+      authority.length !== expectedAuthority.length || !sameSet(authority, expectedAuthority)) {
+    throw new PolicyError(
+      'WAL-006 Zcash authority contains raw, sign, prove, finalize, extract, broadcast, or network capability'
+    );
+  }
+}
+
+function checkWal006RustSourceInventory(actual) {
+  if (!Array.isArray(actual)) {
+    throw new PolicyError('WAL-006 Zcash Rust source inventory must be an array');
+  }
+  if (actual.some((rel) => typeof rel !== 'string' || !rel)) {
+    throw new PolicyError('WAL-006 Zcash Rust source inventory contains a malformed path');
+  }
+  if (new Set(actual).size !== actual.length) {
+    throw new PolicyError('WAL-006 Zcash Rust source inventory contains a duplicate path');
+  }
+  if (JSON.stringify(actual) !== JSON.stringify(WAL006_ALLOWED_RUST_SOURCE_PATHS)) {
+    throw new PolicyError('WAL-006 Zcash Rust source inventory is missing, unlisted, or extra');
   }
 }
 
@@ -1955,11 +2074,13 @@ function checkRustWalletSource(source, rel) {
     throw new PolicyError(`wallet Rust source ${rel} is empty`);
   }
   const screened = source.replace(/#!\[forbid\(unsafe_code\)\]/g, '');
+  const wal006Path = /^wallet-broker\/(?:src\/zec(?:\.rs|\/.*\.rs)|tests\/zec[^/]*\.rs)$/.test(rel);
   const forbidden = [
     [/\bunsafe\b/, 'unsafe'],
     [/extern\s+"C"/, 'FFI'],
     [/std::(?:net|os::unix::net)|TcpListener|TcpStream|UnixListener|UnixStream/, 'network listener'],
-    [/\b(?:reqwest|tokio|keyring|zcash_client_backend|monero)\b/, 'unreviewed authority'],
+    [wal006Path ? /\b(?:reqwest|tokio|keyring|monero)\b/ :
+      /\b(?:reqwest|tokio|keyring|zcash_client_backend|monero)\b/, 'unreviewed authority'],
     [/std::env::temp_dir\s*\(/, 'temporary-directory authority'],
     [/\bCommand::new\s*\(/, 'process authority'],
     [/\b(?:fetch|WebSocket)\s*\(/, 'network authority'],
@@ -1967,6 +2088,30 @@ function checkRustWalletSource(source, rel) {
   for (const [pattern, label] of forbidden) {
     if (pattern.test(screened)) {
       throw new PolicyError(`wallet Rust source ${rel} contains forbidden ${label}`);
+    }
+  }
+  if (wal006Path) {
+    const wal006Forbidden = [
+      [/zcash_client_backend(?:::[A-Za-z0-9_]+)*::proto::service|compact_tx_streamer_client|lightwalletd/i,
+        'WAL-006 Zcash lightwalletd service-client authority'],
+      [/\b(?:endpoint|url|uri)\s*(?::[^=;\n]+)?=/i, 'WAL-006 Zcash endpoint authority'],
+      [/\b(?:broadcast|send_transaction)\s*!?\s*\(|\.broadcast\s*\(/i,
+        'WAL-006 Zcash broadcast authority'],
+      [/\b(?:connect|listen)\s*\(|\.(?:connect|listen)\s*\(/i,
+        'WAL-006 Zcash network authority'],
+    ];
+    for (const [pattern, label] of wal006Forbidden) {
+      if (pattern.test(screened)) {
+        throw new PolicyError(`wallet Rust source ${rel} contains forbidden ${label}`);
+      }
+    }
+    if (/\.(?:sign|prove|extract)\s*\(|\b(?:sign|prove|extract)\s*\(/i.test(screened) ||
+        /\b(?:pczt|transaction|tx|prepared_pczt|artifact)\s*\.\s*finalize\s*\(/i.test(screened)) {
+      throw new PolicyError(`wallet Rust source ${rel} contains forbidden WAL-006 Zcash authority`);
+    }
+    if (rel.startsWith('wallet-broker/src/zec') &&
+        rel !== 'wallet-broker/src/zec/test_support.rs' && /\bNetwork::MainNetwork\b/.test(screened)) {
+      throw new PolicyError(`wallet Rust source ${rel} contains forbidden WAL-006 Zcash mainnet authority`);
     }
   }
   if (rel === 'wallet-broker/src/vault.rs') {
@@ -2200,6 +2345,32 @@ function checkRepository(root) {
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkRustWalletSource(fs.readFileSync(sourcePath, 'utf8'), rel);
   }
+  const recursiveRustSources = [];
+  const collectRustSources = (directory, relative) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const childRelative = path.posix.join(relative, entry.name);
+      if (entry.isDirectory()) {
+        collectRustSources(path.join(directory, entry.name), childRelative);
+      } else if (entry.isFile() && entry.name.endsWith('.rs')) {
+        recursiveRustSources.push(childRelative);
+      }
+    }
+  };
+  collectRustSources(rustSourceDirectory, 'wallet-broker/src');
+  const wal006RustSources = recursiveRustSources
+    .filter((rel) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(rel))
+    .sort();
+  checkWal006RustSourceInventory(wal006RustSources);
+  for (const rel of WAL006_ALLOWED_RUST_SOURCE_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkRustWalletSource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
+  checkWal006ResolvedFeatures({
+    direct: WAL006_DIRECT_DEPENDENCIES,
+    compiled_pczt_capabilities: WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+    bitbook_authority: ['receiver.fresh', 'fixture.scan', 'pczt.prepare'],
+  });
   checkWalletBrokerDenyPolicy(fs.readFileSync(path.join(root, 'deny.toml'), 'utf8'));
   const social = loadWorkflow(path.join(root, '.github/workflows/social.yml'));
   const security = loadWorkflow(path.join(root, '.github/workflows/security.yml'));
@@ -2282,6 +2453,9 @@ module.exports = {
   WAL006_SUPPORT_DEPENDENCIES,
   WAL006_PREPARE_DEPENDENCIES,
   WAL006_TEST_TARGETS,
+  WAL006_FORBIDDEN_FEATURES,
+  WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
+  WAL006_ALLOWED_RUST_SOURCE_PATHS,
   parseYaml,
   loadWorkflow,
   eventTriggers,
@@ -2298,6 +2472,8 @@ module.exports = {
   checkWalletBoundarySource,
   checkWalletBrokerManifest,
   checkRustWalletSourceInventory,
+  checkWal006ResolvedFeatures,
+  checkWal006RustSourceInventory,
   checkRustWalletSource,
   checkWalletBrokerDenyPolicy,
   checkRepository,
