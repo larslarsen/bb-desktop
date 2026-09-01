@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SERDE FEATURE PRODUCTION SOURCE ACCEPTED — HERMES LOCK CAPTURE AUTHORIZED
+State: PHASE-C PREPARE SERDE LOCK CAPTURE COMPLETED — HERMES LOCK CAPTURE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -17,8 +17,11 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare serde lock-capture handoff:
+Completed prepare serde lock-capture handoff:
 [HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md)
+
+Accepted prepare serde lock-capture evidence:
+[BBD-WAL-006-PREPARE-SERDE-LOCK-CAPTURE-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-LOCK-CAPTURE-01.md)
 
 Accepted prepare serde-feature production source review:
 [BBD-WAL-006-PREPARE-SERDE-FEATURE-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-PRODUCTION-SOURCE-REVIEW-01.md)
