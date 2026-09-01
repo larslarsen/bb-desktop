@@ -1,8 +1,14 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — FALSIFICATION AUTHORIZED
+Status: COMPLETE — ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+
+Final acceptance: `docs/testing/BBD-WAL-005-ACCEPTANCE.md`
+
+Accepted production commit: `0b51c73f8a875b69b3b57ad0dfb4740c5d96dc12`
+
+Final falsification evidence: `3e1e0b14cd2b78f9a144f4dc8e98ed87a027c3b9`
 
 Test and production source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
@@ -250,7 +256,7 @@ Hermes completed the resumed expected-red gate at commit
 `d00ba98e2d3951cbadbb913e84dbbac11f4a443e`; the reviewer acceptance is
 `docs/testing/BBD-WAL-005-EXPECTED-RED-REVIEW-01.md`.
 
-### Phase B — production source only (active)
+### Phase B — production source only (complete)
 
 Under `docs/handoff/CODEX_SOL_BBD_WAL_005_PRODUCTION_01.md`, Codex Sol may create or edit
 only:
@@ -293,3 +299,8 @@ Hermes must separately falsify and restore at least:
 
 Each isolated mutation must make the focused test fail for the intended reason. The
 restored tree must then pass the complete gate. No falsification mutation is committed.
+
+Hermes completed all four isolated falsifications and the restored verification gate at
+`3e1e0b14cd2b78f9a144f4dc8e98ed87a027c3b9`. The reviewer accepted that evidence in
+`docs/testing/BBD-WAL-005-ACCEPTANCE.md`. GitHub Social client workflow run
+`33549927614` succeeded on the accepted production commit. BBD-WAL-005 is complete.
