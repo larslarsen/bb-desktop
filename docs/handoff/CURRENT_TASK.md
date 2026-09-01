@@ -2,19 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE ORCHARD-PADDING CORRECTION AUTHORIZED
+State: PHASE-C PREPARE ORCHARD-PADDING FOCUSED GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol, `wallet-broker/src/zec/store.rs` only
+Authorized source actor: none — Orchard-padding correction source accepted
 
-Authorized integration actor: none until focused source review
+Authorized integration actor: Jr Dev — Hermes, one focused gate command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active correction: classify Orchard protocol padding as padding; reject any witnessed Orchard
-spend or positive/user-addressed Orchard output.
+Active focused gate handoff:
+[HERMES_BBD_WAL_006_ORCHARD_PADDING_FOCUSED_GATE_01.md](HERMES_BBD_WAL_006_ORCHARD_PADDING_FOCUSED_GATE_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
