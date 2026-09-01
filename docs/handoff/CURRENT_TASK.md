@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SERDE FEATURE EXPECTED RED COMPLETED — HERMES EVIDENCE INTEGRATION COMPLETED
+State: PHASE-C PREPARE SERDE FEATURE EXPECTED-RED EVIDENCE REJECTED — HERMES CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (evidence-only expected-red integration)
+Authorized integration actor: Jr Dev — Hermes (evidence correction only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare serde-feature expected-red evidence handoff:
+Active prepare serde-feature evidence correction handoff:
+[HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EVIDENCE_CORRECTION_01.md)
+
+Prepare serde-feature expected-red evidence review:
+[BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md)
+
+Completed prepare serde-feature expected-red evidence handoff:
 [HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EXPECTED_RED_RESUME_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EXPECTED_RED_RESUME_01.md)
 
 Accepted prepare serde-feature expected-red count review:
