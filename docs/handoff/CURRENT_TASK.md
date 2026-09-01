@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SERDE LOCK CAPTURE COMPLETED — HERMES LOCK CAPTURE AUTHORIZED
+State: PHASE-C PREPARE SERDE LOCK ACCEPTED — HERMES PREPARE GATE RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (free Nous route; offline lock capture only)
+Authorized integration actor: Jr Dev — Hermes (free Nous route; prepare gate resume only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -16,6 +16,12 @@ Jr Dev routing:
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
+
+Active prepare gate resume handoff:
+[HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_04.md](HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_04.md)
+
+Accepted prepare serde lock-capture review:
+[BBD-WAL-006-PREPARE-SERDE-LOCK-CAPTURE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-LOCK-CAPTURE-REVIEW-01.md)
 
 Completed prepare serde lock-capture handoff:
 [HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md)
