@@ -2104,7 +2104,7 @@ const WAL006_DIRECT_DEPENDENCIES = {
   zcash_client_sqlite: {
     version: '=0.22.0',
     default_features: false,
-    features: ['orchard', 'test-dependencies', 'transparent-inputs'],
+    features: ['orchard', 'serde', 'test-dependencies', 'transparent-inputs'],
     optional: false,
   },
   pczt: { version: '=0.9.3', default_features: false, features: [], optional: false },
@@ -2213,8 +2213,8 @@ test('WAL-006 manifest requires six exact defaults-off pins and the minimum dire
     ['version = "=0.16.1"', 'version = "0.16"'],
     ['features = ["pczt"]', 'features = ["pczt", "sync"]'],
     [
-      'features = ["orchard", "test-dependencies", "transparent-inputs"]',
-      'features = ["orchard", "test-dependencies", "transparent-inputs", "zewif"]',
+      'features = ["orchard", "serde", "test-dependencies", "transparent-inputs"]',
+      'features = ["orchard", "serde", "test-dependencies", "transparent-inputs", "zewif"]',
     ],
     [
       'pczt = { version = "=0.9.3", default-features = false }',
@@ -2243,8 +2243,8 @@ test('WAL-006 manifest requires six exact defaults-off pins and the minimum dire
   );
   const gitDependency = replaceOnce(
     manifestText,
-    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }',
-    'zcash_client_sqlite = { git = "https://example.invalid/librustzcash", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }'
+    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "serde", "test-dependencies", "transparent-inputs"] }',
+    'zcash_client_sqlite = { git = "https://example.invalid/librustzcash", default-features = false, features = ["orchard", "serde", "test-dependencies", "transparent-inputs"] }'
   );
   assertRejects(
     () => policy.checkWalletBrokerManifest(gitDependency, {
