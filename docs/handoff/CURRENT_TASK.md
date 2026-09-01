@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SERDE FEATURE EXPECTED-RED EVIDENCE CORRECTION COMPLETED — REVIEW REQUIRED
+State: PHASE-C PREPARE SERDE FEATURE EXPECTED RED ACCEPTED — BOUNDED PRODUCTION CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; bounded serde/API production correction)
 
 Authorized integration actor: none
 
@@ -17,9 +17,14 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare serde-feature evidence record:
+Active prepare serde-feature production handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_SERDE_FEATURE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_SERDE_FEATURE_PRODUCTION_01.md)
+
+Accepted prepare serde-feature expected-red review:
+[BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-REVIEW-01.md)
+
+Completed prepare serde-feature evidence correction:
 [HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_FEATURE_EVIDENCE_CORRECTION_01.md)
-[BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md)
 
 Prepare serde-feature expected-red evidence review:
 [BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-EXPECTED-RED-EVIDENCE-REVIEW-01.md)
