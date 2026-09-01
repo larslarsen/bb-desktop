@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE PRODUCTION SOURCE REAUTHORIZED — SOURCE DROP REQUIRED
+State: PHASE-C PREPARE PRODUCTION SOURCE REJECTED — CORRECTED SOURCE DROP REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; production source only)
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; bounded production correction only)
 
 Authorized integration actor: none
 
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare production resume handoff:
+Active prepare production correction handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_CORRECTION_01.md)
+
+Rejected prepare production source review:
+[BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-REVIEW-01.md)
+
+Superseded prepare production resume handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_RESUME_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_RESUME_01.md)
 
 Accepted prepare secret-bytes integration review:
