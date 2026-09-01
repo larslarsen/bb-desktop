@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE FORMAT CORRECTION ACCEPTED — HERMES GATE RESUME AUTHORIZED
+State: PHASE-C PREPARE TARGETED GATE STOPPED — CLOSED STAGE DIAGNOSTIC AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (temporary closed stage markers only)
 
-Authorized integration actor: Jr Dev — Hermes (free Nous route; prepare gate resume only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare gate resume handoff:
+Active prepare stage-diagnostic source handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_STAGE_DIAGNOSTIC_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_STAGE_DIAGNOSTIC_01.md)
+
+Prepare targeted gate stop review:
+[BBD-WAL-006-PREPARE-GATE-TARGETED-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-GATE-TARGETED-REVIEW-01.md)
+
+Stopped prepare gate resume 06 handoff:
 [HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_06.md](HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_06.md)
 
 Accepted prepare format correction review 04:
