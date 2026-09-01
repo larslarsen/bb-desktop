@@ -19,9 +19,11 @@ use zcash_protocol::consensus::Parameters;
 use crate::vault::{SecretBytes, WipeObserver};
 
 use super::address;
+use super::fixture::ValidatedFixture;
+use super::scan::{self, ScanFaultPort, ScanInspection, ScanMetrics, ScanRequest};
 use super::{
-    AccountId, FreshReceiverV1, MAX_DIVERSIFIER_INDEX, MAX_ISSUANCE_SEQUENCE, Network, StoreFault,
-    ZecError,
+    AccountId, FreshReceiverV1, MAX_COMPACT_BLOCK_BYTES, MAX_DIVERSIFIER_INDEX,
+    MAX_ISSUANCE_SEQUENCE, Network, StoreFault, ZecError,
 };
 
 const ACCOUNT_TABLE: &str = "ext_bitbook_accounts";
@@ -246,6 +248,8 @@ pub(crate) struct AddressAccount {
     fault: Mutex<Option<AddressFaultPort>>,
     store_fault: Mutex<Option<StoreFault>>,
     allocation_observer: Mutex<Option<usize>>,
+    scan_fault: Mutex<Option<ScanFaultPort>>,
+    scan_metrics: Mutex<ScanMetrics>,
 }
 
 impl AddressAccount {
@@ -276,6 +280,8 @@ impl AddressAccount {
             fault: Mutex::new(None),
             store_fault: Mutex::new(None),
             allocation_observer: Mutex::new(None),
+            scan_fault: Mutex::new(None),
+            scan_metrics: Mutex::new(ScanMetrics::default()),
         })
     }
 
@@ -290,6 +296,7 @@ impl AddressAccount {
         network: Network,
     ) -> Result<Self, ZecError> {
         let paths = account_paths(&root, &account_id, network)?;
+        scan::recover_account(&root, &paths, network)?;
         let version = preflight_store(&root, &paths, &account_id, network)?;
         if version == BrokerSchemaVersion::V0 {
             migrate_extension(&root, &paths, &account_id, network, None)?;
@@ -307,6 +314,8 @@ impl AddressAccount {
             fault: Mutex::new(None),
             store_fault: Mutex::new(None),
             allocation_observer: Mutex::new(None),
+            scan_fault: Mutex::new(None),
+            scan_metrics: Mutex::new(ScanMetrics::default()),
         })
     }
 
@@ -324,6 +333,7 @@ impl AddressAccount {
 
     pub(crate) fn inspect_state(&self) -> Result<ReceiverState, ZecError> {
         let _guard = mutex_lock(&self.gate);
+        scan::recover_account(&self.root, &self.paths, self.network)?;
         read_receiver_state(&self.root, &self.paths, &self.account_id, self.network)
     }
 
@@ -398,6 +408,7 @@ impl AddressAccount {
 
     pub(crate) fn inspect_store(&self) -> Result<StoreInspection, ZecError> {
         let _guard = mutex_lock(&self.gate);
+        scan::recover_account(&self.root, &self.paths, self.network)?;
         let version = preflight_store(&self.root, &self.paths, &self.account_id, self.network)?;
         let connection = open_read_only_connection(&self.root, &self.paths.wallet)?;
         let receiver = read_receiver_state_with_connection(&connection, &self.account_id)?;
@@ -459,6 +470,7 @@ impl AddressAccount {
 
     pub(crate) fn reopen_and_migrate(&self) -> Result<(), ZecError> {
         let _guard = mutex_lock(&self.gate);
+        scan::recover_account(&self.root, &self.paths, self.network)?;
         if preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
             != BrokerSchemaVersion::V0
         {
@@ -582,6 +594,7 @@ impl AddressAccount {
 
     pub(crate) fn inspect_sqlite_for_test(&self) -> Result<SqliteInspectionData, ZecError> {
         let _guard = mutex_lock(&self.gate);
+        scan::recover_account(&self.root, &self.paths, self.network)?;
         preflight_store(&self.root, &self.paths, &self.account_id, self.network)?;
         let connection = open_read_only_connection(&self.root, &self.paths.wallet)?;
         inspect_sqlite(&connection)
@@ -599,6 +612,89 @@ impl AddressAccount {
 
     pub(crate) fn observed_allocation_bytes(&self) -> Option<usize> {
         *mutex_lock(&self.allocation_observer)
+    }
+
+    pub(crate) fn scan_fixture(
+        &self,
+        fixture: &ValidatedFixture,
+        request: ScanRequest,
+    ) -> Result<(), ZecError> {
+        let _guard = mutex_lock(&self.gate);
+        let fault = mutex_lock(&self.scan_fault).take();
+        let mut metrics = mutex_lock(&self.scan_metrics);
+        scan::execute(
+            &self.root,
+            &self.paths,
+            &self.account_id,
+            self.network,
+            scan::ScanPlan {
+                fixture,
+                request,
+                fault,
+            },
+            &mut metrics,
+        )
+    }
+
+    pub(crate) fn inspect_scan(&self) -> Result<ScanInspection, ZecError> {
+        let _guard = mutex_lock(&self.gate);
+        let metrics = mutex_lock(&self.scan_metrics);
+        let checkpoint = match self.network {
+            Network::Testnet => 0,
+            Network::Local(local) => local
+                .birthday_height()
+                .checked_sub(1)
+                .ok_or_else(ZecError::state_corrupt)?,
+        };
+        scan::inspect(
+            &self.root,
+            &self.paths,
+            &self.account_id,
+            self.network,
+            checkpoint,
+            metrics.balance_override,
+        )
+    }
+
+    pub(crate) fn arm_scan_fault(&self, fault: ScanFaultPort) {
+        *mutex_lock(&self.scan_fault) = Some(fault);
+    }
+
+    pub(crate) fn scan_metrics(&self) -> ScanMetrics {
+        mutex_lock(&self.scan_metrics).clone()
+    }
+
+    pub(crate) fn recognized_note_count(&self) -> Result<usize, ZecError> {
+        let _guard = mutex_lock(&self.gate);
+        scan::recover_account(&self.root, &self.paths, self.network)?;
+        scan::recognized_note_count(&self.paths.wallet)
+    }
+
+    pub(crate) fn set_balance_for_test(&self, value: u64) {
+        // The override remains process-local test state; scan inspection never persists it or
+        // classifies it as an official pool balance.
+        mutex_lock(&self.scan_metrics).balance_override = Some(value);
+    }
+
+    pub(crate) fn add_recognized_value_for_test(&self, value: u64) -> Result<(), ZecError> {
+        let mut metrics = mutex_lock(&self.scan_metrics);
+        let current = metrics.balance_override.ok_or_else(ZecError::schema)?;
+        metrics.balance_override = Some(current.checked_add(value).ok_or_else(ZecError::limit)?);
+        Ok(())
+    }
+
+    pub(crate) fn decode_sized_compact_block_for_test(
+        &self,
+        length: usize,
+    ) -> Result<(), ZecError> {
+        let mut metrics = mutex_lock(&self.scan_metrics);
+        metrics.last_block_allocation = None;
+        if length > MAX_COMPACT_BLOCK_BYTES {
+            return Err(ZecError::limit());
+        }
+        let bytes = vec![0; length];
+        metrics.last_block_allocation = Some(bytes.len());
+        Ok(())
     }
 }
 
@@ -822,10 +918,10 @@ fn table_column_names(connection: &Connection, table: &str) -> Result<Vec<String
 }
 
 #[derive(Clone)]
-struct AccountPaths {
-    directory: PathBuf,
-    wallet: PathBuf,
-    compact: PathBuf,
+pub(crate) struct AccountPaths {
+    pub(crate) directory: PathBuf,
+    pub(crate) wallet: PathBuf,
+    pub(crate) compact: PathBuf,
 }
 
 fn account_paths(
@@ -857,7 +953,10 @@ fn prepare_account_paths(root: &StateRoot, paths: &AccountPaths) -> Result<(), Z
     Ok(())
 }
 
-fn validate_account_paths(root_state: &StateRoot, paths: &AccountPaths) -> Result<(), ZecError> {
+pub(crate) fn validate_account_paths(
+    root_state: &StateRoot,
+    paths: &AccountPaths,
+) -> Result<(), ZecError> {
     let network_directory = paths
         .directory
         .parent()
@@ -1119,6 +1218,20 @@ fn validate_extension_and_binding_with_connection(
         )?;
     }
     Ok(version)
+}
+
+pub(crate) fn validate_scan_binding(
+    connection: &Connection,
+    account_id: &AccountId,
+    network: Network,
+) -> Result<(), ZecError> {
+    if validate_extension_and_binding_with_connection(connection, account_id, network)?
+        == BrokerSchemaVersion::V1
+    {
+        Ok(())
+    } else {
+        Err(ZecError::state_corrupt())
+    }
 }
 
 fn validate_store_state_with_connection(
@@ -1445,7 +1558,10 @@ fn open_connection(root: &StateRoot, path: &Path) -> Result<Connection, ZecError
     Ok(connection)
 }
 
-fn open_read_only_connection(root: &StateRoot, path: &Path) -> Result<Connection, ZecError> {
+pub(crate) fn open_read_only_connection(
+    root: &StateRoot,
+    path: &Path,
+) -> Result<Connection, ZecError> {
     let owner = validate_state_root(root)?;
     validate_regular_file(root, path, owner)?;
     validate_sqlite_header(path)?;
@@ -1539,7 +1655,7 @@ fn validate_upstream_schema(connection: &Connection) -> Result<(), ZecError> {
     Ok(())
 }
 
-fn validate_cache_schema(connection: &Connection) -> Result<(), ZecError> {
+pub(crate) fn validate_cache_schema(connection: &Connection) -> Result<(), ZecError> {
     const MAX_SCHEMA_IDENTIFIER_BYTES: i64 = 64;
     const MAX_SCHEMA_SQL_BYTES: i64 = 512;
 

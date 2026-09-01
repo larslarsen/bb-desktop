@@ -299,7 +299,7 @@ fn sqlite_corruption_during_scan_fails_closed_without_cache_or_tip_commit() {
 #[test]
 fn checked_balance_and_compact_block_limits_cover_below_at_and_above() {
     let mut wallet = wallet("scan-limits");
-    for (value, accepted) in [(u64::MAX - 1, true), (u64::MAX, true)] {
+    for (value, _) in [(u64::MAX - 1, true), (u64::MAX, true)] {
         wallet.set_balance_for_test(value).unwrap();
         assert_eq!(wallet.balances().unwrap().total_zat, value.to_string());
     }

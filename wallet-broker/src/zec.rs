@@ -2,6 +2,7 @@ use core::fmt;
 
 mod address;
 mod fixture;
+mod scan;
 mod store;
 
 #[doc(hidden)]
@@ -10,6 +11,9 @@ pub mod test_support;
 pub const MAX_DIVERSIFIER_INDEX: u64 = i64::MAX as u64;
 pub const MAX_ISSUANCE_SEQUENCE: u64 = i64::MAX as u64;
 pub const MAX_FIXTURE_MANIFEST_BYTES: usize = 256 * 1024;
+pub const MAX_COMPACT_BLOCK_BYTES: usize = 2 * 1024 * 1024;
+
+pub type ScanError = ZecError;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StoreFault {

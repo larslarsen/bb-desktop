@@ -7,11 +7,13 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use sha2::{Digest, Sha256};
+use zcash_protocol::consensus::{BlockHeight, BranchId};
 
 use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
 use super::address::{self, DecodedReceiver, SeedExit};
 use super::fixture;
+use super::scan::{ScanBalances as InnerScanBalances, ScanFaultPort, ScanInspection, ScanRequest};
 use super::store::{
     AddressAccount, AddressFaultPort, HostileEntryKind, SqliteInspectionData, StateRoot,
 };
@@ -24,6 +26,29 @@ pub enum AddressFault {
     ReceiverRowWrite,
     SequenceRowWrite,
     CommitSync,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ScanFault {
+    RollbackWrite,
+    RollbackSync,
+    ReplacementApply,
+    WalletDbCorrupt,
+    CacheDbCorrupt,
+    CommitSync,
+}
+
+impl From<ScanFault> for ScanFaultPort {
+    fn from(value: ScanFault) -> Self {
+        match value {
+            ScanFault::RollbackWrite => Self::RollbackWrite,
+            ScanFault::RollbackSync => Self::RollbackSync,
+            ScanFault::ReplacementApply => Self::ReplacementApply,
+            ScanFault::WalletDbCorrupt => Self::WalletDbCorrupt,
+            ScanFault::CacheDbCorrupt => Self::CacheDbCorrupt,
+            ScanFault::CommitSync => Self::CommitSync,
+        }
+    }
 }
 
 impl From<AddressFault> for AddressFaultPort {
@@ -264,6 +289,21 @@ impl core::fmt::Debug for TestAccount {
 }
 
 impl TestAccount {
+    pub fn bootstrap_from_fixture(
+        root: TestStateRoot,
+        account_id: AccountId,
+        fixture: &FrozenFixture,
+    ) -> Result<Self, ZecError> {
+        let validated = fixture.inner.validate_complete()?;
+        let network = super::LocalNetwork::new(
+            validated.manifest.network.birthday_height,
+            validated.manifest.network.nu6_3,
+            validated.manifest.expected.confirmation_height,
+        )?;
+        let seed = SecretBytes::new(vec![0; 32]).map_err(|_| ZecError::internal())?;
+        Self::bootstrap(root, account_id, Network::Local(network), seed)
+    }
+
     pub fn bootstrap(
         root: TestStateRoot,
         account_id: AccountId,
@@ -508,6 +548,116 @@ impl TestAccount {
         }
         address::exercise_seed_exit(network, &mut seed, &mut wipes, exit)
     }
+
+    pub fn scan(&mut self, fixture: &FrozenFixture) -> Result<(), ZecError> {
+        let validated = fixture.inner.validate_complete()?;
+        self.inner.scan_fixture(&validated, ScanRequest::Canonical)
+    }
+
+    pub fn scan_through(&mut self, fixture: &FrozenFixture, height: u32) -> Result<(), ZecError> {
+        let validated = fixture.inner.validate_complete()?;
+        self.inner
+            .scan_fixture(&validated, ScanRequest::Through(height))
+    }
+
+    pub fn scan_scenario(
+        &mut self,
+        fixture: &FrozenFixture,
+        scenario: &str,
+    ) -> Result<(), ZecError> {
+        let mut validated = fixture.inner.validate_complete()?;
+        match scenario {
+            "wrong-branch" => {
+                let local = super::LocalNetwork::new(
+                    validated.manifest.network.birthday_height,
+                    validated.manifest.network.nu6_3,
+                    validated.manifest.expected.confirmation_height,
+                )?;
+                let actual = u32::from(BranchId::for_height(
+                    &local.upstream(),
+                    BlockHeight::from_u32(validated.manifest.network.nu6_3),
+                ));
+                validated.manifest.expected.nu6_3_branch_id_hex = format!("{:08x}", actual ^ 1);
+            }
+            "wrong-network" => {
+                validated.manifest.network.discriminator = "zec-testnet".to_owned();
+            }
+            _ => {}
+        }
+        self.inner
+            .scan_fixture(&validated, ScanRequest::Scenario(scenario.to_owned()))
+    }
+
+    pub fn inspect_scan_state(&self) -> Result<ScanStateInspection, ZecError> {
+        self.inner.inspect_scan().map(ScanStateInspection::from)
+    }
+
+    pub fn balances(&self) -> Result<ScanBalances, ZecError> {
+        self.inspect_scan_state().map(|state| state.balances)
+    }
+
+    pub fn arm_scan_fault(&mut self, fault: ScanFault) {
+        self.inner.arm_scan_fault(fault.into());
+    }
+
+    pub fn scan_calls(&self) -> usize {
+        self.inner.scan_metrics().scan_calls
+    }
+
+    pub fn applied_block_count(&self) -> usize {
+        self.inner.scan_metrics().applied_block_count
+    }
+
+    pub fn recognized_note_count(&self) -> usize {
+        self.inner
+            .recognized_note_count()
+            .expect("WAL-006 recognized-note inspection failed")
+    }
+
+    pub fn unrelated_output_count_seen(&self) -> usize {
+        self.inner
+            .scan_metrics()
+            .unrelated_output_count
+            .expect("WAL-006 unrelated-output inspection unavailable")
+    }
+
+    pub fn rolled_back_note_count(&self) -> usize {
+        self.inner
+            .scan_metrics()
+            .rolled_back_note_count
+            .expect("WAL-006 rolled-back-note inspection unavailable")
+    }
+
+    pub fn rolled_back_block_count(&self) -> usize {
+        self.inner
+            .scan_metrics()
+            .rolled_back_block_count
+            .expect("WAL-006 rolled-back-block inspection unavailable")
+    }
+
+    pub fn applied_replacement_note_count(&self) -> usize {
+        self.inner
+            .scan_metrics()
+            .applied_replacement_note_count
+            .expect("WAL-006 replacement-note inspection unavailable")
+    }
+
+    pub fn set_balance_for_test(&mut self, value: u64) -> Result<(), ZecError> {
+        self.inner.set_balance_for_test(value);
+        Ok(())
+    }
+
+    pub fn add_recognized_value_for_test(&mut self, value: u64) -> Result<(), ZecError> {
+        self.inner.add_recognized_value_for_test(value)
+    }
+
+    pub fn decode_sized_compact_block_for_test(&mut self, length: usize) -> Result<(), ZecError> {
+        self.inner.decode_sized_compact_block_for_test(length)
+    }
+
+    pub fn last_block_allocation(&self) -> Option<usize> {
+        self.inner.scan_metrics().last_block_allocation
+    }
 }
 
 pub struct StorePathInspection {
@@ -741,6 +891,52 @@ impl WipeObserver for IgnoreWipes {
     fn observe(&mut self, _event: WipeEvent) {}
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ScanBalances {
+    pub transparent_zat: String,
+    pub sapling_zat: String,
+    pub orchard_migration_required_zat: String,
+    pub ironwood_pending_zat: String,
+    pub ironwood_spendable_zat: String,
+    pub total_zat: String,
+}
+
+impl From<InnerScanBalances> for ScanBalances {
+    fn from(value: InnerScanBalances) -> Self {
+        Self {
+            transparent_zat: value.transparent_zat,
+            sapling_zat: value.sapling_zat,
+            orchard_migration_required_zat: value.orchard_migration_required_zat,
+            ironwood_pending_zat: value.ironwood_pending_zat,
+            ironwood_spendable_zat: value.ironwood_spendable_zat,
+            total_zat: value.total_zat,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ScanStateInspection {
+    pub tip_height: u32,
+    pub tip_hash: String,
+    pub tree_root: String,
+    pub receiver_sequence: String,
+    pub balances: ScanBalances,
+    pub pool_classification: String,
+}
+
+impl From<ScanInspection> for ScanStateInspection {
+    fn from(value: ScanInspection) -> Self {
+        Self {
+            tip_height: value.tip_height,
+            tip_hash: value.tip_hash,
+            tree_root: value.tree_root,
+            receiver_sequence: value.receiver_sequence,
+            balances: value.balances.into(),
+            pool_classification: value.pool_classification,
+        }
+    }
+}
+
 pub struct FrozenFixture {
     inner: fixture::FrozenFixture,
     manifest: FrozenManifest,
@@ -749,26 +945,225 @@ pub struct FrozenFixture {
 impl FrozenFixture {
     pub fn open(path: &str) -> Result<Self, ZecError> {
         let inner = fixture::FrozenFixture::open(path)?;
-        let manifest = FrozenManifest {
-            expected: FrozenExpected {
-                orchard_only_receiver: inner.orchard_only_receiver().to_owned(),
-            },
-        };
+        let manifest = FrozenManifest::from(&inner.manifest);
         Ok(Self { inner, manifest })
     }
 
     pub fn manifest(&self) -> &FrozenManifest {
-        let _ = &self.inner;
         &self.manifest
+    }
+
+    pub fn expected_destination_receiver(&self) -> &str {
+        self.inner.orchard_only_receiver()
+    }
+
+    pub fn canonical_block_count(&self) -> usize {
+        self.manifest.scenarios.canonical.len()
+    }
+
+    pub fn bytes(&self, file: &FrozenFile) -> Result<Vec<u8>, ZecError> {
+        self.inner
+            .validate_complete()?
+            .file(&file.name)
+            .map(|block| block.bytes)
+    }
+
+    pub fn sha256(&self, file: &FrozenFile) -> Result<String, ZecError> {
+        self.bytes(file).map(|bytes| sha256_hex(&bytes))
+    }
+
+    pub fn decode_block(&self, height: u32) -> Result<DecodedCompactBlock, ZecError> {
+        let validated = self.inner.validate_complete()?;
+        let file = validated
+            .manifest
+            .files
+            .iter()
+            .find(|file| file.block_height == Some(height))
+            .ok_or_else(ZecError::schema)?;
+        validated.file(&file.name)?;
+        let manifest_branch =
+            u32::from_str_radix(&validated.manifest.expected.nu6_3_branch_id_hex, 16)
+                .map_err(|_| ZecError::state_corrupt())?;
+        let local = super::LocalNetwork::new(
+            validated.manifest.network.birthday_height,
+            validated.manifest.network.nu6_3,
+            validated.manifest.expected.confirmation_height,
+        )?;
+        let consensus_branch = u32::from(BranchId::for_height(
+            &local.upstream(),
+            BlockHeight::from_u32(height),
+        ));
+        if consensus_branch != manifest_branch {
+            return Err(ZecError::state_corrupt());
+        }
+        Ok(DecodedCompactBlock { consensus_branch })
+    }
+
+    pub fn mutated_manifest_for_test(&self, mutation: &str) -> Self {
+        use fixture::ManifestMutation;
+        let mutation = match mutation {
+            "unknown-field" => ManifestMutation::UnknownField,
+            "duplicate-entry" => ManifestMutation::DuplicateEntry,
+            "path-traversal" => ManifestMutation::PathTraversal,
+            "absolute-path" => ManifestMutation::AbsolutePath,
+            "wrong-length" => ManifestMutation::WrongLength,
+            "wrong-sha256" => ManifestMutation::WrongSha256,
+            "wrong-network" => ManifestMutation::WrongNetwork,
+            "unsupported-version" => ManifestMutation::UnsupportedVersion,
+            "duplicate-json-key" => ManifestMutation::DuplicateJsonKey,
+            _ => ManifestMutation::UnknownField,
+        };
+        Self {
+            inner: self.inner.mutated(mutation),
+            manifest: self.manifest.clone(),
+        }
     }
 }
 
+#[derive(Clone)]
 pub struct FrozenManifest {
+    pub format: String,
+    pub version: u32,
+    pub generator: FrozenGenerator,
+    pub network: FrozenNetwork,
     pub expected: FrozenExpected,
+    pub files: Vec<FrozenFile>,
+    pub scenarios: FrozenScenarios,
 }
 
+#[derive(Clone)]
+pub struct FrozenGenerator {
+    pub zcash_client_backend: String,
+    pub zcash_client_sqlite: String,
+    pub pczt: String,
+    pub zcash_primitives: String,
+    pub zcash_protocol: String,
+    pub zcash_keys: String,
+}
+
+#[derive(Clone)]
+pub struct FrozenNetwork {
+    pub discriminator: String,
+    pub birthday_height: u32,
+    pub checkpoint_height: u32,
+    pub overwinter: u32,
+    pub sapling: u32,
+    pub blossom: u32,
+    pub heartwood: u32,
+    pub canopy: u32,
+    pub nu5: u32,
+    pub nu6: u32,
+    pub nu6_1: u32,
+    pub nu6_2: u32,
+    pub nu6_3: u32,
+}
+
+#[derive(Clone)]
 pub struct FrozenExpected {
     pub orchard_only_receiver: String,
+    pub orchard_migration_required_zat: u64,
+    pub ironwood_spendable_zat: u64,
+    pub reorg_victim_ironwood_pending_zat: u64,
+    pub reorg_replacement_ironwood_pending_zat: u64,
+    pub confirmation_height: u32,
+    pub nu6_3_branch_id_hex: String,
+    pub prepared_transaction_version: u32,
+}
+
+#[derive(Clone)]
+pub struct FrozenFile {
+    pub name: String,
+    pub byte_length: u64,
+    pub sha256: String,
+    pub block_height: Option<u32>,
+    pub block_hash: Option<String>,
+    pub previous_hash: Option<String>,
+    pub scenario_labels: Vec<String>,
+}
+
+#[derive(Clone)]
+pub struct FrozenScenarios {
+    pub canonical: Vec<String>,
+    pub replay: Vec<String>,
+    pub discontinuity: String,
+    pub height_gap: String,
+    pub one_block_reorg: String,
+    pub truncation: String,
+    pub malformed: String,
+    pub corruption: String,
+    pub impossible_tree_state: String,
+}
+
+impl From<&fixture::FixtureManifest> for FrozenManifest {
+    fn from(value: &fixture::FixtureManifest) -> Self {
+        Self {
+            format: value.format.clone(),
+            version: value.version,
+            generator: FrozenGenerator {
+                zcash_client_backend: value.generator.zcash_client_backend.clone(),
+                zcash_client_sqlite: value.generator.zcash_client_sqlite.clone(),
+                pczt: value.generator.pczt.clone(),
+                zcash_primitives: value.generator.zcash_primitives.clone(),
+                zcash_protocol: value.generator.zcash_protocol.clone(),
+                zcash_keys: value.generator.zcash_keys.clone(),
+            },
+            network: FrozenNetwork {
+                discriminator: value.network.discriminator.clone(),
+                birthday_height: value.network.birthday_height,
+                checkpoint_height: value.network.checkpoint_height,
+                overwinter: value.network.overwinter,
+                sapling: value.network.sapling,
+                blossom: value.network.blossom,
+                heartwood: value.network.heartwood,
+                canopy: value.network.canopy,
+                nu5: value.network.nu5,
+                nu6: value.network.nu6,
+                nu6_1: value.network.nu6_1,
+                nu6_2: value.network.nu6_2,
+                nu6_3: value.network.nu6_3,
+            },
+            expected: FrozenExpected {
+                orchard_only_receiver: value.expected.orchard_only_receiver.clone(),
+                orchard_migration_required_zat: value.expected.orchard_migration_required_zat,
+                ironwood_spendable_zat: value.expected.ironwood_spendable_zat,
+                reorg_victim_ironwood_pending_zat: value.expected.reorg_victim_ironwood_pending_zat,
+                reorg_replacement_ironwood_pending_zat: value
+                    .expected
+                    .reorg_replacement_ironwood_pending_zat,
+                confirmation_height: value.expected.confirmation_height,
+                nu6_3_branch_id_hex: value.expected.nu6_3_branch_id_hex.clone(),
+                prepared_transaction_version: value.expected.prepared_transaction_version,
+            },
+            files: value
+                .files
+                .iter()
+                .map(|file| FrozenFile {
+                    name: file.name.clone(),
+                    byte_length: file.byte_length,
+                    sha256: file.sha256.clone(),
+                    block_height: file.block_height,
+                    block_hash: file.block_hash.clone(),
+                    previous_hash: file.previous_hash.clone(),
+                    scenario_labels: file.scenario_labels.clone(),
+                })
+                .collect(),
+            scenarios: FrozenScenarios {
+                canonical: value.scenarios.canonical.clone(),
+                replay: value.scenarios.replay.clone(),
+                discontinuity: value.scenarios.discontinuity.clone(),
+                height_gap: value.scenarios.height_gap.clone(),
+                one_block_reorg: value.scenarios.one_block_reorg.clone(),
+                truncation: value.scenarios.truncation.clone(),
+                malformed: value.scenarios.malformed.clone(),
+                corruption: value.scenarios.corruption.clone(),
+                impossible_tree_state: value.scenarios.impossible_tree_state.clone(),
+            },
+        }
+    }
+}
+
+pub struct DecodedCompactBlock {
+    pub consensus_branch: u32,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

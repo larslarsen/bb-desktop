@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN GATE RESUME 06 AUTHORIZED
+State: PHASE-C SCAN GATE COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
