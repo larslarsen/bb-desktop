@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE FINAL GATE AND INTEGRATION AUTHORIZED
+State: PHASE-C PREPARE POST-PARSE FORMAT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — source and focused regression accepted
+Authorized source actor: Principal Dev — Codex Sol at High, one formatter-proven line wrap
 
-Authorized integration actor: Jr Dev — Hermes, final gate/evidence/integration only
+Authorized integration actor: none until formatter correction review
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active gate handoff:
+Active source handoff:
+[CODEX_SOL_BBD_WAL_006_POST_PARSE_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_POST_PARSE_FORMAT_CORRECTION_01.md)
+
+Stopped final gate handoff:
 [HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md)
 
 Completed focused gate handoff:
