@@ -3,6 +3,7 @@
 const path = require('path');
 const { app, BrowserWindow, Menu, ipcMain, session } = require('electron');
 const { createWalletSupervisor } = require('./wallet-broker/supervisor');
+const { sanitizeWalletSnapshot } = require('./wallet-pay/model');
 
 app.enableSandbox();
 
@@ -109,68 +110,6 @@ function walletHandler(channel, method) {
   };
 }
 
-function snapshotData(value, key) {
-  const descriptor = value && typeof value === 'object'
-    ? Object.getOwnPropertyDescriptor(value, key) : null;
-  return descriptor && Object.prototype.hasOwnProperty.call(descriptor, 'value')
-    ? descriptor.value : undefined;
-}
-
-function plainSnapshotObject(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype;
-}
-
-function snapshotCapabilities(value) {
-  const result = {};
-  if (!plainSnapshotObject(value)) return result;
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-    if (Object.prototype.hasOwnProperty.call(descriptor, 'value') &&
-        /^[a-z][a-z0-9_]*$/.test(key) && typeof descriptor.value === 'boolean') {
-      result[key] = descriptor.value;
-    }
-  }
-  return result;
-}
-
-function sanitizeSnapshot(value) {
-  const broker = ['down', 'locked', 'ready', 'syncing', 'degraded'].includes(snapshotData(value, 'broker'))
-    ? snapshotData(value, 'broker') : 'down';
-  const sourceAccounts = snapshotData(value, 'accounts');
-  const accounts = [];
-  if (Array.isArray(sourceAccounts)) {
-    for (const source of sourceAccounts.slice(0, 256)) {
-      if (!plainSnapshotObject(source)) continue;
-      const accountId = snapshotData(source, 'account_id');
-      if (typeof accountId !== 'string' || !ID.test(accountId)) continue;
-      const account = { account_id: accountId };
-      for (const key of ['label', 'asset', 'network', 'kind', 'privacy', 'balance_atomic']) {
-        if (typeof snapshotData(source, key) === 'string') account[key] = snapshotData(source, key);
-      }
-      account.capabilities = snapshotCapabilities(snapshotData(source, 'capabilities'));
-      const sync = snapshotData(source, 'sync');
-      if (plainSnapshotObject(sync)) {
-        account.sync = {};
-        if (typeof snapshotData(sync, 'state') === 'string') account.sync.state = snapshotData(sync, 'state');
-        if (typeof snapshotData(sync, 'progress') === 'number' &&
-            Number.isFinite(snapshotData(sync, 'progress'))) account.sync.progress = snapshotData(sync, 'progress');
-      }
-      const device = snapshotData(source, 'device');
-      if (plainSnapshotObject(device)) {
-        account.device = {};
-        if (typeof snapshotData(device, 'present') === 'boolean') account.device.present = snapshotData(device, 'present');
-        if (typeof snapshotData(device, 'label') === 'string') account.device.label = snapshotData(device, 'label');
-        const verified = snapshotData(device, 'verified_fields');
-        if (Array.isArray(verified) && verified.every((field) => typeof field === 'string')) {
-          account.device.verified_fields = verified.slice();
-        }
-      }
-      accounts.push(account);
-    }
-  }
-  return { v: 1, broker, accounts };
-}
-
 function denyNavigation(event) {
   event.preventDefault();
 }
@@ -217,7 +156,7 @@ app.on('ready', () => {
   ipcMain.handle('wallet:payee-request:get', walletHandler('wallet:payee-request:get', 'receiver.fresh'));
   walletSupervisor.subscribeSnapshot((value) => {
     if (!window) return;
-    const snapshot = cloneBoundary(sanitizeSnapshot(value));
+    const snapshot = cloneBoundary(sanitizeWalletSnapshot(value));
     window.webContents.send('wallet:snapshot:subscribe', snapshot);
   });
 });

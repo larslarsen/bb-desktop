@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-005 Production Green 01
 
-State: ACTIVE
+State: COMPLETE
 
 Accepted production identity:
 `docs/testing/BBD-WAL-005-PRODUCTION-SOURCE-REVIEW-01.md`

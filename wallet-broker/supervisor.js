@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const childProcess = require('child_process');
+const { sanitizeWalletSnapshot } = require('../wallet-pay/model');
 const {
   computeSessionId,
   createProtocolSession,
@@ -125,72 +126,16 @@ function createBrokerDispatcher(options = {}) {
   };
 }
 
-function readData(value, key) {
-  if (value === null || typeof value !== 'object') return undefined;
-  const descriptor = Object.getOwnPropertyDescriptor(value, key);
-  return descriptor && Object.prototype.hasOwnProperty.call(descriptor, 'value')
-    ? descriptor.value : undefined;
-}
+const sanitizeSnapshot = sanitizeWalletSnapshot;
 
-function isPlainObject(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype;
-}
-
-function safeCapabilities(value) {
-  const descriptors = isPlainObject(value) ? Object.getOwnPropertyDescriptors(value) : null;
-  const result = {};
-  if (!descriptors) return result;
-  for (const [key, descriptor] of Object.entries(descriptors)) {
-    if (Object.prototype.hasOwnProperty.call(descriptor, 'value') &&
-        /^[a-z][a-z0-9_]*$/.test(key) && typeof descriptor.value === 'boolean') result[key] = descriptor.value;
-  }
-  return result;
-}
-
-function sanitizeAccount(value) {
-  if (!isPlainObject(value)) return null;
-  const accountId = readData(value, 'account_id');
-  if (typeof accountId !== 'string' || !ID.test(accountId)) return null;
-  const result = { account_id: accountId };
-  for (const key of ['label', 'asset', 'network', 'kind', 'privacy', 'balance_atomic']) {
-    const field = readData(value, key);
-    if (typeof field === 'string') result[key] = field;
-  }
-  result.capabilities = safeCapabilities(readData(value, 'capabilities'));
-  const sync = readData(value, 'sync');
-  if (isPlainObject(sync)) {
-    result.sync = {};
-    if (typeof readData(sync, 'state') === 'string') result.sync.state = readData(sync, 'state');
-    if (typeof readData(sync, 'progress') === 'number' && Number.isFinite(readData(sync, 'progress'))) {
-      result.sync.progress = readData(sync, 'progress');
-    }
-  }
-  const device = readData(value, 'device');
-  if (isPlainObject(device)) {
-    result.device = {};
-    if (typeof readData(device, 'present') === 'boolean') result.device.present = readData(device, 'present');
-    if (typeof readData(device, 'label') === 'string') result.device.label = readData(device, 'label');
-    const verified = readData(device, 'verified_fields');
-    if (Array.isArray(verified) && verified.every((item) => typeof item === 'string')) {
-      result.device.verified_fields = verified.slice();
-    }
-  }
-  return result;
-}
-
-function sanitizeSnapshot(value) {
-  const brokerValues = ['down', 'locked', 'ready', 'syncing', 'degraded'];
-  const broker = brokerValues.includes(readData(value, 'broker')) ? readData(value, 'broker') : 'down';
-  const sourceAccounts = readData(value, 'accounts');
-  const accounts = [];
-  if (Array.isArray(sourceAccounts)) {
-    for (const source of sourceAccounts.slice(0, 256)) {
-      const account = sanitizeAccount(source);
-      if (account) accounts.push(account);
-    }
-  }
-  return { v: 1, broker, accounts };
+function eventSnapshot(value) {
+  const envelope = exactDataObject(value, [
+    'v', 'id', 'seq', 'kind', 'method', 'params', 'session',
+  ]);
+  if (!envelope || envelope.kind.value !== 'evt' ||
+      envelope.method.value !== 'sync.subscribe') return undefined;
+  const params = exactDataObject(envelope.params.value, ['snapshot']);
+  return params ? params.snapshot.value : undefined;
 }
 
 function defaultSystem() {
@@ -352,6 +297,8 @@ function createWalletSupervisor(options = {}) {
         protocolSession.accept('child', value);
         if (timer) system.clearTimeout(timer);
         timer = null;
+        const receivedSnapshot = eventSnapshot(value);
+        if (receivedSnapshot !== undefined && supervisor.bound) publish(receivedSnapshot);
         return { ok: true };
       } catch (_) {
         return { ok: false, snapshot: close() };

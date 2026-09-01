@@ -98,6 +98,7 @@ const SOCIAL_PATHS = [
   'scripts/build-macos.sh',
   'scripts/build-windows.ps1',
   'wallet-broker/**',
+  'wallet-pay/**',
   '.github/workflows/social.yml',
 ];
 
@@ -111,6 +112,7 @@ const SECURITY_PATHS = [
   'package.json',
   'package-lock.json',
   'wallet-broker/**',
+  'wallet-pay/**',
   'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
@@ -121,7 +123,7 @@ const SECURITY_PATHS = [
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
@@ -150,6 +152,13 @@ const WALLET_IMPORT_ALLOWLIST = [
   './index',
   './index.js',
 ];
+const PAY_MODEL_PATHS = ['wallet-pay/model.js'];
+const PAY_TEST_SCRIPT = 'test:wallet-pay';
+const PAY_TEST_COMMAND = 'node test/walletPay.node.js';
+const PAY_CI_COMMAND = `npm run ${PAY_TEST_SCRIPT}`;
+const PAY_BUILD_COMMANDS = PAY_MODEL_PATHS.map((rel) => `node --check ${rel}`);
+const PAY_SOURCE_FILTER = 'wallet-pay/**';
+const PAY_IMPORT_ALLOWLIST = [];
 const BROKER_BOUNDARY_PATHS = [
   'wallet-broker/protocol.js',
   'wallet-broker/supervisor.js',
@@ -169,6 +178,7 @@ const BROKER_IMPORT_ALLOWLISTS = {
   'wallet-broker/supervisor.js': [
     'crypto', 'node:crypto', 'buffer', 'node:buffer', 'fs', 'node:fs', 'path', 'node:path',
     'child_process', 'node:child_process', './protocol', './protocol.js',
+    '../wallet-pay/model', '../wallet-pay/model.js',
   ],
   'wallet-preload.js': ['electron'],
 };
@@ -184,15 +194,21 @@ const SOCIAL_WORKFLOW_PATHS = [
   ...SOCIAL_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
+  PAY_SOURCE_FILTER,
   'wallet-preload.js',
-  ...SOCIAL_PATHS.slice(2).filter((item) => item !== 'wallet-broker/**'),
+  ...SOCIAL_PATHS.slice(2).filter(
+    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER
+  ),
 ];
 const SECURITY_WORKFLOW_PATHS = [
   ...SECURITY_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
+  PAY_SOURCE_FILTER,
   'wallet-preload.js',
-  ...SECURITY_PATHS.slice(2).filter((item) => item !== 'wallet-broker/**'),
+  ...SECURITY_PATHS.slice(2).filter(
+    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER
+  ),
 ];
 
 const WAL004_MANIFEST = 'wallet-broker/Cargo.toml';
@@ -386,6 +402,8 @@ const REQUIRED_FILES = [
   '.github/workflows/sbom.yml',
   'test/electronSecurity.node.js',
   'test/securityPolicy.node.js',
+  'test/walletPay.node.js',
+  'wallet-pay/model.js',
   '.gitleaksignore',
   ...WAL004_REQUIRED_FILES,
   'deny.toml',
@@ -1226,6 +1244,7 @@ function checkSocialWorkflow(text, data) {
 
   for (const command of [
     BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD, BROKER_CI_COMMAND,
+    PAY_CI_COMMAND,
     WAL004_ROUTINE_TEST, WAL004_FMT, WAL004_CLIPPY, WAL004_NATIVE_CHECK,
   ]) {
     if (!routineCommands.includes(command)) {
@@ -1770,6 +1789,26 @@ function checkWalletContractSource(source, rel) {
   }
 }
 
+function checkWalletPaySource(source, rel) {
+  if (typeof source !== 'string' || !source.trim() || !PAY_MODEL_PATHS.includes(rel)) {
+    throw new PolicyError(`wallet Pay model source ${rel} is empty or unreviewed`);
+  }
+  if (/\b(?:require|import)\s*\(/.test(source) || /\bimport\s+(?!\s*\()/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden wallet Pay model import`);
+  }
+  if (/\bfetch\s*\(|\b(?:new\s+)?WebSocket\s*\(|\bprocess\.env\b/.test(source)) {
+    throw new PolicyError(`${rel} contains forbidden wallet Pay model I/O or process authority`);
+  }
+  if (/\bDate\.now\s*\(|\bMath\.random\s*\(|\bset(?:Timeout|Interval)\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains forbidden wallet Pay model nondeterminism or timer authority`);
+  }
+  for (const authority of ['intent.confirm', 'tx.broadcast']) {
+    if (source.includes(authority)) {
+      throw new PolicyError(`${rel} contains forbidden wallet Pay model authority ${authority}`);
+    }
+  }
+}
+
 function checkWalletBoundarySource(source, rel) {
   if (typeof source !== 'string' || !source.trim()) {
     throw new PolicyError(`wallet boundary source ${rel} is empty`);
@@ -1823,6 +1862,9 @@ function checkWalletBoundarySource(source, rel) {
   }
 
   if (rel === 'wallet-broker/supervisor.js') {
+    if (!/\brequire\s*\(\s*['"]\.\.\/wallet-pay\/model(?:\.js)?['"]\s*\)/.test(source)) {
+      throw new PolicyError(`${rel} must use the reviewed shared wallet Pay sanitizer`);
+    }
     const spawnCount = (source.match(/\bspawn\s*\(/g) || []).length;
     if (spawnCount === 0) throw new PolicyError(`${rel} does not contain the reviewed inert spawn boundary`);
     const spawnCalls = source.match(/\bspawn\s*\([^;]*\)/g) || [];
@@ -2284,6 +2326,9 @@ function checkPackageJson(packageText) {
   if (pkg.scripts[BROKER_TEST_SCRIPT] !== BROKER_TEST_COMMAND) {
     throw new PolicyError(`package.json must expose ${BROKER_TEST_SCRIPT} as the exact broker tests`);
   }
+  if (pkg.scripts[PAY_TEST_SCRIPT] !== PAY_TEST_COMMAND) {
+    throw new PolicyError(`package.json must expose ${PAY_TEST_SCRIPT} as ${PAY_TEST_COMMAND}`);
+  }
   if (pkg.scripts.test !== TOP_LEVEL_TEST_CMD) {
     throw new PolicyError('package.json top-level npm test must include the exact wallet contract command');
   }
@@ -2299,6 +2344,11 @@ function checkPackageJson(packageText) {
   for (const command of BROKER_BUILD_COMMANDS) {
     if (!buildCommands.includes(command)) {
       throw new PolicyError(`package.json wallet broker build syntax omits ${command}`);
+    }
+  }
+  for (const command of PAY_BUILD_COMMANDS) {
+    if (!buildCommands.includes(command)) {
+      throw new PolicyError(`package.json wallet Pay build syntax omits ${command}`);
     }
   }
   if (!buildCommands.includes('node --check scripts/validate-rust-sbom.js')) {
@@ -2326,6 +2376,11 @@ function checkRepository(root) {
     const sourcePath = path.join(root, rel);
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkWalletContractSource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
+  for (const rel of PAY_MODEL_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkWalletPaySource(fs.readFileSync(sourcePath, 'utf8'), rel);
   }
   for (const rel of BROKER_BOUNDARY_PATHS) {
     const sourcePath = path.join(root, rel);
@@ -2425,6 +2480,10 @@ module.exports = {
   WALLET_CONTRACT_PATHS,
   WALLET_BUILD_COMMANDS,
   WALLET_IMPORT_ALLOWLIST,
+  PAY_MODEL_PATHS,
+  PAY_TEST_COMMAND,
+  PAY_BUILD_COMMANDS,
+  PAY_IMPORT_ALLOWLIST,
   BROKER_BOUNDARY_PATHS,
   BROKER_TEST_COMMANDS,
   BROKER_TEST_SCRIPT,
@@ -2470,6 +2529,7 @@ module.exports = {
   checkSbomWorkflow,
   checkPackageJson,
   checkWalletContractSource,
+  checkWalletPaySource,
   checkWalletBoundarySource,
   checkWalletBrokerManifest,
   checkRustWalletSourceInventory,
