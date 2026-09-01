@@ -1,8 +1,12 @@
 # BBD-WAL-006 — Offline Zcash Viewing and Unsigned Ironwood PCZT Adapter
 
-Status: PHASE-C ADDRESS PRODUCTION SOURCE REAUTHORIZED
+Status: COMPLETE — ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+
+Final acceptance: `docs/testing/BBD-WAL-006-ACCEPTANCE.md`
+
+Accepted source/policy commit: `996444e905c9e61e01cfec8b2b6efd8c39423649`
 
 Test and production source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 

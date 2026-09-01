@@ -2,16 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: FINAL LOCAL GATE COMPLETE — REVIEWER ACCEPTANCE PENDING
+State: COMPLETE — REVIEWER ACCEPTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — CC0/final gate complete
+Authorized source actor: none — ticket complete
 
-Authorized integration actor: none — gate complete, reviewer acceptance pending
+Authorized integration actor: none — ticket complete
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
+
+Final reviewer acceptance:
+[BBD-WAL-006-ACCEPTANCE.md](../testing/BBD-WAL-006-ACCEPTANCE.md)
 
 Active CC0/final gate handoff:
 [HERMES_BBD_WAL_006_CC0_FINAL_GATE_01.md](HERMES_BBD_WAL_006_CC0_FINAL_GATE_01.md)
