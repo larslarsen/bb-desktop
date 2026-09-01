@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — TEST-SOURCE SYNTAX CORRECTION AUTHORIZED
+Status: ACTIVE — EXPECTED RED RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -238,8 +238,13 @@ assertions must remain green. A later production handoff will authorize source p
 targeted/broader green commands only after this expected-red evidence is reviewed.
 
 Hermes stopped the first expected-red attempt before production evaluation because
-`test/walletPay.node.js` did not parse. Only the exact one-line parenthesis correction in
-`docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_CORRECTION_01.md` is now authorized.
+`test/walletPay.node.js` did not parse. The exact one-line parenthesis correction was
+performed under `docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_CORRECTION_01.md`.
+
+That one-line correction is reviewer-accepted at 778 lines and SHA-256
+`18969bd83cc0630c98839b9bc3e01a2cddd32a1723e77e6463eb750e31666315`.
+Hermes may resume only under
+`docs/handoff/HERMES_BBD_WAL_005_EXPECTED_RED_RESUME_01.md`.
 
 ## Falsification and acceptance
 

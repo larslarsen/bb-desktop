@@ -1,6 +1,6 @@
 # Codex Sol Handoff — BBD-WAL-005 Test Syntax Correction 01
 
-State: ACTIVE
+State: COMPLETE — REVIEWER ACCEPTED
 
 Production baseline: `14a6818740a1da0641f88a1f91dea3346554dddd`
 

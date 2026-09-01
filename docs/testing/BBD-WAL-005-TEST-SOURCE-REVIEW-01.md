@@ -12,7 +12,7 @@ Reviewer governance HEAD before the drop: `cf1768b7`
 
 | Path | Lines | SHA-256 |
 | --- | ---: | --- |
-| `test/walletPay.node.js` | 778 | `8b43779e2a824dd69155c36ee25d53f5f684c2001bc4c3b972ded1b548e9fd90` |
+| `test/walletPay.node.js` | 778 | `18969bd83cc0630c98839b9bc3e01a2cddd32a1723e77e6463eb750e31666315` |
 | `test/walletSupervisor.node.js` | 350 | `82d5a7a9e352697bf4fe32871e808bd804201b3ecf85d5a592440f684065a16c` |
 | `test/electronSecurity.node.js` | 873 | `cc9bd07a687a07bd5852aa6849e19622e52fc56ab2f8e9e76cc32f9796b5cad8` |
 | `test/securityPolicy.node.js` | 2645 | `116dbdf90c2f380b27dfce0bf31cc6155133213990710c7e5dac0b7a50a02e8e` |
@@ -44,3 +44,7 @@ The high-value assertions are non-vacuous:
 The source actor ran no test or build. Passing behavior is not claimed. Hermes alone is
 authorized to record the expected-red results and integrate this accepted identity.
 
+Correction 01 replaced only the mismatched-parenthesis assertion at line 310 after the
+first Hermes attempt stopped on a syntax error. It made one insertion and one deletion,
+kept the file at 778 lines, and left every test input and assertion meaning unchanged.
+The corrected hash above supersedes the initial accepted hash for that path.
