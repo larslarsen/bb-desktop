@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN ATOMICITY DESIGN REVIEW AUTHORIZED
+State: PHASE-C SCAN PRODUCTION SOURCE RESUMED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SCAN_PRODUCTION_RESUME_01.md](CODEX_SOL_BBD_WAL_006_SCAN_PRODUCTION_RESUME_01.md)
+
+Accepted scan atomicity review:
+[BBD-WAL-006-SCAN-ATOMICITY-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-ATOMICITY-REVIEW-01.md)
+
+Completed Grok Build design handoff:
 [GROK_BUILD_BBD_WAL_006_SCAN_ATOMICITY_REVIEW_01.md](GROK_BUILD_BBD_WAL_006_SCAN_ATOMICITY_REVIEW_01.md)
 
 Scan source no-edit stop review:
