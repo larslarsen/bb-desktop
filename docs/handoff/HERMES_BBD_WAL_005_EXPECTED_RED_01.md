@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-005 Expected Red 01
 
-State: ACTIVE
+State: STOPPED — TEST SOURCE SYNTAX ERROR
 
 Reviewer governance parent before this handoff: `cf1768b7`
 

@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — EXPECTED RED AUTHORIZED
+Status: ACTIVE — TEST-SOURCE SYNTAX CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -236,6 +236,10 @@ node test/securityPolicy.node.js
 Each command must exit nonzero only on the newly reserved WAL-005 behavior. Pre-existing
 assertions must remain green. A later production handoff will authorize source paths and
 targeted/broader green commands only after this expected-red evidence is reviewed.
+
+Hermes stopped the first expected-red attempt before production evaluation because
+`test/walletPay.node.js` did not parse. Only the exact one-line parenthesis correction in
+`docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_CORRECTION_01.md` is now authorized.
 
 ## Falsification and acceptance
 
