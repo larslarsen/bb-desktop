@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE EXACT-COMMAND EVIDENCE CORRECTION AUTHORIZED
+State: PHASE-C STORE GATE COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -35,7 +35,7 @@ Accepted address integration review:
 Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
-Active handoff:
+Completed exact-command evidence correction:
 [HERMES_BBD_WAL_006_STORE_EVIDENCE_CORRECTION_02.md](HERMES_BBD_WAL_006_STORE_EVIDENCE_CORRECTION_02.md)
 
 Store evidence correction review:
