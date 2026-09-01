@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SERDE FEATURE EXPECTED RED ACCEPTED — BOUNDED PRODUCTION CORRECTION AUTHORIZED
+State: PHASE-C PREPARE SERDE FEATURE PRODUCTION SOURCE ACCEPTED — HERMES LOCK CAPTURE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; bounded serde/API production correction)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes (free Nous route; offline lock capture only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare serde-feature production handoff:
+Active prepare serde lock-capture handoff:
+[HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md](HERMES_BBD_WAL_006_PREPARE_SERDE_LOCK_CAPTURE_01.md)
+
+Accepted prepare serde-feature production source review:
+[BBD-WAL-006-PREPARE-SERDE-FEATURE-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SERDE-FEATURE-PRODUCTION-SOURCE-REVIEW-01.md)
+
+Completed prepare serde-feature production handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_SERDE_FEATURE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_SERDE_FEATURE_PRODUCTION_01.md)
 
 Accepted prepare serde-feature expected-red review:
