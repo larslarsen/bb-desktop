@@ -2,16 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: WAL-006 FIVE-CASE FALSIFICATION GATE 01 COMPLETED
+State: WAL-006 FINAL LOCAL ACCEPTANCE GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — only five exact temporary Sol-authored mutations authorized
+Authorized source actor: none — implementation/policy/falsifications accepted
 
-Authorized integration actor: Jr Dev — Hermes, falsification/evidence integration only
+Authorized integration actor: Jr Dev — Hermes, final local gate/evidence integration only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
+
+Active final local gate handoff:
+[HERMES_BBD_WAL_006_FINAL_LOCAL_GATE_01.md](HERMES_BBD_WAL_006_FINAL_LOCAL_GATE_01.md)
 
 Completed falsification gate 01:
 [BBD-WAL-006-FALSIFICATION-GATE-01.md](../testing/BBD-WAL-006-FALSIFICATION-GATE-01.md)
