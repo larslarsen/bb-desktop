@@ -2,16 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE TARGETED GATE STOPPED — ARCHITECTURE DECISION REQUIRED
+State: PHASE-C PREPARE ROLLBACK EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: none — rollback regression test source complete
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes, one focused expected-red command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
+
+Active expected-red handoff:
+[HERMES_BBD_WAL_006_PREPARE_ROLLBACK_EXPECTED_RED_01.md](HERMES_BBD_WAL_006_PREPARE_ROLLBACK_EXPECTED_RED_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
