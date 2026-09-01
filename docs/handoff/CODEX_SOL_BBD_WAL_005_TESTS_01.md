@@ -1,11 +1,8 @@
-# Grok Build Handoff — BBD-WAL-005 Test Source 01
+# Codex Sol Handoff — BBD-WAL-005 Test Source 01
 
-State: STOPPED — NO SOURCE DROP
+State: ACTIVE
 
 Parent: `af52a63c`
-
-Two bounded Grok Build attempts were stopped after producing no file changes. The shared
-tree remained clean. This handoff authorizes no further work.
 
 Read `AGENTS.md`, `TESTING.md`, `tickets/BBD-WAL-005.md`, and the architecture sections
 named by the ticket before editing.

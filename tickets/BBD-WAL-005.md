@@ -4,7 +4,7 @@ Status: ACTIVE — TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Test and production source actor: Sr Dev — Grok Build (High)
+Test and production source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Integration actor: Jr Dev — Hermes
 
@@ -208,7 +208,7 @@ and leave no timers/listeners/handles.
 
 ### Phase A — test source only (active)
 
-Under `docs/handoff/GROK_BUILD_BBD_WAL_005_TESTS_01.md`, Grok Build may create or edit
+Under `docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_01.md`, Codex Sol may create or edit
 only:
 
 - `test/walletPay.node.js`
@@ -250,4 +250,3 @@ Hermes must separately falsify and restore at least:
 
 Each isolated mutation must make the focused test fail for the intended reason. The
 restored tree must then pass the complete gate. No falsification mutation is committed.
-
