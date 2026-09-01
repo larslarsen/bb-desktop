@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — EXPECTED RED RESUME AUTHORIZED
+Status: ACTIVE — PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -207,7 +207,7 @@ and leave no timers/listeners/handles.
 
 ## Test-first phases and current authorization
 
-### Phase A — test source only (accepted; expected red active)
+### Phase A — test source only (complete; expected red accepted)
 
 Under `docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_01.md`, Codex Sol may create or edit
 only:
@@ -245,6 +245,28 @@ That one-line correction is reviewer-accepted at 778 lines and SHA-256
 `18969bd83cc0630c98839b9bc3e01a2cddd32a1723e77e6463eb750e31666315`.
 Hermes may resume only under
 `docs/handoff/HERMES_BBD_WAL_005_EXPECTED_RED_RESUME_01.md`.
+
+Hermes completed the resumed expected-red gate at commit
+`d00ba98e2d3951cbadbb913e84dbbac11f4a443e`; the reviewer acceptance is
+`docs/testing/BBD-WAL-005-EXPECTED-RED-REVIEW-01.md`.
+
+### Phase B — production source only (active)
+
+Under `docs/handoff/CODEX_SOL_BBD_WAL_005_PRODUCTION_01.md`, Codex Sol may create or edit
+only:
+
+- `wallet-pay/model.js`
+- `wallet-broker/supervisor.js`
+- `social-main.js`
+- `package.json`
+- `scripts/security-policy.js`
+- `.github/workflows/social.yml`
+- `.github/workflows/security.yml`
+
+The accepted five test/fixture paths are frozen. No test, preload, renderer DOM/CSS,
+wallet contract, Rust, dependency, lockfile, evidence, documentation, Git, GitHub,
+command execution, network, browser, device, cleanup, or unlisted path is authorized for
+the source actor.
 
 ## Falsification and acceptance
 
