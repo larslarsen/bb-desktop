@@ -6,7 +6,7 @@ unicode-normalization dependency.
 ## Hermes identity
 
 - Version: Hermes Agent v0.18.2 (2026.7.7.2) · upstream b20cc5f7 · local 10b6d1a9 (+1 carried commit)
-- Provider: meituan/longcat-2.0:free
+- Provider: nous
 - Model: meituan/longcat-2.0:free
 
 ## Protected parent
@@ -105,6 +105,10 @@ dependencies = [
 
 No existing package/version/checksum/source/dependency edge or other lock byte
 changed.
+
+The inspected published `unicode-normalization 0.1.25` package has `build = false`,
+`rust-version = 1.36`, and license `MIT OR Apache-2.0`, within the repository's
+existing allowlist.
 
 ## Negative capability
 
