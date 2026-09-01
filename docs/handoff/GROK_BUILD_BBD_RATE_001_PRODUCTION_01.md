@@ -1,6 +1,6 @@
 # Grok Build Handoff — BBD-RATE-001 Production 01
 
-State: ACTIVE
+State: COMPLETE — SOURCE DELIVERED; REVIEW REJECTED; CORRECTION 01 SUPERSEDES
 
 Actor: Sr Dev — Grok Build (`Grok 4.6`, High)
 

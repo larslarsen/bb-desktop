@@ -1,6 +1,6 @@
 # BBD-RATE-001 — Isolated Optional Fiat Quote Worker
 
-Status: ACTIVE — PRODUCTION SOURCE AUTHORIZED
+Status: ACTIVE — PRODUCTION SOURCE CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
