@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE PRODUCTION SOURCE AUTHORIZED — SOURCE DROP REQUIRED
+State: PHASE-C PREPARE SECRET-BYTES AUTO-TRAIT TEST SOURCE AUTHORIZED — TEST DROP REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; production source only)
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; test source only)
 
 Authorized integration actor: none
 
@@ -17,7 +17,16 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare production handoff:
+Active prepare secret-bytes test handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_TESTS_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_TESTS_01.md)
+
+Accepted prepare secret-bytes design review:
+[BBD-WAL-006-PREPARE-SECRET-BYTES-DESIGN-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SECRET-BYTES-DESIGN-REVIEW-01.md)
+
+Stopped prepare production source review:
+[BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-STOP-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-STOP-REVIEW-01.md)
+
+Stopped prepare production handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_01.md)
 
 Accepted prepare NFC dependency integration review:
