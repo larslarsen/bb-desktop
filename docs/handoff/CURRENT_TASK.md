@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN GATE RESUME 05 AUTHORIZED
+State: PHASE-C SCAN FORMAT CAPTURE 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: paused
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes (capture only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_02.md](HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_02.md)
+
+Scan gate formatter stop review 03:
+[BBD-WAL-006-SCAN-GATE-FORMAT-REVIEW-03.md](../testing/BBD-WAL-006-SCAN-GATE-FORMAT-REVIEW-03.md)
+
+Stopped scan gate resume 05:
 [HERMES_BBD_WAL_006_SCAN_GATE_RESUME_05.md](HERMES_BBD_WAL_006_SCAN_GATE_RESUME_05.md)
 
 Accepted runtime fail-closed correction:
