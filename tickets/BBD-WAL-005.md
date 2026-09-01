@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — PRODUCTION SOURCE AUTHORIZED
+Status: ACTIVE — PRODUCTION GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -267,6 +267,10 @@ The accepted five test/fixture paths are frozen. No test, preload, renderer DOM/
 wallet contract, Rust, dependency, lockfile, evidence, documentation, Git, GitHub,
 command execution, network, browser, device, cleanup, or unlisted path is authorized for
 the source actor.
+
+The seven-path production drop is reviewer-accepted at the exact identities in
+`docs/testing/BBD-WAL-005-PRODUCTION-SOURCE-REVIEW-01.md`. Only Hermes may execute and
+integrate it under `docs/handoff/HERMES_BBD_WAL_005_GREEN_01.md`.
 
 ## Falsification and acceptance
 
