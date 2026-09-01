@@ -2,18 +2,18 @@
 
 Ticket: BBD-WAL-006
 
-State: PREPARE INTEGRATION EVIDENCE CORRECTION AUTHORIZED
+State: PREPARE INTEGRATED — EVIDENCE CORRECTED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — implementation integrated
+Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes, two-document evidence correction only
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active evidence-correction handoff:
+Completed integration evidence correction:
 [HERMES_BBD_WAL_006_INTEGRATION_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_006_INTEGRATION_EVIDENCE_CORRECTION_01.md)
 
 Completed prepare final gate resume handoff:
@@ -23,9 +23,6 @@ Prepare rollback gate evidence:
 [BBD-WAL-006-PREPARE-ROLLBACK-GATE-01.md](../testing/BBD-WAL-006-PREPARE-ROLLBACK-GATE-01.md)
 
 Integration commit: be3b23ec295f144d532ae21df95c15223efeeefa
-
-Stopped final gate handoff:
-[HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md)
 
 Stopped final gate handoff:
 [HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_FINAL_GATE_01.md)

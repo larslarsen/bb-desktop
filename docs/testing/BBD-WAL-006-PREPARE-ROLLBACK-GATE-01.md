@@ -98,11 +98,11 @@ The production source uses the official upstream PCZT construction APIs inside o
 
 ## One unsigned real Ironwood action
 
-The decoded inspection in `sufficient_confirmed_ironwood_prepares_sanitized_v6_handle_and_decoded_pczt` reports `ironwood_inputs == 1` with `!has_signatures`, `!has_proofs`, `!finalized`, `!extractable`. The real Ironwood input is identified by its retained spend witness, not by `dummy_sk`.
+The decoded inspection in `sufficient_confirmed_ironwood_prepares_sanitized_v6_handle_and_decoded_pczt` reports `ironwood_inputs == 1` with `!has_signatures`, `!has_proofs`, `!finalized`, `!extractable`. Both Ironwood actions may retain spend witnesses; the authorization-required real action is the one whose `spend_auth_sig` is absent, and the build requires exactly one such unsigned action (`authorization_required_inputs == 1`).
 
 ## One IO-finalized signed padding action
 
-The fixture includes protocol-padding spends that the IO Finalizer clears after signing. The unsigned check applies only to witnessed real spends; these padding signatures are not wallet authority and are excluded from the prepared artifact inspection.
+The pinned upstream IO Finalizer signs the protocol-padding dummy spend. The build requires exactly one signed padding action (`finalized_padding_inputs == 1`). That padding signature is excluded from `inspection.has_signatures` (reported false) only after the exact two-action shape passes: `ironwood_action_count == 2`, exactly one unsigned, exactly one signed.
 
 ## Negative capability
 
@@ -110,7 +110,7 @@ The test `public_capability_surface_has_no_raw_sign_prove_finalize_extract_broad
 
 ## Earlier focused one-test pass
 
-The focused one-test pass was recorded in the earlier HERMES_BBD_WAL_006_POST_PARSE_CORRECTION_GATE_01.md evidence, where the single targeted prepare test passed after the rollback production correction was integrated.
+The focused one-test pass was reported by the completed Hermes handoff HERMES_BBD_WAL_006_POST_PARSE_CORRECTION_GATE_01.md, where the single targeted prepare test passed after the rollback production correction was integrated.
 
 ## Negative evidence
 
