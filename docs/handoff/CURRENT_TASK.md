@@ -2,16 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PREPARE INTEGRATED — EVIDENCE CORRECTED
+State: FINAL WAL-006 POLICY PRODUCTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol at High, one policy source path
 
-Authorized integration actor: none
+Authorized integration actor: none until source review
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
+
+Active policy-source handoff:
+[CODEX_SOL_BBD_WAL_006_FINAL_POLICY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_FINAL_POLICY_PRODUCTION_01.md)
 
 Completed integration evidence correction:
 [HERMES_BBD_WAL_006_INTEGRATION_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_006_INTEGRATION_EVIDENCE_CORRECTION_01.md)
