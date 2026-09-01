@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-RATE-001 Production Gate 01
 
-State: ACTIVE
+State: PAUSED — VALID STOP; FIXTURE CORRECTION REQUIRED
 
 You are **Jr Dev — Hermes** using only the free configured Nous route. Integrate the
 reviewer-accepted production bytes, execute exactly five temporary falsifications, restore
