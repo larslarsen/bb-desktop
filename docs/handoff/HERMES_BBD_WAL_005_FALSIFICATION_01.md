@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-005 Falsification 01
 
-State: ACTIVE
+State: COMPLETE
 
 Baseline: `0b51c73f8a875b69b3b57ad0dfb4740c5d96dc12`
 
