@@ -2,19 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE POST-PARSE DIAGNOSTIC SOURCE AUTHORIZED
+State: PHASE-C PREPARE POST-PARSE DIAGNOSTIC EXECUTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol, temporary marker in `wallet-broker/src/zec/store.rs` only
+Authorized source actor: none — temporary marker accepted
 
-Authorized integration actor: none until marker review
+Authorized integration actor: Jr Dev — Hermes, one diagnostic command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active diagnostic: emit one fixed post-parse line containing only invariant booleans/counts; no
-receiver, memo, amount, key, witness, signature, path, raw bytes, or upstream error text.
+Active diagnostic handoff:
+[HERMES_BBD_WAL_006_POST_PARSE_DIAGNOSTIC_01.md](HERMES_BBD_WAL_006_POST_PARSE_DIAGNOSTIC_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
