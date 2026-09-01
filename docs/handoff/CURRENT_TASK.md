@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE PRODUCTION SOURCE ACCEPTED — HERMES GATE AUTHORIZED
+State: PHASE-C PREPARE GATE STOPPED AT FORMAT — GROK FORMAT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build (bounded prepare format correction only)
 
-Authorized integration actor: Jr Dev — Hermes (bounded prepare gate only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare gate handoff:
+Active prepare format correction handoff:
+[GROK_BUILD_BBD_WAL_006_PREPARE_FORMAT_CORRECTION_01.md](GROK_BUILD_BBD_WAL_006_PREPARE_FORMAT_CORRECTION_01.md)
+
+Stopped prepare gate format review:
+[BBD-WAL-006-PREPARE-GATE-FORMAT-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-GATE-FORMAT-REVIEW-01.md)
+
+Stopped prepare gate handoff:
 [HERMES_BBD_WAL_006_PREPARE_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_GATE_01.md)
 
 Accepted corrected prepare production source review:
