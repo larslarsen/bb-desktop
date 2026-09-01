@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN SOURCE TRUTH CORRECTION AUTHORIZED
+State: PHASE-C SCAN GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[HERMES_BBD_WAL_006_SCAN_GATE_01.md](HERMES_BBD_WAL_006_SCAN_GATE_01.md)
+
+Accepted scan truth correction review:
+[BBD-WAL-006-SCAN-TRUTH-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-TRUTH-CORRECTION-REVIEW-01.md)
+
+Completed scan truth correction:
 [CODEX_SOL_BBD_WAL_006_SCAN_TRUTH_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_SCAN_TRUTH_CORRECTION_01.md)
 
 Scan production source review:
