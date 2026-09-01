@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE GATE RESUME 02 AUTHORIZED
+State: PHASE-C STORE TEST COMPILE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -22,6 +22,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_STORE_TEST_COMPILE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_STORE_TEST_COMPILE_CORRECTION_01.md)
+
+Store gate test-compile stop review:
+[BBD-WAL-006-STORE-GATE-TEST-COMPILE-REVIEW-01.md](../testing/BBD-WAL-006-STORE-GATE-TEST-COMPILE-REVIEW-01.md)
+
+Stopped Hermes store gate resume 02:
 [HERMES_BBD_WAL_006_STORE_GATE_RESUME_02.md](HERMES_BBD_WAL_006_STORE_GATE_RESUME_02.md)
 
 Accepted store format-correction review 02:
