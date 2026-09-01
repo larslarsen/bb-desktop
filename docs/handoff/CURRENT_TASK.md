@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: WAL-006 CC0 LICENSE POLICY PRODUCTION AUTHORIZED
+State: WAL-006 CC0 AND FINAL LOCAL GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol at High, two exact policy lines
+Authorized source actor: none — test-first CC0 correction accepted
 
-Authorized integration actor: none until production review
+Authorized integration actor: Jr Dev — Hermes, bounded final gate/evidence/integration
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active CC0 production handoff:
+Active CC0/final gate handoff:
+[HERMES_BBD_WAL_006_CC0_FINAL_GATE_01.md](HERMES_BBD_WAL_006_CC0_FINAL_GATE_01.md)
+
+Completed CC0 production handoff:
 [CODEX_SOL_BBD_WAL_006_CC0_LICENSE_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_CC0_LICENSE_PRODUCTION_01.md)
 
 Completed CC0 expected-red handoff:
