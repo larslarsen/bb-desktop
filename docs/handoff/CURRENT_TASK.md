@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE DESIGN REVIEW AUTHORIZED
+State: PHASE-C PREPARE NFC DEPENDENCY TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Senior Dev — Grok Build (read-only design)
+Authorized source actor: Principal Dev — Codex Sol (test source only)
 
 Authorized integration actor: Jr Dev — Hermes (paused)
 
@@ -24,7 +24,10 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_006_PREPARE_DESIGN_REVIEW_01.md](GROK_BUILD_BBD_WAL_006_PREPARE_DESIGN_REVIEW_01.md)
+[CODEX_SOL_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_TESTS_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_TESTS_01.md)
+
+Accepted prepare design review:
+[BBD-WAL-006-PREPARE-DESIGN-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-DESIGN-REVIEW-01.md)
 
 Completed scan gate resume 06:
 [HERMES_BBD_WAL_006_SCAN_GATE_RESUME_06.md](HERMES_BBD_WAL_006_SCAN_GATE_RESUME_06.md)
