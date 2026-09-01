@@ -2,19 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE ROLLBACK GATE AUTHORIZED
+State: PHASE-C PREPARE ROLLBACK TARGETED DIAGNOSTIC AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none — rollback source accepted
 
-Authorized integration actor: Jr Dev — Hermes, exact rollback gate only
+Authorized integration actor: Jr Dev — Hermes, one focused diagnostic command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active rollback gate handoff:
-[HERMES_BBD_WAL_006_PREPARE_ROLLBACK_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_ROLLBACK_GATE_01.md)
+Active rollback diagnostic handoff:
+[HERMES_BBD_WAL_006_PREPARE_ROLLBACK_DIAGNOSTIC_01.md](HERMES_BBD_WAL_006_PREPARE_ROLLBACK_DIAGNOSTIC_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
