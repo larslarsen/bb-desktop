@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE POST-PARSE CORRECTION AUTHORIZED
+State: PHASE-C PREPARE POST-PARSE CORRECTION FOCUSED GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol at High, one bounded source correction
+Authorized source actor: none — correction accepted for focused execution
 
-Authorized integration actor: none until reviewer acceptance
+Authorized integration actor: Jr Dev — Hermes, one focused test command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active source handoff:
+Active gate handoff:
+[HERMES_BBD_WAL_006_POST_PARSE_CORRECTION_GATE_01.md](HERMES_BBD_WAL_006_POST_PARSE_CORRECTION_GATE_01.md)
+
+Completed source handoff:
 [CODEX_SOL_BBD_WAL_006_POST_PARSE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_POST_PARSE_CORRECTION_01.md)
 
 Completed diagnostic handoff:
