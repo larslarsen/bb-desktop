@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE PRODUCTION SOURCE REJECTED — CORRECTED SOURCE DROP REQUIRED
+State: PHASE-C PREPARE PRODUCTION SOURCE ACCEPTED — HERMES GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; bounded production correction only)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes (bounded prepare gate only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare production correction handoff:
+Active prepare gate handoff:
+[HERMES_BBD_WAL_006_PREPARE_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_GATE_01.md)
+
+Accepted corrected prepare production source review:
+[BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-REVIEW-02.md](../testing/BBD-WAL-006-PREPARE-PRODUCTION-SOURCE-REVIEW-02.md)
+
+Completed prepare production correction handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_CORRECTION_01.md)
 
 Rejected prepare production source review:
