@@ -43,6 +43,13 @@ fn assert_all_zero(log: &SharedWipes, label: &str, length: usize) {
     );
 }
 
+fn assert_send_sync<T: Send + Sync>() {}
+
+#[test]
+fn secret_bytes_can_be_owned_by_synchronized_account_state() {
+    assert_send_sync::<SecretBytes>();
+}
+
 #[test]
 fn debug_display_errors_logs_snapshots_and_evidence_omit_secret_canaries() {
     let secret = SecretBytes::new(SECRET.to_vec()).unwrap();
