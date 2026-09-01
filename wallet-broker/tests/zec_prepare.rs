@@ -72,7 +72,11 @@ fn assert_exact_inspection(inspection: &PreparedInspection) {
 #[test]
 fn sufficient_confirmed_ironwood_prepares_sanitized_v6_handle_and_decoded_pczt() {
     let mut wallet = wallet("prepare-happy");
+    let wallet_db = wallet.inspect_paths().absolute_wallet_db().to_owned();
+    let wallet_db_before_prepare = std::fs::read(&wallet_db).unwrap();
     let prepared = wallet.prepare(input(), &mut ManualClock::at(NOW)).unwrap();
+    let wallet_db_after_prepare = std::fs::read(&wallet_db).unwrap();
+    assert_eq!(wallet_db_after_prepare, wallet_db_before_prepare);
     assert_eq!(prepared.handle.len(), 32);
     assert!(
         prepared

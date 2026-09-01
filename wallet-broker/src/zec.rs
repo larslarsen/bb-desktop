@@ -2,6 +2,7 @@ use core::fmt;
 
 mod address;
 mod fixture;
+mod prepare;
 mod scan;
 mod store;
 
@@ -12,6 +13,11 @@ pub const MAX_DIVERSIFIER_INDEX: u64 = i64::MAX as u64;
 pub const MAX_ISSUANCE_SEQUENCE: u64 = i64::MAX as u64;
 pub const MAX_FIXTURE_MANIFEST_BYTES: usize = 256 * 1024;
 pub const MAX_COMPACT_BLOCK_BYTES: usize = 2 * 1024 * 1024;
+pub const MAX_MEMO_BYTES: usize = 512;
+pub const MAX_PREPARED_HANDLES: usize = 64;
+pub const MAX_DIAGNOSTIC_BYTES: usize = 4096;
+
+pub use prepare::{HandleBinding, HandleInvalidation, PrepareZecV1, PreparedZecV1};
 
 pub type ScanError = ZecError;
 
@@ -189,6 +195,34 @@ impl ZecError {
             "PROTOCOL_INCOMPATIBLE",
             "Receiver composition is unsupported",
         )
+    }
+
+    pub(crate) fn locked() -> Self {
+        Self::new("LOCKED", "Zcash account is locked")
+    }
+
+    pub(crate) fn watch_only() -> Self {
+        Self::new("WATCH_ONLY", "Zcash account is viewing-only")
+    }
+
+    pub(crate) fn capability_missing() -> Self {
+        Self::new("CAPABILITY_MISSING", "Zcash capability is unavailable")
+    }
+
+    pub(crate) fn migration_required() -> Self {
+        Self::new("MIGRATION_REQUIRED", "Zcash value requires migration")
+    }
+
+    pub(crate) fn insufficient_funds() -> Self {
+        Self::new("INSUFFICIENT_FUNDS", "Insufficient eligible Zcash funds")
+    }
+
+    pub(crate) fn fee_bound() -> Self {
+        Self::new("FEE_BOUND", "Zcash fee exceeds the approved bound")
+    }
+
+    pub(crate) fn expired() -> Self {
+        Self::new("EXPIRED", "Zcash request has expired")
     }
 
     pub fn code(&self) -> &'static str {

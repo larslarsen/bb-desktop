@@ -10,16 +10,33 @@ use rand_core::OsRng;
 use rusqlite::types::ValueRef;
 use rusqlite::{Connection, OpenFlags, TransactionBehavior, params};
 use sha2::{Digest, Sha256};
+use zcash_client_backend::data_api::WalletRead;
+use zcash_client_backend::data_api::wallet::{
+    ConfirmationsPolicy, create_pczt_from_proposal,
+    input_selection::{GreedyInputSelector, SpendPolicy},
+    propose_transfer,
+};
+use zcash_client_backend::fees::{
+    DustOutputPolicy, StandardFeeRule, standard::SingleOutputChangeStrategy,
+};
+use zcash_client_backend::wallet::OvkPolicy;
+use zcash_client_backend::zip321::{Payment, TransactionRequest};
 use zcash_client_sqlite::chain::init::init_cache_database;
 use zcash_client_sqlite::util::SystemClock;
 use zcash_client_sqlite::wallet::init::{WalletMigrator, migrations::CURRENT_LEAF_MIGRATIONS};
 use zcash_client_sqlite::{BlockDb, WalletDb};
+use zcash_keys::address::Address;
+use zcash_primitives::transaction::{TxVersion, builder::BundlePadding};
 use zcash_protocol::consensus::Parameters;
+use zcash_protocol::memo::MemoBytes;
+use zcash_protocol::value::Zatoshis;
+use zcash_protocol::{PoolType, ShieldedPool};
 
 use crate::vault::{SecretBytes, WipeObserver};
 
 use super::address;
 use super::fixture::ValidatedFixture;
+use super::prepare::{PcztInspection, sha256_hex};
 use super::scan::{self, ScanFaultPort, ScanInspection, ScanMetrics, ScanRequest};
 use super::{
     AccountId, FreshReceiverV1, MAX_COMPACT_BLOCK_BYTES, MAX_DIVERSIFIER_INDEX,
@@ -239,6 +256,12 @@ pub(crate) struct ReceiverState {
     pub issued_at_sequence: u64,
 }
 
+pub(crate) struct PreparedBuild {
+    pub raw: SecretBytes,
+    pub fee_zat: u64,
+    pub inspection: PcztInspection,
+}
+
 pub(crate) struct AddressAccount {
     root: StateRoot,
     account_id: AccountId,
@@ -329,6 +352,50 @@ impl AddressAccount {
             self.network,
             fault,
         )
+    }
+
+    pub(crate) fn build_prepared_pczt(
+        &self,
+        receiver: &str,
+        amount: u64,
+        memo: &str,
+        request_id: &str,
+        intent_hash: &str,
+    ) -> Result<PreparedBuild, ZecError> {
+        let _guard = mutex_lock(&self.gate);
+        validate_account_paths(&self.root, &self.paths)?;
+        if preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
+            != BrokerSchemaVersion::V1
+        {
+            return Err(ZecError::state_corrupt());
+        }
+        let cache = open_read_only_connection(&self.root, &self.paths.compact)?;
+        validate_cache_schema(&cache)?;
+        drop(cache);
+        let connection = open_read_write_no_create_connection(&self.root, &self.paths.wallet)?;
+        rusqlite::vtab::array::load_module(&connection).map_err(|_| ZecError::state_corrupt())?;
+        match self.network {
+            Network::Testnet => build_prepared_for(
+                connection,
+                zcash_protocol::consensus::Network::TestNetwork,
+                self.network,
+                receiver,
+                amount,
+                memo,
+                request_id,
+                intent_hash,
+            ),
+            Network::Local(local) => build_prepared_for(
+                connection,
+                local.upstream(),
+                self.network,
+                receiver,
+                amount,
+                memo,
+                request_id,
+                intent_hash,
+            ),
+        }
     }
 
     pub(crate) fn inspect_state(&self) -> Result<ReceiverState, ZecError> {
@@ -1574,6 +1641,22 @@ pub(crate) fn open_read_only_connection(
     Ok(connection)
 }
 
+fn open_read_write_no_create_connection(
+    root: &StateRoot,
+    path: &Path,
+) -> Result<Connection, ZecError> {
+    let owner = validate_state_root(root)?;
+    validate_regular_file(root, path, owner)?;
+    validate_sqlite_header(path)?;
+    let connection = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_WRITE)
+        .map_err(|_| ZecError::state_corrupt())?;
+    connection
+        .busy_timeout(Duration::from_secs(5))
+        .map_err(|_| ZecError::state_corrupt())?;
+    validate_sqlite_database(&connection)?;
+    Ok(connection)
+}
+
 fn validate_sqlite_header(path: &Path) -> Result<(), ZecError> {
     let mut file = fs::File::open(path).map_err(|_| ZecError::state_corrupt())?;
     let mut header = [0; 100];
@@ -1743,6 +1826,212 @@ fn network_heights(network: Network) -> (u32, u32, u32) {
             local.confirmation_height(),
         ),
     }
+}
+
+enum PcztRollback {
+    Prepared,
+    Failed,
+}
+
+impl From<rusqlite::Error> for PcztRollback {
+    fn from(_: rusqlite::Error) -> Self {
+        Self::Failed
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_prepared_for<P: Parameters + Clone + Send + 'static>(
+    mut connection: Connection,
+    params: P,
+    network: Network,
+    receiver: &str,
+    amount: u64,
+    memo: &str,
+    request_id: &str,
+    intent_hash: &str,
+) -> Result<PreparedBuild, ZecError> {
+    let decoded = Address::decode(&params, receiver).ok_or_else(ZecError::schema)?;
+    let destination = decoded.to_zcash_address(&params);
+    let amount_value = Zatoshis::from_u64(amount).map_err(|_| ZecError::limit())?;
+    let memo = if memo.is_empty() {
+        None
+    } else {
+        Some(MemoBytes::from_bytes(memo.as_bytes()).map_err(|_| ZecError::schema())?)
+    };
+    let payment = Payment::new(
+        destination,
+        Some(amount_value),
+        memo,
+        None,
+        None,
+        Vec::new(),
+    )
+    .map_err(|_| ZecError::schema())?;
+    let request = TransactionRequest::new(vec![payment]).map_err(|_| ZecError::schema())?;
+    let input_selector = GreedyInputSelector::new();
+    let change_strategy = SingleOutputChangeStrategy::new(
+        StandardFeeRule::Zip317,
+        None,
+        ShieldedPool::Ironwood,
+        DustOutputPolicy::default(),
+    );
+    let mut wallet = WalletDb::from_connection(&mut connection, params.clone(), SystemClock, OsRng);
+    let account_ids = wallet
+        .get_account_ids()
+        .map_err(|_| ZecError::state_corrupt())?;
+    if account_ids.len() != 1 {
+        return Err(ZecError::state_corrupt());
+    }
+    let proposal = propose_transfer::<_, _, _, _, std::convert::Infallible>(
+        &mut wallet,
+        &params,
+        account_ids[0],
+        &input_selector,
+        &change_strategy,
+        request,
+        ConfirmationsPolicy::MIN,
+        &SpendPolicy::shielded_pools([ShieldedPool::Ironwood]),
+        None,
+        Some(TxVersion::V6),
+    )
+    .map_err(|_| ZecError::insufficient_funds())?;
+    let mut steps = proposal.steps().iter();
+    let step = steps.next().ok_or_else(ZecError::internal)?;
+    if steps.next().is_some()
+        || step.payment_pools().get(&0) != Some(&PoolType::IRONWOOD)
+        || step.input_count_in_pool(PoolType::IRONWOOD) != 1
+        || step.output_count_in_pool(PoolType::IRONWOOD) != 1
+        || step.change_count_in_pool(PoolType::IRONWOOD) != 1
+        || step.input_count_in_pool(PoolType::TRANSPARENT) != 0
+        || step.input_count_in_pool(PoolType::SAPLING) != 0
+        || step.input_count_in_pool(PoolType::ORCHARD) != 0
+    {
+        return Err(ZecError::protocol_incompatible());
+    }
+    let fee = u64::from(step.balance().fee_required());
+    let mut prepared_pczt = None;
+    let rollback: Result<(), PcztRollback> = wallet.transactionally(|transactional_wallet| {
+        let pczt = create_pczt_from_proposal::<
+            _,
+            _,
+            std::convert::Infallible,
+            _,
+            std::convert::Infallible,
+            _,
+        >(
+            transactional_wallet,
+            &params,
+            account_ids[0],
+            OvkPolicy::Sender,
+            &proposal,
+            None,
+            BundlePadding::DEFAULT,
+        )
+        .map_err(|_| PcztRollback::Failed)?;
+        prepared_pczt = Some(pczt);
+        Err(PcztRollback::Prepared)
+    });
+    let pczt = match rollback {
+        Err(PcztRollback::Prepared) => prepared_pczt.ok_or_else(ZecError::internal)?,
+        Ok(()) | Err(PcztRollback::Failed) => return Err(ZecError::internal()),
+    };
+    let pczt = pczt::roles::redactor::Redactor::new(pczt)
+        .redact_ironwood_with(|mut bundle| bundle.compact_resolvable_fields())
+        .finish();
+    let raw = SecretBytes::new(pczt.serialize().map_err(|_| ZecError::internal())?)
+        .map_err(|_| ZecError::internal())?;
+    let parsed = raw
+        .expose(pczt::Pczt::parse)
+        .map_err(|_| ZecError::internal())?;
+    let global = parsed.global();
+    let ironwood = parsed.ironwood();
+    let orchard = parsed.orchard();
+    let ironwood_action_count = ironwood.actions().len();
+    // The IO Finalizer signs the padding spend; the unsigned action is the real spend that
+    // still requires wallet authorization.
+    let authorization_required_inputs = ironwood
+        .actions()
+        .iter()
+        .filter(|action| action.spend().spend_auth_sig().is_none())
+        .count();
+    let finalized_padding_inputs = ironwood
+        .actions()
+        .iter()
+        .filter(|action| action.spend().spend_auth_sig().is_some())
+        .count();
+    let real_outputs = ironwood
+        .actions()
+        .iter()
+        .filter(|action| action.output().value().is_some_and(|value| value > 0))
+        .count();
+    let payment_output = ironwood.actions().iter().find(|action| {
+        action.output().value() == &Some(amount)
+            && action.output().user_address().as_deref() == Some(receiver)
+    });
+    let has_orchard_real_spends = orchard
+        .actions()
+        .iter()
+        .any(|action| action.spend().witness().is_some());
+    let has_orchard_output_bundle = orchard.actions().iter().any(|action| {
+        action.output().value().is_some_and(|value| value > 0)
+            || action.output().user_address().is_some()
+    });
+    let is_v6 = *global.tx_version() == zcash_protocol::constants::V6_TX_VERSION;
+    let is_expected_branch = *global.consensus_branch_id() == 0x37a5_165b;
+    let transparent_empty =
+        parsed.transparent().inputs().is_empty() && parsed.transparent().outputs().is_empty();
+    let sapling_empty =
+        parsed.sapling().spends().is_empty() && parsed.sapling().outputs().is_empty();
+    let ironwood_proof = ironwood.zkproof().is_some();
+    let orchard_proof = orchard.zkproof().is_some();
+    let payment_output = payment_output.ok_or_else(ZecError::protocol_incompatible)?;
+    let memo_bytes = match payment_output.output().enc_ciphertext() {
+        pczt::orchard::EncCiphertext::MemoPlaintext(memo) => memo.as_stripped_bytes(),
+        pczt::orchard::EncCiphertext::Encrypted(_) => {
+            return Err(ZecError::protocol_incompatible());
+        }
+    };
+    let has_proofs = ironwood_proof || orchard_proof;
+    if !is_v6
+        || !is_expected_branch
+        || ironwood_action_count != 2
+        || authorization_required_inputs != 1
+        || finalized_padding_inputs != 1
+        || real_outputs != 2
+        || !transparent_empty
+        || !sapling_empty
+        || has_orchard_real_spends
+        || has_orchard_output_bundle
+        || has_proofs
+    {
+        return Err(ZecError::protocol_incompatible());
+    }
+    Ok(PreparedBuild {
+        raw,
+        fee_zat: fee,
+        inspection: PcztInspection {
+            network: network.as_str().to_owned(),
+            consensus_branch: *global.consensus_branch_id(),
+            transaction_version: *global.tx_version(),
+            destination: receiver.to_owned(),
+            amount_zat: amount.to_string(),
+            memo_sha256: sha256_hex(memo_bytes),
+            fee_zat: fee.to_string(),
+            ironwood_inputs: authorization_required_inputs,
+            ironwood_outputs: real_outputs,
+            has_transparent_bundle: false,
+            has_sapling_bundle: false,
+            has_orchard_output_bundle,
+            has_signatures: false,
+            has_proofs,
+            finalized: false,
+            extractable: false,
+            spend_pool: "ironwood".to_owned(),
+            legacy_input_value_zat: "0".to_owned(),
+            intent_hash_binding: intent_hash.to_owned(),
+            request_id_binding: request_id.to_owned(),
+        },
+    })
 }
 
 fn detect_network(root: &StateRoot, account_id: &AccountId) -> Result<Network, ZecError> {

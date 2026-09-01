@@ -13,11 +13,18 @@ use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
 use super::address::{self, DecodedReceiver, SeedExit};
 use super::fixture;
+use super::prepare::{
+    PcztInspection, PoolInventoryData, PrepareState, PrepareWipeLog, normalize_diagnostic,
+    parse_canonical_positive_u64,
+};
 use super::scan::{ScanBalances as InnerScanBalances, ScanFaultPort, ScanInspection, ScanRequest};
 use super::store::{
     AddressAccount, AddressFaultPort, HostileEntryKind, SqliteInspectionData, StateRoot,
 };
-use super::{AccountId, FreshReceiverV1, Network, StoreFault, ZecError};
+use super::{
+    AccountId, FreshReceiverV1, HandleBinding, HandleInvalidation, Network, PrepareZecV1,
+    PreparedZecV1, StoreFault, ZecError,
+};
 
 static NEXT_STATE_ROOT: AtomicU64 = AtomicU64::new(1);
 
@@ -59,6 +66,261 @@ impl From<AddressFault> for AddressFaultPort {
             AddressFault::CommitSync => Self::CommitSync,
         }
     }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CanonicalNumericField {
+    Amount,
+    FeeBound,
+}
+
+pub fn parse_canonical_u64_for_test(
+    _field: CanonicalNumericField,
+    value: &str,
+) -> Result<u64, ZecError> {
+    parse_canonical_positive_u64(value)
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum PrepareMutation {
+    AccountId(String),
+    Network(String),
+    RequestId(String),
+    IntentHash(String),
+    Amount(String),
+    FeeBound(String),
+    ExpiresAt(String),
+}
+
+pub type PrepareBinding = HandleBinding;
+
+pub struct ManualClock {
+    value: String,
+}
+
+impl ManualClock {
+    pub fn at(value: &str) -> Self {
+        Self {
+            value: value.to_owned(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PoolInventory {
+    inner: PoolInventoryData,
+}
+
+impl PoolInventory {
+    pub fn confirmed_ironwood(value: &str) -> Self {
+        Self::values("0", "0", "0", value, "0", "0")
+    }
+
+    pub fn mixed(ironwood: &str, orchard: &str) -> Self {
+        Self::values("0", "0", orchard, ironwood, "0", "0")
+    }
+
+    pub fn orchard(value: &str) -> Self {
+        Self::values("0", "0", value, "0", "0", "0")
+    }
+
+    pub fn transparent(value: &str) -> Self {
+        Self::values(value, "0", "0", "0", "0", "0")
+    }
+
+    pub fn sapling(value: &str) -> Self {
+        Self::values("0", value, "0", "0", "0", "0")
+    }
+
+    pub fn mixed_with_sufficient_ironwood(ironwood: &str, orchard: &str) -> Self {
+        Self::values("0", "0", orchard, ironwood, "0", "0")
+    }
+
+    pub fn unconfirmed_ironwood(value: &str) -> Self {
+        Self::values("0", "0", "0", "0", value, "0")
+    }
+
+    pub fn locked_ironwood(value: &str) -> Self {
+        Self::values("0", "0", "0", "0", "0", value)
+    }
+
+    fn values(
+        transparent: &str,
+        sapling: &str,
+        orchard: &str,
+        ironwood_spendable: &str,
+        ironwood_unconfirmed: &str,
+        ironwood_locked: &str,
+    ) -> Self {
+        let parse = |value: &str| value.parse::<u64>().expect("WAL-006 inventory value");
+        Self {
+            inner: PoolInventoryData {
+                transparent: parse(transparent),
+                sapling: parse(sapling),
+                orchard: parse(orchard),
+                ironwood_spendable: parse(ironwood_spendable),
+                ironwood_unconfirmed: parse(ironwood_unconfirmed),
+                ironwood_locked: parse(ironwood_locked),
+            },
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PreparedInspection {
+    pub network: String,
+    pub consensus_branch: u32,
+    pub transaction_version: u32,
+    pub destination: String,
+    pub amount_zat: String,
+    pub memo_sha256: String,
+    pub fee_zat: String,
+    pub ironwood_inputs: usize,
+    pub ironwood_outputs: usize,
+    pub has_transparent_bundle: bool,
+    pub has_sapling_bundle: bool,
+    pub has_orchard_output_bundle: bool,
+    pub has_signatures: bool,
+    pub has_proofs: bool,
+    pub finalized: bool,
+    pub extractable: bool,
+    pub spend_pool: String,
+    pub legacy_input_value_zat: String,
+    pub intent_hash_binding: String,
+    pub request_id_binding: String,
+}
+
+impl From<PcztInspection> for PreparedInspection {
+    fn from(value: PcztInspection) -> Self {
+        Self {
+            network: value.network,
+            consensus_branch: value.consensus_branch,
+            transaction_version: value.transaction_version,
+            destination: value.destination,
+            amount_zat: value.amount_zat,
+            memo_sha256: value.memo_sha256,
+            fee_zat: value.fee_zat,
+            ironwood_inputs: value.ironwood_inputs,
+            ironwood_outputs: value.ironwood_outputs,
+            has_transparent_bundle: value.has_transparent_bundle,
+            has_sapling_bundle: value.has_sapling_bundle,
+            has_orchard_output_bundle: value.has_orchard_output_bundle,
+            has_signatures: value.has_signatures,
+            has_proofs: value.has_proofs,
+            finalized: value.finalized,
+            extractable: value.extractable,
+            spend_pool: value.spend_pool,
+            legacy_input_value_zat: value.legacy_input_value_zat,
+            intent_hash_binding: value.intent_hash_binding,
+            request_id_binding: value.request_id_binding,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LookupObservation {
+    pub shape: String,
+    pub returned_bytes: usize,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ObservableSecretClass {
+    Seed,
+    SpendingKey,
+    VaultPlaintext,
+    Ufvk,
+    ReceiverInternals,
+    Memo,
+    NotePlaintext,
+    Nullifier,
+    CompactBlock,
+    SqliteRow,
+    RawPczt,
+    Transaction,
+    UserPath,
+}
+
+impl ObservableSecretClass {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Seed => "seed",
+            Self::SpendingKey => "spending-key",
+            Self::VaultPlaintext => "vault-plaintext",
+            Self::Ufvk => "ufvk",
+            Self::ReceiverInternals => "receiver-internals",
+            Self::Memo => "memo",
+            Self::NotePlaintext => "note-plaintext",
+            Self::Nullifier => "nullifier",
+            Self::CompactBlock => "compact-block",
+            Self::SqliteRow => "sqlite-row",
+            Self::RawPczt => "raw-pczt",
+            Self::Transaction => "transaction",
+            Self::UserPath => "user-path",
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct ObservableCanary<'a> {
+    class: ObservableSecretClass,
+    value: &'a str,
+}
+
+impl<'a> ObservableCanary<'a> {
+    pub fn new(class: ObservableSecretClass, value: &'a str) -> Self {
+        Self { class, value }
+    }
+
+    pub fn class(&self) -> ObservableSecretClass {
+        self.class
+    }
+
+    pub fn value(&self) -> &str {
+        self.value
+    }
+}
+
+pub struct ObservableCanaryReceipt {
+    commitments: Vec<CanaryCommitment>,
+}
+
+impl ObservableCanaryReceipt {
+    pub fn is_closed(&self) -> bool {
+        self.class_names()
+            == [
+                "seed",
+                "spending-key",
+                "vault-plaintext",
+                "ufvk",
+                "receiver-internals",
+                "memo",
+                "note-plaintext",
+                "nullifier",
+                "compact-block",
+                "sqlite-row",
+                "raw-pczt",
+                "transaction",
+                "user-path",
+            ]
+    }
+
+    pub fn class_names(&self) -> Vec<&'static str> {
+        self.commitments.iter().map(|value| value.class).collect()
+    }
+
+    pub fn commitments(&self) -> &[CanaryCommitment] {
+        &self.commitments
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct Capabilities {
+    pub can_sign: bool,
+    pub can_prove: bool,
+    pub can_extract: bool,
+    pub can_broadcast: bool,
+    pub can_network: bool,
+    pub can_mainnet: bool,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -280,6 +542,7 @@ fn sanitize_label(label: &str) -> String {
 
 pub struct TestAccount {
     inner: AddressAccount,
+    prepare: PrepareState,
 }
 
 impl core::fmt::Debug for TestAccount {
@@ -311,8 +574,12 @@ impl TestAccount {
         seed: SecretBytes,
     ) -> Result<Self, ZecError> {
         let mut observer = IgnoreWipes;
-        AddressAccount::bootstrap(root.inner, account_id, network, seed, &mut observer)
-            .map(|inner| Self { inner })
+        AddressAccount::bootstrap(root.inner, account_id, network, seed, &mut observer).map(
+            |inner| Self {
+                inner,
+                prepare: PrepareState::new(),
+            },
+        )
     }
 
     pub fn bootstrap_product_network(
@@ -333,7 +600,10 @@ impl TestAccount {
     }
 
     pub fn open_viewing(root: TestStateRoot, account_id: AccountId) -> Result<Self, ZecError> {
-        AddressAccount::open_viewing(root.inner, account_id).map(|inner| Self { inner })
+        AddressAccount::open_viewing(root.inner, account_id).map(|inner| Self {
+            inner,
+            prepare: PrepareState::viewing_only(),
+        })
     }
 
     pub fn open_viewing_with_network(
@@ -341,8 +611,12 @@ impl TestAccount {
         account_id: AccountId,
         network: Network,
     ) -> Result<Self, ZecError> {
-        AddressAccount::open_viewing_with_network(root.inner, account_id, network)
-            .map(|inner| Self { inner })
+        AddressAccount::open_viewing_with_network(root.inner, account_id, network).map(|inner| {
+            Self {
+                inner,
+                prepare: PrepareState::viewing_only(),
+            }
+        })
     }
 
     pub fn fresh_receiver(&mut self, now: u64) -> Result<FreshReceiverV1, ZecError> {
@@ -370,9 +644,296 @@ impl TestAccount {
     }
 
     pub fn close(self) -> Result<TestStateRoot, ZecError> {
+        self.prepare.invalidate(HandleInvalidation::BrokerExit);
         Ok(TestStateRoot {
             inner: self.inner.root(),
         })
+    }
+
+    pub fn unlock_with_fixture_seed(&mut self) -> Result<(), ZecError> {
+        self.prepare
+            .unlock(SecretBytes::new(vec![0; 32]).map_err(|_| ZecError::internal())?)
+    }
+
+    pub fn session_id(&self) -> String {
+        self.prepare.session_id()
+    }
+
+    pub fn prepare(
+        &mut self,
+        input: PrepareZecV1,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        self.prepare.prepare(&self.inner, input, None, &clock.value)
+    }
+
+    pub fn prepare_with_binding(
+        &mut self,
+        input: PrepareZecV1,
+        binding: PrepareBinding,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        self.prepare
+            .prepare(&self.inner, input, Some(&binding), &clock.value)
+    }
+
+    pub fn prepare_mutated_for_test(
+        &mut self,
+        mut input: PrepareZecV1,
+        mutation: PrepareMutation,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        match mutation {
+            PrepareMutation::AccountId(value) => input.account_id = value,
+            PrepareMutation::Network(value) => input.network = value,
+            PrepareMutation::RequestId(value) => input.request_id = value,
+            PrepareMutation::IntentHash(value) => input.intent_hash = value,
+            PrepareMutation::Amount(value) => input.amount_zat = value,
+            PrepareMutation::FeeBound(value) => input.fee_bound_zat = value,
+            PrepareMutation::ExpiresAt(value) => input.expires_at = value,
+        }
+        self.prepare(input, clock)
+    }
+
+    pub fn prepare_with_receiver(
+        &mut self,
+        mut input: PrepareZecV1,
+        receiver: impl AsRef<str>,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        input.receiver = receiver.as_ref().to_owned();
+        self.prepare(input, clock)
+    }
+
+    pub fn prepare_with_memo(
+        &mut self,
+        mut input: PrepareZecV1,
+        memo: String,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        input.memo = memo;
+        self.prepare(input, clock)
+    }
+
+    pub fn prepare_with_fee_bound(
+        &mut self,
+        mut input: PrepareZecV1,
+        fee_bound: &str,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        input.fee_bound_zat = fee_bound.to_owned();
+        self.prepare(input, clock)
+    }
+
+    pub fn inspect_prepared_for_test(&self, handle: &str) -> Result<PreparedInspection, ZecError> {
+        self.prepare
+            .inspection(handle)
+            .map(PreparedInspection::from)
+    }
+
+    pub fn reset_spend_access_observer(&mut self) {
+        self.prepare.reset_spend_access();
+    }
+
+    pub fn spend_access_count(&self) -> usize {
+        self.prepare.spend_accesses()
+    }
+
+    pub fn prepared_handle_count(&self) -> usize {
+        self.prepare.handle_count()
+    }
+
+    pub fn replace_inventory_for_test(&mut self, inventory: PoolInventory) {
+        self.prepare.replace_inventory(inventory.inner);
+    }
+
+    pub fn fee_rule_calls(&self) -> usize {
+        self.prepare.fee_rule_calls()
+    }
+
+    pub fn caller_fee_calls(&self) -> usize {
+        self.prepare.caller_fee_calls()
+    }
+
+    pub fn fill_prepared_handles_for_test(&mut self, count: usize) -> Result<(), ZecError> {
+        self.prepare.fill_reserved(count)
+    }
+
+    pub fn lock(&mut self) -> Result<(), ZecError> {
+        self.prepare.invalidate(HandleInvalidation::Lock);
+        Ok(())
+    }
+
+    pub fn lookup_prepared(
+        &self,
+        handle: &str,
+        binding: &HandleBinding,
+    ) -> Result<PreparedZecV1, ZecError> {
+        self.prepare.lookup(handle, binding)
+    }
+
+    pub fn reset_lookup_observer(&mut self) {
+        self.prepare.reset_lookup();
+    }
+
+    pub fn lookup_observation(&self) -> LookupObservation {
+        let (shape, returned_bytes) = self.prepare.lookup_observation();
+        LookupObservation {
+            shape,
+            returned_bytes,
+        }
+    }
+
+    pub fn constant_miss_shape(&self) -> String {
+        "zec-prepared-lookup-miss-v1".to_owned()
+    }
+
+    pub fn attach_wipe_observer(&mut self, wipes: RecordingWipes) {
+        self.prepare.attach_wipe_log(wipes.prepare_log);
+    }
+
+    pub fn prepared_raw_length_for_test(&self, handle: &str) -> Result<usize, ZecError> {
+        self.prepare.raw_len(handle)
+    }
+
+    pub fn invalidate_for_test(&mut self, edge: HandleInvalidation) -> Result<(), ZecError> {
+        self.prepare.invalidate(edge);
+        Ok(())
+    }
+
+    pub fn contains_prepared_handle(&self, handle: &str) -> bool {
+        self.prepare.contains(handle)
+    }
+
+    pub fn spend_material_length_for_test(&self) -> usize {
+        self.prepare.derived_len()
+    }
+
+    pub fn panic_inside_prepare_for_test(&mut self) -> ! {
+        self.prepare.arm_panic_after_access();
+        let mut clock = ManualClock::at("2026-08-30T12:00:00Z");
+        let _ = self.prepare_fixture_payment(
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            &mut clock,
+        );
+        panic!("WAL-006 prepare panic guard did not unwind")
+    }
+
+    pub fn prepare_fixture_payment(
+        &mut self,
+        request_id: &str,
+        intent_hash: &str,
+        clock: &mut ManualClock,
+    ) -> Result<PreparedZecV1, ZecError> {
+        let fixture = FrozenFixture::open("tests/fixtures/zec")?;
+        let input = PrepareZecV1::new(
+            self.inner.account_id().as_str(),
+            self.inner.network().as_str(),
+            request_id,
+            intent_hash,
+            fixture.expected_destination_receiver(),
+            "100000000",
+            "12000",
+            "coffee",
+            "2026-08-30T12:15:00Z",
+        )?;
+        self.prepare(input, clock)
+    }
+
+    pub fn install_observable_canaries_for_test(
+        &mut self,
+        canaries: &[ObservableCanary<'_>],
+    ) -> Result<ObservableCanaryReceipt, ZecError> {
+        let expected = [
+            ObservableSecretClass::Seed,
+            ObservableSecretClass::SpendingKey,
+            ObservableSecretClass::VaultPlaintext,
+            ObservableSecretClass::Ufvk,
+            ObservableSecretClass::ReceiverInternals,
+            ObservableSecretClass::Memo,
+            ObservableSecretClass::NotePlaintext,
+            ObservableSecretClass::Nullifier,
+            ObservableSecretClass::CompactBlock,
+            ObservableSecretClass::SqliteRow,
+            ObservableSecretClass::RawPczt,
+            ObservableSecretClass::Transaction,
+            ObservableSecretClass::UserPath,
+        ];
+        if canaries.len() != expected.len()
+            || !canaries
+                .iter()
+                .zip(expected)
+                .all(|(canary, class)| canary.class == class && !canary.value.is_empty())
+        {
+            return Err(ZecError::schema());
+        }
+        let commitments = canaries
+            .iter()
+            .map(|canary| CanaryCommitment {
+                class: canary.class.as_str(),
+                byte_length: canary.value.len(),
+                sha256: sha256_hex(canary.value.as_bytes()),
+            })
+            .collect::<Vec<_>>();
+        self.prepare.install_canary_commitments(
+            commitments
+                .iter()
+                .map(|value| {
+                    (
+                        value.class.to_owned(),
+                        value.byte_length,
+                        value.sha256.clone(),
+                    )
+                })
+                .collect(),
+        );
+        Ok(ObservableCanaryReceipt { commitments })
+    }
+
+    pub fn synthetic_failure_for_test(&self) -> ZecError {
+        ZecError::internal()
+    }
+
+    pub fn captured_logs(&self) -> Vec<&'static str> {
+        let _installed_secret_classes = self.prepare.canary_commitment_count();
+        Vec::new()
+    }
+
+    pub fn diagnostics(&self) -> Vec<&'static str> {
+        vec!["[REDACTED]"]
+    }
+
+    pub fn diagnostic_field_names(&self) -> [&'static str; 4] {
+        ["operation", "account_id", "network", "code"]
+    }
+
+    pub fn public_zec_operations(&self) -> [&'static str; 4] {
+        [
+            "account.bootstrap",
+            "receiver.fresh",
+            "fixture.scan",
+            "pczt.prepare",
+        ]
+    }
+
+    pub fn invoke_operation_for_test(&self, _operation: &str) -> Result<(), ZecError> {
+        Err(ZecError::capability_missing())
+    }
+
+    pub fn capabilities(&self) -> Capabilities {
+        Capabilities {
+            can_sign: false,
+            can_prove: false,
+            can_extract: false,
+            can_broadcast: false,
+            can_network: false,
+            can_mainnet: false,
+        }
+    }
+
+    pub fn normalize_diagnostic_for_test(&self, value: &str) -> Result<&'static str, ZecError> {
+        normalize_diagnostic(value)
     }
 
     pub fn arm_address_fault(&mut self, fault: AddressFault) {
@@ -848,6 +1409,7 @@ pub struct ReceiverStateInspection {
 #[derive(Clone)]
 pub struct RecordingWipes {
     events: Arc<Mutex<Vec<RecordedWipe>>>,
+    prepare_log: PrepareWipeLog,
     exit: String,
 }
 
@@ -863,12 +1425,15 @@ impl RecordingWipes {
     pub fn shared() -> Self {
         Self {
             events: Arc::new(Mutex::new(Vec::new())),
+            prepare_log: PrepareWipeLog::new(),
             exit: String::new(),
         }
     }
 
     pub fn contains_post_wipe(&self, label: &str, length: usize, exit: &str) -> bool {
         mutex_lock(&self.events).iter().any(|event| {
+            event.label == label && event.length == length && event.all_zero && event.exit == exit
+        }) || mutex_lock(&self.prepare_log.records).iter().any(|event| {
             event.label == label && event.length == length && event.all_zero && event.exit == exit
         })
     }
@@ -955,6 +1520,51 @@ impl FrozenFixture {
 
     pub fn expected_destination_receiver(&self) -> &str {
         self.inner.orchard_only_receiver()
+    }
+
+    pub fn wrong_network_receiver(&self) -> String {
+        let local = super::LocalNetwork::new(
+            self.manifest.network.birthday_height,
+            self.manifest.network.nu6_3,
+            self.manifest.expected.confirmation_height,
+        )
+        .expect("WAL-006 fixture network");
+        zcash_keys::address::Address::decode(&local.upstream(), self.inner.orchard_only_receiver())
+            .expect("WAL-006 fixture receiver")
+            .encode(&zcash_protocol::consensus::Network::TestNetwork)
+    }
+
+    pub fn orchard_plus_p2pkh_receiver(&self) -> String {
+        self.reencode_mainnet_vector(
+            "u1ukslldhknrzmvpdmn03u03edgfy976w3muurfs9asvh3n9uh9h6sgle6m7yjgf3wafxtvke08u735v4nd3kjqnyulw7cvxh6ke357knyjudgqtes6kcw7y28e6kewr03pjah5mh26na",
+        )
+    }
+
+    pub fn orchard_plus_sapling_receiver(&self) -> String {
+        self.reencode_mainnet_vector(
+            "u1ay3aawlldjrmxqnjf5medr5ma6p3acnet464ht8lmwplq5cd3ugytcmlf96rrmtgwldc75x94qn4n8pgen36y8tywlq6yjk7lkf3fa8wzjrav8z2xpxqnrnmjxh8tmz6jhfh425t7f3vy6p4pd3zmqayq49efl2c4xydc0gszg660q9p",
+        )
+    }
+
+    pub fn unknown_item_receiver(&self) -> String {
+        self.reencode_mainnet_vector(
+            "u1uehkuaq6rpfgt4ed5zpvhczg9apgpmyk5eq9qg23j8w7jxkhdnqzacte6gu8zgzfzgxy48ryzus3wnkhfxrxmlhs34xde3f34uxcnv3y6dsgj288vu56xs9f6ghvqsgkhuwtz4kkfxj8pa27v5p3ttlst340zvwx9nj6s0zw8p3wwk3zh37dwc7znqz52gj2fpaapzxzyagah0aeyxwa9fxxvyyj6w989v96ymsgf7s8s6ej9346p60fcjzzynvf9rmxevumdvt8l9mvhdfz4u5j4h7e0zjr2sde7fu7z9s02447qg6qzllm22egnx6ej6qczkkk2ygvpy08un9ggp853sddp6vskrlar6sygxec5f6c2t2eu9zmc728esy4sj9z853gxuplr6hw7lpcwzk20d85vuflnhlfv8nr3020r0v9z83ryudsyjv66rttxq2cscqlrdxakrmpjptzcf",
+        )
+    }
+
+    fn reencode_mainnet_vector(&self, encoded: &str) -> String {
+        let local = super::LocalNetwork::new(
+            self.manifest.network.birthday_height,
+            self.manifest.network.nu6_3,
+            self.manifest.expected.confirmation_height,
+        )
+        .expect("WAL-006 fixture network");
+        zcash_keys::address::Address::decode(
+            &zcash_protocol::consensus::Network::MainNetwork,
+            encoded,
+        )
+        .expect("pinned ZIP-316 mainnet vector")
+        .encode(&local.upstream())
     }
 
     pub fn canonical_block_count(&self) -> usize {

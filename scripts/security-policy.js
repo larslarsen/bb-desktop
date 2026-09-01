@@ -268,7 +268,7 @@ const WAL006_DIRECT_DEPENDENCIES = {
   zcash_client_sqlite: {
     version: '=0.22.0',
     default_features: false,
-    features: ['orchard', 'test-dependencies', 'transparent-inputs'],
+    features: ['orchard', 'serde', 'test-dependencies', 'transparent-inputs'],
     optional: false,
   },
   pczt: { version: '=0.9.3', default_features: false, features: [], optional: false },
@@ -1870,7 +1870,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'sha2 = { version = "=0.10.9", default-features = false }',
     'zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }',
     'zcash_client_backend = { version = "=0.24.0", default-features = false, features = ["pczt"] }',
-    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "test-dependencies", "transparent-inputs"] }',
+    'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "serde", "test-dependencies", "transparent-inputs"] }',
     'pczt = { version = "=0.9.3", default-features = false }',
     'zcash_primitives = { version = "=0.30.1", default-features = false }',
     'zcash_protocol = { version = "=0.10.5", default-features = false, features = ["local-consensus"] }',
