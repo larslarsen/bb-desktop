@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN FORMAT CAPTURE 02 AUTHORIZED
+State: PHASE-C SCAN FORMAT CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: paused
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes (capture only)
+Authorized integration actor: Jr Dev — Hermes (paused)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SCAN_FORMAT_CORRECTION_03.md](CODEX_SOL_BBD_WAL_006_SCAN_FORMAT_CORRECTION_03.md)
+
+Accepted scan format capture review 02:
+[BBD-WAL-006-SCAN-FORMAT-CAPTURE-REVIEW-02.md](../testing/BBD-WAL-006-SCAN-FORMAT-CAPTURE-REVIEW-02.md)
+
+Completed scan format capture 02:
 [HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_02.md](HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_02.md)
 
 Scan gate formatter stop review 03:
