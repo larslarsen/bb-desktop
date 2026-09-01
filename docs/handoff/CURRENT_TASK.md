@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE NFC DEPENDENCY GATE COMPLETE
+State: PHASE-C PREPARE NFC DEPENDENCY EVIDENCE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none (accepted dependency source awaiting integration)
+Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (offline dependency gate)
+Authorized integration actor: Jr Dev — Hermes (evidence correction only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -27,7 +27,10 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
-[HERMES_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_GATE_01.md)
+[HERMES_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_006_PREPARE_NFC_DEPENDENCY_EVIDENCE_CORRECTION_01.md)
+
+Prepare NFC dependency gate evidence review:
+[BBD-WAL-006-PREPARE-NFC-DEPENDENCY-GATE-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-NFC-DEPENDENCY-GATE-EVIDENCE-REVIEW-01.md)
 
 Accepted prepare NFC dependency production source review:
 [BBD-WAL-006-PREPARE-NFC-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-NFC-DEPENDENCY-PRODUCTION-SOURCE-REVIEW-01.md)
