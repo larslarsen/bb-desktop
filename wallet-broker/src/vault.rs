@@ -171,14 +171,18 @@ pub trait VaultWorkObserver {
 
 pub struct SecretBytes {
     bytes: SecretSlice<u8>,
-    drop_observer: Option<(&'static str, Box<dyn WipeObserver>)>,
+}
+
+pub struct ObservedSecretBytes {
+    secret: SecretBytes,
+    label: &'static str,
+    observer: Box<dyn WipeObserver>,
 }
 
 impl SecretBytes {
     pub fn new(bytes: Vec<u8>) -> Result<Self, VaultError> {
         Ok(Self {
             bytes: SecretSlice::new(bytes.into_boxed_slice()),
-            drop_observer: None,
         })
     }
 
@@ -186,10 +190,11 @@ impl SecretBytes {
         bytes: Vec<u8>,
         label: &'static str,
         observer: Box<dyn WipeObserver>,
-    ) -> Result<Self, VaultError> {
-        Ok(Self {
-            bytes: SecretSlice::new(bytes.into_boxed_slice()),
-            drop_observer: Some((label, observer)),
+    ) -> Result<ObservedSecretBytes, VaultError> {
+        Ok(ObservedSecretBytes {
+            secret: Self::new(bytes)?,
+            label,
+            observer,
         })
     }
 
@@ -247,16 +252,25 @@ impl fmt::Display for SecretBytes {
 impl Drop for SecretBytes {
     fn drop(&mut self) {
         let bytes = self.bytes.expose_secret_mut();
-        let length = bytes.len();
         bytes.zeroize();
-        let all_zero = bytes.iter().all(|byte| *byte == 0);
-        if let Some((label, mut observer)) = self.drop_observer.take() {
-            observer.observe(WipeEvent {
-                label,
-                length,
-                all_zero,
-            });
-        }
+    }
+}
+
+impl fmt::Debug for ObservedSecretBytes {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("ObservedSecretBytes([REDACTED])")
+    }
+}
+
+impl fmt::Display for ObservedSecretBytes {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("[REDACTED]")
+    }
+}
+
+impl Drop for ObservedSecretBytes {
+    fn drop(&mut self) {
+        self.secret.wipe_with(self.label, self.observer.as_mut());
     }
 }
 
