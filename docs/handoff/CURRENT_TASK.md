@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: WAL-006 CC0 LICENSE POLICY TEST SOURCE AUTHORIZED
+State: WAL-006 CC0 LICENSE POLICY EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol at High, one policy test path
+Authorized source actor: none — CC0 policy test source accepted
 
-Authorized integration actor: none until expected red
+Authorized integration actor: Jr Dev — Hermes, one expected-red Node command only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active CC0 test-source handoff:
+Active CC0 expected-red handoff:
+[HERMES_BBD_WAL_006_CC0_LICENSE_EXPECTED_RED_01.md](HERMES_BBD_WAL_006_CC0_LICENSE_EXPECTED_RED_01.md)
+
+Completed CC0 test-source handoff:
 [CODEX_SOL_BBD_WAL_006_CC0_LICENSE_TEST_01.md](CODEX_SOL_BBD_WAL_006_CC0_LICENSE_TEST_01.md)
 
 Stopped final local gate handoff:
