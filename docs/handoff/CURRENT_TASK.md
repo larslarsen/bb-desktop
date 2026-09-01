@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE POST-PARSE DIAGNOSTIC EXECUTION AUTHORIZED
+State: PHASE-C PREPARE POST-PARSE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — temporary marker accepted
+Authorized source actor: Principal Dev — Codex Sol at High, one bounded source correction
 
-Authorized integration actor: Jr Dev — Hermes, one diagnostic command only
+Authorized integration actor: none until reviewer acceptance
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active diagnostic handoff:
+Active source handoff:
+[CODEX_SOL_BBD_WAL_006_POST_PARSE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_POST_PARSE_CORRECTION_01.md)
+
+Completed diagnostic handoff:
 [HERMES_BBD_WAL_006_POST_PARSE_DIAGNOSTIC_01.md](HERMES_BBD_WAL_006_POST_PARSE_DIAGNOSTIC_01.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
