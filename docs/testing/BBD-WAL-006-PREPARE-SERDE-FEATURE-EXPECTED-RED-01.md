@@ -12,17 +12,20 @@ Jr Dev — Hermes: expected-red evidence integration for the already-observed 68
 - Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 - Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 - Test source: `test/securityPolicy.node.js`, 2,525 lines, `2c1bd92c778a975b1218dfd2445b6b1b605bb047032fd5289573cbbb6d0a0169`
-- Frozen production: `wallet-broker/src/zec/prepare.rs` (untracked, not staged)
-- Diff inventory: exactly `test/securityPolicy.node.js`, 5 insertions, 5 deletions
+- Frozen production paths:
+  - `wallet-broker/src/zec/prepare.rs`, 963 lines, `417178e0458a3a13e4f36331b8e17bb92148836631eefbdf1a0786501cd114e3`
+  - `wallet-broker/src/zec.rs`, 252 lines, `1061adff987aefd8a641dfed11e06c85d0bc56ddb39f17a5c95d495d6aea387b`
+  - `wallet-broker/src/zec/store.rs`, 2,049 lines, `077a3d0910d8ab4f5fabdf140ceb0a78e310291ea64dbdfe73b668ea1758b389`
+  - `wallet-broker/src/zec/test_support.rs`, 1,830 lines, `5a1c30199874ad13eb753deaf83c3080534ba495fdfaf225a3d8d03c6ef1ac77`
+- Test-source delta: exactly `test/securityPolicy.node.js`, 5 insertions, 5 deletions
+- Pre-integration worktree inventory: the above four production paths plus `test/securityPolicy.node.js` (five paths total)
 - `git diff --check`: clean, no warnings
 
 ## Sole acceptance command
 
 ```text
-npm test
+node test/securityPolicy.node.js
 ```
-
-The test script is `npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker`. The security policy portion (`npm run test:security`) executes `test/securityPolicy.node.js`.
 
 ## Result
 
