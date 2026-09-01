@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: FINAL WAL-006 POLICY FOCUSED GATE AUTHORIZED
+State: FINAL WAL-006 POLICY INTEGRATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — policy source accepted for focused execution
+Authorized source actor: none — policy source and focused gate accepted
 
-Authorized integration actor: Jr Dev — Hermes, one focused Node command only
+Authorized integration actor: Jr Dev — Hermes, bounded policy gate/evidence/integration
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active policy gate handoff:
+Active policy integration handoff:
+[HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md](HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md)
+
+Completed focused policy gate handoff:
 [HERMES_BBD_WAL_006_FINAL_POLICY_FOCUSED_GATE_01.md](HERMES_BBD_WAL_006_FINAL_POLICY_FOCUSED_GATE_01.md)
 
 Completed policy-source handoff:
