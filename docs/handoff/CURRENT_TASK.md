@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SECRET-BYTES GREEN/REGRESSION GATE 01 COMPLETE — HERMES INTEGRATED
+State: PHASE-C PREPARE PRODUCTION SOURCE REAUTHORIZED — SOURCE DROP REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; production source only)
 
-Authorized integration actor: Jr Dev — Hermes (green/regression gate only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare secret-bytes gate handoff:
+Active prepare production resume handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_RESUME_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_PRODUCTION_RESUME_01.md)
+
+Accepted prepare secret-bytes integration review:
+[BBD-WAL-006-PREPARE-SECRET-BYTES-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SECRET-BYTES-INTEGRATION-REVIEW-01.md)
+
+Completed prepare secret-bytes gate handoff:
 [HERMES_BBD_WAL_006_PREPARE_SECRET_BYTES_GATE_01.md](HERMES_BBD_WAL_006_PREPARE_SECRET_BYTES_GATE_01.md)
 
 Completed prepare secret-bytes gate 01:
