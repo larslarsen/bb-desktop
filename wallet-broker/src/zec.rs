@@ -9,6 +9,17 @@ pub mod test_support;
 
 pub const MAX_DIVERSIFIER_INDEX: u64 = i64::MAX as u64;
 pub const MAX_ISSUANCE_SEQUENCE: u64 = i64::MAX as u64;
+pub const MAX_FIXTURE_MANIFEST_BYTES: usize = 256 * 1024;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum StoreFault {
+    MigrationWrite,
+    MigrationSync,
+    MigrationCommit,
+    Write,
+    FileSync,
+    DirectorySync,
+}
 
 #[derive(Clone, Eq, Hash, PartialEq)]
 pub struct AccountId(String);

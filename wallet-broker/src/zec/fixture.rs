@@ -1,12 +1,12 @@
 use std::collections::BTreeSet;
 use std::fs;
+use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 
 use serde::Deserialize;
 
-use super::ZecError;
+use super::{MAX_FIXTURE_MANIFEST_BYTES, ZecError};
 
-const MAX_MANIFEST_BYTES: u64 = 256 * 1024;
 const FIXTURE_FORMAT: &str = "bitbook-zec-compact-fixture";
 const FIXTURE_VERSION: u32 = 1;
 
@@ -31,14 +31,12 @@ impl FrozenFixture {
         if manifest_metadata.file_type().is_symlink()
             || !manifest_metadata.file_type().is_file()
             || manifest_metadata.len() == 0
-            || manifest_metadata.len() > MAX_MANIFEST_BYTES
         {
             return Err(ZecError::schema());
         }
-        let bytes = fs::read(&manifest_path).map_err(|_| ZecError::schema())?;
-        if bytes.len() as u64 != manifest_metadata.len() {
-            return Err(ZecError::schema());
-        }
+        let length = usize::try_from(manifest_metadata.len()).map_err(|_| ZecError::limit())?;
+        validate_manifest_length(length)?;
+        let bytes = read_manifest_exact(&manifest_path, length)?;
         let manifest: FixtureManifest =
             serde_json::from_slice(&bytes).map_err(|_| ZecError::schema())?;
         manifest.validate()?;
@@ -48,6 +46,32 @@ impl FrozenFixture {
     pub(crate) fn orchard_only_receiver(&self) -> &str {
         &self.manifest.expected.orchard_only_receiver
     }
+}
+
+fn read_manifest_exact(path: &Path, length: usize) -> Result<Vec<u8>, ZecError> {
+    validate_manifest_length(length)?;
+    let mut bytes = vec![0; length];
+    let mut file = fs::File::open(path).map_err(|_| ZecError::schema())?;
+    file.read_exact(&mut bytes)
+        .map_err(|_| ZecError::schema())?;
+    let mut extra = [0; 1];
+    if file.read(&mut extra).map_err(|_| ZecError::schema())? != 0 {
+        return Err(ZecError::schema());
+    }
+    Ok(bytes)
+}
+
+pub(crate) fn validate_manifest_length(length: usize) -> Result<(), ZecError> {
+    if length > MAX_FIXTURE_MANIFEST_BYTES {
+        Err(ZecError::limit())
+    } else {
+        Ok(())
+    }
+}
+
+pub(crate) fn allocate_manifest_sized(length: usize) -> Result<Vec<u8>, ZecError> {
+    validate_manifest_length(length)?;
+    Ok(vec![0; length])
 }
 
 fn validate_relative_path(value: &str) -> Result<&Path, ZecError> {

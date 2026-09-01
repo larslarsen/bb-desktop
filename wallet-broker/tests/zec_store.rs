@@ -174,18 +174,8 @@ fn sqlite_schema_and_rows_contain_viewing_state_but_no_spend_secrets() {
         );
     }
     assert!(inspection.decoded_row_count() > 0);
-    assert!(
-        inspection
-            .decoded_value_kinds()
-            .iter()
-            .any(|kind| kind == "text")
-    );
-    assert!(
-        inspection
-            .decoded_value_kinds()
-            .iter()
-            .any(|kind| kind == "blob")
-    );
+    assert!(inspection.decoded_value_kinds().contains(&"text"));
+    assert!(inspection.decoded_value_kinds().contains(&"blob"));
     for canary in [
         SEED_CANARY,
         MNEMONIC_CANARY,
