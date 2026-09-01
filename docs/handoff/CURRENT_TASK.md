@@ -2,11 +2,11 @@
 
 Ticket: BBD-RATE-001
 
-State: ACTIVE — TEST SOURCE AUTHORIZED
+State: ACTIVE — TEST SOURCE CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High), test source only
+Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High), test correction only
 
 Authorized integration actor: none until reviewer accepts the test source
 
@@ -17,8 +17,11 @@ Ticket: [BBD-RATE-001.md](../../tickets/BBD-RATE-001.md)
 Provider review:
 [BBD-RATE-001-PROVIDER-REVIEW.md](../architecture/BBD-RATE-001-PROVIDER-REVIEW.md)
 
-Active test-source handoff:
-[GROK_BUILD_BBD_RATE_001_TESTS_01.md](GROK_BUILD_BBD_RATE_001_TESTS_01.md)
+Rejected source review:
+[BBD-RATE-001-TEST-SOURCE-REVIEW-01.md](../testing/BBD-RATE-001-TEST-SOURCE-REVIEW-01.md)
+
+Active correction handoff:
+[GROK_BUILD_BBD_RATE_001_TESTS_CORRECTION_01.md](GROK_BUILD_BBD_RATE_001_TESTS_CORRECTION_01.md)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
