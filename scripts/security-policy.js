@@ -290,6 +290,11 @@ const WAL006_SUPPORT_DEPENDENCIES = {
     version: '=0.37.0', default_features: false, features: [], optional: false,
   },
 };
+const WAL006_PREPARE_DEPENDENCIES = {
+  'unicode-normalization': {
+    version: '=0.1.25', default_features: false, features: ['std'], optional: false,
+  },
+};
 const WAL006_TEST_TARGETS = [
   'zec_fixture_builder',
   'zec_address',
@@ -1872,6 +1877,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'zcash_keys = { version = "=0.16.1", default-features = false, features = ["orchard"] }',
     'rand_core = { version = "=0.6.4", default-features = false, features = ["std"] }',
     'rusqlite = { version = "=0.37.0", default-features = false }',
+    'unicode-normalization = { version = "=0.1.25", default-features = false, features = ["std"] }',
   ];
   const dependencyBlock = manifestText.split('[dependencies]\n')[1];
   if (!dependencyBlock) {
@@ -2274,6 +2280,7 @@ module.exports = {
   WAL004_DIRECT_DEPENDENCIES,
   WAL006_DIRECT_DEPENDENCIES,
   WAL006_SUPPORT_DEPENDENCIES,
+  WAL006_PREPARE_DEPENDENCIES,
   WAL006_TEST_TARGETS,
   parseYaml,
   loadWorkflow,

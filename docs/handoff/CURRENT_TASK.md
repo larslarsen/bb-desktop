@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE NFC DEPENDENCY GATE AUTHORIZED
+State: PHASE-C PREPARE NFC DEPENDENCY GATE COMPLETE
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,9 @@ Jr Dev routing:
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
+
+Completed prepare NFC dependency gate 01:
+[BBD-WAL-006-PREPARE-NFC-DEPENDENCY-GATE-01.md](../testing/BBD-WAL-006-PREPARE-NFC-DEPENDENCY-GATE-01.md)
 
 Accepted scan integration review:
 [BBD-WAL-006-SCAN-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-INTEGRATION-REVIEW-01.md)
