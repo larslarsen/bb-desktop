@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE GATE COMPLETE — REVIEW REQUIRED
+State: PHASE-C SCAN PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -16,6 +16,12 @@ Jr Dev routing:
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `b450cd78c9e2e74597a0724741d7d3cade0a55b2`
+
+Accepted store integration review:
+[BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
+
+Active handoff:
+[CODEX_SOL_BBD_WAL_006_SCAN_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_SCAN_PRODUCTION_01.md)
 
 Store gate evidence:
 [BBD-WAL-006-STORE-GATE-01.md](../testing/BBD-WAL-006-STORE-GATE-01.md)
