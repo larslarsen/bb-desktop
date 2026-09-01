@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SECRET-BYTES EXPECTED-RED GATE COMPLETED — EVIDENCE RECORDED
+State: PHASE-C PREPARE SECRET-BYTES PRODUCTION SOURCE AUTHORIZED — SOURCE DROP REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; production source only)
 
-Authorized integration actor: Jr Dev — Hermes (expected-red gate only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -16,6 +16,12 @@ Jr Dev routing:
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
+
+Active prepare secret-bytes production handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_PRODUCTION_01.md)
+
+Accepted prepare secret-bytes expected-red review:
+[BBD-WAL-006-PREPARE-SECRET-BYTES-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SECRET-BYTES-EXPECTED-RED-REVIEW-01.md)
 
 Completed prepare secret-bytes expected-red gate 01:
 [BBD-WAL-006-PREPARE-SECRET-BYTES-EXPECTED-RED-01.md](../testing/BBD-WAL-006-PREPARE-SECRET-BYTES-EXPECTED-RED-01.md)
