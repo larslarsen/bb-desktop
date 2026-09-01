@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C STORE GATE RESUME 04 AUTHORIZED
+State: PHASE-C STORE GATE RESUME 05 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -22,6 +22,12 @@ Accepted fixture/expected-red integration review:
 [BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-FIXTURE-EXPECTED-RED-INTEGRATION-REVIEW-01.md)
 
 Active handoff:
+[HERMES_BBD_WAL_006_STORE_GATE_RESUME_05.md](HERMES_BBD_WAL_006_STORE_GATE_RESUME_05.md)
+
+Store gate policy-count stop review:
+[BBD-WAL-006-STORE-GATE-POLICY-COUNT-REVIEW-01.md](../testing/BBD-WAL-006-STORE-GATE-POLICY-COUNT-REVIEW-01.md)
+
+Stopped Hermes store gate resume 04:
 [HERMES_BBD_WAL_006_STORE_GATE_RESUME_04.md](HERMES_BBD_WAL_006_STORE_GATE_RESUME_04.md)
 
 Accepted store cache-schema correction review:
