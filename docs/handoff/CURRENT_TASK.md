@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE TEMPORARY STAGE MARKERS ACCEPTED — ONE HERMES DIAGNOSTIC AUTHORIZED
+State: PHASE-C PREPARE TARGETED GATE STOPPED — ARCHITECTURE DECISION REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (free Nous route; one diagnostic test only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,10 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare stage-diagnostic execution handoff:
+Active architecture-stop review:
+[BBD-WAL-006-PREPARE-STAGE-DIAGNOSTIC-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-STAGE-DIAGNOSTIC-REVIEW-01.md)
+
+Completed prepare stage-diagnostic execution handoff:
 [HERMES_BBD_WAL_006_PREPARE_STAGE_DIAGNOSTIC_01.md](HERMES_BBD_WAL_006_PREPARE_STAGE_DIAGNOSTIC_01.md)
 
 Temporary stage-diagnostic source review:
