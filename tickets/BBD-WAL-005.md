@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — TEST SOURCE AUTHORIZED
+Status: ACTIVE — EXPECTED RED AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -144,8 +144,9 @@ context:
 ```
 
 It returns a new closed object containing `visible`, `can_begin`, `can_request`, and one
-row per matching account with `account_id`, the three booleans, `reason_code`, and a fixed
-`status_label`. It must not return or retain the context or snapshot.
+row per sanitized account with `account_id`, the three booleans, `reason_code`, and a fixed
+`status_label`. A nonmatching asset/network row is inert with `WRONG_NETWORK`; it never
+becomes a fallback selection. The result must not return or retain the context or snapshot.
 
 The deterministic blocker precedence is:
 
@@ -206,7 +207,7 @@ and leave no timers/listeners/handles.
 
 ## Test-first phases and current authorization
 
-### Phase A — test source only (active)
+### Phase A — test source only (accepted; expected red active)
 
 Under `docs/handoff/CODEX_SOL_BBD_WAL_005_TESTS_01.md`, Codex Sol may create or edit
 only:
@@ -221,7 +222,9 @@ No production source, package/workflow/policy implementation, Rust, renderer DOM
 dependency, lockfile, evidence, documentation, Git, GitHub, command execution, network,
 device, or unlisted path is authorized for the source actor.
 
-After reviewer acceptance of the test drop, Hermes will run, in order:
+The test drop is reviewer-accepted at the five exact hashes recorded in
+`docs/testing/BBD-WAL-005-TEST-SOURCE-REVIEW-01.md`. Under
+`docs/handoff/HERMES_BBD_WAL_005_EXPECTED_RED_01.md`, Hermes will run, in order:
 
 ```text
 node test/walletPay.node.js
