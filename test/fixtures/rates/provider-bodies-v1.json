@@ -1,0 +1,263 @@
+{
+  "name": "bbd-rate-001-provider-bodies-v1",
+  "fetched_at": "2026-09-01T12:00:00Z",
+  "fresh_until": "2026-09-01T12:05:00Z",
+  "expires_at": "2026-09-01T12:05:00Z",
+  "prices": {
+    "zec": "42.123456789012345678",
+    "xmr": "158.987654321098765432",
+    "zec_canonical_trailing": "42.500000000000000000",
+    "zec_canonical_expected": "42.5",
+    "round_even": "1.225",
+    "round_odd": "1.235",
+    "round_even_expected": "1.22",
+    "round_odd_expected": "1.24"
+  },
+  "queries": {
+    "zec": {
+      "v": 1,
+      "asset_ids": ["zec-zcash"],
+      "quote_currencies": ["USD"]
+    },
+    "xmr": {
+      "v": 1,
+      "asset_ids": ["xmr-monero"],
+      "quote_currencies": ["USD"]
+    }
+  },
+  "bodies": {
+    "coinbase_zec_valid": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "42.123456789012345678",
+      "raw_json": "{\"ask\":\"42.20\",\"bid\":\"42.10\",\"volume\":\"1234.56789000\",\"trade_id\":987654321,\"price\":\"42.123456789012345678\",\"size\":\"0.01000000\",\"time\":\"2026-09-01T12:00:00.123456789Z\",\"rfq_volume\":null}"
+    },
+    "kraken_xmr_valid": {
+      "provider_id": "kraken-spot-v1",
+      "price": "158.987654321098765432",
+      "raw_json": "{\"error\":[],\"result\":{\"XXMRZUSD\":{\"a\":[\"159.00000\",\"1\",\"1.000\"],\"b\":[\"158.90000\",\"1\",\"1.000\"],\"c\":[\"158.987654321098765432\",\"0.50000000\"],\"v\":[\"1000.00000000\",\"2000.00000000\"],\"p\":[\"158.50000\",\"157.50000\"],\"t\":[100,200],\"l\":[\"150.00000\",\"148.00000\"],\"h\":[\"165.00000\",\"166.00000\"],\"o\":\"157.00000\"}}}"
+    },
+    "coinbase_zec_trailing_zeros": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "42.5",
+      "raw_json": "{\"price\":\"42.500000000000000000\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_numeric_price": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":42.123456789012345678,\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_missing_price": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"time\":\"2026-09-01T12:00:00Z\",\"ask\":\"42.20\"}"
+    },
+    "coinbase_missing_time": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.123456789012345678\"}"
+    },
+    "coinbase_time_offset": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00+00:00\"}"
+    },
+    "coinbase_time_leap_second": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T23:59:60Z\"}"
+    },
+    "coinbase_time_too_old": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T11:49:59Z\"}"
+    },
+    "coinbase_time_too_future": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:05:01Z\"}"
+    },
+    "coinbase_zero_price": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"0\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_exponent_price": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"4.2e1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_12_whole": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "999999999999.1",
+      "raw_json": "{\"price\":\"999999999999.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_18_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "1.123456789012345678",
+      "raw_json": "{\"price\":\"1.123456789012345678\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_13_whole": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"1000000000000.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_19_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"1.1234567890123456789\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_all_zero_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"0.000000000000000000\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_sign": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"-42.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_plus_sign": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"+42.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_whitespace": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\" 42.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_decimal_leading_zero": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"042.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_time_feb30": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-02-30T12:00:00Z\"}"
+    },
+    "coinbase_time_2019": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2019-12-31T23:59:59Z\"}"
+    },
+    "coinbase_time_2101": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2101-01-01T00:00:00Z\"}"
+    },
+    "coinbase_time_10_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00.1234567890Z\"}"
+    },
+    "coinbase_time_lowercase_z": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00z\"}"
+    },
+    "coinbase_time_zero_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "42.1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_time_nine_frac": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "42.1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00.123456789Z\"}"
+    },
+    "coinbase_wrong_product_eth": {
+      "provider_id": "coinbase-exchange-v1",
+      "request_path": "/products/ETH-USD/ticker",
+      "raw_json": "{\"price\":\"3500.10\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "coinbase_wrong_product_xmr": {
+      "provider_id": "coinbase-exchange-v1",
+      "request_path": "/products/XMR-USD/ticker",
+      "raw_json": "{\"price\":\"158.98\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "kraken_error_array": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[\"EService:Unavailable\"],\"result\":{}}"
+    },
+    "kraken_wrong_pair_xxbtzusd": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"result\":{\"XXBTZUSD\":{\"c\":[\"65000.1\",\"0.1\"]}}}"
+    },
+    "kraken_alias_xmrusd": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"result\":{\"XMRUSD\":{\"c\":[\"158.987654321098765432\",\"0.5\"]}}}"
+    },
+    "kraken_extra_pair": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"result\":{\"XXMRZUSD\":{\"c\":[\"158.987654321098765432\",\"0.5\"]},\"XXBTZUSD\":{\"c\":[\"65000.1\",\"0.1\"]}}}"
+    },
+    "kraken_numeric_last": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"result\":{\"XXMRZUSD\":{\"c\":[158.987654321098765432,\"0.5\"]}}}"
+    },
+    "kraken_malformed_ticker_array": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"result\":{\"XXMRZUSD\":{\"c\":\"158.98\"}}}"
+    },
+    "duplicate_key_coinbase": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"1.00\",\"price\":\"9.99\",\"time\":\"2026-09-01T12:00:00Z\"}"
+    },
+    "duplicate_key_kraken": {
+      "provider_id": "kraken-spot-v1",
+      "raw_json": "{\"error\":[],\"error\":[\"EGeneral:Invalid\"],\"result\":{\"XXMRZUSD\":{\"c\":[\"158.98\",\"0.5\"]}}}"
+    },
+    "depth_eight_ok": {
+      "provider_id": "coinbase-exchange-v1",
+      "price": "42.1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00Z\",\"x\":{\"a\":{\"b\":{\"c\":{\"d\":{\"e\":{\"f\":{\"g\":1}}}}}}}}"
+    },
+    "depth_nine_fail": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00Z\",\"x\":{\"a\":{\"b\":{\"c\":{\"d\":{\"e\":{\"f\":{\"g\":{\"h\":1}}}}}}}}}"
+    },
+    "oversize": {
+      "provider_id": "coinbase-exchange-v1",
+      "byte_length": 65537,
+      "prefix": "{\"price\":\"1\",\"time\":\"2026-09-01T12:00:00Z\",\"pad\":\"",
+      "fill": "a",
+      "suffix": "\"}"
+    },
+    "exact_limit": {
+      "provider_id": "coinbase-exchange-v1",
+      "byte_length": 65536,
+      "prefix": "{\"price\":\"1\",\"time\":\"2026-09-01T12:00:00Z\",\"pad\":\"",
+      "fill": "a",
+      "suffix": "\"}"
+    },
+    "malformed_utf8": {
+      "provider_id": "coinbase-exchange-v1",
+      "hex_bytes": "7b227072696365223a2231222c2274696d65223a22c32822207d"
+    },
+    "trailing_json": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{\"price\":\"42.1\",\"time\":\"2026-09-01T12:00:00Z\"}{}"
+    },
+    "empty_object": {
+      "provider_id": "coinbase-exchange-v1",
+      "raw_json": "{}"
+    }
+  },
+  "https": {
+    "coinbase": {
+      "method": "GET",
+      "url": "https://api.exchange.coinbase.com/products/ZEC-USD/ticker",
+      "hostname": "api.exchange.coinbase.com",
+      "path": "/products/ZEC-USD/ticker",
+      "request_bytes": "GET /products/ZEC-USD/ticker HTTP/1.1\r\nHost: api.exchange.coinbase.com\r\nAccept: application/json\r\nAccept-Encoding: identity\r\nConnection: close\r\n\r\n"
+    },
+    "kraken": {
+      "method": "GET",
+      "url": "https://api.kraken.com/0/public/Ticker?pair=XMRUSD",
+      "hostname": "api.kraken.com",
+      "path": "/0/public/Ticker?pair=XMRUSD",
+      "request_bytes": "GET /0/public/Ticker?pair=XMRUSD HTTP/1.1\r\nHost: api.kraken.com\r\nAccept: application/json\r\nAccept-Encoding: identity\r\nConnection: close\r\n\r\n"
+    }
+  },
+  "canaries": {
+    "account_id": "00112233445566778899aabbccddeeff",
+    "address": "u1CANARYADDRESSFORBIDDEN",
+    "balance": "18446744073709551615",
+    "amount_atomic": "123456789",
+    "fee_atomic": "FEE_CANARY_999",
+    "peer_id": "QmCANARYPEERIDFORBIDDEN",
+    "memo": "MEMO_CANARY_SECRET",
+    "request_id": "ffeeddccbbaa99887766554433221100",
+    "receiver": "u1CANARYRECEIVER",
+    "wallet_method": "intent.confirm",
+    "broker_method": "account.export-backup",
+    "identity": "social-identity-canary",
+    "secret": "SECRET_TOKEN_CANARY",
+    "api_key": "API_KEY_CANARY_DO_NOT_LEAK",
+    "cookie": "session=COOKIE_CANARY",
+    "proxy": "http://proxy-canary.invalid:8080",
+    "os_path": "/home/lars/.bitbook/wallet",
+    "user_path": "/Users/canary/Library",
+    "arbitrary_url": "https://evil.example/steal?seed=1"
+  }
+}

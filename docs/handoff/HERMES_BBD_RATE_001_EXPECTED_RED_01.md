@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-RATE-001 Expected Red 01
 
-State: ACTIVE
+State: COMPLETE
 
 Reviewer governance parent before this handoff: `c8eefb55`
 

@@ -2616,6 +2616,205 @@ test('WAL-006 policy rejects live-network and authority-bearing Rust snippets wi
   );
 });
 
+const QUOTE_WORKER_PATHS = [
+  'quote-worker/providers.js',
+  'quote-worker/model.js',
+  'quote-worker/framing.js',
+  'quote-worker/worker.js',
+  'quote-worker/supervisor.js',
+];
+const RATE_TEST_SCRIPT = 'test:rate';
+const RATE_TEST_COMMAND = 'node test/rateWorker.node.js && node test/rateSupervisor.node.js';
+const RATE_CI_COMMAND = `npm run ${RATE_TEST_SCRIPT}`;
+const RATE_BUILD_COMMANDS = QUOTE_WORKER_PATHS.map((rel) => `node --check ${rel}`);
+const RATE_SOURCE_FILTER = 'quote-worker/**';
+const RATE_IMPORT_ALLOWLISTS = {
+  'quote-worker/providers.js': [],
+  'quote-worker/model.js': ['buffer', 'node:buffer'],
+  'quote-worker/framing.js': ['buffer', 'node:buffer'],
+  'quote-worker/worker.js': [
+    'https', 'node:https', 'buffer', 'node:buffer',
+    './providers', './providers.js', './model', './model.js', './framing', './framing.js',
+  ],
+  'quote-worker/supervisor.js': [
+    'buffer', 'node:buffer', 'path', 'node:path',
+    'child_process', 'node:child_process',
+    './framing', './framing.js', './model', './model.js', './providers', './providers.js',
+  ],
+};
+const RATE_PROVIDER_URLS = [
+  'https://api.exchange.coinbase.com/products/ZEC-USD/ticker',
+  'https://api.kraken.com/0/public/Ticker?pair=XMRUSD',
+];
+
+test('RATE-001 quote-worker package, syntax, top-level, and routine CI commands are exact', () => {
+  const policy = loadPolicy();
+  const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
+  const pkg = JSON.parse(packageText);
+  const lock = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package-lock.json'), 'utf8'));
+  assert.strictEqual(pkg.dependencies, undefined, 'quote worker must add no production dependency');
+  assert.deepStrictEqual(pkg.devDependencies, { electron: ELECTRON_VERSION });
+  assert.strictEqual(lock.packages[''].dependencies, undefined, 'quote worker must add no locked production dependency');
+  assert.deepStrictEqual(lock.packages[''].devDependencies, { electron: ELECTRON_VERSION });
+  assert.strictEqual(pkg.scripts[RATE_TEST_SCRIPT], RATE_TEST_COMMAND);
+  assert.ok(pkg.scripts.test.split(/\s*&&\s*/).includes(RATE_CI_COMMAND));
+  assert.strictEqual(
+    pkg.scripts.test,
+    `${TOP_LEVEL_TEST_CMD} && ${RATE_CI_COMMAND}`
+  );
+  const buildCommands = pkg.scripts.build.split(/\s*&&\s*/);
+  for (const command of RATE_BUILD_COMMANDS) {
+    assert.ok(buildCommands.includes(command), `build omits ${command}`);
+  }
+  assert.deepStrictEqual(policy.QUOTE_WORKER_PATHS, QUOTE_WORKER_PATHS);
+  assert.deepStrictEqual(policy.RATE_BUILD_COMMANDS, RATE_BUILD_COMMANDS);
+  assert.strictEqual(policy.RATE_TEST_COMMAND, RATE_TEST_COMMAND);
+  assert.strictEqual(policy.RATE_TEST_SCRIPT, RATE_TEST_SCRIPT);
+  policy.checkPackageJson(packageText);
+
+  const missingScript = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, { [RATE_TEST_SCRIPT]: 'echo skipped' }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingScript), /rate|quote-worker|test/i);
+  const missingTopLevel = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, {
+      test: pkg.scripts.test.split(/\s*&&\s*/).filter((item) => item !== RATE_CI_COMMAND).join(' && '),
+    }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingTopLevel), /rate|quote-worker|top-level|npm test/i);
+  for (const command of RATE_BUILD_COMMANDS) {
+    const missingBuild = JSON.stringify(Object.assign({}, pkg, {
+      scripts: Object.assign({}, pkg.scripts, {
+        build: pkg.scripts.build.split(/\s*&&\s*/).filter((item) => item !== command).join(' && '),
+      }),
+    }));
+    assertRejects(() => policy.checkPackageJson(missingBuild), /rate|quote-worker|build|syntax/i);
+  }
+
+  const workflows = loadWorkflows(policy);
+  const routine = [];
+  for (const [, job, step] of policy.iterSteps(workflows.social.data)) {
+    if (!job.if) routine.push(...policy.stepRunLines(step));
+  }
+  assert.ok(routine.includes(RATE_CI_COMMAND), `routine CI omits ${RATE_CI_COMMAND}`);
+  assertRejects(
+    () => policy.checkSocialWorkflow(replaceOnce(workflows.social.text, `      - run: ${RATE_CI_COMMAND}\n`, '')),
+    /rate|quote-worker|test/i
+  );
+});
+
+test('RATE-001 quote-worker paths trigger routine workflows and remain policy-maintained', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  assert.ok(policy.SOCIAL_PATHS.includes(RATE_SOURCE_FILTER));
+  assert.ok(policy.SECURITY_PATHS.includes(RATE_SOURCE_FILTER));
+  for (const [name, workflow, checker] of [
+    ['social', workflows.social, policy.checkSocialWorkflow],
+    ['security', workflows.security, policy.checkSecurityWorkflow],
+  ]) {
+    for (const [, paths] of assertedTriggerPaths(workflow, name)) {
+      assert.ok(paths.includes(RATE_SOURCE_FILTER), `${name} workflow omits ${RATE_SOURCE_FILTER}`);
+    }
+    assert.ok(workflow.text.includes(`      - "${RATE_SOURCE_FILTER}"\n`));
+    const mutated = replaceOnce(workflow.text, `      - "${RATE_SOURCE_FILTER}"\n`, '');
+    assertRejects(() => checker.call(policy, mutated), /quote-worker|rate|path/i);
+  }
+});
+
+test('RATE-001 source policy permits only reviewed built-ins and forbids wallet, Electron, and default-on providers', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkQuoteWorkerSource, 'function');
+  assert.deepStrictEqual(policy.RATE_IMPORT_ALLOWLISTS, RATE_IMPORT_ALLOWLISTS);
+  assert.deepStrictEqual(policy.QUOTE_WORKER_PATHS, QUOTE_WORKER_PATHS);
+  policy.checkQuoteWorkerSource("'use strict'; function pure(value) { return value; }", 'quote-worker/providers.js');
+  policy.checkQuoteWorkerSource("const { Buffer } = require('buffer');", 'quote-worker/model.js');
+  policy.checkQuoteWorkerSource("const { Buffer } = require('buffer');", 'quote-worker/framing.js');
+  policy.checkQuoteWorkerSource(
+    "const https = require('https'); const { PROVIDERS } = require('./providers'); https.request({ method: 'GET', hostname: 'api.exchange.coinbase.com', path: '/products/ZEC-USD/ticker', minVersion: 'TLSv1.2', rejectUnauthorized: true });",
+    'quote-worker/worker.js'
+  );
+  policy.checkQuoteWorkerSource(
+    "const { spawn } = require('child_process'); spawn(file, [workerPath, 'coinbase-exchange-v1'], { shell: false, stdio: ['pipe','pipe','pipe'], env: cleanEnv });",
+    'quote-worker/supervisor.js'
+  );
+  const forbidden = [
+    ['quote-worker/providers.js', "require('https')"],
+    ['quote-worker/providers.js', "require('fs')"],
+    ['quote-worker/model.js', "require('https')"],
+    ['quote-worker/model.js', "require('child_process')"],
+    ['quote-worker/framing.js', "require('https')"],
+    ['quote-worker/worker.js', "require('fs')"],
+    ['quote-worker/worker.js', "require('child_process')"],
+    ['quote-worker/worker.js', "require('electron')"],
+    ['quote-worker/worker.js', "require('../wallet-pay/model')"],
+    ['quote-worker/worker.js', "require('../wallet-broker/supervisor')"],
+    ['quote-worker/supervisor.js', "require('https')"],
+    ['quote-worker/supervisor.js', "require('electron')"],
+    ['quote-worker/supervisor.js', "require('../wallet-broker/protocol')"],
+    ['quote-worker/supervisor.js', "spawn(file, [], { shell: true, env: cleanEnv })"],
+    ['quote-worker/supervisor.js', "spawn(file, [], { shell: false, env: process.env })"],
+    ['quote-worker/worker.js', "fetch('https://api.coingecko.com/api/v3/simple/price')"],
+    ['quote-worker/worker.js', "https.request({ hostname: 'ticker.openbazaar.org' })"],
+    ['quote-worker/worker.js', "https.request({ path: '/products/XMR-USD/ticker' })"],
+    ['quote-worker/providers.js', 'enabled_by_default: true'],
+  ];
+  for (const [rel, source] of forbidden) {
+    assertRejects(
+      () => policy.checkQuoteWorkerSource(source, rel),
+      /rate|quote-worker|allowlist|forbidden|https|spawn|wallet|electron|default|provider/i
+    );
+  }
+  for (const rel of QUOTE_WORKER_PATHS) {
+    assert.ok(fs.existsSync(path.join(repoRoot, rel)), `maintained quote-worker source is missing: ${rel}`);
+    const source = fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+    assert.ok(source.trim(), `maintained quote-worker source is empty: ${rel}`);
+    policy.checkQuoteWorkerSource(source, rel);
+  }
+});
+
+test('RATE-001 policy exports exact provider pins and rejects unreviewed hosts and paths', () => {
+  const policy = loadPolicy();
+  assert.deepStrictEqual(RATE_PROVIDER_URLS, [
+    'https://api.exchange.coinbase.com/products/ZEC-USD/ticker',
+    'https://api.kraken.com/0/public/Ticker?pair=XMRUSD',
+  ]);
+  assert.deepStrictEqual(policy.RATE_PROVIDER_URLS, RATE_PROVIDER_URLS);
+  assert.deepStrictEqual(policy.RATE_IMPORT_ALLOWLISTS, RATE_IMPORT_ALLOWLISTS);
+  const mutations = [
+    ["http://api.exchange.coinbase.com/products/ZEC-USD/ticker", /http|downgrade|tls|https|pin|provider|host/i],
+    ["https://evil.example/products/ZEC-USD/ticker", /host|pin|provider|forbidden|arbitrary/i],
+    ["https://api.exchange.coinbase.com/products/XMR-USD/ticker", /path|product|pair|pin|provider/i],
+    ["https://api.exchange.coinbase.com/products/ETH-USD/ticker", /path|product|pair|pin|provider/i],
+    ["https://api.coinbase.com/products/ZEC-USD/ticker", /host|coinbase|pin|provider/i],
+    ["https://pro.coinbase.com/products/ZEC-USD/ticker", /host|coinbase|pin|provider/i],
+    ["https://api.kraken.com/0/public/Ticker?pair=XBTUSD", /pair|path|kraken|pin|provider/i],
+    ["https://ticker.openbazaar.org/api", /ticker|openbazaar|pin|provider|host/i],
+    ["https://www.tradingview.com/widget/", /tradingview|pin|provider|host/i],
+    ["https://api.coingecko.com/api/v3/simple/price", /coingecko|pin|provider|host/i],
+    ["https://api.coinpaprika.com/v1/tickers", /coinpaprika|pin|provider|host/i],
+  ];
+  for (const [url, needle] of mutations) {
+    const parsed = new URL(url);
+    const source = `https.request({ protocol: '${parsed.protocol}', hostname: '${parsed.hostname}', path: '${parsed.pathname}${parsed.search}' })`;
+    assertRejects(() => policy.checkQuoteWorkerSource(source, 'quote-worker/worker.js'), needle);
+  }
+  for (const rel of QUOTE_WORKER_PATHS) {
+    const source = fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+    policy.checkQuoteWorkerSource(source, rel);
+    const urls = source.match(/https?:\/\/[^\s'"`]+/g) || [];
+    for (const url of urls) {
+      assert.ok(RATE_PROVIDER_URLS.includes(url.replace(/[.,;]+$/, '')), `${rel} contains unreviewed pin ${url}`);
+    }
+  }
+  const socialHtml = fs.readFileSync(path.join(repoRoot, 'social', 'index.html'), 'utf8');
+  for (const host of [
+    'api.exchange.coinbase.com', 'api.kraken.com', 'api.coinbase.com', 'pro.coinbase.com',
+    'ticker.openbazaar.org', 'coingecko', 'coinpaprika', 'tradingview',
+  ]) {
+    assert.ok(!socialHtml.toLowerCase().includes(host), `renderer CSP/html grants ${host}`);
+  }
+});
+
 function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
