@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE GATE STOPPED AT CLIPPY — BOUNDED SOL STYLE CORRECTION AUTHORIZED
+State: PHASE-C PREPARE CLIPPY CORRECTION ACCEPTED — HERMES GATE RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (prepare.rs style correction only)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes (free Nous route; prepare gate resume only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare Clippy correction handoff:
+Active prepare gate resume handoff:
+[HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_05.md](HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_05.md)
+
+Accepted prepare Clippy correction review:
+[BBD-WAL-006-PREPARE-CLIPPY-CORRECTION-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-CLIPPY-CORRECTION-REVIEW-01.md)
+
+Completed prepare Clippy correction handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_CLIPPY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_CLIPPY_CORRECTION_01.md)
 
 Prepare gate Clippy stop review 02:
