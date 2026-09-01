@@ -18,14 +18,13 @@ wallet-free and rate-free. `../go-ipfs` remains deprecated.
 
 ## Objective
 
-Add a separate, least-privileged quote worker that can parse source-pinned recorded
-provider bodies, aggregate optional ZEC/USD or XMR/USD unit prices deterministically, and
-format a local approximate fiat display without gaining wallet or payment authority.
+Add a separate, least-privileged quote worker that parses one source-pinned recorded body
+per asset—Coinbase Exchange for ZEC/USD and Kraken for XMR/USD—and formats an optional
+approximate display without gaining wallet or payment authority.
 
 Rates are untrusted presentation data. Every wallet and Pay path must behave identically
-when the worker is disabled, absent, crashed, stale, rate-limited, malformed, or
-disagreeing. This ticket adds no visible rate setting or Pay UI and enables no live
-provider by default.
+when the worker is disabled, absent, crashed, stale, rate-limited, or malformed. This
+ticket adds no visible rate setting or Pay UI and enables no live provider by default.
 
 ## Closed public modules
 
@@ -39,9 +38,9 @@ quote-worker/worker.js
 quote-worker/supervisor.js
 ```
 
-`providers.js` exports an immutable, closed `PROVIDERS` table containing only the three
-reviewed provider IDs, HTTPS request pins, stable mappings, parser IDs, attribution flag,
-and `enabled_by_default: false`.
+`providers.js` exports an immutable, closed `PROVIDERS` table containing only
+`coinbase-exchange-v1` for ZEC and `kraken-spot-v1` for XMR, their HTTPS request pins,
+exact mappings, parser IDs, and `enabled_by_default: false`.
 
 `model.js` exports exactly:
 
@@ -96,11 +95,10 @@ RateSnapshotV1 {
   display: {
     asset: "ZEC" | "XMR",
     quote_currency: "USD",
-    price: DecimalString only for median/single,
-    method: "median" | "single_labeled_source" | "unavailable",
-    source_ids: [reviewed provider IDs],
-    spread: positive DecimalString only when at least two prices differ,
-    label: "approximate" | "fiat estimate unavailable" | "quotes disagree"
+    price: DecimalString only for a fresh single source,
+    method: "single_labeled_source" | "unavailable",
+    source_ids: [] | ["coinbase-exchange-v1"] | ["kraken-spot-v1"],
+    label: "approximate" | "fiat estimate unavailable"
   }
 }
 ```
@@ -110,16 +108,18 @@ most 12 whole and 18 fractional digits. Canonical output removes leading whole z
 trailing fractional zeroes, removing the decimal point when no fraction remains. Zero,
 signs, exponent notation, grouping, whitespace, NaN, and Infinity are invalid prices.
 
-The provider JSON parser must preserve numeric token text before any IEEE-754 conversion,
-reject duplicate keys and depth greater than eight, and never use `Number`, `parseFloat`,
-or binary floating-point arithmetic for a price, spread, coin amount, or conversion.
-Timestamp arithmetic may use integer milliseconds after strict calendar validation.
+The provider JSON parser must reject duplicate keys and depth greater than eight. A price
+is accepted only as the exact JSON string at its pinned provider field; it must never pass
+through `Number`, `parseFloat`, or binary floating-point arithmetic. Timestamp arithmetic
+may use integer milliseconds after strict calendar validation.
 
-Each accepted provider quote must be no more than ten minutes old at fetch and no more
-than five minutes in the future. Kraken's reviewed parser uses `fetched_at` as
-`provider_observed_at` because the pinned public ticker response has no observation
-timestamp. `fresh_until` and `expires_at` are exactly five minutes after `fetched_at`.
-No quote is returned or cached after either bound.
+Coinbase's reviewed parser requires response `time` as a strict UTC RFC 3339 calendar
+value with zero through nine fractional digits, no offset, no leap second, and year
+2020–2100. It normalizes that value down to the same whole second as `TimestampV1`; it
+does not round. The result may be no more than ten minutes old or five minutes in the
+future. Kraken uses `fetched_at` as `provider_observed_at` because the pinned public
+ticker response has no observation timestamp. `fresh_until` and `expires_at` are exactly
+five minutes after `fetched_at`. No quote is returned or cached after either bound.
 
 ## Exact provider parsing
 
@@ -127,34 +127,23 @@ Every response is bytes-first, at most 65,536 bytes, UTF-8 JSON with depth at mo
 Unknown provider payload fields may be ignored only after the whole JSON envelope passes
 the structural bounds and duplicate-key check.
 
-- CoinPaprika requires the exact requested `id`, exact symbol, strict `last_updated`, and
-  the raw numeric lexeme at `quotes.USD.price`.
-- CoinMarketCap keyless requires one exact numeric ID, a successful status with strict
-  `status.timestamp`, and the raw numeric `price` lexeme. Extra/missing/duplicate asset
-  IDs and nonzero/error status fail the entire provider result.
-- Kraken requires an empty `error` array, exactly the pinned result key/pair, and the
-  decimal string at `c[0]`. Pair aliases, collisions, extra result pairs, and malformed
-  ticker arrays fail the provider result.
+- Coinbase requires the exact `ZEC-USD` ticker path, strict response `time`, and decimal
+  string `price`. Missing, extra, numeric, or malformed price/time fields fail the result.
+- Kraken requires an empty `error` array, exactly `XXMRZUSD`, and the decimal string at
+  `c[0]`. Pair aliases, collisions, extra result pairs, and malformed ticker arrays fail
+  the result.
 
 A malformed result produces no `RateQuoteV1`; it never produces a zero or retained stale
 row.
 
-## Deterministic aggregation and display conversion
+## Deterministic selection and display conversion
 
-Quotes are deduplicated by provider ID, filtered to the one query asset/USD, and sorted
-by provider ID. The display rule is the exact decision in the provider review:
-
-1. three fresh quotes and exact relative spread at most five percent: middle price,
-   `median`, all three sources, `approximate`;
-2. exactly one fresh quote: its price, `single_labeled_source`, that source,
-   `approximate`;
-3. zero or two fresh quotes: no price and `unavailable`; use `quotes disagree` when two
-   exceed five percent, otherwise `fiat estimate unavailable`; and
-4. three quotes beyond five percent: no price, `unavailable`, `quotes disagree`.
-
-Relative spread is compared exactly as `(max - min) * 100 <= median * 5`. Its optional
-display value is the fractional ratio `(max - min) / median`, rounded half-even to at
-most 18 fractional digits and omitted when exactly zero.
+The one fresh quote must match the query asset/USD and its pinned provider exactly:
+`coinbase-exchange-v1` for ZEC and `kraken-spot-v1` for XMR. It produces its price,
+method `single_labeled_source`, that source ID, and label `approximate`. Zero, duplicate,
+mismatched, or multiple quotes produce no price, method `unavailable`, an empty source
+list, and label `fiat estimate unavailable`. There is no v1 median, spread, quorum, or
+disagreement calculation.
 
 `formatFiatEstimate` accepts a canonical nonnegative u64 `amount_atomic`, exponent 8 for
 ZEC or 12 for XMR, a valid price, and exactly USD. It returns a plain decimal string with
@@ -197,7 +186,7 @@ production defaults remain closed.
 ## Forbidden authority and leakage
 
 The complete query, child arguments, environment, logs, and HTTPS requests may contain
-only reviewed provider IDs, canonical asset ID, USD, fixed path/headers, frame ID, and
+only the reviewed provider ID, canonical asset ID, USD, fixed path/headers, frame ID, and
 bounded timing/error categories. Tests use canaries to reject every account ID, address,
 balance, amount, fee, peer ID, memo, request ID, receiver, wallet/broker method, identity,
 secret, API key, cookie, proxy, OS/user path, and arbitrary URL.
@@ -257,7 +246,8 @@ Before acceptance Hermes must isolate, detect, and restore at least:
 1. IEEE-754 coercion of a precision canary price;
 2. one private-context field admitted to a rate query/log/request;
 3. redirect acceptance or an unpinned provider URL;
-4. a median emitted beyond the five-percent agreement bound; and
+4. a wrong Coinbase product or wrong/extra Kraken result pair accepted as the requested
+   asset; and
 5. a provider enabled or spawned by default without opt-in.
 
 Every mutation must make the focused test fail for the intended reason. No falsification

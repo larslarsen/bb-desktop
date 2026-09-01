@@ -30,14 +30,13 @@ frozen.
 ## Required drop
 
 Author complete test source for every Phase-A contract in the ticket. The fixture must
-contain recorded-shape raw bodies for all three reviewed providers plus bounded malformed,
-precision, collision, stale/future, disagreement, duplicate-key, depth, and oversize
-cases. Preserve price numbers as raw JSON text within fixture strings so tests can detect
-IEEE-754 loss.
+contain a recorded-shape Coinbase ZEC body and Kraken XMR body plus bounded malformed,
+precision, wrong/extra-product-or-pair, duplicate-key, depth, and oversize cases. Preserve
+both prices as JSON strings so tests can detect IEEE-754 loss.
 
 The tests must be offline and deterministic. Use injected clocks, HTTPS, spawn, child,
 and timers. Assert non-vacuous request bytes, exact frame bytes, exact closed outputs,
-exact source ordering, exact decimal/rounding boundaries, cleanup, and the complete
+exact single-source selection, exact decimal/rounding boundaries, cleanup, and the complete
 private-context canary set. Require the future package/build/CI/source-policy contract to
 fail closed without changing production policy now.
 
