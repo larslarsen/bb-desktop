@@ -1,8 +1,8 @@
 # BBD-RATE-001 — Isolated Optional Fiat Quote Worker
 
-Status: ACTIVE — PRODUCTION SOURCE CORRECTION 02 AUTHORIZED
+Status: ACTIVE — PRODUCTION FALSIFICATION AND GREEN GATE AUTHORIZED
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Test and production source actor: Sr Dev — Grok Build (`Grok 4.6`, High)
 
