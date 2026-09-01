@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN RUNTIME DESIGN REVIEW AUTHORIZED
+State: PHASE-C SCAN RUNTIME CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High; read-only)
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: Jr Dev — Hermes (paused)
 
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[CODEX_SOL_BBD_WAL_006_SCAN_RUNTIME_CORRECTION_01.md](CODEX_SOL_BBD_WAL_006_SCAN_RUNTIME_CORRECTION_01.md)
+
+Accepted scan runtime design review:
+[BBD-WAL-006-SCAN-RUNTIME-DESIGN-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-RUNTIME-DESIGN-REVIEW-01.md)
+
+Completed Grok runtime review:
 [GROK_BUILD_BBD_WAL_006_SCAN_RUNTIME_REVIEW_01.md](GROK_BUILD_BBD_WAL_006_SCAN_RUNTIME_REVIEW_01.md)
 
 Scan gate runtime stop review:
