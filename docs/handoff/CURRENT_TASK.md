@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN GATE AUTHORIZED
+State: PHASE-C SCAN FORMAT CAPTURE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_01.md](HERMES_BBD_WAL_006_SCAN_FORMAT_CAPTURE_01.md)
+
+Scan gate formatter stop review:
+[BBD-WAL-006-SCAN-GATE-FORMAT-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-GATE-FORMAT-REVIEW-01.md)
+
+Stopped scan gate:
 [HERMES_BBD_WAL_006_SCAN_GATE_01.md](HERMES_BBD_WAL_006_SCAN_GATE_01.md)
 
 Accepted scan truth correction review:
