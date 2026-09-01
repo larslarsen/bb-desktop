@@ -23,7 +23,7 @@ HEAD == origin/master == 5c429d2d6c55e369a40dffc2aeaff10bb77c631d, exactly one d
 ## Exact execution (each run once, in order, no network)
 
 1. `node test/securityPolicy.node.js`
-   - Exit: 0. Exactly 75 `ok`, zero `not ok`, final line `BitBook desktop security policy tests passed (75).`
+   - Exit: 0. Exactly 75 `ok`, zero `not ok`, final line `BitBook security policy tests passed (75).`
 
 2. `node scripts/security-policy.js`
    - Exit: 0. Exact line `BitBook desktop security policy checks passed.`

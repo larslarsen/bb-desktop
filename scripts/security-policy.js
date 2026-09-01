@@ -231,6 +231,7 @@ const WAL004_ALLOWED_LICENSES = [
   'BSD-2-Clause',
   'BSD-3-Clause',
   'BSL-1.0',
+  'CC0-1.0',
   'ISC',
   'Zlib',
   '0BSD',
