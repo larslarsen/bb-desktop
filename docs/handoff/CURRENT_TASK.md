@@ -2,25 +2,31 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN GATE COMPLETE — REVIEW REQUIRED
+State: PHASE-C PREPARE DESIGN REVIEW AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: paused
+Authorized source actor: Senior Dev — Grok Build (read-only design)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes (paused)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
-Integration commit: `b450cd78c9e2e74597a0724741d7d3cade0a55b2`
+Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
+
+Accepted scan integration review:
+[BBD-WAL-006-SCAN-INTEGRATION-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-INTEGRATION-REVIEW-01.md)
 
 Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[GROK_BUILD_BBD_WAL_006_PREPARE_DESIGN_REVIEW_01.md](GROK_BUILD_BBD_WAL_006_PREPARE_DESIGN_REVIEW_01.md)
+
+Completed scan gate resume 06:
 [HERMES_BBD_WAL_006_SCAN_GATE_RESUME_06.md](HERMES_BBD_WAL_006_SCAN_GATE_RESUME_06.md)
 
 Accepted scan format correction review 03:
