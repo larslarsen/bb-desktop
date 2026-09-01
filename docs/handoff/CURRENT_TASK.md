@@ -2,13 +2,13 @@
 
 Ticket: BBD-RATE-001
 
-State: ACTIVE — EXPECTED RED AUTHORIZED
+State: ACTIVE — PRODUCTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none; accepted test bytes are frozen
+Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High), production source only
 
-Authorized integration actor: Jr Dev — Hermes, expected red only
+Authorized integration actor: none until reviewer accepts production source
 
 Source baseline: `54cc0ccc17bc55eec5b23a1d414f3250f4c728cc`
 
@@ -17,11 +17,11 @@ Ticket: [BBD-RATE-001.md](../../tickets/BBD-RATE-001.md)
 Provider review:
 [BBD-RATE-001-PROVIDER-REVIEW.md](../architecture/BBD-RATE-001-PROVIDER-REVIEW.md)
 
-Accepted source review:
-[BBD-RATE-001-TEST-SOURCE-REVIEW-03.md](../testing/BBD-RATE-001-TEST-SOURCE-REVIEW-03.md)
+Accepted expected-red review:
+[BBD-RATE-001-EXPECTED-RED-REVIEW-01.md](../testing/BBD-RATE-001-EXPECTED-RED-REVIEW-01.md)
 
-Active integration handoff:
-[HERMES_BBD_RATE_001_EXPECTED_RED_01.md](HERMES_BBD_RATE_001_EXPECTED_RED_01.md)
+Active production handoff:
+[GROK_BUILD_BBD_RATE_001_PRODUCTION_01.md](GROK_BUILD_BBD_RATE_001_PRODUCTION_01.md)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
