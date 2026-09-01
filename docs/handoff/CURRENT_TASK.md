@@ -2,18 +2,21 @@
 
 Ticket: BBD-WAL-006
 
-State: WAL-006 FINAL LOCAL ACCEPTANCE GATE AUTHORIZED
+State: WAL-006 CC0 LICENSE POLICY TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — implementation/policy/falsifications accepted
+Authorized source actor: Principal Dev — Codex Sol at High, one policy test path
 
-Authorized integration actor: Jr Dev — Hermes, final local gate/evidence integration only
+Authorized integration actor: none until expected red
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active final local gate handoff:
+Active CC0 test-source handoff:
+[CODEX_SOL_BBD_WAL_006_CC0_LICENSE_TEST_01.md](CODEX_SOL_BBD_WAL_006_CC0_LICENSE_TEST_01.md)
+
+Stopped final local gate handoff:
 [HERMES_BBD_WAL_006_FINAL_LOCAL_GATE_01.md](HERMES_BBD_WAL_006_FINAL_LOCAL_GATE_01.md)
 
 Completed falsification gate 01:
