@@ -1,6 +1,6 @@
 # BBD-WAL-005 — Pay Snapshot Gating and Sanitized Preview
 
-Status: ACTIVE — PRODUCTION GREEN AUTHORIZED
+Status: ACTIVE — FALSIFICATION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -271,6 +271,11 @@ the source actor.
 The seven-path production drop is reviewer-accepted at the exact identities in
 `docs/testing/BBD-WAL-005-PRODUCTION-SOURCE-REVIEW-01.md`. Only Hermes may execute and
 integrate it under `docs/handoff/HERMES_BBD_WAL_005_GREEN_01.md`.
+
+Hermes integrated the exact production bytes at
+`0b51c73f8a875b69b3b57ad0dfb4740c5d96dc12`; the complete local green evidence is
+reviewer-accepted in `docs/testing/BBD-WAL-005-LOCAL-GREEN-REVIEW-01.md`. Only the four
+required falsifications are now authorized.
 
 ## Falsification and acceptance
 
