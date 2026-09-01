@@ -1,6 +1,6 @@
 # BBD-WAL-006 Store Gate 01 Evidence
 
-Execution timestamp: 2026-08-31 18:15:00 UTC (recorded at integration)
+Execution timestamp: exact command start time not retained; integration completion recorded by commit timestamp 2026-08-31T18:00:17-07:00 (America/Los_Angeles)
 
 Protected governance parent: `2d2a52ef619aecab2fc1a29b6287b8c1aecfb8b5` (commit containing Store Gate Resume 05)
 
@@ -46,17 +46,17 @@ Source-only and whole-worktree `git diff --check`: both exit 0, no conflict mark
 
 ## Exact execution (each run once, in order, no network)
 
-1. `cargo +1.98.0 fmt --manifest-path wallet-broker/Cargo.toml --check`
+1. `env TMPDIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-tmp CARGO_TARGET_DIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-cargo cargo +1.98.0 fmt --manifest-path wallet-broker/Cargo.toml --check`
    - Exit: 0, no mutation, no diagnostic.
 
-2. `cargo +1.98.0 clippy --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --lib -- -D warnings`
+2. `env TMPDIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-tmp CARGO_TARGET_DIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-cargo cargo +1.98.0 clippy --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --lib -- -D warnings`
    - Exit: 0, no warning or diagnostic.
 
-3. `cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_store`
+3. `env TMPDIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-tmp CARGO_TARGET_DIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-cargo cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_store`
    - Exit: 0. Exactly 8 passed, 0 failed, 0 ignored, 0 measured, 0 filtered out.
    - Tests: symlink_nonregular_and_wrong_mode_state_are_rejected_without_replacement, store_limits_cover_immediate_below_at_and_above_before_allocation, initialization_and_reopen_bind_exact_account_network_and_schema, sqlite_paths_are_closed_account_network_derived_and_linux_private, sqlite_schema_and_rows_contain_viewing_state_but_no_spend_secrets, failed_write_file_sync_and_directory_sync_never_report_durable_state, schema_migration_is_atomic_across_write_sync_and_commit_failures, corrupt_wrong_schema_and_truncated_sqlite_fail_closed_without_empty_recreation.
 
-4. `cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_address`
+4. `env TMPDIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-tmp CARGO_TARGET_DIR=/home/lars/OpenBazaar/bb-desktop/wallet-broker/target/wal006-cargo cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_address`
    - Exit: 0. Exactly 8 passed, 0 failed, 0 ignored, 0 measured, 0 filtered out.
    - Tests: seed_is_wiped_on_success_error_cancellation_replacement_unwind_and_drop, account_network_and_mainnet_validation_precede_database_or_derivation, fresh_receiver_decodes_to_exactly_one_orchard_protocol_receiver, two_concurrent_issuers_serialize_one_account_without_duplicates, unsupported_receiver_composition_never_falls_back, receiver_issuance_is_monotonic_durable_and_viewing_only_after_reopen, coupled_receiver_state_write_failure_returns_nothing_and_advances_neither_record, receiver_limits_cover_immediate_below_at_and_above_without_wrap.
 
@@ -76,9 +76,8 @@ Source-only and whole-worktree `git diff --check`: both exit 0, no conflict mark
 - v0/v1 migration: schema_migration_is_atomic_across_write_sync_and_commit_failures proves migration is atomic across write/sync/commit failures.
 - Corrupt-state read-only preflight: corrupt_wrong_schema_and_truncated_sqlite_fail_closed_without_empty_recreation proves corrupt/wrong-schema/truncated SQLite fails closed without empty recreation.
 - Hostile-entry rejection: symlink_nonregular_and_wrong_mode_state_are_rejected_without_replacement proves symlink/nonregular/wrong-mode state are rejected without replacement.
-- Store durability: failed_write_file_file_sync_and_directory_sync_never_report_durable_state proves failed write/file-sync/directory-sync never report durable state.
-- Secret-exclusion: sqlite_schema_and_rows_contain_viewing_state_but_no_spend_secrets proves SQLite schema/rows contain viewing state but no spend secrets.
-- Viewing-only: initialization_and_reopen_bind_exact_account_network_and_schema proves initialization/reopen bind exact account/network/schema without spend authority.
+- Store durability: failed_write_file_sync_and_directory_sync_never_report_durable_state proves failed write/file-sync/directory-sync never report durable state.
+- Secret-exclusion + viewing-only: sqlite_schema_and_rows_contain_viewing_state_but_no_spend_secrets proves SQLite schema/rows contain viewing state but no spend secrets; it calls open_viewing_context() and proves has_spending_authority() == false.
 - Allocation-bound: store_limits_cover_immediate_below_at_and_above_before_allocation proves store limits cover immediate-below/at/above before allocation.
 - Closed paths: sqlite_paths_are_closed_account_network_derived_and_linux_private proves SQLite paths are closed/account/network-derived/Linux-private.
 
@@ -92,8 +91,10 @@ Staged exactly seven paths: four source files (zec.rs, fixture.rs, store.rs, tes
 
 Commit: `feat: add WAL-006 viewing store boundary`
 
+Integration commit: `b450cd78c9e2e74597a0724741d7d3cade0a55b2`
+
 Push: master
 
-Final state: HEAD == origin/master, clean index, clean tracked worktree.
+Final state: HEAD == origin/master == b450cd78c9e2e74597a0724741d7d3cade0a55b2, clean index, clean tracked worktree.
 
 The reviewer alone accepts the result and authorizes the next slice.
