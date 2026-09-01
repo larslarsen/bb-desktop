@@ -69,6 +69,7 @@ const SOCIAL_PATHS = [
   'scripts/build-macos.sh',
   'scripts/build-windows.ps1',
   'wallet-broker/**',
+  'wallet-pay/**',
   '.github/workflows/social.yml',
 ];
 
@@ -82,6 +83,7 @@ const SECURITY_PATHS = [
   'package.json',
   'package-lock.json',
   'wallet-broker/**',
+  'wallet-pay/**',
   'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
@@ -107,6 +109,8 @@ const REQUIRED_PATHS = [
   '.github/workflows/sbom.yml',
   'test/electronSecurity.node.js',
   'test/securityPolicy.node.js',
+  'test/walletPay.node.js',
+  'wallet-pay/model.js',
   '.gitleaksignore',
   'deny.toml',
 ];
@@ -1225,7 +1229,7 @@ test('inherited metrics and feedback loaders are structurally neutralized and un
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
@@ -1404,6 +1408,118 @@ test('routine CI executes the exact wallet contract command and rejects its remo
   assertRejects(() => policy.checkSocialWorkflow(mutated), /wallet|test:wallet|walletContract/i);
 });
 
+const PAY_MODEL_PATHS = ['wallet-pay/model.js'];
+const PAY_TEST_SCRIPT = 'test:wallet-pay';
+const PAY_TEST_COMMAND = 'node test/walletPay.node.js';
+const PAY_CI_COMMAND = `npm run ${PAY_TEST_SCRIPT}`;
+const PAY_BUILD_COMMANDS = PAY_MODEL_PATHS.map((rel) => `node --check ${rel}`);
+const PAY_SOURCE_FILTER = 'wallet-pay/**';
+const PAY_IMPORT_ALLOWLIST = [];
+
+test('WAL-005 Pay model package, syntax, top-level, and routine CI commands are exact', () => {
+  const policy = loadPolicy();
+  const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
+  const pkg = JSON.parse(packageText);
+  const lock = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package-lock.json'), 'utf8'));
+  assert.strictEqual(pkg.dependencies, undefined, 'Pay model must add no production dependency');
+  assert.deepStrictEqual(pkg.devDependencies, { electron: ELECTRON_VERSION });
+  assert.strictEqual(lock.packages[''].dependencies, undefined, 'Pay model must add no locked production dependency');
+  assert.deepStrictEqual(lock.packages[''].devDependencies, { electron: ELECTRON_VERSION });
+  assert.strictEqual(pkg.scripts[PAY_TEST_SCRIPT], PAY_TEST_COMMAND);
+  assert.strictEqual(pkg.scripts.test, TOP_LEVEL_TEST_CMD);
+  const buildCommands = pkg.scripts.build.split(/\s*&&\s*/);
+  for (const command of PAY_BUILD_COMMANDS) assert.ok(buildCommands.includes(command), `build omits ${command}`);
+  assert.deepStrictEqual(policy.PAY_MODEL_PATHS, PAY_MODEL_PATHS);
+  assert.deepStrictEqual(policy.PAY_BUILD_COMMANDS, PAY_BUILD_COMMANDS);
+  assert.strictEqual(policy.PAY_TEST_COMMAND, PAY_TEST_COMMAND);
+  policy.checkPackageJson(packageText);
+
+  const missingScript = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, { [PAY_TEST_SCRIPT]: 'echo skipped' }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingScript), /wallet|pay|test|model/i);
+  const missingTopLevel = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, {
+      test: pkg.scripts.test.split(/\s*&&\s*/).filter((item) => item !== PAY_CI_COMMAND).join(' && '),
+    }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingTopLevel), /wallet|pay|top-level|npm test/i);
+  const missingBuild = JSON.stringify(Object.assign({}, pkg, {
+    scripts: Object.assign({}, pkg.scripts, {
+      build: buildCommands.filter((item) => item !== PAY_BUILD_COMMANDS[0]).join(' && '),
+    }),
+  }));
+  assertRejects(() => policy.checkPackageJson(missingBuild), /wallet|pay|build|syntax/i);
+
+  const workflows = loadWorkflows(policy);
+  const routine = [];
+  for (const [, job, step] of policy.iterSteps(workflows.social.data)) {
+    if (!job.if) routine.push(...policy.stepRunLines(step));
+  }
+  assert.ok(routine.includes(PAY_CI_COMMAND), `routine CI omits ${PAY_CI_COMMAND}`);
+  assertRejects(
+    () => policy.checkSocialWorkflow(replaceOnce(workflows.social.text, `      - run: ${PAY_CI_COMMAND}\n`, '')),
+    /wallet|pay|test|model/i
+  );
+});
+
+test('WAL-005 Pay model paths trigger routine workflows and remain policy-maintained', () => {
+  const policy = loadPolicy();
+  const workflows = loadWorkflows(policy);
+  assert.ok(SOCIAL_PATHS.includes(PAY_SOURCE_FILTER));
+  assert.ok(SECURITY_PATHS.includes(PAY_SOURCE_FILTER));
+  for (const [name, workflow, checker] of [
+    ['social', workflows.social, policy.checkSocialWorkflow],
+    ['security', workflows.security, policy.checkSecurityWorkflow],
+  ]) {
+    for (const [, paths] of assertedTriggerPaths(workflow, name)) {
+      assert.ok(paths.includes(PAY_SOURCE_FILTER), `${name} workflow omits ${PAY_SOURCE_FILTER}`);
+    }
+    const mutated = replaceOnce(workflow.text, `      - "${PAY_SOURCE_FILTER}"\n`, '');
+    assertRejects(() => checker.call(policy, mutated), /wallet-pay|wallet|pay|path/i);
+  }
+});
+
+test('WAL-005 Pay model source policy permits no imports, I/O, authority, nondeterminism, or timers', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkWalletPaySource, 'function');
+  assert.deepStrictEqual(policy.PAY_IMPORT_ALLOWLIST, PAY_IMPORT_ALLOWLIST);
+  policy.checkWalletPaySource("'use strict'; function pure(value) { return value; }", PAY_MODEL_PATHS[0]);
+  const forbidden = [
+    "require('crypto')",
+    "require('buffer')",
+    "require('fs')",
+    "require('child_process')",
+    "require('electron')",
+    "require('http')",
+    "require('net')",
+    "require('usb')",
+    "require('node-hid')",
+    "const name = 'fs'; require(name)",
+    "import('crypto')",
+    "import x from 'left-pad'",
+    "fetch('https://provider.invalid')",
+    "new WebSocket('wss://provider.invalid')",
+    'Date.now()',
+    'Math.random()',
+    'setTimeout(() => {}, 1)',
+    'setInterval(() => {}, 1)',
+    "process.env.WALLET_SECRET",
+    "dispatch('intent.confirm', {})",
+    "dispatch('tx.broadcast', {})",
+  ];
+  for (const source of forbidden) {
+    assertRejects(
+      () => policy.checkWalletPaySource(source, PAY_MODEL_PATHS[0]),
+      /wallet|pay|model|import|module|I\/O|authority|determin|timer|forbidden/i
+    );
+  }
+  assert.ok(fs.existsSync(path.join(repoRoot, PAY_MODEL_PATHS[0])), 'maintained Pay model is missing');
+  const source = fs.readFileSync(path.join(repoRoot, PAY_MODEL_PATHS[0]), 'utf8');
+  assert.ok(source.trim(), 'maintained Pay model is empty');
+  policy.checkWalletPaySource(source, PAY_MODEL_PATHS[0]);
+});
+
 const BROKER_BOUNDARY_PATHS = [
   'wallet-broker/protocol.js',
   'wallet-broker/supervisor.js',
@@ -1423,6 +1539,7 @@ const BROKER_IMPORT_ALLOWLISTS = {
   'wallet-broker/supervisor.js': [
     'crypto', 'node:crypto', 'buffer', 'node:buffer', 'fs', 'node:fs', 'path', 'node:path',
     'child_process', 'node:child_process', './protocol', './protocol.js',
+    '../wallet-pay/model', '../wallet-pay/model.js',
   ],
   'wallet-preload.js': ['electron'],
 };
@@ -1506,7 +1623,7 @@ test('wallet boundary source policy allows only reviewed built-ins and forbids l
   assert.strictEqual(policy.PRELOAD_SUBSCRIBE_CHANNEL, PRELOAD_SUBSCRIBE_CHANNEL);
   policy.checkWalletBoundarySource("const crypto = require('crypto');", 'wallet-broker/protocol.js');
   policy.checkWalletBoundarySource(
-    "const { spawn } = require('child_process'); spawn(file, [], { shell: false, stdio: ['pipe','pipe','pipe'], env: cleanEnv });",
+    "const { spawn } = require('child_process'); const { sanitizeWalletSnapshot } = require('../wallet-pay/model'); spawn(file, [], { shell: false, stdio: ['pipe','pipe','pipe'], env: cleanEnv });",
     'wallet-broker/supervisor.js'
   );
   policy.checkWalletBoundarySource(
@@ -1531,6 +1648,7 @@ test('wallet boundary source policy allows only reviewed built-ins and forbids l
     ['wallet-broker/protocol.js', "require('child_process')"],
     ['wallet-broker/protocol.js', "require('electron')"],
     ['wallet-broker/supervisor.js', "require('electron')"],
+    ['wallet-broker/supervisor.js', "require('../wallet-pay/other')"],
     ['wallet-preload.js', "require('fs')"],
     ['wallet-preload.js', "require('child_process')"],
   ];

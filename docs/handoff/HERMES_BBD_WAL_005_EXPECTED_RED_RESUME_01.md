@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-005 Expected Red Resume 01
 
-State: ACTIVE
+State: COMPLETE
 
 Correction governance parent before this handoff: `cc3077dd`
 

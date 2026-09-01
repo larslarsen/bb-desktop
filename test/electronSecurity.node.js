@@ -4,6 +4,8 @@ const assert = require('assert');
 const fs = require('fs');
 const Module = require('module');
 const path = require('path');
+const payFixture = require('./fixtures/wallet-pay/snapshots-v1.json');
+const { sanitizeWalletSnapshot } = require('../wallet-pay/model');
 
 const repoRoot = path.resolve(__dirname, '..');
 const mainPath = path.join(repoRoot, 'social-main.js');
@@ -86,6 +88,7 @@ function createElectronMock() {
     supervisorResults: [],
     supervisorSubscribers: [],
     rendererMessages: [],
+    sanitizerCalls: [],
   };
 
   class WebContents {
@@ -225,12 +228,17 @@ function loadMaintainedMain() {
   assert.ok(fs.existsSync(mainPath), 'maintained Electron entry social-main.js is missing');
   const mock = createElectronMock();
   const originalLoad = Module._load;
+  const trackedSanitizer = (value) => {
+    mock.state.sanitizerCalls.push(value);
+    return sanitizeWalletSnapshot(value);
+  };
   Module._load = function loadWithElectronMock(request, parent, isMain) {
     if (request === 'electron') {
       return mock.electron;
     }
     if (/(?:^|\/)wallet-broker\/supervisor$/.test(request)) {
       return {
+        sanitizeSnapshot: trackedSanitizer,
         createWalletSupervisor() {
           return {
             dispatch(method, params) {
@@ -246,6 +254,9 @@ function loadMaintainedMain() {
           };
         },
       };
+    }
+    if (/(?:^|\/)wallet-pay\/model$/.test(request)) {
+      return { sanitizeWalletSnapshot: trackedSanitizer };
     }
     return originalLoad.call(this, request, parent, isMain);
   };
@@ -493,6 +504,12 @@ test('CSP keeps self-only script/style and denies objects, frames, base, and for
       assert.notStrictEqual(value, "'unsafe-eval'", `${name} allows unsafe-eval`);
     }
   }
+  for (const forbiddenHost of [
+    'coingecko', 'coinpaprika', 'kraken', 'ticker.openbazaar.org',
+    'lightwalletd', 'monerod', 'wallet-rpc', 'wallet-broker',
+  ]) {
+    assert.ok(!joined.includes(forbiddenHost), `renderer CSP grants forbidden rate/wallet endpoint ${forbiddenHost}`);
+  }
 });
 
 test('maintained source has no HTML injection, eval, or javascript: sinks', () => {
@@ -522,6 +539,55 @@ const WALLET_IPC_CHANNELS = [
   'wallet:payee-request:get',
   'wallet:snapshot:get',
 ];
+const WALLET_PRELOAD_METHODS = [
+  'beginIntent',
+  'cancelIntent',
+  'getPayeeRequest',
+  'getSnapshot',
+  'listAccounts',
+  'subscribeSnapshot',
+];
+
+test('wallet preload retains exactly six frozen methods and no Electron confirmation action', () => {
+  let exposed;
+  const listeners = new Map();
+  const electron = {
+    contextBridge: {
+      exposeInMainWorld(name, value) {
+        assert.strictEqual(name, 'bitbookWallet');
+        exposed = value;
+      },
+    },
+    ipcRenderer: {
+      invoke() { return Promise.resolve({ ok: true }); },
+      on(channel, listener) { listeners.set(channel, listener); },
+      removeListener(channel, listener) {
+        if (listeners.get(channel) === listener) listeners.delete(channel);
+      },
+    },
+  };
+  const originalLoad = Module._load;
+  Module._load = function loadPreloadMock(request, parent, isMain) {
+    if (request === 'electron') return electron;
+    return originalLoad.call(this, request, parent, isMain);
+  };
+  try {
+    delete require.cache[expectedPreload];
+    require(expectedPreload);
+  } finally {
+    Module._load = originalLoad;
+    delete require.cache[expectedPreload];
+  }
+  assert.deepStrictEqual(Object.keys(exposed).sort(), WALLET_PRELOAD_METHODS);
+  assert.strictEqual(Object.isFrozen(exposed), true);
+  for (const method of WALLET_PRELOAD_METHODS) {
+    assert.strictEqual(typeof exposed[method], 'function');
+    assert.strictEqual(Object.isFrozen(exposed[method]), true);
+  }
+  for (const forbidden of ['confirmIntent', 'confirm', 'unlock', 'exportBackup', 'sign', 'broadcast']) {
+    assert.strictEqual(exposed[forbidden], undefined);
+  }
+});
 
 test('wallet IPC registers only the exact renderer channel allowlist', () => {
   const ctx = boot();
@@ -611,20 +677,30 @@ test('wallet snapshot subscription targets only the maintained main frame with s
   const ctx = boot();
   const win = windowUnderTest();
   assert.strictEqual(ctx.state.supervisorSubscribers.length, 1);
-  const source = { v: 1, broker: 'down', accounts: [], secret: 'CANARY' };
+  const source = JSON.parse(JSON.stringify(payFixture.valid_full_input));
+  const sanitizerCallsBefore = ctx.state.sanitizerCalls.length;
   ctx.state.supervisorSubscribers[0](source);
+  assert.strictEqual(ctx.state.sanitizerCalls.length, sanitizerCallsBefore + 1);
+  assert.strictEqual(ctx.state.sanitizerCalls[sanitizerCallsBefore], source);
   assert.deepStrictEqual(ctx.state.rendererMessages, [[
     win.webContents.mainFrame,
     'wallet:snapshot:subscribe',
-    { v: 1, broker: 'down', accounts: [] },
+    payFixture.valid_full_expected,
   ]]);
   const delivered = ctx.state.rendererMessages[0][2];
   assert.notStrictEqual(delivered, source);
   assert.notStrictEqual(delivered.accounts, source.accounts);
-  delivered.accounts.push({ account_id: 'mutated' });
-  assert.deepStrictEqual(source.accounts, []);
-  assert.ok(!JSON.stringify(ctx.state.rendererMessages).includes('CANARY'));
-  assert.strictEqual(source.secret, 'CANARY');
+  delivered.accounts[0].label = 'renderer mutation';
+  delivered.intent_preview.state = 'failed';
+  assert.strictEqual(source.accounts[0].label, 'Shielded ZEC');
+  assert.strictEqual(source.intent_preview.state, 'awaiting_confirm');
+  const serialized = JSON.stringify(ctx.state.rendererMessages);
+  assert.ok(!serialized.includes('SNAPSHOT_SECRET_CANARY'));
+  assert.ok(!serialized.includes('u1-forbidden'));
+  assert.strictEqual(delivered.intent_preview.can_cancel, true);
+  for (const key of ['confirm', 'actions', 'receiver', 'fee_atomic', 'memo', 'request_id', 'raw_transaction', 'pczt']) {
+    assert.strictEqual(Object.prototype.hasOwnProperty.call(delivered.intent_preview, key), false);
+  }
 });
 
 test('wallet Electron boundary exposes no confirmation, unlock, backup, sign, or broadcast surface', () => {

@@ -1,0 +1,155 @@
+{
+  "valid_full_input": {
+    "v": 1,
+    "broker": "ready",
+    "accounts": [
+      {
+        "account_id": "00112233445566778899aabbccddeeff",
+        "label": "Shielded ZEC",
+        "asset": "ZEC",
+        "network": "zec-testnet",
+        "kind": "software",
+        "privacy": "private",
+        "balance_atomic": "18446744073709551615",
+        "restored_pool": "ironwood",
+        "probed_at": "2026-08-30T12:00:00Z",
+        "probe_source": "static_fixture",
+        "capabilities": {
+          "can_view": true,
+          "can_derive_fresh_receiver": true,
+          "can_receive_private": true,
+          "can_receive_orchard": true,
+          "can_receive_ironwood": true,
+          "can_prepare_tx": true,
+          "can_sign_spend": true,
+          "can_sign_orchard": true,
+          "can_sign_ironwood": true,
+          "can_tx_v6": true,
+          "can_migrate_orchard_to_ironwood": false,
+          "can_sign_transparent": false,
+          "can_display_amount_on_device": false,
+          "can_display_recipient_on_device": false,
+          "can_display_network_on_device": false,
+          "can_verify_pczt_on_device": true,
+          "can_export_viewing_material": true,
+          "can_broadcast": false,
+          "consensus_branch": "nu6.3-test-fixture",
+          "pczt_version": "v6-fixture",
+          "tx_version_max": "6",
+          "unknown_boolean": true,
+          "receiver": "u1-forbidden",
+          "fee_atomic": "123"
+        },
+        "sync": {
+          "state": "idle",
+          "progress": 1,
+          "diagnostics": "SNAPSHOT_SECRET_CANARY"
+        },
+        "device": {
+          "present": false,
+          "label": "Software signer",
+          "verified_fields": ["amount", "recipient", "network", "fee"],
+          "fingerprint": "SNAPSHOT_SECRET_CANARY"
+        },
+        "receiver": "u1-forbidden",
+        "receivers": ["u1-forbidden"],
+        "seed": "SNAPSHOT_SECRET_CANARY",
+        "spend_key": "SNAPSHOT_SECRET_CANARY",
+        "viewing_key": "SNAPSHOT_SECRET_CANARY",
+        "backup_path": "/forbidden/wallet.backup",
+        "rpc_endpoint": "https://wallet.invalid",
+        "provider": "forbidden-rate-provider",
+        "quote": { "price": "99" },
+        "generic_method": "intent.confirm"
+      }
+    ],
+    "intent_preview": {
+      "intent_id": "ffeeddccbbaa99887766554433221100",
+      "state": "awaiting_confirm",
+      "asset": "ZEC",
+      "network": "zec-testnet",
+      "amount_atomic": "42",
+      "status_label": "HOSTILE LABEL",
+      "can_cancel": false,
+      "error": {
+        "code": "LOCKED",
+        "message": "SNAPSHOT_SECRET_CANARY",
+        "stack": "/forbidden/wallet.js:1",
+        "data": { "receiver": "u1-forbidden" },
+        "retry_text": "confirm again"
+      },
+      "receiver": "u1-forbidden",
+      "fee_atomic": "123",
+      "memo": "SNAPSHOT_SECRET_CANARY",
+      "peer_id": "SNAPSHOT_SECRET_CANARY",
+      "request_id": "0123456789abcdef0123456789abcdef",
+      "rate": { "price": "99" },
+      "raw_transaction": "SNAPSHOT_SECRET_CANARY",
+      "pczt": "SNAPSHOT_SECRET_CANARY",
+      "confirm": true,
+      "actions": ["cancel", "confirm"]
+    },
+    "receiver": "u1-forbidden",
+    "seed": "SNAPSHOT_SECRET_CANARY",
+    "passphrase": "SNAPSHOT_SECRET_CANARY",
+    "quote": { "price": "99" },
+    "method": "intent.confirm"
+  },
+  "valid_full_expected": {
+    "v": 1,
+    "broker": "ready",
+    "accounts": [
+      {
+        "account_id": "00112233445566778899aabbccddeeff",
+        "label": "Shielded ZEC",
+        "asset": "ZEC",
+        "network": "zec-testnet",
+        "kind": "software",
+        "privacy": "private",
+        "balance_atomic": "18446744073709551615",
+        "restored_pool": "ironwood",
+        "probed_at": "2026-08-30T12:00:00Z",
+        "probe_source": "static_fixture",
+        "capabilities": {
+          "can_view": true,
+          "can_derive_fresh_receiver": true,
+          "can_receive_private": true,
+          "can_receive_orchard": true,
+          "can_receive_ironwood": true,
+          "can_prepare_tx": true,
+          "can_sign_spend": true,
+          "can_sign_orchard": true,
+          "can_sign_ironwood": true,
+          "can_tx_v6": true,
+          "can_migrate_orchard_to_ironwood": false,
+          "can_sign_transparent": false,
+          "can_display_amount_on_device": false,
+          "can_display_recipient_on_device": false,
+          "can_display_network_on_device": false,
+          "can_verify_pczt_on_device": true,
+          "can_export_viewing_material": true,
+          "can_broadcast": false,
+          "consensus_branch": "nu6.3-test-fixture",
+          "pczt_version": "v6-fixture",
+          "tx_version_max": "6"
+        },
+        "sync": { "state": "idle", "progress": 1 },
+        "device": {
+          "present": false,
+          "label": "Software signer",
+          "verified_fields": ["amount", "recipient", "network", "fee"]
+        }
+      }
+    ],
+    "intent_preview": {
+      "intent_id": "ffeeddccbbaa99887766554433221100",
+      "state": "awaiting_confirm",
+      "asset": "ZEC",
+      "network": "zec-testnet",
+      "amount_atomic": "42",
+      "status_label": "Confirm in BitBook Wallet",
+      "can_cancel": true,
+      "error_code": "LOCKED"
+    }
+  }
+}

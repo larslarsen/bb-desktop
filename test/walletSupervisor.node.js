@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const fixture = require('./fixtures/wallet-broker/transcript-v1.json');
+const payFixture = require('./fixtures/wallet-pay/snapshots-v1.json');
+const { sanitizeWalletSnapshot } = require('../wallet-pay/model');
 const {
   BROKER_METHODS,
   createBrokerDispatcher,
@@ -296,35 +298,43 @@ test('quit: an unbound child terminates without any application frame', () => {
   );
 });
 
-test('snapshot: keys, receivers, backup, RPC, raw data, and canaries are removed', () => {
-  let getterCalls = 0;
-  const input = {
-    v: 1, broker: 'ready',
-    accounts: [{
-      account_id: '00112233445566778899aabbccddeeff', label: 'Shielded ZEC', asset: 'ZEC', network: 'zec-testnet',
-      kind: 'software', privacy: 'private', capabilities: { can_view: true }, balance_atomic: '0',
-      sync: { state: 'idle', progress: 1, secret: 'CANARY' },
-      device: { present: false, label: 'Synthetic', verified_fields: [], raw: 'CANARY' },
-      receivers: ['secret'], backup: {}, rpc: {}, raw_transaction: 'raw',
-    }],
-    seed: 'CANARY', receivers: ['secret'], backup: {}, rpc: {}, raw_transaction: 'raw', confirm: () => true,
-  };
-  Object.defineProperty(input.accounts[0], 'spend_key', { enumerable: true, get() { getterCalls += 1; return 'CANARY'; } });
+test('snapshot: supervisor exports the shared Pay sanitizer and removes every fixture canary', () => {
+  assert.strictEqual(sanitizeSnapshot, sanitizeWalletSnapshot);
+  const input = JSON.parse(JSON.stringify(payFixture.valid_full_input));
   const result = sanitizeSnapshot(input);
-  assert.deepStrictEqual(result, {
-    v: 1, broker: 'ready', accounts: [{
-      account_id: '00112233445566778899aabbccddeeff', label: 'Shielded ZEC', asset: 'ZEC', network: 'zec-testnet',
-      kind: 'software', privacy: 'private', capabilities: { can_view: true }, balance_atomic: '0',
-      sync: { state: 'idle', progress: 1 },
-      device: { present: false, label: 'Synthetic', verified_fields: [] },
-    }],
-  });
-  assert.strictEqual(getterCalls, 0);
+  assert.deepStrictEqual(result, payFixture.valid_full_expected);
   assert.notStrictEqual(result.accounts, input.accounts);
   assert.notStrictEqual(result.accounts[0].sync, input.accounts[0].sync);
   result.accounts[0].sync.state = 'changed';
   assert.strictEqual(input.accounts[0].sync.state, 'idle');
-  assert.ok(!JSON.stringify(result).includes('CANARY'));
+  assert.ok(!JSON.stringify(result).includes('SNAPSHOT_SECRET_CANARY'));
+  assert.ok(!JSON.stringify(result).includes('u1-forbidden'));
+});
+
+test('snapshot: sync publication traverses the shared sanitizer before every subscriber', () => {
+  const ctx = harness();
+  bindSupervisor(ctx);
+  const source = JSON.parse(JSON.stringify(payFixture.valid_full_input));
+  const received = [];
+  const unsubscribe = ctx.supervisor.subscribeSnapshot((value) => received.push(value));
+  assert.strictEqual(ctx.supervisor.receiveProtocol({
+    v: 1,
+    id: '22223333444455556666777788889999',
+    seq: 2,
+    kind: 'evt',
+    method: 'sync.subscribe',
+    params: { snapshot: source },
+    session: fixture.session_id,
+  }).ok, true);
+  assert.deepStrictEqual(received, [payFixture.valid_full_expected]);
+  assert.notStrictEqual(received[0], source);
+  assert.notStrictEqual(received[0].accounts, source.accounts);
+  received[0].accounts[0].label = 'renderer mutation';
+  assert.strictEqual(source.accounts[0].label, 'Shielded ZEC');
+  assert.ok(!JSON.stringify(received).includes('SNAPSHOT_SECRET_CANARY'));
+  assert.ok(!JSON.stringify(received).includes('u1-forbidden'));
+  assert.strictEqual(unsubscribe(), true);
+  assert.strictEqual(unsubscribe(), false);
 });
 
 function run() {
