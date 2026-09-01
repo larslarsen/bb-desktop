@@ -2,19 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE ORCHARD-PADDING FOCUSED GATE AUTHORIZED
+State: PHASE-C PREPARE POST-PARSE DIAGNOSTIC SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — Orchard-padding correction source accepted
+Authorized source actor: Principal Dev — Codex Sol, temporary marker in `wallet-broker/src/zec/store.rs` only
 
-Authorized integration actor: Jr Dev — Hermes, one focused gate command only
+Authorized integration actor: none until marker review
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-Active focused gate handoff:
-[HERMES_BBD_WAL_006_ORCHARD_PADDING_FOCUSED_GATE_01.md](HERMES_BBD_WAL_006_ORCHARD_PADDING_FOCUSED_GATE_01.md)
+Active diagnostic: emit one fixed post-parse line containing only invariant booleans/counts; no
+receiver, memo, amount, key, witness, signature, path, raw bytes, or upstream error text.
 
 Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
