@@ -2,16 +2,19 @@
 
 Ticket: BBD-WAL-006
 
-State: FINAL WAL-006 POLICY GATE INTEGRATED
+State: WAL-006 FIVE-CASE FALSIFICATION GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — final policy gate integrated
+Authorized source actor: none — only five exact temporary Sol-authored mutations authorized
 
-Authorized integration actor: none — final policy gate integrated
+Authorized integration actor: Jr Dev — Hermes, falsification/evidence integration only
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
+
+Active falsification handoff:
+[HERMES_BBD_WAL_006_FALSIFICATION_GATE_01.md](HERMES_BBD_WAL_006_FALSIFICATION_GATE_01.md)
 
 Completed final policy integration gate 01:
 [HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md](HERMES_BBD_WAL_006_FINAL_POLICY_INTEGRATION_01.md)
