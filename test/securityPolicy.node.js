@@ -2126,6 +2126,11 @@ const WAL006_SUPPORT_DEPENDENCIES = {
     version: '=0.37.0', default_features: false, features: [], optional: false,
   },
 };
+const WAL006_PREPARE_DEPENDENCIES = {
+  'unicode-normalization': {
+    version: '=0.1.25', default_features: false, features: ['std'], optional: false,
+  },
+};
 const WAL006_TEST_TARGETS = [
   'zec_fixture_builder',
   'zec_address',
@@ -2307,6 +2312,72 @@ test('WAL-006 manifest pins the exact production support APIs for RNG and SQLite
         requireLibrary: true, requireLockfile: false,
       }),
       /support|dependency|manifest|RNG|rand_core|SQLite|rusqlite/i
+    );
+  }
+});
+
+test('WAL-006 prepare NFC dependency is one exact defaults-off Unicode normalization pin', () => {
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  const unicodeNormalizationLine =
+    'unicode-normalization = { version = "=0.1.25", default-features = false, features = ["std"] }';
+  assert.strictEqual(
+    manifestText.split(`${unicodeNormalizationLine}\n`).length - 1,
+    1,
+    `manifest prepare dependency line must be unique and exact: ${unicodeNormalizationLine}`
+  );
+
+  const policy = loadPolicy();
+  assert.deepStrictEqual(policy.WAL006_PREPARE_DEPENDENCIES, WAL006_PREPARE_DEPENDENCIES);
+  policy.checkWalletBrokerManifest(manifestText, { requireLibrary: true, requireLockfile: false });
+
+  for (const [label, replacement] of [
+    [
+      'loose version',
+      unicodeNormalizationLine.replace('version = "=0.1.25"', 'version = "0.1.25"'),
+    ],
+    [
+      'enabled defaults',
+      unicodeNormalizationLine.replace('default-features = false', 'default-features = true'),
+    ],
+    [
+      'removed std feature',
+      unicodeNormalizationLine.replace(', features = ["std"]', ''),
+    ],
+    [
+      'widened features',
+      unicodeNormalizationLine.replace('["std"]', '["alloc", "std"]'),
+    ],
+    [
+      'optional dependency',
+      unicodeNormalizationLine.replace(' }', ', optional = true }'),
+    ],
+    [
+      'git source',
+      unicodeNormalizationLine.replace(
+        'version = "=0.1.25"',
+        'git = "https://example.invalid/unicode-normalization"'
+      ),
+    ],
+    [
+      'path source',
+      unicodeNormalizationLine.replace(
+        'version = "=0.1.25"',
+        'path = "../unicode-normalization"'
+      ),
+    ],
+    [
+      'second implementation',
+      `${unicodeNormalizationLine}\n` +
+        'unicode-normalization-copy = { package = "unicode-normalization", version = "=0.1.25", default-features = false, features = ["std"] }',
+    ],
+  ]) {
+    const mutated = replaceOnce(manifestText, unicodeNormalizationLine, replacement);
+    assert.notStrictEqual(mutated, manifestText, `prepare dependency mutation did not change: ${label}`);
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(mutated, {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      /prepare|unicode|normalization|dependency|manifest/i
     );
   }
 });
