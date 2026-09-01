@@ -1,31 +1,26 @@
 # Current Task
 
-Ticket: BBD-WAL-005
+Ticket: BBD-RATE-001
 
-State: COMPLETE — REVIEWER ACCEPTED
+State: ACTIVE — TEST SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none — ticket complete
+Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High), test source only
 
-Authorized integration actor: none — ticket complete
+Authorized integration actor: none until reviewer accepts the test source
 
-Accepted production: `0b51c73f8a875b69b3b57ad0dfb4740c5d96dc12`
+Source baseline: `54cc0ccc17bc55eec5b23a1d414f3250f4c728cc`
 
-Final falsification evidence: `3e1e0b14cd2b78f9a144f4dc8e98ed87a027c3b9`
+Ticket: [BBD-RATE-001.md](../../tickets/BBD-RATE-001.md)
 
-Ticket: [BBD-WAL-005.md](../../tickets/BBD-WAL-005.md)
+Provider review:
+[BBD-RATE-001-PROVIDER-REVIEW.md](../architecture/BBD-RATE-001-PROVIDER-REVIEW.md)
 
-Final reviewer acceptance:
-[BBD-WAL-005-ACCEPTANCE.md](../testing/BBD-WAL-005-ACCEPTANCE.md)
-
-Completed falsification handoff:
-[HERMES_BBD_WAL_005_FALSIFICATION_01.md](HERMES_BBD_WAL_005_FALSIFICATION_01.md)
-
-Falsification evidence:
-[BBD-WAL-005-FALSIFICATION-01.md](../testing/BBD-WAL-005-FALSIFICATION-01.md)
+Active test-source handoff:
+[GROK_BUILD_BBD_RATE_001_TESTS_01.md](GROK_BUILD_BBD_RATE_001_TESTS_01.md)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 
-BBD-WAL-006 remains complete and accepted at `14a68187`; none of its source is open.
+BBD-WAL-005 remains complete and accepted at `54cc0ccc`; none of its source is open.
