@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE SECRET-BYTES AUTO-TRAIT TEST SOURCE AUTHORIZED — TEST DROP REQUIRED
+State: PHASE-C PREPARE SECRET-BYTES EXPECTED-RED GATE AUTHORIZED — HERMES EXECUTION REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; test source only)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes (expected-red gate only)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare secret-bytes test handoff:
+Active prepare secret-bytes expected-red handoff:
+[HERMES_BBD_WAL_006_PREPARE_SECRET_BYTES_EXPECTED_RED_01.md](HERMES_BBD_WAL_006_PREPARE_SECRET_BYTES_EXPECTED_RED_01.md)
+
+Accepted prepare secret-bytes test-source review:
+[BBD-WAL-006-PREPARE-SECRET-BYTES-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-006-PREPARE-SECRET-BYTES-TEST-SOURCE-REVIEW-01.md)
+
+Completed prepare secret-bytes test handoff:
 [CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_TESTS_01.md](CODEX_SOL_BBD_WAL_006_PREPARE_SECRET_BYTES_TESTS_01.md)
 
 Accepted prepare secret-bytes design review:
