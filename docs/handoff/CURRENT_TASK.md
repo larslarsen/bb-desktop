@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C SCAN GATE RESUME 01 AUTHORIZED
+State: PHASE-C SCAN COMPILE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; complete)
+Authorized source actor: Sr Dev — Grok Build (`Grok 4.6`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes (paused pending source acceptance)
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -21,6 +21,12 @@ Accepted store integration review:
 [BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md](../testing/BBD-WAL-006-STORE-INTEGRATION-REVIEW-02.md)
 
 Active handoff:
+[GROK_BUILD_BBD_WAL_006_SCAN_COMPILE_CORRECTION_01.md](GROK_BUILD_BBD_WAL_006_SCAN_COMPILE_CORRECTION_01.md)
+
+Scan gate Clippy stop review:
+[BBD-WAL-006-SCAN-GATE-CLIPPY-REVIEW-01.md](../testing/BBD-WAL-006-SCAN-GATE-CLIPPY-REVIEW-01.md)
+
+Stopped scan gate resume 01:
 [HERMES_BBD_WAL_006_SCAN_GATE_RESUME_01.md](HERMES_BBD_WAL_006_SCAN_GATE_RESUME_01.md)
 
 Accepted scan format correction review:
