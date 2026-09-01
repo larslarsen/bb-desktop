@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-006
 
-State: PHASE-C PREPARE FINAL FORMAT CORRECTION ACCEPTED — HERMES GATE RESUME 02 AUTHORIZED
+State: PHASE-C PREPARE GATE RESUME 02 STOPPED AT FORMAT — SOL VERBATIM FORMAT CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High; four verbatim formatter hunks only)
 
-Authorized integration actor: Jr Dev — Hermes (bounded prepare gate resume 02 only)
+Authorized integration actor: none
 
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
@@ -17,7 +17,13 @@ Source baseline: `432e69c0443dd5233609d578b43d5a43d83d2c3d`
 
 Integration commit: `4be931150583876fabadf5a6ffb52021c791fdb3`
 
-Active prepare gate resume handoff:
+Active prepare format correction handoff:
+[CODEX_SOL_BBD_WAL_006_PREPARE_FORMAT_CORRECTION_03.md](CODEX_SOL_BBD_WAL_006_PREPARE_FORMAT_CORRECTION_03.md)
+
+Stopped prepare gate resume 02 format review:
+[BBD-WAL-006-PREPARE-GATE-FORMAT-REVIEW-03.md](../testing/BBD-WAL-006-PREPARE-GATE-FORMAT-REVIEW-03.md)
+
+Stopped prepare gate resume 02 handoff:
 [HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_02.md](HERMES_BBD_WAL_006_PREPARE_GATE_RESUME_02.md)
 
 Accepted final prepare format correction review:
