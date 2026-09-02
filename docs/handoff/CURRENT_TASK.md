@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE A MD5 PIN CORRECTION AUTHORIZED
+State: PHASE B EXPECTED RED RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,12 +18,12 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_MD5_PIN_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_MD5_PIN_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_01.md](HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_01.md)
 
-Hermes stopped before lock mutation because the final `md-5 0.11.0` pin conflicts with
-the Zcash graph's exact prerelease Digest. Sol may change only the exact dependency line
-and its Node policy mirror to `md-5 0.11.0-pre.4`. All other accepted test bytes,
-production, execution, integration, and the real local-Monero gate remain unauthorized.
+The corrected ten-path Phase-A source is accepted at the exact hashes in
+[BBD-WAL-007-TEST-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-02.md).
+Hermes alone may resume the exact lock inspection, focused expected red, evidence, and
+integration. Production and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
