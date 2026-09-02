@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 1 DISTRIBUTION SOURCE AUTHORIZED
+State: PHASE C SLICE 1 CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,12 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_DISTRIBUTION.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_DISTRIBUTION.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_CORRECTION_01.md)
 
-Phase B is accepted at `62042559`; evidence is
-[BBD-WAL-007-PHASE-B-ACCEPTANCE-01.md](../testing/BBD-WAL-007-PHASE-B-ACCEPTANCE-01.md).
-Sol alone may author Slice 1 distribution/native-selection source. Execution,
-integration, later production slices, and the real local-Monero gate remain unauthorized.
+Slice-1 source requires the exact corrections in
+[BBD-WAL-007-SLICE-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-01-SOURCE-REVIEW-01.md).
+Sol alone may add the missing verifier facade, close its path accessor, and repair the
+incremental-inventory policy contradiction. Execution, integration, later slices, and
+the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
