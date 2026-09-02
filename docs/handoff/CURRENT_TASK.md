@@ -2,14 +2,14 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 COMPILE CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 3 FOCUSED GREEN RESUME 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High; XHigh required before
 security-sensitive source acceptance or final Slice-3 acceptance
 
-Authorized source actor: Sr Dev — Grok Build (Grok 4.6 High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -19,7 +19,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BBD_WAL_007_PHASE_C_SLICE_03_COMPILE_CORRECTION_01.md](GROK_BBD_WAL_007_PHASE_C_SLICE_03_COMPILE_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_02.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -86,7 +86,11 @@ falsification test hit a macro recursion-limit compile error before runtime. The
 stop and exact restored source identity are reviewed in
 [BBD-WAL-007-SLICE-03-GREEN-RESUME-01-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-RESUME-01-STOP-REVIEW-01.md).
 Grok alone may make the bounded one-path test-support compile correction. Hermes
-execution remains unauthorized pending reviewer source inspection.
+execution remained unauthorized pending reviewer source inspection.
+Grok's one-path correction is accepted in
+[BBD-WAL-007-SLICE-03-COMPILE-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-COMPILE-CORRECTION-SOURCE-REVIEW-01.md).
+Hermes alone may run the exact focused-green resume. Slices 4–5, broader acceptance,
+and the real local-Monero gate remain unauthorized pending XHigh reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
