@@ -27,3 +27,10 @@ remain inside its existing `Zeroizing` owner while the inner fixed array is view
 slice. `apply_json_fault` must finish computing the same replacement bytes before the
 single assignment through `body`. No cryptographic, JSON-fault, production-policy, test,
 API, dependency, or compiler-setting behavior is reopened.
+
+Erratum recorded after Green Resume 03: the abbreviated Resume-02 report identified the
+test-support E0502 only by its then-current line number. The reviewer incorrectly
+attributed it to the nearby `apply_json_fault` assignment. The precise Resume-03
+diagnostic proves the persistent error is the `body.resize(body.len() + ...)` expression
+in `http_response`; the one-line `apply_json_fault` refactor is semantically neutral but
+was not the causal repair. Green Resume 03 Stop Review 01 supersedes that attribution.
