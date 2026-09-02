@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE A TEST SOURCE AUTHORIZED
+State: PHASE B EXPECTED RED AUTHORIZED
 
-Reviewer: Lead Engineer/Reviewer — Codex at High
+Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
-Source baseline: `657074b20b2a9233ae9247a2437ba237c7f99b73`
+Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-007.md](../../tickets/BBD-WAL-007.md)
 
@@ -18,11 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_A_TESTS.md](CODEX_SOL_BBD_WAL_007_PHASE_A_TESTS.md)
+[HERMES_BBD_WAL_007_EXPECTED_RED_01.md](HERMES_BBD_WAL_007_EXPECTED_RED_01.md)
 
-Only the ten Phase-A test/manifest paths named by that handoff are open to Sol.
-Production source, execution, integration, `Cargo.lock`, Git, and GitHub remain
-unauthorized.
+The ten Phase-A paths are accepted at the exact hashes in
+[BBD-WAL-007-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-01.md).
+Hermes alone may resolve the reviewed lock delta, inspect it, execute the focused
+expected-red handoff, record evidence, and integrate those exact bytes. Production and
+the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
