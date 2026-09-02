@@ -69,10 +69,15 @@ Do not edit `Cargo.lock`.
   expansion. Source-text checks do not replace behavior tests.
 - `xmr_local_gate.rs` is complete test source but cannot execute in ordinary tests. It
   accepts only `BITBOOK_MONERO_TEST_ROOT`, verifies the ticket's exact reviewed inner
-  binary hashes, uses an exact disk-backed scratch path supplied later by the Hermes
-  handoff, launches test-owned stagenet `monerod` with offline/loopback/random-port
-  flags, and never touches a running user node, existing wallet, mainnet, or public
-  network. It emits no path, port, address, password, mnemonic, raw RPC, or wallet data.
+  binary hashes, and derives its sole scratch leaf exactly as
+  `PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/wal007-local-gate")`.
+  No environment or caller may select the scratch location. It refuses an existing leaf,
+  a noncanonical parent, or a symlink component; creates the leaf itself; launches
+  test-owned stagenet `monerod` with offline/loopback/random-port flags; reaps every
+  child; and recursively removes only that exact validated leaf. The later Hermes
+  handoff performs the disk-backed-filesystem preflight. The gate never touches a
+  running user node, existing wallet, mainnet, or public network and emits no path, port,
+  address, password, mnemonic, raw RPC, or wallet data.
 - No ignored tests, conditional success, placeholder assertions, compile-error stubs,
   commented future tests, source copies of production algorithms, real user secrets,
   mainnet wallet material, or machine-specific paths are allowed.

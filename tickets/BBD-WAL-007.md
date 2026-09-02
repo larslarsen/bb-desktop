@@ -455,6 +455,9 @@ class and require redacted `Debug`, display, error chains, panic, and teardown o
    match, software-wallet creation, fresh non-primary subaddress, close/stop, and no
    outbound connection. The gate creates only ephemeral stagenet material, emits no
    seed/password/path, and deletes its exact scratch directory after evidence hashes.
+   The scratch directory is derived only as
+   `PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/wal007-local-gate")`;
+   it is not accepted from an environment variable or caller.
 
 Tests assert behavior, bytes, persisted state, call ordering, child state, and negative
 capability. Source-text assertions are limited to dependency, production-inventory, and
@@ -528,6 +531,13 @@ ephemeral, reviewer-verified official Monero root supplied outside source. It re
 release/hash identities and normalized behavior only, never the personal root, wallet
 path, port, password, seed, address, or raw output. No live mainnet/stagenet peer network,
 funds, existing user wallet, or currently running user node is touched.
+
+Before that run, Hermes verifies that `wallet-broker/target` is on a disk-backed
+filesystem, not tmpfs. The gate refuses to start if the exact derived scratch leaf
+already exists, if its parent is not the manifest directory's real `target`, or if any
+validated component is a symlink. It creates that leaf itself. Cleanup may recursively
+remove only that exact validated leaf after every child is reaped; it must never clean a
+caller/env-selected path or a broader `target` directory.
 
 This document authorizes none of the phases. `docs/handoff/CURRENT_TASK.md` or a later
 reviewer handoff must explicitly open exact paths and stop conditions.
