@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-007 Expected Red 01
 
-State: AUTHORIZED — NOT STARTED
+State: STOPPED — DEPENDENCY RESOLUTION CONFLICT
 
 You are Jr Dev — Hermes. Own only this dependency-resolution, expected-red, evidence,
 and integration gate.

@@ -95,7 +95,7 @@ does not select, verify, launch, or own the user's `monerod`.
 The only new direct Rust dependency permitted by this ticket is:
 
 ```toml
-md-5 = { version = "=0.11.0", default-features = false, features = ["zeroize"] }
+md-5 = { version = "=0.11.0-pre.4", default-features = false, features = ["zeroize"] }
 ```
 
 It exists solely for legacy interoperability with Monero's HTTP Digest authentication.
@@ -105,6 +105,14 @@ security boundary remains loopback plus process ownership, with same-user malwar
 explicit residual risk. No general HTTP client, async runtime, TLS stack, URL parser,
 proxy library, Monero Rust wallet, C/C++ FFI, git dependency, wildcard requirement,
 `[patch]`, build-time downloader, vendored binary, or new first-party `unsafe` is allowed.
+
+The exact prerelease pin is intentional. The accepted Zcash dependency graph already
+requires `digest = "=0.11.0-pre.9"`; Cargo cannot resolve that exact prerelease beside
+the final `md-5 0.11.0` crate's stable `digest ^0.11` requirement. Official RustCrypto
+`md-5 0.11.0-pre.4` requires exactly `digest 0.11.0-pre.9`, retains the
+`digest/zeroize` feature forwarding, is `build = false`, and therefore adds no second
+Digest line or build script. Upstream source metadata:
+<https://docs.rs/crate/md-5/0.11.0-pre.4/source/Cargo.toml>.
 
 ## Closed installation-selection contract
 
