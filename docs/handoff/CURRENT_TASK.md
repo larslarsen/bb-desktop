@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 EXACT FORMATTER DIFF REQUIRED
+State: PHASE C SLICE 2 FORMAT CORRECTION 03 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: none
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-none
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_03.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_03.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -46,9 +46,10 @@ reviewed in
 The second formatting handoff named one region that was already in the prescribed
 layout. Sol stopped without editing; that stop is reviewed in
 [BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-02-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-02-STOP-REVIEW-01.md).
-The exact Rust 1.98 formatter diff is required before another correction. Source work,
-Hermes resume, Slice 3, broader acceptance, and the real local-Monero gate are
-unauthorized.
+The owner's verbatim Rust 1.98 formatter output is preserved in
+[BBD-WAL-007-SLICE-02-FORMATTER-DIFF-01.md](../testing/BBD-WAL-007-SLICE-02-FORMATTER-DIFF-01.md).
+Sol may apply only that exact recorded diff. Hermes resume, Slice 3, broader acceptance,
+and the real local-Monero gate remain unauthorized pending XHigh review of the drop.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
