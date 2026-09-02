@@ -335,6 +335,8 @@ The account state DB is a broker-owned SQLite file with `0600` mode and `FULL` s
 closed schema binds schema version, account ID, network, primary address, greatest
 issuance sequence, and receiver rows:
 
+The schema version is exactly `1`.
+
 ```text
 request_id, account_index, subaddress_index, subaddress, issued_at_sequence
 ```
