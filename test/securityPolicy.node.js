@@ -70,6 +70,7 @@ const SOCIAL_PATHS = [
   'scripts/build-windows.ps1',
   'wallet-broker/**',
   'wallet-pay/**',
+  'quote-worker/**',
   '.github/workflows/social.yml',
 ];
 
@@ -84,6 +85,7 @@ const SECURITY_PATHS = [
   'package-lock.json',
   'wallet-broker/**',
   'wallet-pay/**',
+  'quote-worker/**',
   'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
@@ -1229,7 +1231,7 @@ test('inherited metrics and feedback loaders are structurally neutralized and un
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay && npm run test:rate';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
@@ -2660,7 +2662,7 @@ test('RATE-001 quote-worker package, syntax, top-level, and routine CI commands 
   assert.ok(pkg.scripts.test.split(/\s*&&\s*/).includes(RATE_CI_COMMAND));
   assert.strictEqual(
     pkg.scripts.test,
-    `${TOP_LEVEL_TEST_CMD} && ${RATE_CI_COMMAND}`
+    TOP_LEVEL_TEST_CMD
   );
   const buildCommands = pkg.scripts.build.split(/\s*&&\s*/);
   for (const command of RATE_BUILD_COMMANDS) {

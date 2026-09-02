@@ -7,16 +7,17 @@
   "scripts": {
     "start": "electron --no-sandbox .",
     "start:sandboxed": "electron .",
-    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js && node --check scripts/security-policy.js && node --check scripts/validate-sbom.js && node --check scripts/validate-rust-sbom.js && node --check wallet-contract/canonical.js && node --check wallet-contract/framing.js && node --check wallet-contract/model.js && node --check wallet-contract/state-machine.js && node --check wallet-contract/fakes.js && node --check wallet-contract/index.js && node --check wallet-broker/protocol.js && node --check wallet-broker/supervisor.js && node --check wallet-pay/model.js && node --check wallet-preload.js && bash -n scripts/build-deb.sh && bash -n scripts/build-macos.sh",
+    "build": "node --check social-main.js && node --check social/core.js && node --check social/app.js && node --check scripts/security-policy.js && node --check scripts/validate-sbom.js && node --check scripts/validate-rust-sbom.js && node --check wallet-contract/canonical.js && node --check wallet-contract/framing.js && node --check wallet-contract/model.js && node --check wallet-contract/state-machine.js && node --check wallet-contract/fakes.js && node --check wallet-contract/index.js && node --check wallet-broker/protocol.js && node --check wallet-broker/supervisor.js && node --check wallet-pay/model.js && node --check wallet-preload.js && node --check quote-worker/providers.js && node --check quote-worker/model.js && node --check quote-worker/framing.js && node --check quote-worker/worker.js && node --check quote-worker/supervisor.js && bash -n scripts/build-deb.sh && bash -n scripts/build-macos.sh",
     "package:linux": "bash scripts/build-deb.sh",
     "package:macos": "bash scripts/build-macos.sh",
     "package:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows.ps1",
-    "test": "npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay",
+    "test": "npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay && npm run test:rate",
     "test:social": "node test/socialCore.node.js",
     "test:security": "node test/electronSecurity.node.js && node test/securityPolicy.node.js",
     "test:wallet": "node test/walletContract.node.js",
     "test:wallet-broker": "node test/walletBrokerProtocol.node.js && node test/walletSupervisor.node.js && node test/walletPreload.node.js",
-    "test:wallet-pay": "node test/walletPay.node.js"
+    "test:wallet-pay": "node test/walletPay.node.js",
+    "test:rate": "node test/rateWorker.node.js && node test/rateSupervisor.node.js"
   },
   "repository": {
     "type": "git",

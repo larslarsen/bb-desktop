@@ -8,6 +8,7 @@ on:
       - "wallet-contract/**"
       - "wallet-broker/**"
       - "wallet-pay/**"
+      - "quote-worker/**"
       - "wallet-preload.js"
       - "test/**"
       - "scripts/security-policy.js"

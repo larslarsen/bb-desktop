@@ -8,6 +8,7 @@ on:
       - "wallet-contract/**"
       - "wallet-broker/**"
       - "wallet-pay/**"
+      - "quote-worker/**"
       - "wallet-preload.js"
       - "test/**"
       - "package.json"
@@ -26,6 +27,7 @@ on:
       - "wallet-contract/**"
       - "wallet-broker/**"
       - "wallet-pay/**"
+      - "quote-worker/**"
       - "wallet-preload.js"
       - "test/**"
       - "package.json"
@@ -56,6 +58,7 @@ jobs:
       - run: npm run test:wallet
       - run: npm run test:wallet-broker
       - run: npm run test:wallet-pay
+      - run: npm run test:rate
       - run: rustup toolchain install 1.98.0 --profile minimal --component rustfmt --component clippy
       - run: cargo +1.98.0 test --manifest-path wallet-broker/Cargo.toml --locked --no-default-features
       - run: cargo +1.98.0 fmt --manifest-path wallet-broker/Cargo.toml --check

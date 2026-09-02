@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-RATE-001 Production Gate Resume 02
 
-State: ACTIVE
+State: COMPLETE
 
 You are **Jr Dev — Hermes** using only the free configured Nous route. Run the complete
 green/security gate against accepted Source Correction 03, complete the existing evidence,

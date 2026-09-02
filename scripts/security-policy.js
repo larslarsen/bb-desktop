@@ -99,6 +99,7 @@ const SOCIAL_PATHS = [
   'scripts/build-windows.ps1',
   'wallet-broker/**',
   'wallet-pay/**',
+  'quote-worker/**',
   '.github/workflows/social.yml',
 ];
 
@@ -113,6 +114,7 @@ const SECURITY_PATHS = [
   'package-lock.json',
   'wallet-broker/**',
   'wallet-pay/**',
+  'quote-worker/**',
   'deny.toml',
   '.github/workflows/**',
   '.gitleaksignore',
@@ -123,7 +125,7 @@ const SECURITY_PATHS = [
 const WALLET_TEST_SCRIPT = 'test:wallet';
 const WALLET_TEST_CMD = 'node test/walletContract.node.js';
 const WALLET_CI_CMD = 'npm run test:wallet';
-const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay';
+const TOP_LEVEL_TEST_CMD = 'npm run test:social && npm run test:security && npm run test:wallet && npm run test:wallet-broker && npm run test:wallet-pay && npm run test:rate';
 const WALLET_SOURCE_FILTER = 'wallet-contract/**';
 const WALLET_CONTRACT_PATHS = [
   'wallet-contract/canonical.js',
@@ -190,14 +192,45 @@ const PRELOAD_INVOKE_CHANNELS = [
   'wallet:payee-request:get',
 ];
 const PRELOAD_SUBSCRIBE_CHANNEL = 'wallet:snapshot:subscribe';
+const QUOTE_WORKER_PATHS = [
+  'quote-worker/providers.js',
+  'quote-worker/model.js',
+  'quote-worker/framing.js',
+  'quote-worker/worker.js',
+  'quote-worker/supervisor.js',
+];
+const RATE_TEST_SCRIPT = 'test:rate';
+const RATE_TEST_COMMAND = 'node test/rateWorker.node.js && node test/rateSupervisor.node.js';
+const RATE_CI_COMMAND = `npm run ${RATE_TEST_SCRIPT}`;
+const RATE_BUILD_COMMANDS = QUOTE_WORKER_PATHS.map((rel) => `node --check ${rel}`);
+const RATE_SOURCE_FILTER = 'quote-worker/**';
+const RATE_IMPORT_ALLOWLISTS = {
+  'quote-worker/providers.js': [],
+  'quote-worker/model.js': ['buffer', 'node:buffer'],
+  'quote-worker/framing.js': ['buffer', 'node:buffer'],
+  'quote-worker/worker.js': [
+    'https', 'node:https', 'buffer', 'node:buffer',
+    './providers', './providers.js', './model', './model.js', './framing', './framing.js',
+  ],
+  'quote-worker/supervisor.js': [
+    'buffer', 'node:buffer', 'path', 'node:path',
+    'child_process', 'node:child_process',
+    './framing', './framing.js', './model', './model.js', './providers', './providers.js',
+  ],
+};
+const RATE_PROVIDER_URLS = [
+  'https://api.exchange.coinbase.com/products/ZEC-USD/ticker',
+  'https://api.kraken.com/0/public/Ticker?pair=XMRUSD',
+];
 const SOCIAL_WORKFLOW_PATHS = [
   ...SOCIAL_PATHS.slice(0, 2),
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
   PAY_SOURCE_FILTER,
+  RATE_SOURCE_FILTER,
   'wallet-preload.js',
   ...SOCIAL_PATHS.slice(2).filter(
-    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER
+    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER && item !== RATE_SOURCE_FILTER
   ),
 ];
 const SECURITY_WORKFLOW_PATHS = [
@@ -205,9 +238,10 @@ const SECURITY_WORKFLOW_PATHS = [
   WALLET_SOURCE_FILTER,
   'wallet-broker/**',
   PAY_SOURCE_FILTER,
+  RATE_SOURCE_FILTER,
   'wallet-preload.js',
   ...SECURITY_PATHS.slice(2).filter(
-    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER
+    (item) => item !== 'wallet-broker/**' && item !== PAY_SOURCE_FILTER && item !== RATE_SOURCE_FILTER
   ),
 ];
 
@@ -1244,7 +1278,7 @@ function checkSocialWorkflow(text, data) {
 
   for (const command of [
     BUILD_CMD, SOCIAL_TEST_CMD, SECURITY_TEST_CMD, WALLET_CI_CMD, BROKER_CI_COMMAND,
-    PAY_CI_COMMAND,
+    PAY_CI_COMMAND, RATE_CI_COMMAND,
     WAL004_ROUTINE_TEST, WAL004_FMT, WAL004_CLIPPY, WAL004_NATIVE_CHECK,
   ]) {
     if (!routineCommands.includes(command)) {
@@ -1789,6 +1823,75 @@ function checkWalletContractSource(source, rel) {
   }
 }
 
+function checkQuoteWorkerSource(source, rel) {
+  if (typeof source !== 'string' || !source.trim()) {
+    throw new PolicyError(`quote-worker source ${rel} is empty`);
+  }
+  const allowed = RATE_IMPORT_ALLOWLISTS[rel];
+  if (!allowed || !QUOTE_WORKER_PATHS.includes(rel)) {
+    throw new PolicyError(`unknown quote-worker path ${rel}`);
+  }
+  const allow = new Set(allowed);
+  const callPattern = /\b(require|import)\s*\(([^)]*)\)/g;
+  let match;
+  while ((match = callPattern.exec(source)) !== null) {
+    const specifier = literalModuleSpecifier(match[2]);
+    if (!specifier || !allow.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted ${match[1]} module load`);
+    }
+  }
+  const staticPattern = /\bimport\s+(?!\s*\()([^;\n]+)/g;
+  while ((match = staticPattern.exec(source)) !== null) {
+    const clause = match[1].trim();
+    const direct = clause.match(/^(['"])([^'"]+)\1$/);
+    const from = clause.match(/\bfrom\s+(['"])([^'"]+)\1$/);
+    const specifier = direct ? direct[2] : from ? from[2] : null;
+    if (!specifier || !allow.has(specifier)) {
+      throw new PolicyError(`${rel} contains a computed or non-allowlisted static import`);
+    }
+  }
+  if (/\bfetch\s*\(/.test(source) || /\b(?:new\s+)?WebSocket\s*\(/.test(source)) {
+    throw new PolicyError(`${rel} contains a forbidden network capability`);
+  }
+  if (/enabled_by_default\s*:\s*true/.test(source)) {
+    throw new PolicyError(`${rel} enables a provider by default`);
+  }
+  if (/\bshell\s*:\s*true\b/.test(source)) {
+    throw new PolicyError(`${rel} contains forbidden spawn shell`);
+  }
+  if (/\benv\s*:\s*process\.env\b|\bprocess\.env\b/.test(source) && rel === 'quote-worker/supervisor.js') {
+    throw new PolicyError(`${rel} inherits process environment`);
+  }
+  if (rel === 'quote-worker/worker.js' || rel === 'quote-worker/providers.js') {
+    const urls = source.match(/https?:\/\/[^\s'"`]+/g) || [];
+    for (const url of urls) {
+      const cleaned = url.replace(/[.,;]+$/, '');
+      if (!RATE_PROVIDER_URLS.includes(cleaned)) {
+        throw new PolicyError(`${rel} contains unreviewed provider pin ${cleaned}`);
+      }
+      if (cleaned.startsWith('http://')) {
+        throw new PolicyError(`${rel} contains an http downgrade`);
+      }
+    }
+    const requestBlocks = source.match(/https\.request\s*\(\s*\{[^}]*\}/g) || [];
+    for (const block of requestBlocks) {
+      const protocol = (block.match(/protocol\s*:\s*['"]([^'"]+)['"]/) || [])[1];
+      const hostname = (block.match(/hostname\s*:\s*['"]([^'"]+)['"]/) || [])[1];
+      const pathValue = (block.match(/path\s*:\s*['"]([^'"]+)['"]/) || [])[1];
+      if (protocol && protocol !== 'https:') {
+        throw new PolicyError(`${rel} contains an http downgrade`);
+      }
+      if (hostname && hostname !== 'api.exchange.coinbase.com' && hostname !== 'api.kraken.com') {
+        throw new PolicyError(`${rel} contains an unreviewed provider host`);
+      }
+      if (pathValue && pathValue !== '/products/ZEC-USD/ticker' &&
+          pathValue !== '/0/public/Ticker?pair=XMRUSD') {
+        throw new PolicyError(`${rel} contains an unreviewed provider path or pair`);
+      }
+    }
+  }
+}
+
 function checkWalletPaySource(source, rel) {
   if (typeof source !== 'string' || !source.trim() || !PAY_MODEL_PATHS.includes(rel)) {
     throw new PolicyError(`wallet Pay model source ${rel} is empty or unreviewed`);
@@ -2329,8 +2432,11 @@ function checkPackageJson(packageText) {
   if (pkg.scripts[PAY_TEST_SCRIPT] !== PAY_TEST_COMMAND) {
     throw new PolicyError(`package.json must expose ${PAY_TEST_SCRIPT} as ${PAY_TEST_COMMAND}`);
   }
+  if (pkg.scripts[RATE_TEST_SCRIPT] !== RATE_TEST_COMMAND) {
+    throw new PolicyError(`package.json must expose ${RATE_TEST_SCRIPT} as the exact quote-worker tests`);
+  }
   if (pkg.scripts.test !== TOP_LEVEL_TEST_CMD) {
-    throw new PolicyError('package.json top-level npm test must include the exact wallet contract command');
+    throw new PolicyError('package.json top-level npm test must include the exact rate test command');
   }
   if (typeof pkg.scripts.build !== 'string') {
     throw new PolicyError('package.json build script is missing');
@@ -2349,6 +2455,11 @@ function checkPackageJson(packageText) {
   for (const command of PAY_BUILD_COMMANDS) {
     if (!buildCommands.includes(command)) {
       throw new PolicyError(`package.json wallet Pay build syntax omits ${command}`);
+    }
+  }
+  for (const command of RATE_BUILD_COMMANDS) {
+    if (!buildCommands.includes(command)) {
+      throw new PolicyError(`package.json quote-worker build syntax omits ${command}`);
     }
   }
   if (!buildCommands.includes('node --check scripts/validate-rust-sbom.js')) {
@@ -2386,6 +2497,11 @@ function checkRepository(root) {
     const sourcePath = path.join(root, rel);
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkWalletBoundarySource(fs.readFileSync(sourcePath, 'utf8'), rel);
+  }
+  for (const rel of QUOTE_WORKER_PATHS) {
+    const sourcePath = path.join(root, rel);
+    if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
+    checkQuoteWorkerSource(fs.readFileSync(sourcePath, 'utf8'), rel);
   }
   checkWalletBrokerManifest(fs.readFileSync(path.join(root, WAL004_MANIFEST), 'utf8'), {
     requireLibrary: true,
@@ -2477,6 +2593,13 @@ module.exports = {
   SBOM_RETENTION_DAYS,
   SOCIAL_PATHS,
   SECURITY_PATHS,
+  QUOTE_WORKER_PATHS,
+  RATE_BUILD_COMMANDS,
+  RATE_TEST_COMMAND,
+  RATE_TEST_SCRIPT,
+  RATE_CI_COMMAND,
+  RATE_IMPORT_ALLOWLISTS,
+  RATE_PROVIDER_URLS,
   WALLET_CONTRACT_PATHS,
   WALLET_BUILD_COMMANDS,
   WALLET_IMPORT_ALLOWLIST,
@@ -2530,6 +2653,7 @@ module.exports = {
   checkPackageJson,
   checkWalletContractSource,
   checkWalletPaySource,
+  checkQuoteWorkerSource,
   checkWalletBoundarySource,
   checkWalletBrokerManifest,
   checkRustWalletSourceInventory,
