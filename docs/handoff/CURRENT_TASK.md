@@ -2,11 +2,12 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 FORMAT CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 3 FORMAT CORRECTION 01 RESUME 01 AUTHORIZED
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+Reviewer: Lead Engineer/Reviewer — Codex at High; XHigh required before
+security-sensitive source acceptance or final Slice-3 acceptance
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: Sr Dev — Grok Build (Grok 4.6 High)
 
 Authorized integration actor: none
 
@@ -18,7 +19,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01.md)
+[GROK_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01_RESUME_01.md](GROK_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01_RESUME_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -66,9 +67,13 @@ Correction 02 is accepted at XHigh in
 [BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md).
 Hermes's first focused-green formatter check stopped cleanly and is reviewed in
 [BBD-WAL-007-SLICE-03-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-STOP-REVIEW-01.md).
-Sol alone may apply the exact formatting-only correction in the active handoff. Hermes
-execution/integration, Slices 4–5, broader acceptance, and the real local-Monero gate
-remain unauthorized pending a new XHigh source review.
+The owner rerouted source edits to Grok, with Sol available only as a fill-in when Grok
+is not strong enough. Sol's interrupted partial mechanical edit is reviewed in
+[BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-01-REROUTE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-01-REROUTE-REVIEW-01.md).
+The earlier Sol formatting handoff is superseded. Grok alone may finish the exact
+formatting-only correction in the active handoff. Hermes execution/integration, Slices
+4–5, broader acceptance, and the real local-Monero gate remain unauthorized pending a
+new reviewer source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

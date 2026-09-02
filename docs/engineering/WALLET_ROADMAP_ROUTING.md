@@ -16,24 +16,26 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 | P2 complete | BBD-RATE-001 | Grok Build, High | Bounded untrusted-provider parser/worker and deterministic single-source selection after the process split exists | Production accepted at `c7d91c69`; local falsification/green evidence and GitHub Actions run `33578112536` passed |
 | P2 complete | BBD-WAL-005 | Codex Sol, High | The view model touches the security-sensitive shared snapshot sanitizer; two bounded Grok Build attempts produced no file changes and were stopped, so the reviewer re-routed the unchanged source task | Production accepted at `0b51c73f`; final falsification evidence at `3e1e0b14` |
 | P2 complete | BBD-WAL-006 | Codex Sol, High | ZEC consensus, PCZT, Ironwood, SQLite viewing state, and librustzcash adapter | Reviewer-accepted at `996444e9`; final evidence at `14a68187` |
-| P3 ticket ready | BBD-WAL-007 | Codex Sol, High | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Ticket frozen at `tickets/BBD-WAL-007.md`; implementation authorization pending |
-| P3 | BBD-WAL-008 | Codex Sol, High | Hardware capability attestation and device trust | Applicable coin adapter accepted |
-| P3 | BBD-WAL-009 | Codex Sol, High | XMR prepare/sign/verify plus cross-coin broadcast, concurrency, cancellation races, and crash recovery | Coin adapters accepted |
-| P4 | BBD-WAL-010 | Codex Spark, High for DOM/CSS/state boilerplate; Grok or Sol for any authority-bearing correction | User-facing composition after authority and state-machine behavior are executable | WAL-005, RATE-001, and payment flow accepted |
-| P4 | BBD-WAL-011 | Codex Sol, High | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
-| P5 | BBD-WAL-012 | Codex Sol, High | Mainnet release gate and money-safety evidence | Every preceding wallet gate accepted |
+| P3 active | BBD-WAL-007 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Slice 3 formatting correction active |
+| P3 | BBD-WAL-008 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Hardware capability attestation and device trust | Applicable coin adapter accepted |
+| P3 | BBD-WAL-009 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR prepare/sign/verify plus cross-coin broadcast, concurrency, cancellation races, and crash recovery | Coin adapters accepted |
+| P4 | BBD-WAL-010 | Codex Spark, High for explicitly delegated DOM/CSS/state boilerplate; Grok for senior/authority-bearing source; Sol only by documented escalation | User-facing composition after authority and state-machine behavior are executable | WAL-005, RATE-001, and payment flow accepted |
+| P4 | BBD-WAL-011 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
+| P5 | BBD-WAL-012 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Mainnet release gate and money-safety evidence | Every preceding wallet gate accepted |
 
 ## Routing guardrails
 
-- Exactly one source actor owns a ticket. Spark, Grok, and Sol never edit the same drop.
-- Tests lead every source phase. The source actor writes tests and stops; Codex Luna owns
+- Exactly one source actor owns each authorized source handoff. Actor changes require a
+  stop, exact resulting identities, and a new reviewer handoff before another actor edits.
+- Tests lead every source phase. The source actor writes tests and stops; Hermes owns
   execution, evidence, Git, commit, and push.
-- Codex Sol is not spent on rote fixture copying, CSS, static tables, or already-fixed
-  schema wiring. Codex Spark never owns signature verification, IPC authority, native
+- Grok is the default senior source actor. Codex Sol is used only when a reviewer record
+  explains why Grok is not strong enough or could not produce a usable bounded drop.
+  Codex Spark never owns signature verification, IPC authority, native
   process verification, custody, persistent state, hardware capability decisions, or
   transaction/broadcast behavior.
-- Grok Build may implement a bounded protocol or rate contract only after the reviewer
-  fixes its schemas, trust direction, failure behavior, and forbidden capabilities.
+- Grok Build implements only after the reviewer fixes schemas, trust direction, failure
+  behavior, forbidden capabilities, and exact source/test paths.
 - Work in `bb-desktop` and `bb-go` may proceed concurrently only when their authorized
   paths and contracts do not overlap. A cross-repository baseline is recorded in both
   tickets before integration.

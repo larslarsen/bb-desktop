@@ -39,15 +39,15 @@ This file governs agent work in the `bb-desktop` repository.
   sandbox, native packaging, cryptography, concurrency, custody, or persistence-design
   decisions. It does not execute tests or own integration, repository records, Git,
   commits, or pushes.
-- **Principal Dev — Codex Sol:** agentic, using `gpt-5.6-sol` at High. Authors the
-  highest-risk trust-boundary, custody, cryptography, concurrency, persistence, native
-  process, coin-adapter, and release-gate source and test source bounded by the active
-  ticket. It does not execute tests or own integration, repository records, Git,
-  commits, or pushes.
-- **Sr Dev — Grok Build:** agentic, using Grok 4.6 High. Authors bounded protocol,
-  rate-worker, corrective, and other senior source and test source after the reviewer has
-  fixed the sensitive semantics. It does not execute tests or own integration,
-  repository records, Git, commits, or pushes.
+- **Sr Dev — Grok Build:** agentic, using Grok 4.6 High. It is the default senior actor
+  for reviewer-bounded source and test-source edits after the reviewer has fixed the
+  sensitive semantics, including protocol, native-process, coin-adapter, corrective,
+  custody, concurrency, persistence, and release-gate implementation. It does not
+  execute tests or own integration, repository records, Git, commits, or pushes.
+- **Principal Dev — Codex Sol:** agentic, using `gpt-5.6-sol` at High. It is a fill-in
+  escalation only when the reviewer records that Grok is not strong enough for the
+  bounded task or Grok has stopped without a usable drop. It does not execute tests or
+  own integration, repository records, Git, commits, or pushes.
 - **Jr Dev — Hermes:** agentic through the locally installed Hermes Agent. Owns production/test
   source-drop integration, test and acceptance-command
   execution, implementation/evidence records, and the corresponding Git, commits, and
@@ -57,8 +57,9 @@ This file governs agent work in the `bb-desktop` repository.
   owner is not the engineering acceptance authority.
 
 Only the reviewer accepts a developer drop or authorizes another implementation task.
-Routing is based on engineering risk, reliability, and end-to-end usage per accepted
-result. See `docs/engineering/DEVELOPMENT_ROLES.md`.
+Grok is the default senior source actor; Sol requires a documented escalation. Routing
+otherwise remains based on engineering risk, reliability, and end-to-end usage per
+accepted result. See `docs/engineering/DEVELOPMENT_ROLES.md`.
 
 ## Workflow
 
