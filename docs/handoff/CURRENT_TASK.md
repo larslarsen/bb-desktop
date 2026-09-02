@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 GREEN 02 EVIDENCE CORRECTED — REVIEW REQUIRED
+State: PHASE C SLICE 4 ACCOUNT SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
 
-Authorized integration actor: Jr Dev — Hermes, evidence-only
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_ACCOUNT.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_ACCOUNT.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -156,9 +156,13 @@ The corrected evidence is recorded in
 [BBD-WAL-007-SLICE-03-GREEN-02.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02.md).
 The XHigh evidence review requiring these corrections is
 [BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md).
-No source actor or integration actor is authorized pending reviewer acceptance.
-Slices 4–5, broader acceptance, and the real local-Monero gate remain unauthorized
-pending reviewer acceptance.
+The documentation-only correction stopped with source and integration closed pending
+reviewer acceptance.
+Slice 3 is accepted at `c4bda0e9`, with its evidence corrected at `292f000f`, in
+[BBD-WAL-007-SLICE-03-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-03-ACCEPTANCE-01.md).
+Only the active Slice-4 account custody/recovery source handoff is now authorized to
+Grok 4.6 High. Hermes integration, Slice 5, broader acceptance, and the real offline
+local-Monero gate remain unauthorized pending XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
