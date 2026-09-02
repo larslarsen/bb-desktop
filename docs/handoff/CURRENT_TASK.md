@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 ACCEPTED — SLICE 3 NOT YET AUTHORIZED
+State: PHASE C SLICE 3 RPC/NODE SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: none
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-none
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_RPC.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_RPC.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -56,7 +56,9 @@ The complete green evidence is recorded in
 Slice 2 is accepted at `d0a14dd5` in
 [BBD-WAL-007-SLICE-02-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-02-ACCEPTANCE-01.md).
 The acceptance records Hermes's non-mutating post-integration command-scope deviation.
-Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized.
+Sol alone may author the exact four-path RPC/local-node Slice-3 drop. Hermes execution
+and integration, Slices 4–5, broader acceptance, and the real local-Monero gate remain
+unauthorized pending XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
