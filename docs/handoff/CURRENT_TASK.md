@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 GREEN 02 COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 3 GREEN 02 EVIDENCE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes, evidence-only
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_07.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_07.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -147,6 +147,11 @@ Grok's warning correction is accepted at XHigh in
 Hermes alone ran the wholly fresh focused-green resume 07. The complete green evidence
 is recorded in
 [BBD-WAL-007-SLICE-03-GREEN-02.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02.md).
+The XHigh transcript review accepts the execution and integration but requires three
+bounded evidence corrections in
+[BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md).
+Hermes alone may perform the documentation-only correction in the active handoff. No
+source actor is authorized.
 Slices 4–5, broader acceptance, and the real local-Monero gate remain unauthorized
 pending reviewer acceptance.
 
