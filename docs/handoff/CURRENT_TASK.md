@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 FOCUSED GREEN AUTHORIZED
+State: PHASE C SLICE 3 FORMAT CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -64,10 +64,11 @@ Correction 01 is rejected at XHigh in
 [BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md).
 Correction 02 is accepted at XHigh in
 [BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md).
-Hermes alone may run the exact formatter, bootstrap-policy falsification, focused green,
-regressions, evidence, and integration in the active handoff. Slices 4–5, broader
-acceptance, and the real local-Monero gate remain unauthorized pending reviewer
-acceptance.
+Hermes's first focused-green formatter check stopped cleanly and is reviewed in
+[BBD-WAL-007-SLICE-03-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-STOP-REVIEW-01.md).
+Sol alone may apply the exact formatting-only correction in the active handoff. Hermes
+execution/integration, Slices 4–5, broader acceptance, and the real local-Monero gate
+remain unauthorized pending a new XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
