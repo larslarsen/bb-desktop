@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 FORMAT CORRECTION 02 AUTHORIZED
+State: PHASE C SLICE 2 EXACT FORMATTER DIFF REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
 Authorized integration actor: none
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_02.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_02.md)
+none
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -43,9 +43,12 @@ The exact mechanical correction is accepted at XHigh in
 Hermes's resumed formatter check still failed without source mutation; that stop is
 reviewed in
 [BBD-WAL-007-SLICE-02-GREEN-STOP-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-02-GREEN-STOP-REVIEW-02.md).
-Sol may make only the four reported mechanical layout corrections. Hermes resume,
-Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized pending
-XHigh review of the second formatting-only drop.
+The second formatting handoff named one region that was already in the prescribed
+layout. Sol stopped without editing; that stop is reviewed in
+[BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-02-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-02-STOP-REVIEW-01.md).
+The exact Rust 1.98 formatter diff is required before another correction. Source work,
+Hermes resume, Slice 3, broader acceptance, and the real local-Monero gate are
+unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
