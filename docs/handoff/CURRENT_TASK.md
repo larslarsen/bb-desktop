@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 TEST/PRODUCTION CORRECTION 02 AUTHORIZED
+State: PHASE C SLICE 3 FOCUSED GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_02.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_02.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -62,9 +62,12 @@ The pinned upstream semantics are fixed in
 [BBD-WAL-007-SLICE-03-UPSTREAM-RPC-DECISION.md](../architecture/BBD-WAL-007-SLICE-03-UPSTREAM-RPC-DECISION.md).
 Correction 01 is rejected at XHigh in
 [BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md).
-Sol alone may correct the exact three paths in the active handoff. Hermes execution and
-integration, Slices 4–5, broader acceptance, and the real local-Monero gate remain
-unauthorized pending a new XHigh source review.
+Correction 02 is accepted at XHigh in
+[BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-03.md).
+Hermes alone may run the exact formatter, bootstrap-policy falsification, focused green,
+regressions, evidence, and integration in the active handoff. Slices 4–5, broader
+acceptance, and the real local-Monero gate remain unauthorized pending reviewer
+acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
