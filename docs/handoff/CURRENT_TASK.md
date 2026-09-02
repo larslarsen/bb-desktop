@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 COMPILE CORRECTION 04 AUTHORIZED
+State: PHASE C SLICE 3 FOCUSED GREEN RESUME 05 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Sr Dev — Grok Build (Grok 4.6 High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BBD_WAL_007_PHASE_C_SLICE_03_COMPILE_CORRECTION_04.md](GROK_BBD_WAL_007_PHASE_C_SLICE_03_COMPILE_CORRECTION_04.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_05.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_05.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -116,9 +116,13 @@ Hermes stopped that resume at the required first mismatch because seven expected
 assertions could not compile without `Debug` on their success view. The valid stop and
 exact restored identity are reviewed in
 [BBD-WAL-007-SLICE-03-GREEN-RESUME-04-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-RESUME-04-STOP-REVIEW-01.md).
-Grok alone may add the exact two test-support derives. Hermes execution, Slices 4–5,
-broader acceptance, and the real local-Monero gate remain unauthorized pending reviewer
-source inspection.
+Grok alone was authorized to add the exact two test-support derives. Hermes execution,
+Slices 4–5, broader acceptance, and the real local-Monero gate remained unauthorized
+pending reviewer source inspection.
+Grok's exact derive-only repair is accepted at XHigh in
+[BBD-WAL-007-SLICE-03-COMPILE-CORRECTION-SOURCE-REVIEW-04.md](../testing/BBD-WAL-007-SLICE-03-COMPILE-CORRECTION-SOURCE-REVIEW-04.md).
+Hermes alone may run the exact focused-green resume. Slices 4–5, broader acceptance,
+and the real local-Monero gate remain unauthorized pending reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
