@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 OWNED-CHILD EXPECTED RED EVIDENCE CORRECTED — REVIEW REQUIRED
+State: PHASE C SLICE 2 PROCESS SOURCE RESUME 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_RED_EVIDENCE_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_PROCESS_RESUME_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_PROCESS_RESUME_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -27,11 +27,11 @@ group. The XHigh decision is
 [BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md](../architecture/BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md).
 The exact one-path correction is accepted in
 [BBD-WAL-007-SLICE-02-OWNED-CHILD-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-OWNED-CHILD-TEST-SOURCE-REVIEW-01.md).
-The command result is accepted, but its architecture paragraph requires the exact
-evidence-only correction in
-[BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md).
-Hermes corrected the evidence. No production source is authorized pending reviewer
-acceptance.
+The corrected expected red is accepted in
+[BBD-WAL-007-SLICE-02-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-02-EXPECTED-RED-ACCEPTANCE-01.md).
+Sol alone may author the exact four-path process/lifecycle source drop using exact-owned-
+child teardown. Hermes execution/integration, Slice 3, broader acceptance, and the real
+local-Monero gate remain unauthorized pending XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
