@@ -2028,6 +2028,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'license = "MIT"',
     'default = []',
     'native-ui = ["dep:eframe", "dep:rfd"]',
+    'xmr-local-gate = []',
   ]) {
     if (!manifestText.split('\n').includes(required)) {
       throw new PolicyError(`wallet Rust manifest omits exact ${required}`);
@@ -2040,6 +2041,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'eframe = { version = "=0.36.1", optional = true, default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }',
     'getrandom = { version = "=0.4.3", default-features = false, features = ["std"] }',
     'hkdf = { version = "=0.12.4", default-features = false }',
+    'md-5 = { version = "=0.11.0-pre.4", default-features = false, features = ["zeroize"] }',
     'rfd = { version = "=0.17.2", optional = true, default-features = false, features = ["xdg-portal", "wayland"] }',
     'secrecy = { version = "=0.10.3", default-features = false }',
     'serde = { version = "=1.0.229", default-features = false, features = ["alloc", "derive"] }',
@@ -2096,6 +2098,13 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'zec_scan:tests/zec_scan.rs',
     'zec_prepare:tests/zec_prepare.rs',
     'zec_hygiene:tests/zec_hygiene.rs',
+    'xmr_distribution:tests/xmr_distribution.rs',
+    'xmr_process:tests/xmr_process.rs',
+    'xmr_rpc:tests/xmr_rpc.rs',
+    'xmr_account:tests/xmr_account.rs',
+    'xmr_receiver:tests/xmr_receiver.rs',
+    'xmr_hygiene:tests/xmr_hygiene.rs',
+    'xmr_local_gate:tests/xmr_local_gate.rs',
   ];
   if (JSON.stringify(tests) !== JSON.stringify(expectedTests)) {
     throw new PolicyError('wallet Rust manifest integration-test targets differ from review');

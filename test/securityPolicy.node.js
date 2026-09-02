@@ -2817,6 +2817,227 @@ test('RATE-001 policy exports exact provider pins and rejects unreviewed hosts a
   }
 });
 
+const WAL007_DIRECT_DEPENDENCY =
+  'md-5 = { version = "=0.11.0-pre.4", default-features = false, features = ["zeroize"] }';
+const WAL007_LOCAL_GATE_FEATURE = 'xmr-local-gate = []';
+const WAL007_TEST_TARGETS = [
+  'xmr_distribution',
+  'xmr_process',
+  'xmr_rpc',
+  'xmr_account',
+  'xmr_receiver',
+  'xmr_hygiene',
+  'xmr_local_gate',
+];
+const WAL007_PHASE_C_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/lib.rs',
+  'wallet-broker/src/native.rs',
+  'wallet-broker/src/native_ui.rs',
+  'wallet-broker/src/xmr.rs',
+  'wallet-broker/src/xmr/account.rs',
+  'wallet-broker/src/xmr/distribution.rs',
+  'wallet-broker/src/xmr/model.rs',
+  'wallet-broker/src/xmr/process.rs',
+  'wallet-broker/src/xmr/receiver.rs',
+  'wallet-broker/src/xmr/rpc.rs',
+  'wallet-broker/src/xmr/store.rs',
+  'wallet-broker/src/xmr/test_support.rs',
+];
+const WAL007_PHASE_C_XMR_PATHS = WAL007_PHASE_C_RUST_SOURCE_PATHS.filter(
+  (relative) => relative === 'wallet-broker/src/xmr.rs' || relative.startsWith('wallet-broker/src/xmr/')
+);
+const WAL007_PHASE_C_RUNTIME_PATHS = WAL007_PHASE_C_RUST_SOURCE_PATHS.filter(
+  (relative) => relative !== 'wallet-broker/src/xmr/test_support.rs'
+);
+const WAL007_ELECTRON_NODE_PRODUCTION_PATHS = [];
+const WAL007_FORBIDDEN_AUTHORITY = [
+  ['generic JSON-RPC', /(?:rpc|json_rpc)[_.:]?raw|raw[_-]?rpc/i],
+  ['transfer', /\btransfer(?:_split)?\b/i],
+  ['sweep', /\bsweep(?:_all|_single)?\b/i],
+  ['sign', /\bsign(?:_transfer)?\b/i],
+  ['submit', /\bsubmit(?:_transfer)?\b/i],
+  ['relay', /\brelay(?:_tx)?\b/i],
+  ['key image', /\b(?:export|import)_key_images\b/i],
+  ['daemon switch', /\bset_daemon\b/i],
+  ['remote node', /https?:\/\/(?!127\.0\.0\.1\b|localhost\b)|\b(?:remote|public)[_-]?node\b/i],
+  ['download', /\b(?:download|curl|wget)\b/i],
+  ['path search', /\b(?:which|whereis)\b|\bvar(?:_os)?\s*\(\s*"PATH"\s*\)|\b(?:option_)?env!\s*\(\s*"PATH"\s*\)/],
+];
+const WAL007_ALLOWED_MAINNET_DENIAL_LINES = [
+  /^\s*"xmr-mainnet"\s*=>\s*Err\(XmrError::network_disabled\(\)\),?\s*$/,
+  /^\s*XmrNetwork::Mainnet\s*=>\s*Err\(XmrError::network_disabled\(\)\),?\s*$/,
+  /^\s*const MAINNET_NODE_PORT: u16 = 18_081;\s*$/,
+];
+
+function collectWal007RustSourcePaths(directory, relativePrefix) {
+  if (!fs.existsSync(directory)) return [];
+  const paths = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const relative = path.posix.join(relativePrefix, entry.name);
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      paths.push(...collectWal007RustSourcePaths(absolute, relative));
+    } else if (entry.isFile() && entry.name.endsWith('.rs')) {
+      paths.push(relative);
+    }
+  }
+  return paths.sort();
+}
+
+function checkWal007RuntimeSource(source, relative) {
+  assert.ok(
+    WAL007_PHASE_C_RUNTIME_PATHS.includes(relative),
+    `WAL-007 runtime checker received unreviewed path ${relative}`
+  );
+  assert.strictEqual(typeof source, 'string', `${relative} source must be text`);
+  assert.ok(source.trim(), `${relative} source is empty`);
+
+  const screenedLines = [];
+  for (const line of source.split('\n')) {
+    if (/\bxmr-mainnet\b|\bMainnet\b|\bMAINNET\b/.test(line)) {
+      assert.ok(
+        WAL007_ALLOWED_MAINNET_DENIAL_LINES.some((pattern) => pattern.test(line)),
+        `${relative} contains mainnet text outside the exact fail-closed denial/port forms`
+      );
+      continue;
+    }
+    screenedLines.push(line);
+  }
+  const screened = screenedLines.join('\n');
+  for (const [label, pattern] of WAL007_FORBIDDEN_AUTHORITY) {
+    assert.ok(!pattern.test(screened), `${relative} contains forbidden WAL-007 ${label} authority`);
+  }
+}
+
+test('WAL-007 manifest freezes one MD5 interop dependency, empty local-gate feature, and seven targets', () => {
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  assert.strictEqual(
+    manifestText.split('\n').filter((line) => line === WAL007_DIRECT_DEPENDENCY).length,
+    1,
+    'WAL-007 md-5 dependency must appear exactly once'
+  );
+  assert.strictEqual(
+    manifestText.split('\n').filter((line) => line === WAL007_LOCAL_GATE_FEATURE).length,
+    1,
+    'WAL-007 local gate feature must be exact and empty'
+  );
+  const xmrAuthorityDependencies = manifestText.split('\n').filter(
+    (line) => /^\S+\s*=\s*\{/.test(line) &&
+      /\b(?:md-5|monero|reqwest|tokio|url|openssl|rustls)\b/i.test(line)
+  );
+  assert.deepStrictEqual(xmrAuthorityDependencies, [WAL007_DIRECT_DEPENDENCY]);
+  for (const target of WAL007_TEST_TARGETS) {
+    assert.ok(manifestText.includes(`name = "${target}"`), `missing WAL-007 target ${target}`);
+    assert.ok(manifestText.includes(`path = "tests/${target}.rs"`), `wrong WAL-007 path ${target}`);
+  }
+  assert.match(
+    manifestText,
+    /\[\[test\]\]\nname = "xmr_local_gate"\npath = "tests\/xmr_local_gate\.rs"\nrequired-features = \["xmr-local-gate"\]/
+  );
+  for (const target of WAL007_TEST_TARGETS.filter((name) => name !== 'xmr_local_gate')) {
+    const block = manifestText.match(
+      new RegExp(`\\[\\[test\\]\\]\\nname = "${target}"\\npath = "tests/${target}\\.rs"(?:\\nrequired-features = \\[[^\\n]+)?`)
+    );
+    assert.ok(block, `missing exact target block ${target}`);
+    assert.ok(!block[0].includes('required-features'), `${target} must be an ordinary fake test`);
+  }
+  for (const relative of collectWal007RustSourcePaths(
+    path.join(repoRoot, 'wallet-broker', 'src'),
+    'wallet-broker/src'
+  )) {
+    const source = fs.readFileSync(path.join(repoRoot, relative), 'utf8');
+    assert.ok(
+      !source.includes('xmr-local-gate'),
+      `${relative} lets the empty local-gate feature alter library compilation or behavior`
+    );
+  }
+});
+
+test('WAL-007 permits no Phase-A XMR source and freezes the only Phase-C Rust inventory', () => {
+  assert.strictEqual(new Set(WAL007_PHASE_C_RUST_SOURCE_PATHS).size, 12);
+  assert.deepStrictEqual(WAL007_PHASE_C_XMR_PATHS, [
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/account.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/process.rs',
+    'wallet-broker/src/xmr/receiver.rs',
+    'wallet-broker/src/xmr/rpc.rs',
+    'wallet-broker/src/xmr/store.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]);
+  const actual = collectWal007RustSourcePaths(
+    path.join(repoRoot, 'wallet-broker', 'src'),
+    'wallet-broker/src'
+  ).filter(
+    (relative) => relative === 'wallet-broker/src/xmr.rs' || relative.startsWith('wallet-broker/src/xmr/')
+  );
+  if (actual.length === 0) {
+    assert.deepStrictEqual(actual, [], 'Phase A must contain no XMR production implementation');
+  } else {
+    assert.deepStrictEqual(actual, WAL007_PHASE_C_XMR_PATHS, 'Phase C XMR inventory is missing or extra');
+  }
+});
+
+test('WAL-007 production inventory grants no Electron or Node expansion', () => {
+  assert.deepStrictEqual(WAL007_ELECTRON_NODE_PRODUCTION_PATHS, []);
+  assert.ok(WAL007_PHASE_C_RUST_SOURCE_PATHS.every((relative) => relative.endsWith('.rs')));
+  for (const relative of WAL007_PHASE_C_RUST_SOURCE_PATHS) {
+    assert.ok(!relative.startsWith('social/'));
+    assert.ok(!relative.startsWith('quote-worker/'));
+    assert.ok(!relative.startsWith('wallet-pay/'));
+    assert.notStrictEqual(relative, 'social-main.js');
+    assert.notStrictEqual(relative, 'wallet-preload.js');
+  }
+});
+
+test('WAL-007 closed checker scans every present runtime source and rejects authority mutations', () => {
+  const allowed = [
+    'pub enum WalletCall { GetVersion, CreateWallet, OpenWallet, CloseWallet, Refresh, GetBalance, CreateAddress }',
+    'const WALLET_BIND: &str = "127.0.0.1";',
+    'const STAGENET_NODE_PORT: u16 = 38081;',
+    'const TESTNET_NODE_PORT: u16 = 28081;',
+    '"xmr-mainnet" => Err(XmrError::network_disabled()),',
+    'const MAINNET_NODE_PORT: u16 = 18_081;',
+  ].join('\n');
+  checkWal007RuntimeSource(allowed, 'wallet-broker/src/xmr/model.rs');
+
+  for (const relative of WAL007_PHASE_C_RUNTIME_PATHS) {
+    const absolute = path.join(repoRoot, relative);
+    if (fs.existsSync(absolute)) {
+      checkWal007RuntimeSource(fs.readFileSync(absolute, 'utf8'), relative);
+    }
+  }
+
+  assert.strictEqual(
+    WAL007_PHASE_C_RUST_SOURCE_PATHS.filter(
+      (relative) => relative.endsWith('/test_support.rs')
+    ).join(','),
+    'wallet-broker/src/xmr/test_support.rs',
+    'only exact test_support may contain negative RPC fixtures and it is never runtime-scanned'
+  );
+  const forbidden = [
+    ['generic JSON-RPC', 'pub fn rpc_raw(method: &str, body: &[u8]) {}'],
+    ['transfer', 'const METHOD: &str = "transfer_split";'],
+    ['sweep', 'wallet.sweep_all();'],
+    ['sign', 'wallet.sign_transfer(unsigned);'],
+    ['submit', 'wallet.submit_transfer(signed);'],
+    ['relay', 'wallet.relay_tx(tx);'],
+    ['key image', 'wallet.export_key_images();'],
+    ['daemon switch', 'wallet.set_daemon(host);'],
+    ['mainnet', 'const NETWORK: &str = "xmr-mainnet";'],
+    ['remote node', 'const NODE: &str = "https://node.example";'],
+    ['download', 'download("monero-wallet-rpc");'],
+    ['path search', 'let inherited = std::env::var("PATH");'],
+  ];
+  for (const [label, source] of forbidden) {
+    assertRejects(
+      () => checkWal007RuntimeSource(source, 'wallet-broker/src/xmr/rpc.rs'),
+      label === 'mainnet' ? /mainnet|fail-closed/i : new RegExp(label.replace(' ', '|'), 'i')
+    );
+  }
+});
+
 function run() {
   let failed = 0;
   for (const { name, fn } of tests) {

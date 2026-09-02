@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-WAL-007 Expected Red Resume 04
 
-State: AUTHORIZED — NOT STARTED
+State: COMPLETE
 
 You are Jr Dev — Hermes. Rerun only the corrected Node policy, complete the preserved
 expected-red evidence, and integrate the accepted Phase-A source.

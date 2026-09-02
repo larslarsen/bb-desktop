@@ -270,6 +270,7 @@ dependencies = [
  "eframe",
  "getrandom 0.4.3",
  "hkdf",
+ "md-5",
  "pczt",
  "rand_core",
  "rfd",
@@ -356,6 +357,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fd016a0ddc7cb13661bf5576073ce07330a693f8608a1320b4e20561cc12cdc"
 dependencies = [
  "hybrid-array",
+ "zeroize",
 ]
 
 [[package]]
@@ -894,6 +896,7 @@ dependencies = [
  "block-buffer 0.11.0-rc.3",
  "crypto-common 0.2.0-rc.1",
  "subtle",
+ "zeroize",
 ]
 
 [[package]]
@@ -2126,6 +2129,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ea1f30cedd69f0a2954655f7188c6a834246d2bcf1e315e2ac40c4b24dc9519"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "md-5"
+version = "0.11.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "117b97b6b9ae1ec9a396b357698efa3ecff4fc1f40e0ec59ae7c1270b460ac1d"
+dependencies = [
+ "cfg-if",
+ "digest 0.11.0-pre.9",
 ]
 
 [[package]]

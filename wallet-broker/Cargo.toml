@@ -9,6 +9,7 @@ license = "MIT"
 [features]
 default = []
 native-ui = ["dep:eframe", "dep:rfd"]
+xmr-local-gate = []
 
 [dependencies]
 argon2 = { version = "=0.5.3", default-features = false, features = ["alloc"] }
@@ -17,6 +18,7 @@ chacha20poly1305 = { version = "=0.10.1", default-features = false, features = [
 eframe = { version = "=0.36.1", optional = true, default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
 getrandom = { version = "=0.4.3", default-features = false, features = ["std"] }
 hkdf = { version = "=0.12.4", default-features = false }
+md-5 = { version = "=0.11.0-pre.4", default-features = false, features = ["zeroize"] }
 rfd = { version = "=0.17.2", optional = true, default-features = false, features = ["xdg-portal", "wayland"] }
 secrecy = { version = "=0.10.3", default-features = false }
 serde = { version = "=1.0.229", default-features = false, features = ["alloc", "derive"] }
@@ -80,3 +82,32 @@ path = "tests/zec_prepare.rs"
 [[test]]
 name = "zec_hygiene"
 path = "tests/zec_hygiene.rs"
+
+[[test]]
+name = "xmr_distribution"
+path = "tests/xmr_distribution.rs"
+
+[[test]]
+name = "xmr_process"
+path = "tests/xmr_process.rs"
+
+[[test]]
+name = "xmr_rpc"
+path = "tests/xmr_rpc.rs"
+
+[[test]]
+name = "xmr_account"
+path = "tests/xmr_account.rs"
+
+[[test]]
+name = "xmr_receiver"
+path = "tests/xmr_receiver.rs"
+
+[[test]]
+name = "xmr_hygiene"
+path = "tests/xmr_hygiene.rs"
+
+[[test]]
+name = "xmr_local_gate"
+path = "tests/xmr_local_gate.rs"
+required-features = ["xmr-local-gate"]

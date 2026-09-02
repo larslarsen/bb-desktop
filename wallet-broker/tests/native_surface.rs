@@ -1,6 +1,7 @@
 use bitbook_wallet_broker::native::{
     ActionOrigin, CustodyPort, FileDialogPort, NativeAction, NativeController, NativeError,
     NativeSurfacePort, PasswordPrompt, RestoreMetadata, SurfaceResult,
+    XmrInstallationSelectionPort, XmrSelectionController,
 };
 use bitbook_wallet_broker::vault::{SecretBytes, WipeEvent, WipeObserver};
 
@@ -535,6 +536,125 @@ fn generic_unlock_backup_and_future_payment_confirmation_methods_are_absent() {
         "intent.confirm",
         "signer.sign",
         "tx.broadcast",
+    ] {
+        assert_eq!(
+            NativeAction::from_method(method).unwrap_err().code(),
+            "SCHEMA"
+        );
+    }
+}
+
+#[derive(Default)]
+struct XmrSelection {
+    selected: Option<String>,
+    operations: Vec<&'static str>,
+    dialog_calls: usize,
+    selected_paths: Vec<String>,
+    verify_calls: usize,
+    persist_calls: usize,
+    persisted_paths: Vec<String>,
+    process_calls: usize,
+}
+
+impl XmrInstallationSelectionPort for XmrSelection {
+    fn choose_wallet_rpc(&mut self) -> Result<Option<String>, NativeError> {
+        self.operations.push("choose");
+        self.dialog_calls += 1;
+        Ok(self.selected.clone())
+    }
+
+    fn validate_selected_path(&mut self, path: &str) -> Result<(), NativeError> {
+        self.operations.push("validate");
+        self.selected_paths.push(path.to_owned());
+        Ok(())
+    }
+
+    fn verify_selected_executable(&mut self, _path: &str) -> Result<(), NativeError> {
+        self.operations.push("verify");
+        self.verify_calls += 1;
+        Ok(())
+    }
+
+    fn persist_selection(&mut self, path: &str) -> Result<(), NativeError> {
+        self.operations.push("persist");
+        self.persist_calls += 1;
+        self.persisted_paths.push(path.to_owned());
+        Ok(())
+    }
+
+    fn process_side_effect_for_test(&mut self) {
+        self.operations.push("process");
+        self.process_calls += 1;
+    }
+}
+
+#[test]
+fn native_xmr_installation_selection_chooses_validates_verifies_and_persists_in_order() {
+    const SELECTED: &str = "/synthetic/monero-gui/extras/monero-wallet-rpc";
+    let mut selection = XmrSelection {
+        selected: Some(SELECTED.to_owned()),
+        ..XmrSelection::default()
+    };
+
+    XmrSelectionController::select(ActionOrigin::NativeSurface, &mut selection).unwrap();
+
+    assert_eq!(
+        selection.operations,
+        ["choose", "validate", "verify", "persist"]
+    );
+    assert_eq!(selection.dialog_calls, 1);
+    assert_eq!(selection.selected_paths, [SELECTED]);
+    assert_eq!(selection.verify_calls, 1);
+    assert_eq!(selection.persist_calls, 1);
+    assert_eq!(selection.persisted_paths, [SELECTED]);
+    assert_eq!(selection.process_calls, 0);
+}
+
+#[test]
+fn cancelled_native_xmr_installation_selection_stops_after_the_chooser() {
+    let mut selection = XmrSelection::default();
+
+    XmrSelectionController::select(ActionOrigin::NativeSurface, &mut selection).unwrap();
+
+    assert_eq!(selection.operations, ["choose"]);
+    assert_eq!(selection.dialog_calls, 1);
+    assert!(selection.selected_paths.is_empty());
+    assert_eq!(selection.verify_calls, 0);
+    assert_eq!(selection.persist_calls, 0);
+    assert!(selection.persisted_paths.is_empty());
+    assert_eq!(selection.process_calls, 0);
+}
+
+#[test]
+fn xmr_installation_selection_is_rejected_before_every_nonnative_side_effect() {
+    for origin in [
+        ActionOrigin::Electron,
+        ActionOrigin::BrokerProtocol,
+        ActionOrigin::Http,
+    ] {
+        let mut selection = XmrSelection::default();
+        assert_eq!(
+            XmrSelectionController::select(origin, &mut selection)
+                .unwrap_err()
+                .code(),
+            "UNAUTH"
+        );
+        assert_eq!(selection.dialog_calls, 0);
+        assert!(selection.selected_paths.is_empty());
+        assert_eq!(selection.verify_calls, 0);
+        assert_eq!(selection.persist_calls, 0);
+        assert_eq!(selection.process_calls, 0);
+    }
+}
+
+#[test]
+fn generic_methods_cannot_reach_xmr_installation_selection() {
+    for method in [
+        "xmr.selectInstallation",
+        "xmr.installation.select",
+        "wallet.selectExecutable",
+        "wallet.invoke",
+        "rpc.raw",
     ] {
         assert_eq!(
             NativeAction::from_method(method).unwrap_err().code(),

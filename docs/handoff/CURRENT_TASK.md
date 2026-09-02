@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE B NODE POLICY RERUN AUTHORIZED
+State: PHASE B EXPECTED RED COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -22,8 +22,7 @@ Active handoff:
 
 The eleven-path Phase-A source is accepted at the exact hashes in
 [BBD-WAL-007-TEST-SOURCE-REVIEW-05.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-05.md).
-Hermes alone may rerun the corrected Node policy, finish evidence, and integrate. Wallet
-production and the real local-Monero gate remain unauthorized.
+Phase B expected red is complete. Production and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
