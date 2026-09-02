@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 FORMAT CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 2 FORMAT CORRECTION ACCEPTED — HERMES RESUME AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_FORMAT_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_RESUME_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_RESUME_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -38,9 +38,10 @@ The corrected five-path drop is accepted in
 Hermes stopped before execution because the formatter check failed without mutation;
 that stop is reviewed in
 [BBD-WAL-007-SLICE-02-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-GREEN-STOP-REVIEW-01.md).
-Sol may make only the exact three-path mechanical formatting correction. Hermes resume,
-Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized pending
-XHigh review of the formatting-only drop.
+The exact mechanical correction is accepted at XHigh in
+[BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-SOURCE-REVIEW-01.md).
+Hermes may restart only the exact Slice-2 focused green/falsification/integration gate.
+Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
