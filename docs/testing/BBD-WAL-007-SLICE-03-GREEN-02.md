@@ -30,7 +30,7 @@ Protected identities verified before execution:
 
 Formatter: `/home/lars/.cargo/bin/rustup run 1.98.0 cargo fmt --manifest-path wallet-broker/Cargo.toml --check` — exit 0, no output diagnostic, no mutation.
 
-Falsification: temporarily removed `|| !info.bootstrap_daemon_address.is_empty()` from `evaluate_node_policy` in `wallet-broker/src/xmr/rpc.rs`. Test `node_syncing_is_distinct_from_bootstrap_remote_and_unavailable` run exactly once. Result: exit 101, 0 passed, 0 ignored, 0 measured, 14 filtered out, test failed with `called Result::unwrap_err() on an Ok value: NodeProbeView { state: NodeStateView(Ready) }` — confirming the production core accepted the injected current bootstrap address. Immediately restored the exact line. `wallet-broker/src/xmr/rpc.rs` restored to 1,913 lines, SHA-256 `7593322a5aef2fc146698d2e07a541cd9fb796b92e1f8e3fd699bcfbb2b219f9`. No staging or commit of the temporary mutation.
+Falsification: temporarily removed `|| !info.bootstrap_daemon_address.is_empty()` from `evaluate_node_policy` in `wallet-broker/src/xmr/rpc.rs`. Test `node_syncing_is_distinct_from_bootstrap_remote_and_unavailable` run exactly once. Result: exit 101, 0 passed, 1 failed, 0 ignored, 0 measured, 14 filtered out, test failed with `called Result::unwrap_err() on an Ok value: NodeProbeView { state: NodeStateView(Ready) }` — confirming the production core accepted the injected current bootstrap address. Immediately restored the exact line. `wallet-broker/src/xmr/rpc.rs` restored to 1,913 lines, SHA-256 `7593322a5aef2fc146698d2e07a541cd9fb796b92e1f8e3fd699bcfbb2b219f9`. No staging or commit of the temporary mutation.
 
 Warning-free normalized green command results:
 
@@ -44,10 +44,10 @@ Warning-free normalized green command results:
 | `node test/securityPolicy.node.js` | 86 `ok`, no `not ok`, final `BitBook security policy tests passed (86).` |
 | `node scripts/security-policy.js` | exit 0, final `BitBook desktop security policy checks passed.` |
 
-All Rust commands emitted no warning or diagnostic. No accepted source/test mutated.
+The formatter, falsification compile stage, and normalized green Rust commands emitted no warning or compile diagnostic. The falsification emitted only the expected runtime failure already recorded above. No accepted source/test remained mutated after restoration.
 
-Scope: only the accepted warning correction in `wallet-broker/src/xmr/rpc.rs` (already committed at 6eb566d6). This resume integrated no new source — only the exact falsification, green sequence, evidence, and integration.
+Scope: Resume 07 integrated only the accepted warning correction in `wallet-broker/src/xmr/rpc.rs`, Green Evidence 02, and `CURRENT_TASK.md`. `6eb566d6` integrated the base Slice-3 RPC transport. `c4bda0e9` newly integrated the accepted warning correction. No other source/test was integrated.
 
 Green Evidence 01 rejection: Green Evidence 01 is rejected and not reused. Hermes continued after two warnings, altered a command with an output pipeline, and reran every green command after commit/push. This Green Evidence 02 is a wholly fresh execution with no reused Resume-06 results.
 
-Prohibited-action confirmation: no formatter/test/check/Node/npm/policy/security/build/product command run after commit/push; no source repair; no Slice 4; no real local-Monero gate; no command wrapper/redirection/pipeline/reuse; no `/tmp`, download, network, personal Monero path, or product/Monero binary used.
+Prohibited-action confirmation: no formatter/test/check/Node/npm/policy/security/build/product command run after commit/push; no source repair; no Slice 4; no real local-Monero gate; no formatter, falsification, or normalized-green command used a wrapper, redirection, or pipeline, and no Resume-06 result was reused; no `/tmp`, download, network, personal Monero path, or product/Monero binary used.

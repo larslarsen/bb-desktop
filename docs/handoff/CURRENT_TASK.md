@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 GREEN 02 EVIDENCE CORRECTION AUTHORIZED
+State: PHASE C SLICE 3 GREEN 02 EVIDENCE CORRECTED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -150,8 +150,13 @@ is recorded in
 The XHigh transcript review accepts the execution and integration but requires three
 bounded evidence corrections in
 [BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md).
-Hermes alone may perform the documentation-only correction in the active handoff. No
-source actor is authorized.
+Hermes completed the documentation-only evidence correction in
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_02_EVIDENCE_CORRECTION_01.md).
+The corrected evidence is recorded in
+[BBD-WAL-007-SLICE-03-GREEN-02.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02.md).
+The XHigh evidence review requiring these corrections is
+[BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02-EVIDENCE-REVIEW-01.md).
+No source actor or integration actor is authorized pending reviewer acceptance.
 Slices 4–5, broader acceptance, and the real local-Monero gate remain unauthorized
 pending reviewer acceptance.
 
