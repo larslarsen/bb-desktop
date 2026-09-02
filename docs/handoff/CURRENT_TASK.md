@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE B EXPECTED RED COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 1 DISTRIBUTION SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: none
 
@@ -18,11 +18,12 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_04.md](HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_04.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_DISTRIBUTION.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_DISTRIBUTION.md)
 
-The eleven-path Phase-A source is accepted at the exact hashes in
-[BBD-WAL-007-TEST-SOURCE-REVIEW-05.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-05.md).
-Phase B expected red is complete. Production and the real local-Monero gate remain unauthorized.
+Phase B is accepted at `62042559`; evidence is
+[BBD-WAL-007-PHASE-B-ACCEPTANCE-01.md](../testing/BBD-WAL-007-PHASE-B-ACCEPTANCE-01.md).
+Sol alone may author Slice 1 distribution/native-selection source. Execution,
+integration, later production slices, and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
