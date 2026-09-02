@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE A TEST FORMAT REPAIR AUTHORIZED
+State: PHASE B EXPECTED RED RESUME 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,12 +18,12 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_TEST_FORMAT_REPAIR_01.md](CODEX_SOL_BBD_WAL_007_TEST_FORMAT_REPAIR_01.md)
+[HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_02.md](HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_02.md)
 
-Hermes correctly stopped its resumed gate on unformatted new Rust tests. Sol alone may
-make the seven-path formatting-only repair. The uncommitted lock resolution and Hermes
-evidence are preserved and read-only. Production, test execution, integration, and the
-real local-Monero gate remain unauthorized.
+The formatting-corrected ten-path Phase-A source is accepted at the exact hashes in
+[BBD-WAL-007-TEST-SOURCE-REVIEW-03.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-03.md).
+Hermes alone may run the corrected focused expected-red gate, finish evidence, and
+integrate. Production and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
