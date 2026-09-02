@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 1 CORRECTION AUTHORIZED
+State: PHASE C SLICE 1 GREEN GATE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,13 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_01_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_01.md)
 
-Slice-1 source requires the exact corrections in
-[BBD-WAL-007-SLICE-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-01-SOURCE-REVIEW-01.md).
-Sol alone may add the missing verifier facade, close its path accessor, and repair the
-incremental-inventory policy contradiction. Execution, integration, later slices, and
-the real local-Monero gate remain unauthorized.
+Slice-1 source is accepted at XHigh in
+[BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md).
+Hermes alone may run the exact focused green commands and integrate the frozen nine-path
+drop. Source repair, test edits, later slices, broader acceptance, and the real
+local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
