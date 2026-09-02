@@ -2131,7 +2131,9 @@ function checkRustWalletSourceInventory(actual) {
     sameSet(actual, WAL004_RUST_SOURCE_PATHS);
   const withWal006 = [...WAL004_RUST_SOURCE_PATHS, 'wallet-broker/src/zec.rs'];
   const extended = actual.length === withWal006.length && sameSet(actual, withWal006);
-  if (!legacy && !extended) {
+  const withWal007 = [...withWal006, 'wallet-broker/src/xmr.rs'];
+  const xmrExtended = actual.length === withWal007.length && sameSet(actual, withWal007);
+  if (!legacy && !extended && !xmrExtended) {
     throw new PolicyError('wallet Rust source inventory is missing or extra');
   }
 }
@@ -2228,14 +2230,25 @@ function checkRustWalletSource(source, rel) {
   if (typeof source !== 'string' || !source.trim()) {
     throw new PolicyError(`wallet Rust source ${rel} is empty`);
   }
-  const screened = source.replace(/#!\[forbid\(unsafe_code\)\]/g, '');
+  const reviewedXmrPickerTitle = '"Select monero-wallet-rpc"';
+  let screened = source.replace(/#!\[forbid\(unsafe_code\)\]/g, '');
+  if (rel === 'wallet-broker/src/native_ui.rs') {
+    const titleOccurrences = source.split(reviewedXmrPickerTitle).length - 1;
+    if (titleOccurrences > 1) {
+      throw new PolicyError('wallet native source repeats the reviewed XMR picker title');
+    }
+    if (titleOccurrences === 1) {
+      screened = screened.replace(reviewedXmrPickerTitle, '');
+    }
+  }
   const wal006Path = /^wallet-broker\/(?:src\/zec(?:\.rs|\/.*\.rs)|tests\/zec[^/]*\.rs)$/.test(rel);
   const forbidden = [
     [/\bunsafe\b/, 'unsafe'],
     [/extern\s+"C"/, 'FFI'],
     [/std::(?:net|os::unix::net)|TcpListener|TcpStream|UnixListener|UnixStream/, 'network listener'],
-    [wal006Path ? /\b(?:reqwest|tokio|keyring|monero)\b/ :
-      /\b(?:reqwest|tokio|keyring|zcash_client_backend|monero)\b/, 'unreviewed authority'],
+    [wal006Path ? /(?:\b(?:reqwest|tokio|keyring)\b|monero)/i :
+      /(?:\b(?:reqwest|tokio|keyring|zcash_client_backend)\b|monero)/i,
+    'unreviewed authority'],
     [/std::env::temp_dir\s*\(/, 'temporary-directory authority'],
     [/\bCommand::new\s*\(/, 'process authority'],
     [/\b(?:fetch|WebSocket)\s*\(/, 'network authority'],

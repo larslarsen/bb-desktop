@@ -5,6 +5,7 @@ pub mod native;
 pub mod session;
 pub mod store;
 pub mod vault;
+pub mod xmr;
 pub mod zec;
 
 #[cfg(feature = "native-ui")]

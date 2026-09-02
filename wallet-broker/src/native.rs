@@ -76,7 +76,7 @@ impl NativeError {
         Self::new("LOCKED", "Wallet locked")
     }
 
-    fn schema() -> Self {
+    pub(crate) fn schema() -> Self {
         Self::new("SCHEMA", "Wallet request is invalid")
     }
 
@@ -135,6 +135,33 @@ pub trait CustodyPort {
     ) -> Result<RestoreMetadata, NativeError>;
     fn commit_restore(&mut self, path: &str, expected: &RestoreMetadata)
     -> Result<(), NativeError>;
+}
+
+pub trait XmrInstallationSelectionPort {
+    fn choose_wallet_rpc(&mut self) -> Result<Option<String>, NativeError>;
+    fn validate_selected_path(&mut self, path: &str) -> Result<(), NativeError>;
+    fn verify_selected_executable(&mut self, path: &str) -> Result<(), NativeError>;
+    fn persist_selection(&mut self, path: &str) -> Result<(), NativeError>;
+    fn process_side_effect_for_test(&mut self);
+}
+
+pub struct XmrSelectionController;
+
+impl XmrSelectionController {
+    pub fn select(
+        origin: ActionOrigin,
+        port: &mut dyn XmrInstallationSelectionPort,
+    ) -> Result<(), NativeError> {
+        if origin != ActionOrigin::NativeSurface {
+            return Err(NativeError::unauth());
+        }
+        let Some(path) = port.choose_wallet_rpc()? else {
+            return Ok(());
+        };
+        port.validate_selected_path(&path)?;
+        port.verify_selected_executable(&path)?;
+        port.persist_selection(&path)
+    }
 }
 
 pub struct NativeController<C: CustodyPort, W: WipeObserver> {

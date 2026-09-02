@@ -133,3 +133,17 @@ impl FileDialogPort for RfdDialog {
             .transpose()
     }
 }
+
+impl RfdDialog {
+    pub fn choose_xmr_wallet_rpc(&mut self) -> Result<Option<String>, NativeError> {
+        rfd::FileDialog::new()
+            .set_title("Select monero-wallet-rpc")
+            .pick_file()
+            .map(|path| {
+                path.to_str()
+                    .map(str::to_owned)
+                    .ok_or_else(NativeError::schema)
+            })
+            .transpose()
+    }
+}

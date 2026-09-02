@@ -2101,6 +2101,33 @@ test('WAL-004 vault and native source policy requires reviewed secret and path p
 
   const reviewedNativePath = 'let selected = path.to_str().ok_or_else(NativeError::locked)?;';
   policy.checkRustWalletSource(reviewedNativePath, 'wallet-broker/src/native_ui.rs');
+  const reviewedXmrPickerTitle = 'let title = "Select monero-wallet-rpc";';
+  policy.checkRustWalletSource(reviewedXmrPickerTitle, 'wallet-broker/src/native_ui.rs');
+  assertRejects(
+    () => policy.checkRustWalletSource(reviewedXmrPickerTitle, 'wallet-broker/src/native.rs'),
+    /authority|monero|source/i
+  );
+  assertRejects(
+    () => policy.checkRustWalletSource(
+      `${reviewedXmrPickerTitle}\n${reviewedXmrPickerTitle}`,
+      'wallet-broker/src/native_ui.rs'
+    ),
+    /picker|repeat|native|XMR/i
+  );
+  for (const unreviewedMoneroText of [
+    'let title = "Select Monero-wallet-rpc";',
+    'let title = "Choose monero-wallet-rpc";',
+    'let executable = "monero_wallet_rpc";',
+    `${reviewedXmrPickerTitle}\nlet executable = "monero-wallet-rpc";`,
+  ]) {
+    assertRejects(
+      () => policy.checkRustWalletSource(
+        unreviewedMoneroText,
+        'wallet-broker/src/native_ui.rs'
+      ),
+      /authority|monero|source/i
+    );
+  }
   assertRejects(
     () => policy.checkRustWalletSource(
       'let selected = path.to_string_lossy().into_owned();',
@@ -2846,6 +2873,50 @@ const WAL007_PHASE_C_RUST_SOURCE_PATHS = [
 const WAL007_PHASE_C_XMR_PATHS = WAL007_PHASE_C_RUST_SOURCE_PATHS.filter(
   (relative) => relative === 'wallet-broker/src/xmr.rs' || relative.startsWith('wallet-broker/src/xmr/')
 );
+const WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES = Object.freeze([
+  Object.freeze([
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]),
+  Object.freeze([
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/process.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]),
+  Object.freeze([
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/process.rs',
+    'wallet-broker/src/xmr/rpc.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]),
+  Object.freeze([
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/account.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/process.rs',
+    'wallet-broker/src/xmr/rpc.rs',
+    'wallet-broker/src/xmr/store.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]),
+  Object.freeze([
+    'wallet-broker/src/xmr.rs',
+    'wallet-broker/src/xmr/account.rs',
+    'wallet-broker/src/xmr/distribution.rs',
+    'wallet-broker/src/xmr/model.rs',
+    'wallet-broker/src/xmr/process.rs',
+    'wallet-broker/src/xmr/receiver.rs',
+    'wallet-broker/src/xmr/rpc.rs',
+    'wallet-broker/src/xmr/store.rs',
+    'wallet-broker/src/xmr/test_support.rs',
+  ]),
+]);
 const WAL007_PHASE_C_RUNTIME_PATHS = WAL007_PHASE_C_RUST_SOURCE_PATHS.filter(
   (relative) => relative !== 'wallet-broker/src/xmr/test_support.rs'
 );
@@ -2966,6 +3037,46 @@ test('WAL-007 permits no Phase-A XMR source and freezes the only Phase-C Rust in
     'wallet-broker/src/xmr/store.rs',
     'wallet-broker/src/xmr/test_support.rs',
   ]);
+  assert.strictEqual(WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.length, 5);
+  assert.strictEqual(
+    new Set(
+      WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.map((inventory) => JSON.stringify(inventory))
+    ).size,
+    WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.length,
+    'WAL-007 cumulative XMR inventories must be unique'
+  );
+  for (const [index, inventory] of WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.entries()) {
+    assert.deepStrictEqual(
+      [...inventory].sort(),
+      [...inventory],
+      `WAL-007 Slice ${index + 1} must be sorted`
+    );
+    assert.strictEqual(
+      new Set(inventory).size,
+      inventory.length,
+      `WAL-007 Slice ${index + 1} is duplicated`
+    );
+    assert.ok(
+      inventory.every((relative) => WAL007_PHASE_C_XMR_PATHS.includes(relative)),
+      `WAL-007 Slice ${index + 1} contains an unreviewed path`
+    );
+    if (index > 0) {
+      const previous = WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES[index - 1];
+      assert.ok(
+        inventory.length > previous.length,
+        `WAL-007 Slice ${index + 1} is not strictly cumulative`
+      );
+      assert.ok(
+        previous.every((relative) => inventory.includes(relative)),
+        `WAL-007 Slice ${index + 1} removes a previously reviewed path`
+      );
+    }
+  }
+  assert.deepStrictEqual(
+    WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.at(-1),
+    WAL007_PHASE_C_XMR_PATHS,
+    'WAL-007 cumulative inventories must end at the frozen final inventory'
+  );
   const actual = collectWal007RustSourcePaths(
     path.join(repoRoot, 'wallet-broker', 'src'),
     'wallet-broker/src'
@@ -2975,8 +3086,19 @@ test('WAL-007 permits no Phase-A XMR source and freezes the only Phase-C Rust in
   if (actual.length === 0) {
     assert.deepStrictEqual(actual, [], 'Phase A must contain no XMR production implementation');
   } else {
-    assert.deepStrictEqual(actual, WAL007_PHASE_C_XMR_PATHS, 'Phase C XMR inventory is missing or extra');
+    assert.ok(
+      WAL007_PHASE_C_CUMULATIVE_XMR_INVENTORIES.some(
+        (inventory) => JSON.stringify(actual) === JSON.stringify(inventory)
+      ),
+      'Phase C XMR inventory is not an exact accepted cumulative slice'
+    );
   }
+  const policy = loadPolicy();
+  policy.checkRustWalletSourceInventory([
+    ...WAL004_RUST_SOURCE_PATHS,
+    'wallet-broker/src/zec.rs',
+    'wallet-broker/src/xmr.rs',
+  ]);
 });
 
 test('WAL-007 production inventory grants no Electron or Node expansion', () => {

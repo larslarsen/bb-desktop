@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 1 NODE-ONLY GREEN RESUME 02 AUTHORIZED
+State: PHASE C SLICE 1 GREEN COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
