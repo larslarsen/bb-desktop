@@ -34,3 +34,6 @@ explicit selection, release/hash pins, executable validation, broker-only lifecy
 authentication, local-node liveness, portable-drive removal, and fail-closed tests. Exact
 supported Monero release hashes remain review artifacts for that ticket; no personal path
 or machine-specific installation location belongs in product source.
+
+The resulting implementation contract is `../../tickets/BBD-WAL-007.md`. It is ready
+for a later bounded authorization but does not itself authorize source or execution.

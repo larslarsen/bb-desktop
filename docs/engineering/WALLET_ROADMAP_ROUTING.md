@@ -16,9 +16,9 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 | P2 complete | BBD-RATE-001 | Grok Build, High | Bounded untrusted-provider parser/worker and deterministic single-source selection after the process split exists | Production accepted at `c7d91c69`; local falsification/green evidence and GitHub Actions run `33578112536` passed |
 | P2 complete | BBD-WAL-005 | Codex Sol, High | The view model touches the security-sensitive shared snapshot sanitizer; two bounded Grok Build attempts produced no file changes and were stopped, so the reviewer re-routed the unchanged source task | Production accepted at `0b51c73f`; final falsification evidence at `3e1e0b14` |
 | P2 complete | BBD-WAL-006 | Codex Sol, High | ZEC consensus, PCZT, Ironwood, SQLite viewing state, and librustzcash adapter | Reviewer-accepted at `996444e9`; final evidence at `14a68187` |
-| P3 ready | BBD-WAL-007 | Codex Sol, High | XMR wallet/node process isolation, RPC authentication, and persistence | Owner selected a verified user-installed official wallet-rpc managed by the broker; normal and portable installs supported |
+| P3 ticket ready | BBD-WAL-007 | Codex Sol, High | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Ticket frozen at `tickets/BBD-WAL-007.md`; implementation authorization pending |
 | P3 | BBD-WAL-008 | Codex Sol, High | Hardware capability attestation and device trust | Applicable coin adapter accepted |
-| P3 | BBD-WAL-009 | Codex Sol, High | Broadcast, concurrency, cancellation races, and crash recovery | Coin adapters accepted |
+| P3 | BBD-WAL-009 | Codex Sol, High | XMR prepare/sign/verify plus cross-coin broadcast, concurrency, cancellation races, and crash recovery | Coin adapters accepted |
 | P4 | BBD-WAL-010 | Codex Spark, High for DOM/CSS/state boilerplate; Grok or Sol for any authority-bearing correction | User-facing composition after authority and state-machine behavior are executable | WAL-005, RATE-001, and payment flow accepted |
 | P4 | BBD-WAL-011 | Codex Sol, High | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
 | P5 | BBD-WAL-012 | Codex Sol, High | Mainnet release gate and money-safety evidence | Every preceding wallet gate accepted |
