@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 FORMAT CORRECTION ACCEPTED — HERMES RESUME 02 AUTHORIZED
+State: PHASE C SLICE 2 GREEN COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -50,9 +50,10 @@ The retained Rust 1.98 formatter output is preserved in
 [BBD-WAL-007-SLICE-02-FORMATTER-DIFF-01.md](../testing/BBD-WAL-007-SLICE-02-FORMATTER-DIFF-01.md).
 The exact recorded drop is accepted at XHigh in
 [BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-02-FORMAT-CORRECTION-SOURCE-REVIEW-02.md).
-Hermes may restart only the exact Slice-2 focused formatter, falsification, green, and
-integration gate. Slice 3, broader acceptance, and the real local-Monero gate remain
-unauthorized.
+Hermes completed the Slice-2 focused formatter, falsification, and green gate on resume 02.
+The complete green evidence is recorded in
+[BBD-WAL-007-SLICE-02-GREEN-01.md](../testing/BBD-WAL-007-SLICE-02-GREEN-01.md).
+Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

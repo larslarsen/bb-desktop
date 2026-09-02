@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use bitbook_wallet_broker::xmr::process::{
     CONNECT_TIMEOUT_SECS, MAX_ACTIVE_CHILDREN, MAX_LOG_FILE_BYTES, MAX_PORT_ATTEMPTS, PORT_MAX,
     PORT_MIN, READINESS_TIMEOUT_SECS, STOP_TIMEOUT_SECS,
@@ -119,6 +121,7 @@ fn full_wallet_rpc_is_authenticated_ipv4_loopback_without_forbidden_options() {
     assert!(!plan.rpc_login_username().is_empty());
     assert!(!plan.rpc_login_password().is_empty());
     assert_ne!(plan.rpc_login_username(), plan.rpc_login_password());
+    let option_names = plan.option_names_for_test();
     for forbidden in [
         "disable-rpc-login",
         "restricted-rpc",
@@ -133,10 +136,20 @@ fn full_wallet_rpc_is_authenticated_ipv4_loopback_without_forbidden_options() {
         "wallet-password",
         "hw-device",
         "mainnet",
-        "::1",
     ] {
-        assert!(!plan.argv_and_config_text_for_test().contains(forbidden));
+        assert!(!option_names.contains(&forbidden));
     }
+    assert!(option_names.contains(&"untrusted-daemon"));
+    assert!(
+        plan.argv_and_config_text_for_test()
+            .contains("untrusted-daemon=1")
+    );
+    assert!(
+        !plan
+            .option_values_for_test()
+            .iter()
+            .any(|value| value.contains("::1"))
+    );
     assert!(
         !plan
             .argv_and_environment_text_for_test()
@@ -151,8 +164,10 @@ fn full_wallet_rpc_is_authenticated_ipv4_loopback_without_forbidden_options() {
 
 #[test]
 fn rpc_login_and_port_use_fresh_os_entropy_and_do_not_repeat() {
-    let first = rig(XmrNetwork::Stagenet).plan().unwrap();
-    let second = rig(XmrNetwork::Stagenet).plan().unwrap();
+    let first_process = rig(XmrNetwork::Stagenet);
+    let second_process = rig(XmrNetwork::Stagenet);
+    let first = first_process.plan().unwrap();
+    let second = second_process.plan().unwrap();
     for plan in [&first, &second] {
         assert!(plan.rpc_port_from_os_entropy());
         assert!(plan.rpc_username_from_os_entropy());
@@ -164,6 +179,10 @@ fn rpc_login_and_port_use_fresh_os_entropy_and_do_not_repeat() {
     assert_ne!(first.rpc_port(), second.rpc_port());
     assert_ne!(first.rpc_login_username(), second.rpc_login_username());
     assert_ne!(first.rpc_login_password(), second.rpc_login_password());
+    for process in [&first_process, &second_process] {
+        assert!(process.entropy_calls() >= 3);
+        assert_eq!(process.port_entropy_calls(), 1);
+    }
 }
 
 #[test]
@@ -215,6 +234,13 @@ fn startup_requires_authenticated_exact_version_before_ten_second_deadline() {
         if accepted {
             assert!(process.authenticated_readiness_observed());
             assert!(process.version_was_exact());
+            assert!(process.reservation_was_live_at_spawn());
+            assert!(process.reservation_was_released_immediately_before_spawn());
+            assert!(process.config_was_written_and_synced_while_reserved());
+            assert_eq!(
+                process.liveness_checks(),
+                ["before-readiness", "after-readiness"]
+            );
         } else {
             assert_eq!(result.unwrap_err().code(), "UNAVAILABLE");
             assert_eq!(process.child_count(), 0);
@@ -233,6 +259,9 @@ fn one_child_per_account_and_four_child_cap_are_fail_closed() {
             .unwrap();
     }
     assert_eq!(process.child_count(), 4);
+    assert_eq!(process.account_spawn_count(&format!("{:032x}", 0)), 1);
+    process.poll_account_health(&format!("{:032x}", 0)).unwrap();
+    assert_eq!(process.account_spawn_count(&format!("{:032x}", 0)), 1);
     assert_eq!(
         process
             .start_account("ffffffffffffffffffffffffffffffff", XmrNetwork::Testnet)
@@ -262,10 +291,27 @@ fn invalid_account_network_and_mainnet_fail_before_directory_socket_or_process()
         let mut process = ProcessRig::new_unvalidated(account, "xmr-stagenet");
         assert_eq!(process.start().unwrap_err().code(), "SCHEMA");
         assert!(process.operations().is_empty());
+        assert_eq!(process.entropy_calls(), 0);
+        assert_eq!(process.port_attempts(), 0);
     }
     let mut mainnet = ProcessRig::new_unvalidated(ACCOUNT, "xmr-mainnet");
     assert_eq!(mainnet.start().unwrap_err().code(), "NETWORK_DISABLED");
     assert!(mainnet.operations().is_empty());
+    assert_eq!(mainnet.entropy_calls(), 0);
+    assert_eq!(mainnet.port_attempts(), 0);
+    for root in [
+        "/synthetic/private\nextra-option=1",
+        "/synthetic/private\rredirect",
+        "/synthetic/private\0suffix",
+        "/synthetic/private\tvalue",
+    ] {
+        let mut process =
+            ProcessRig::new_with_private_root(ACCOUNT, "xmr-stagenet", Path::new(root));
+        assert_eq!(process.start().unwrap_err().code(), "SCHEMA");
+        assert!(process.operations().is_empty());
+        assert_eq!(process.entropy_calls(), 0);
+        assert_eq!(process.port_attempts(), 0);
+    }
 }
 
 #[test]
@@ -350,11 +396,44 @@ fn every_lifecycle_failure_reaps_and_removes_private_config() {
     ] {
         let mut process = rig(XmrNetwork::Stagenet);
         process.arm_fault(fault);
-        let _ = process.start_or_poll_for_test();
+        let _ = match fault {
+            ProcessFault::ExecutableRemoved | ProcessFault::ExecutableChanged => {
+                process.start().and_then(|()| process.poll_health())
+            }
+            ProcessFault::BrokerExit => process
+                .start()
+                .and_then(|()| process.broker_exit_for_test()),
+            _ => process.start(),
+        };
         assert_eq!(process.child_count(), 0, "fault {fault:?}");
         assert_eq!(process.open_handle_count(), 0, "fault {fault:?}");
         assert!(process.runtime_secrets_removed(), "fault {fault:?}");
         assert!(process.credentials_wiped(), "fault {fault:?}");
+        if matches!(
+            fault,
+            ProcessFault::Authentication
+                | ProcessFault::WrongVersion
+                | ProcessFault::MalformedReadiness
+                | ProcessFault::ExecutableRemoved
+                | ProcessFault::ExecutableChanged
+                | ProcessFault::BrokerExit
+        ) {
+            assert_eq!(
+                process.teardown_operations(),
+                [
+                    "stop-new-calls",
+                    "close-wallet",
+                    "stop-wallet",
+                    "wait-2s",
+                    "reap",
+                    "wipe-rpc-login",
+                    "wipe-wallet-password",
+                    "close-sockets",
+                    "remove-runtime-secrets",
+                ],
+                "fault {fault:?}"
+            );
+        }
     }
 }
 

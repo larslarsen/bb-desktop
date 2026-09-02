@@ -32,6 +32,44 @@ impl HostPlatform {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum XmrNetwork {
+    Stagenet,
+    Testnet,
+}
+
+impl XmrNetwork {
+    pub(crate) fn parse(value: &str) -> Result<Self, XmrError> {
+        match value {
+            "xmr-stagenet" => Ok(Self::Stagenet),
+            "xmr-testnet" => Ok(Self::Testnet),
+            "xmr-mainnet" => Err(XmrError::network_disabled()),
+            _ => Err(XmrError::request_schema()),
+        }
+    }
+
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            Self::Stagenet => "xmr-stagenet",
+            Self::Testnet => "xmr-testnet",
+        }
+    }
+
+    pub(crate) fn daemon_port(self) -> u16 {
+        match self {
+            Self::Stagenet => 38_081,
+            Self::Testnet => 28_081,
+        }
+    }
+
+    pub(crate) fn flag(self) -> &'static str {
+        match self {
+            Self::Stagenet => "stagenet",
+            Self::Testnet => "testnet",
+        }
+    }
+}
+
 #[derive(Clone, Eq, PartialEq)]
 pub struct XmrError {
     code: &'static str,
@@ -45,6 +83,10 @@ impl XmrError {
 
     pub(crate) fn schema() -> Self {
         Self::new("SCHEMA", "Monero installation selection is invalid")
+    }
+
+    pub(crate) fn request_schema() -> Self {
+        Self::new("SCHEMA", "Monero wallet request is invalid")
     }
 
     pub(crate) fn unavailable() -> Self {
@@ -64,6 +106,14 @@ impl XmrError {
 
     pub(crate) fn internal() -> Self {
         Self::new("INTERNAL", "Monero installation could not be saved")
+    }
+
+    pub(crate) fn limit() -> Self {
+        Self::new("LIMIT", "Monero wallet process limit reached")
+    }
+
+    pub(crate) fn network_disabled() -> Self {
+        Self::new("NETWORK_DISABLED", "Monero network is disabled")
     }
 
     pub fn code(&self) -> &'static str {
