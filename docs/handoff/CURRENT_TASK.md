@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE A POLICY REPAIR AUTHORIZED
+State: PHASE B NODE POLICY RERUN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,12 +18,12 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_A_POLICY_REPAIR_01.md](CODEX_SOL_BBD_WAL_007_PHASE_A_POLICY_REPAIR_01.md)
+[HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_04.md](HERMES_BBD_WAL_007_EXPECTED_RED_RESUME_04.md)
 
-Hermes proved formatting and all seven Rust expected-red targets. Sol alone may correct
-the two-file Phase-A Node policy mismatch: extend the committed manifest checker and
-narrow the false-positive path-search regex. Execution, integration, wallet production,
-and the real local-Monero gate remain unauthorized.
+The eleven-path Phase-A source is accepted at the exact hashes in
+[BBD-WAL-007-TEST-SOURCE-REVIEW-05.md](../testing/BBD-WAL-007-TEST-SOURCE-REVIEW-05.md).
+Hermes alone may rerun the corrected Node policy, finish evidence, and integrate. Wallet
+production and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
