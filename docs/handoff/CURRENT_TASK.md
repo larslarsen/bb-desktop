@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 1 GREEN RESUME 01 AUTHORIZED
+State: PHASE C SLICE 1 NATIVE POLICY CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,16 +18,16 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_RESUME_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_RESUME_01.md)
+[CODEX_SOL_BBD_WAL_007_SLICE_01_NATIVE_POLICY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_SLICE_01_NATIVE_POLICY_CORRECTION_01.md)
 
 Slice-1 source is accepted at XHigh in
 [BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md).
-Hermes stopped Green 01 at the first formatter check without changing source. The result
-is accepted in
-[BBD-WAL-007-SLICE-01-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-01-GREEN-STOP-REVIEW-01.md).
-Hermes alone may apply the exact mechanical formatting exception, restart the focused
-gate, and integrate on exact green. Manual source repair, test edits, later slices,
-broader acceptance, and the real local-Monero gate remain unauthorized.
+Hermes completed formatting, 17 native tests, 12 distribution tests, and the native
+feature check, then stopped at the Node policy collision reviewed in
+[BBD-WAL-007-SLICE-01-NODE-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-01-NODE-STOP-REVIEW-01.md).
+Sol alone may correct the exact two policy paths. Hermes execution/integration, all Rust
+edits, later slices, broader acceptance, and the real local-Monero gate remain
+unauthorized pending XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
