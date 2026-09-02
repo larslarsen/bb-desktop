@@ -22,6 +22,10 @@ Final acceptance:
 
 Active handoff: none. No next ticket is authorized by this file.
 
+Next candidate: BBD-WAL-007. Its XMR wallet-rpc distribution owner gate is resolved in
+[BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md),
+but no source or integration work is authorized yet.
+
 Jr Dev routing:
 [HERMES_JR_DEV_ROUTING.md](../engineering/HERMES_JR_DEV_ROUTING.md)
 

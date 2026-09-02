@@ -1155,9 +1155,12 @@ payment IDs instead of subaddresses; treating stagenet and mainnet wallets
 as interchangeable files; `--restricted-rpc` on wallet-rpc for a spending
 account; presenting wallet-rpc as product HTTP.
 
-**Uncertainty:** whether BitBook packages a pinned `monero-wallet-rpc` binary
-or detects a user-installed official binary. That is owner question Q1. The
-adapter API is the same.
+**Owner decision (2026-09-01):** BitBook uses a user-selected official Monero
+installation and verifies its `monero-wallet-rpc` against reviewed release/hash pins.
+The broker manages that verified process; the user does not start wallet RPC manually.
+Normal and portable installations are supported. BitBook does not bundle or silently
+download wallet RPC in v1. See
+`BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md`.
 
 ## 9. Hardware support policy
 
@@ -2133,10 +2136,11 @@ stays stopped until this corrected source is accepted.
 
 Engineering must not fill these silently.
 
-**Q1. XMR wallet-rpc distribution.** Bundle a pinned `monero-wallet-rpc`
-binary in the desktop package, or detect a user-installed official binary by
-hash, or require the user to start wallet-rpc themselves? Node (`monerod`)
-stays user-controlled in all options.
+**Q1. XMR wallet-rpc distribution — RESOLVED 2026-09-01.** Use a user-selected
+official Monero installation, verify `monero-wallet-rpc` against reviewed pins, and let
+the broker manage its authenticated loopback lifecycle. Support normal and portable
+installations. Do not bundle/download it in v1 and do not require the user to start wallet
+RPC. Node (`monerod`) remains user-controlled and local-only.
 
 **Q2. Built-in ZEC light endpoint.** Leave lightwalletd URL empty until the
 user sets one; ship a configurable default list; or later bundle/run a local
