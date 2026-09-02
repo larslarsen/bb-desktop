@@ -2,14 +2,14 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 FORMAT CORRECTION 01 RESUME 02 AUTHORIZED
+State: PHASE C SLICE 3 FOCUSED GREEN RESUME 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High; XHigh required before
 security-sensitive source acceptance or final Slice-3 acceptance
 
-Authorized source actor: Sr Dev — Grok Build (Grok 4.6 High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -19,7 +19,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01_RESUME_02.md](GROK_BBD_WAL_007_PHASE_C_SLICE_03_FORMAT_CORRECTION_01_RESUME_02.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -75,8 +75,11 @@ formatting-only correction. Grok Resume 01 stopped without changes because the e
 formatter hunks were not durable; that stop is reviewed in
 [BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-01-RESUME-01-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-01-RESUME-01-STOP-REVIEW-01.md).
 Resume 02 authorizes only the pinned formatter on the exact three paths. Hermes
-execution/integration, Slices 4–5, broader acceptance, and the real local-Monero gate
-remain unauthorized pending a new reviewer source review.
+execution remained unauthorized pending reviewer inspection.
+Grok's exact formatter drop is accepted in
+[BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-FORMAT-CORRECTION-SOURCE-REVIEW-01.md).
+Hermes alone may run the focused-green resume handoff. Slices 4–5, broader acceptance,
+and the real local-Monero gate remain unauthorized pending reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
