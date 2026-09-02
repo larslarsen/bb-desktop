@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 ACCOUNT SOURCE AUTHORIZED
+State: PHASE C SLICE 4 ACCOUNT SOURCE CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_ACCOUNT.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_ACCOUNT.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -163,6 +163,11 @@ Slice 3 is accepted at `c4bda0e9`, with its evidence corrected at `292f000f`, in
 Only the active Slice-4 account custody/recovery source handoff is now authorized to
 Grok 4.6 High. Hermes integration, Slice 5, broader acceptance, and the real offline
 local-Monero gate remain unauthorized pending XHigh source review.
+Grok's first four-path Slice-4 drop is rejected at XHigh in
+[BBD-WAL-007-SLICE-04-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-SOURCE-REVIEW-01.md).
+The reviewer records that the initial boundary omitted the required RPC/process/vault
+bridges. Grok 4.6 High alone may correct the seven exact source paths in the active
+handoff. Hermes execution/integration remains unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
