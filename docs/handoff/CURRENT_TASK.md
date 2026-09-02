@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 SOURCE CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 2 SOURCE ACCEPTED — HERMES GREEN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -33,9 +33,11 @@ The initial four-path process source drop was rejected at XHigh in
 [BBD-WAL-007-SLICE-02-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-SOURCE-REVIEW-01.md).
 The impossible atomic-listener handoff clause is replaced by
 [BBD-WAL-007-SLICE-02-PORT-PREFLIGHT-DECISION.md](../architecture/BBD-WAL-007-SLICE-02-PORT-PREFLIGHT-DECISION.md).
-Sol alone may correct the exact three paths in the active handoff while retaining the
-valid Slice-2 core. Hermes execution/integration, Slice 3, broader acceptance, and the
-real local-Monero gate remain unauthorized pending a new XHigh source review.
+The corrected five-path drop is accepted in
+[BBD-WAL-007-SLICE-02-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-02-SOURCE-REVIEW-02.md).
+Hermes alone may perform the focused falsification/green/integration handoff. Slice 3,
+broader acceptance, and the real local-Monero gate remain unauthorized pending review of
+Hermes evidence.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
