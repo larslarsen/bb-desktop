@@ -304,7 +304,7 @@ fn graceful_teardown_has_exact_closed_order_and_two_second_wait() {
 }
 
 #[test]
-fn hung_or_failed_child_is_killed_as_exact_process_group_then_reaped() {
+fn hung_or_failed_child_is_killed_as_exact_owned_child_then_reaped() {
     for exit in [
         ChildExit::Hung,
         ChildExit::StopRpcError,
@@ -321,7 +321,7 @@ fn hung_or_failed_child_is_killed_as_exact_process_group_then_reaped() {
                 "close-wallet",
                 "stop-wallet",
                 "wait-2s",
-                "kill-exact-process-group",
+                "kill-exact-owned-child",
                 "reap",
                 "wipe-rpc-login",
                 "wipe-wallet-password",
@@ -329,7 +329,7 @@ fn hung_or_failed_child_is_killed_as_exact_process_group_then_reaped() {
                 "remove-runtime-secrets",
             ]
         );
-        assert!(process.killed_only_owned_process_group());
+        assert!(process.killed_only_owned_child());
         assert_eq!(process.child_count(), 0);
         assert_eq!(process.open_handle_count(), 0);
     }
