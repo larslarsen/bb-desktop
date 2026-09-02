@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 GREEN COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 2 ACCEPTED — SLICE 3 NOT YET AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_02_GREEN_RESUME_02.md)
+none
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -53,6 +53,9 @@ The exact recorded drop is accepted at XHigh in
 Hermes completed the Slice-2 focused formatter, falsification, and green gate on resume 02.
 The complete green evidence is recorded in
 [BBD-WAL-007-SLICE-02-GREEN-01.md](../testing/BBD-WAL-007-SLICE-02-GREEN-01.md).
+Slice 2 is accepted at `d0a14dd5` in
+[BBD-WAL-007-SLICE-02-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-02-ACCEPTANCE-01.md).
+The acceptance records Hermes's non-mutating post-integration command-scope deviation.
 Slice 3, broader acceptance, and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is

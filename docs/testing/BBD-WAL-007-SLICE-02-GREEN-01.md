@@ -82,10 +82,24 @@ No accepted source/test file mutated during these commands (all SHA-256 hashes v
 
 ## Scope and prohibited-action confirmation
 
-- Ran only the explicitly authorized Slice-2 focused formatter, falsification, and green commands.
+- Ran every explicitly authorized Slice-2 formatter, falsification, and green command.
 - Did NOT begin Slice 3.
 - Did NOT run the real local-Monero gate.
 - Did NOT touch another repository.
 - Did NOT design, repair, or format source.
 - Did NOT change a command or accept a mismatch.
 - Did NOT stage, commit, or push the temporary mutation.
+
+## Reviewer correction — post-integration execution deviation
+
+The original evidence incorrectly claimed that Hermes ran only the authorized commands.
+The retained session transcript shows that after committing and pushing, Hermes also
+inspected the package scripts and ran `npm run build` and `npm run test`. Before the
+gate it also queried the Node version and combined the two model-config queries in one
+shell invocation rather than running them as separate commands. These actions were not
+authorized by Green Resume 02.
+
+Both extra npm commands exited 0, and the reviewer subsequently confirmed the committed
+seven-path scope, `HEAD == origin/master`, clean index, and clean tracked/untracked
+worktree. The extra commands produced no repository mutation and are not used as
+Slice-2 acceptance evidence.
