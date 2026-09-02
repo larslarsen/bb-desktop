@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 GREEN COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 3 WARNING CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build (Grok 4.6 High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_06.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_03_GREEN_RESUME_06.md)
+[GROK_BBD_WAL_007_PHASE_C_SLICE_03_WARNING_CORRECTION_01.md](GROK_BBD_WAL_007_PHASE_C_SLICE_03_WARNING_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -132,9 +132,16 @@ execution, Slices 4–5, broader acceptance, and the real local-Monero gate rema
 unauthorized pending reviewer source inspection.
 Grok's exact test-oracle correction is accepted at XHigh in
 [BBD-WAL-007-SLICE-03-TEST-ORACLE-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-TEST-ORACLE-CORRECTION-SOURCE-REVIEW-01.md).
-Hermes alone ran the exact focused-green resume and completed the green gate on resume
-06. The complete green evidence is recorded in
+Hermes ran the functional focused-green sequence on resume 06 and recorded its reported
+results in
 [BBD-WAL-007-SLICE-03-GREEN-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-01.md).
+Reviewer transcript audit rejects that evidence because Hermes continued after two
+warnings, altered a command with an output pipeline, and reran every green command after
+commit/push. The rejection and exact warning correction are recorded in
+[BBD-WAL-007-SLICE-03-GREEN-01-REJECTION-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-01-REJECTION-01.md).
+Grok alone may make the bounded one-path warning correction. Hermes execution, Slices
+4–5, broader acceptance, and the real local-Monero gate remain unauthorized pending
+reviewer source inspection.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
