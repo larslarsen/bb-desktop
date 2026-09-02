@@ -51,6 +51,14 @@ In particular:
 Every retained string or nested value still follows the ticket's no-raw-output and
 secret-wipe rules. Unknown members outside the reviewed pinned inventory fail closed.
 
+The pinned field types and serializer optionality are part of that wire contract.
+`get_info.version` is a string. `block_weight_limit` and `block_weight_median` use
+`KV_SERIALIZE_OPT(..., 0)`, so either is legally absent when zero; a present value must
+still be `u64`. `hard_fork_info.version` and `voting` are `uint8_t`, while `window`,
+`votes`, `threshold`, and `state` are `uint32_t`; the pinned state domain is `0..=2`.
+Closed parsing accepts those reviewed optional omissions and rejects type/width/domain
+confusion or any unreviewed member.
+
 ## Node policy
 
 The ticket's explicit `get_info` rules govern acceptance: exact `OK`, exact network

@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 TEST/PRODUCTION CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 3 TEST/PRODUCTION CORRECTION 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_02.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_03_CORRECTION_02.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -60,7 +60,9 @@ The initial four-path RPC/local-node drop is rejected at XHigh in
 [BBD-WAL-007-SLICE-03-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-01.md).
 The pinned upstream semantics are fixed in
 [BBD-WAL-007-SLICE-03-UPSTREAM-RPC-DECISION.md](../architecture/BBD-WAL-007-SLICE-03-UPSTREAM-RPC-DECISION.md).
-Sol alone may correct the exact five paths in the active handoff. Hermes execution and
+Correction 01 is rejected at XHigh in
+[BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-03-SOURCE-REVIEW-02.md).
+Sol alone may correct the exact three paths in the active handoff. Hermes execution and
 integration, Slices 4–5, broader acceptance, and the real local-Monero gate remain
 unauthorized pending a new XHigh source review.
 
