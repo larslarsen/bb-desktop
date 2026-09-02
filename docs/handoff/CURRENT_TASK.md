@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 FOCUSED GREEN RESUME 07 AUTHORIZED
+State: PHASE C SLICE 3 GREEN 02 COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -144,9 +144,11 @@ Grok alone may make the bounded one-path warning correction. Hermes execution, S
 reviewer source inspection.
 Grok's warning correction is accepted at XHigh in
 [BBD-WAL-007-SLICE-03-WARNING-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-WARNING-CORRECTION-SOURCE-REVIEW-01.md).
-Hermes alone may run the wholly fresh focused-green resume. Slices 4–5, broader
-acceptance, and the real local-Monero gate remain unauthorized pending reviewer
-acceptance.
+Hermes alone ran the wholly fresh focused-green resume 07. The complete green evidence
+is recorded in
+[BBD-WAL-007-SLICE-03-GREEN-02.md](../testing/BBD-WAL-007-SLICE-03-GREEN-02.md).
+Slices 4–5, broader acceptance, and the real local-Monero gate remain unauthorized
+pending reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

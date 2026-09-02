@@ -119,16 +119,35 @@ impl RpcMethod {
 }
 
 pub(crate) fn request_dispatch_for_test(name: &str) -> bool {
+    let method = match name {
+        "get_version" => RpcMethod::GetVersion,
+        "create_wallet" => RpcMethod::CreateWallet,
+        "restore_deterministic_wallet" => RpcMethod::RestoreDeterministicWallet,
+        "generate_from_keys" => RpcMethod::GenerateFromKeys,
+        "open_wallet" => RpcMethod::OpenWallet,
+        "close_wallet" => RpcMethod::CloseWallet,
+        "stop_wallet" => RpcMethod::StopWallet,
+        "query_key" => RpcMethod::QueryKey,
+        "refresh" => RpcMethod::Refresh,
+        "get_height" => RpcMethod::GetHeight,
+        "get_balance" => RpcMethod::GetBalance,
+        "get_address" => RpcMethod::GetAddress,
+        "create_address" => RpcMethod::CreateAddress,
+        "validate_address" => RpcMethod::ValidateAddress,
+        "get_info" => RpcMethod::GetInfo,
+        "hard_fork_info" => RpcMethod::HardForkInfo,
+        _ => return false,
+    };
     matches!(
-        name,
-        "get_version"
-            | "close_wallet"
-            | "stop_wallet"
-            | "get_height"
-            | "get_balance"
-            | "create_address"
-            | "get_info"
-            | "hard_fork_info"
+        method,
+        RpcMethod::GetVersion
+            | RpcMethod::CloseWallet
+            | RpcMethod::StopWallet
+            | RpcMethod::GetHeight
+            | RpcMethod::GetBalance
+            | RpcMethod::CreateAddress
+            | RpcMethod::GetInfo
+            | RpcMethod::HardForkInfo
     )
 }
 
@@ -1892,5 +1911,3 @@ impl JsonCursor<'_> {
         }
     }
 }
-
-use core::fmt::Write as _;
