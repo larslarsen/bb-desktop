@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 OWNED-CHILD EXPECTED RED COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 2 OWNED-CHILD RED EVIDENCE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_EXPECTED_RED_01.md](HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_EXPECTED_RED_01.md)
+[HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_SLICE_02_OWNED_CHILD_RED_EVIDENCE_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -27,9 +27,11 @@ group. The XHigh decision is
 [BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md](../architecture/BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md).
 The exact one-path correction is accepted in
 [BBD-WAL-007-SLICE-02-OWNED-CHILD-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-OWNED-CHILD-TEST-SOURCE-REVIEW-01.md).
-Hermes alone may prove formatting and the corrected expected red, then integrate that
-test-only contract. Production source, Slice 3, broader acceptance, and the real
-local-Monero gate remain unauthorized.
+The command result is accepted, but its architecture paragraph requires the exact
+evidence-only correction in
+[BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md).
+Hermes alone may correct that record. Production source, Slice 3, broader acceptance,
+and the real local-Monero gate remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
