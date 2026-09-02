@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 1 GREEN COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 2 PROCESS SOURCE AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,17 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_01_GREEN_RESUME_02.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_PROCESS.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_02_PROCESS.md)
 
-Slice-1 source is accepted at XHigh in
-[BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md](../testing/BBD-WAL-007-SLICE-01-SOURCE-REVIEW-02.md).
-Hermes completed formatting, 17 native tests, 12 distribution tests, and the native
-feature check, then stopped at the Node policy collision. Sol's exact two-path correction
-is accepted at XHigh in
-[BBD-WAL-007-SLICE-01-NATIVE-POLICY-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-01-NATIVE-POLICY-SOURCE-REVIEW-01.md).
-Hermes alone may run the two remaining Node checks and integrate on exact green. All
-source/test repair, Rust execution, later slices, broader acceptance, and the real
-local-Monero gate remain unauthorized.
+Slice 1 is complete and accepted at `c139641a` in
+[BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
+Sol alone may author the exact four-path process/lifecycle Slice-2 drop. Hermes execution
+and integration, Slice 3, broader acceptance, and the real local-Monero gate remain
+unauthorized pending XHigh source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
