@@ -1,6 +1,6 @@
 # Hermes Handoff — BBD-RATE-001 Production Gate Resume 01
 
-State: ACTIVE
+State: PAUSED — VALID STOP; SOURCE CORRECTION 03 REQUIRED
 
 You are **Jr Dev — Hermes** using only the free configured Nous route. Resume the stopped
 production gate with the accepted corrected fixture. Do not repeat the five falsifications;
