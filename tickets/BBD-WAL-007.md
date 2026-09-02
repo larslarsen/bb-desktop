@@ -281,9 +281,10 @@ multisig, address-book, mining, daemon-switch, raw-RPC, or generic JSON entry po
 
 ## Account custody and persistence
 
-WAL-007 supports `software` and `watch_only`. `hardware_backed` stays capability-false
-until BBD-WAL-008. Account creation/import is a typed broker-native operation; this
-ticket does not add an Electron form.
+WAL-007 supports `software` and `watch_only`. The `hardware_backed` account kind remains
+unsupported until BBD-WAL-008, and every device-specific capability stays false. Account
+creation/import is a typed broker-native operation; this ticket does not add an Electron
+form.
 
 Every wallet has a derived private directory and filename from its validated 32-lowercase
 hex account ID; no caller path becomes a wallet filename. The directory and state DB are
