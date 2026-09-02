@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 2 OWNED-CHILD RED EVIDENCE CORRECTION AUTHORIZED
+State: PHASE C SLICE 2 OWNED-CHILD EXPECTED RED EVIDENCE CORRECTED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -30,8 +30,8 @@ The exact one-path correction is accepted in
 The command result is accepted, but its architecture paragraph requires the exact
 evidence-only correction in
 [BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-02-OWNED-CHILD-EXPECTED-RED-REVIEW-01.md).
-Hermes alone may correct that record. Production source, Slice 3, broader acceptance,
-and the real local-Monero gate remain unauthorized.
+Hermes corrected the evidence. No production source is authorized pending reviewer
+acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

@@ -57,7 +57,7 @@ Zero tests executed — the target's production imports cannot compile. No depen
 
 ## Architecture-decision reference
 
-Slice 2 (owned-child process lifecycle) requires production code that can signal and reap a child process group. The XHigh decision ([BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md](../architecture/BBD-WAL-007-SLICE-02-OWNED-CHILD-DECISION.md)) documents that stable safe Rust cannot signal a process group, which is why Sol stopped before editing and the production boundary remains absent. This expected-red result proves the test is non-vacuous: it fails to compile because the production API it tests does not yet exist.
+Slice 2 requires production code that can kill and reap the exact broker-owned child. The XHigh decision documents why the original group-signal assertion was impossible under safe stable Rust and replaces it with exact-owned-child semantics. This expected-red result proves the test is non-vacuous: it fails to compile because the production API it tests does not yet exist.
 
 ## Scope
 
