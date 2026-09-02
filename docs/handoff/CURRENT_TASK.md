@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 3 FOCUSED GREEN RESUME 06 AUTHORIZED
+State: PHASE C SLICE 3 GREEN COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -132,8 +132,9 @@ execution, Slices 4–5, broader acceptance, and the real local-Monero gate rema
 unauthorized pending reviewer source inspection.
 Grok's exact test-oracle correction is accepted at XHigh in
 [BBD-WAL-007-SLICE-03-TEST-ORACLE-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-03-TEST-ORACLE-CORRECTION-SOURCE-REVIEW-01.md).
-Hermes alone may run the exact focused-green resume. Slices 4–5, broader acceptance,
-and the real local-Monero gate remain unauthorized pending reviewer acceptance.
+Hermes alone ran the exact focused-green resume and completed the green gate on resume
+06. The complete green evidence is recorded in
+[BBD-WAL-007-SLICE-03-GREEN-01.md](../testing/BBD-WAL-007-SLICE-03-GREEN-01.md).
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

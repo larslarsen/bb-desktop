@@ -116,6 +116,14 @@ impl XmrError {
         Self::new("NETWORK_DISABLED", "Monero network is disabled")
     }
 
+    pub(crate) fn unauth() -> Self {
+        Self::new("UNAUTH", "Monero wallet authentication failed")
+    }
+
+    pub(crate) fn node_unavailable() -> Self {
+        Self::new("NODE_UNAVAILABLE", "Monero node is unavailable")
+    }
+
     pub fn code(&self) -> &'static str {
         self.code
     }
