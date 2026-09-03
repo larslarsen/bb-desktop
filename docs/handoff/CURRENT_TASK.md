@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 VIEWING/RECEIVER SOURCE AUTHORIZED
+State: PHASE C SLICE 5 SOURCE CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_RECEIVER.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_RECEIVER.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -304,6 +304,14 @@ Slice 4 is accepted at `3aed346e`, with its evidence corrected at `118cd61a`, in
 Only the linked Slice-5 viewing/fresh-receiver source handoff is authorized to Grok 4.6
 High. Hermes execution/integration, broader/final acceptance, and the real offline
 local-Monero gate remain unauthorized pending reviewer source acceptance.
+Grok's first Slice-5 drop is rejected at High in
+[BBD-WAL-007-SLICE-05-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-SOURCE-REVIEW-01.md).
+Its production receiver is disconnected from the account-owned authenticated child,
+production viewing is absent, persistence faults bypass the named production stages,
+durability failures do not latch unavailable, loaded bindings are incompletely proved,
+FULL drift is healed, the model boundary is circumvented, and test roots are unsafe
+across reruns. Grok 4.6 High alone may make the bounded eight-path Correction 01. Hermes,
+Sol, Spark, tests, and execution/integration remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
