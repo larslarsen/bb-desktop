@@ -10,8 +10,8 @@ Read completely before acting: `AGENTS.md`, `TESTING.md`,
 `docs/engineering/DEVELOPMENT_ROLES.md`, `docs/engineering/HERMES_JR_DEV_ROUTING.md`,
 `tickets/BBD-WAL-007.md`, Test-Source Review 04, Expected Red 02, Slice-4 Acceptance
 01, the original Slice-5 handoff, all Slice-5 correction handoffs and source reviews,
-the complete accepted eight-path drop, the frozen receiver test, and
-`docs/handoff/CURRENT_TASK.md`.
+the complete accepted eight-path drop, the frozen receiver test, the Slice-5
+Format-Correction-01 Source Review, and `docs/handoff/CURRENT_TASK.md`.
 
 ## Sole task and first-mismatch stop
 
@@ -34,20 +34,26 @@ Require:
 
 - `HEAD == origin/master ==` the protected governance parent;
 - a clean index;
-- worktree changes consisting of exactly the eight paths and identities below;
+- worktree changes consisting of exactly the eight source paths and identities below
+  plus the frozen Hermes stop draft named after the table;
 - no other tracked or untracked path; and
 - tracked and untracked-addition whitespace checks clean before execution.
 
 | Path | Lines | SHA-256 |
 | --- | ---: | --- |
-| `wallet-broker/src/xmr.rs` | 8 | `dbcb6133b19f92bc0b0d99aa6ec82d7a55400f553b85c258d583a6584726c7ff` |
+| `wallet-broker/src/xmr.rs` | 8 | `78107f241bb4cb8f02ab4168cbc81a01fc90cc75c80328a2677f819d7c06adce` |
 | `wallet-broker/src/xmr/model.rs` | 214 | `2a2d3ba1ce453aca65138df402bde3e7f1fee997d5d069024cb1beb8102152cb` |
-| `wallet-broker/src/xmr/account.rs` | 3,374 | `8ab5650246afc1a657a91b7b013aa1c79995ee60ce4d78e0a34404db0adb05f6` |
-| `wallet-broker/src/xmr/process.rs` | 1,968 | `ad9d77bbc73cc2e19075fb0b488ddc9961f8dfac521f80f06f431aa08843cd42` |
-| `wallet-broker/src/xmr/rpc.rs` | 2,582 | `302a0d79869df8310973de86784ac138bb49400c174d71c2f15eee3dfd311c55` |
-| `wallet-broker/src/xmr/store.rs` | 1,916 | `b3e66a34571a1801431956f526fef33b923eef645c13c099904dedbad922b018` |
-| `wallet-broker/src/xmr/receiver.rs` | 870 | `fb1ab7ff4210a09612de450b2ed5650f215b2d2a8ca20c868bc16b9e025ca23e` |
-| `wallet-broker/src/xmr/test_support.rs` | 6,027 | `c83fa81b0bfbec811e1b1a9c254c2f786df3b5ed3739f1be9bd7e2ac42ee62e8` |
+| `wallet-broker/src/xmr/account.rs` | 3,375 | `5dcad3d450a2e5d8d780e7e490111c33ba06da6275d7d1ca84e5f76dde09cddb` |
+| `wallet-broker/src/xmr/process.rs` | 1,964 | `66f0aae7fd0b507cbadc27628d0b1c26ee0033d90891c294721c11a00be9dd2d` |
+| `wallet-broker/src/xmr/rpc.rs` | 2,576 | `1bbfdf3ec58f89728b2eb169e9d49c53512eb3b108e5c17f7b02bf2634fada33` |
+| `wallet-broker/src/xmr/store.rs` | 1,904 | `08f7678c8fa5ce85d313c28e9b1ac79b42698ae6ead80c5e7e994f878d6069cd` |
+| `wallet-broker/src/xmr/receiver.rs` | 871 | `4a1fd4ddd8025ea3c64c443d2746f319e91e609526d00ef912548fbd20d833f0` |
+| `wallet-broker/src/xmr/test_support.rs` | 6,019 | `a815ab198559e7942d1c91ce0466a52d3b751631dba6dd80d5044682ec90cf33` |
+
+Also require the frozen untracked Hermes stop draft at
+`docs/testing/BBD-WAL-007-SLICE-05-GREEN-01.md`, 59 lines and SHA-256
+`20f07f0b44dae0f006e192d91b717b541487a857d4d920047bbfd68818705637`.
+Do not edit or delete it before exact success.
 
 Also require these committed/frozen identities:
 
@@ -110,8 +116,8 @@ Require exit 101, no warning or compile diagnostic, and exactly the selected tes
 failing with 0 passed, 0 ignored, 0 measured, and 14 filtered out because suppressing
 the durable replay return caused the replay attempt to continue instead of returning
 the stored binding. Immediately restore the original line and prove
-`wallet-broker/src/xmr/receiver.rs` is restored byte-for-byte to 870 lines and SHA-256
-`fb1ab7ff4210a09612de450b2ed5650f215b2d2a8ca20c868bc16b9e025ca23e`.
+`wallet-broker/src/xmr/receiver.rs` is restored byte-for-byte to 871 lines and SHA-256
+`4a1fd4ddd8025ea3c64c443d2746f319e91e609526d00ef912548fbd20d833f0`.
 Never stage or commit the temporary mutation.
 
 ## Exact green sequence
@@ -152,13 +158,14 @@ No accepted source/test file may mutate during these commands.
 
 ## Exact-success integration
 
-Only on exact success, create `docs/testing/BBD-WAL-007-SLICE-05-GREEN-01.md`. Record
-Hermes version/provider/model, the disk-backed filesystem fact, protected identities,
-formatter/no-mutation result, the warning-free temporary falsification and exact
-restoration proof, every normalized green result and test count, scope, and prohibited-
-action confirmation. Do not record a local Monero path, artifact/cache path,
-environment value, port, credential, process ID, seed, primary address, receiver, or
-raw sensitive output.
+Only on exact success, replace the frozen stop draft at
+`docs/testing/BBD-WAL-007-SLICE-05-GREEN-01.md` with the complete green evidence.
+Record Hermes version/provider/model, the disk-backed filesystem fact, protected
+identities, formatter/no-mutation result, the warning-free temporary falsification and
+exact restoration proof, every normalized green result and test count, scope, and
+prohibited-action confirmation. Do not record a local Monero path, artifact/cache
+path, environment value, port, credential, process ID, seed, primary address,
+receiver, or raw sensitive output.
 
 Update `docs/handoff/CURRENT_TASK.md` to
 `PHASE C SLICE 5 GREEN 01 COMPLETE — REVIEW REQUIRED`, linking the evidence while
