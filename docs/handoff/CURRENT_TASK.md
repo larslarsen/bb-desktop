@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 FORMAT CORRECTION 03 AUTHORIZED
+State: PHASE C SLICE 4 FORMAT CORRECTION 03 ACCEPTED — HERMES GREEN RESUME 07 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_04_FORMAT_CORRECTION_03.md](CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_04_FORMAT_CORRECTION_03.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_07.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_07.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -278,6 +278,11 @@ Hermes Resume 06 stopped at the two-region formatter mismatch recorded in
 [BBD-WAL-007-SLICE-04-GREEN-RESUME-06-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-06-STOP-REVIEW-01.md).
 Codex Spark High alone may apply those exact two mechanical hunks. Hermes, Grok, Sol,
 tests, and further execution are unauthorized pending source review.
+Spark's exact two-region correction is accepted in
+[BBD-WAL-007-SLICE-04-FORMAT-CORRECTION-03-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-FORMAT-CORRECTION-03-SOURCE-REVIEW-01.md).
+Hermes alone may run Green Resume 07 and integrate only on exact success. Grok, Spark,
+Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate are not
+authorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
