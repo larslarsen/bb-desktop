@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 GREEN CORRECTION 02 ACCEPTED — HERMES GREEN RESUME 03 AUTHORIZED
+State: PHASE C SLICE 4 FORMAT CORRECTION 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_03.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_03.md)
+[CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_04_FORMAT_CORRECTION_02.md](CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_04_FORMAT_CORRECTION_02.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -242,6 +242,11 @@ correction is accepted for execution in
 Hermes alone may run Green Resume 03, strictly sequentially and without altered
 commands, and integrate only on exact success. Grok, Sol, Slice 5, broader/final
 acceptance, and the real offline local-Monero gate are not authorized.
+Hermes Resume 03 stopped on the formatter mismatch recorded in
+[BBD-WAL-007-SLICE-04-GREEN-RESUME-03-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-03-STOP-REVIEW-01.md).
+Codex Spark High alone may apply the formatter's exact three mechanical replacements
+in `xmr/test_support.rs`. Hermes, Grok, Sol, and further execution are unauthorized
+pending reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
