@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 GREEN 01 INTEGRATED — EVIDENCE CORRECTION AUTHORIZED
+State: PHASE C SLICE 4 GREEN 01 EVIDENCE CORRECTED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes, documentation only
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -291,6 +291,14 @@ requires the documentation-only corrections in
 Hermes alone may correct the two documentation paths. Source/tests, execution, Grok,
 Spark, Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate
 are not authorized.
+Hermes completed the documentation-only evidence correction in
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md).
+The corrected evidence is recorded in
+[BBD-WAL-007-SLICE-04-GREEN-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01.md).
+The XHigh evidence review requiring these corrections is
+[BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md).
+The documentation-only correction stopped with source and integration closed pending
+reviewer acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
