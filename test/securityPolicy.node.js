@@ -2319,6 +2319,19 @@ const WAL006_ALLOWED_RUST_SOURCE_PATHS = [
   'wallet-broker/src/zec/store.rs',
   'wallet-broker/src/zec/test_support.rs',
 ];
+const WAL008_TEST_TARGETS = [
+  'zec_hardware',
+];
+const WAL008_ZEC_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/zec.rs',
+  'wallet-broker/src/zec/address.rs',
+  'wallet-broker/src/zec/fixture.rs',
+  'wallet-broker/src/zec/hardware.rs',
+  'wallet-broker/src/zec/prepare.rs',
+  'wallet-broker/src/zec/scan.rs',
+  'wallet-broker/src/zec/store.rs',
+  'wallet-broker/src/zec/test_support.rs',
+];
 
 test('WAL-006 manifest requires six exact defaults-off pins and the minimum direct feature union', () => {
   const policy = loadPolicy();
@@ -2567,7 +2580,7 @@ test('WAL-006 feature policy distinguishes compiled upstream PCZT capability fro
   }
 });
 
-test('WAL-006 requires the exact bounded Phase-C ZEC production inventory', () => {
+test('WAL-006 preserves the exact historical seven-path Phase-C ZEC production inventory', () => {
   const policy = loadPolicy();
   assert.deepStrictEqual(policy.WAL006_ALLOWED_RUST_SOURCE_PATHS, WAL006_ALLOWED_RUST_SOURCE_PATHS);
   assert.strictEqual(typeof policy.checkWal006RustSourceInventory, 'function');
@@ -2587,8 +2600,14 @@ test('WAL-006 requires the exact bounded Phase-C ZEC production inventory', () =
   const actual = rustSources
     .filter((relative) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(relative))
     .sort();
-  assert.deepStrictEqual(actual, WAL006_ALLOWED_RUST_SOURCE_PATHS);
-  policy.checkWal006RustSourceInventory(actual);
+  for (const historical of WAL006_ALLOWED_RUST_SOURCE_PATHS) {
+    assert.ok(actual.includes(historical), `current ZEC inventory omits historical ${historical}`);
+  }
+  assert.deepStrictEqual(
+    actual.filter((relative) => WAL006_ALLOWED_RUST_SOURCE_PATHS.includes(relative)),
+    WAL006_ALLOWED_RUST_SOURCE_PATHS
+  );
+  policy.checkWal006RustSourceInventory(WAL006_ALLOWED_RUST_SOURCE_PATHS);
   for (const unlisted of [
     'wallet-broker/src/zec_network.rs',
     'wallet-broker/src/zec/network.rs',
@@ -2643,6 +2662,156 @@ test('WAL-006 policy rejects live-network and authority-bearing Rust snippets wi
       'zcp-builder',
     ]
   );
+});
+
+test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy inventory', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  const hardwareTargetBlock = [
+    '[[test]]',
+    'name = "zec_hardware"',
+    'path = "tests/zec_hardware.rs"',
+  ].join('\n');
+  assert.deepStrictEqual(WAL008_TEST_TARGETS, ['zec_hardware']);
+  assert.strictEqual(
+    manifestText.split(hardwareTargetBlock).length - 1,
+    1,
+    'manifest must contain exactly one WAL-008 zec_hardware target block'
+  );
+  const manifestTargets = [...manifestText.matchAll(
+    /\[\[test\]\]\nname = "([^"]+)"\npath = "([^"]+)"/g
+  )].map((match) => `${match[1]}:${match[2]}`);
+  const hardwareTargetIndex = manifestTargets.indexOf('zec_hardware:tests/zec_hardware.rs');
+  assert.ok(hardwareTargetIndex > 0, 'WAL-008 hardware target is absent from manifest order');
+  assert.deepStrictEqual(
+    manifestTargets.slice(hardwareTargetIndex - 1, hardwareTargetIndex + 2),
+    [
+      'zec_hygiene:tests/zec_hygiene.rs',
+      'zec_hardware:tests/zec_hardware.rs',
+      'xmr_distribution:tests/xmr_distribution.rs',
+    ],
+    'WAL-008 hardware target is not in the reviewed manifest order'
+  );
+
+  assert.deepStrictEqual(policy.WAL008_TEST_TARGETS, WAL008_TEST_TARGETS);
+  assert.deepStrictEqual(
+    policy.WAL008_ZEC_RUST_SOURCE_PATHS,
+    WAL008_ZEC_RUST_SOURCE_PATHS
+  );
+  assert.strictEqual(typeof policy.checkWal008RustSourceInventory, 'function');
+  policy.checkWalletBrokerManifest(manifestText, {
+    requireLibrary: true, requireLockfile: false,
+  });
+
+  const removedTarget = replaceOnce(manifestText, `${hardwareTargetBlock}\n\n`, '');
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(removedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    /WAL-008|Zcash|hardware|manifest|target/i
+  );
+  const renamedTarget = replaceOnce(
+    manifestText,
+    'name = "zec_hardware"\npath = "tests/zec_hardware.rs"',
+    'name = "zec_hardware_renamed"\npath = "tests/zec_hardware.rs"'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(renamedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    /WAL-008|Zcash|hardware|manifest|target/i
+  );
+  const duplicatedTarget = replaceOnce(
+    manifestText,
+    hardwareTargetBlock,
+    `${hardwareTargetBlock}\n\n${hardwareTargetBlock}`
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(duplicatedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    /WAL-008|Zcash|hardware|manifest|target|duplicate/i
+  );
+
+  assert.strictEqual(WAL008_ZEC_RUST_SOURCE_PATHS.length, 8);
+  assert.strictEqual(
+    new Set(WAL008_ZEC_RUST_SOURCE_PATHS).size,
+    WAL008_ZEC_RUST_SOURCE_PATHS.length
+  );
+  assert.deepStrictEqual(
+    [...WAL008_ZEC_RUST_SOURCE_PATHS].sort(),
+    WAL008_ZEC_RUST_SOURCE_PATHS
+  );
+  const sourceRoot = path.join(repoRoot, 'wallet-broker', 'src');
+  const rustSources = [];
+  const collectRustSources = (directory, relative) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const childRelative = path.posix.join(relative, entry.name);
+      if (entry.isDirectory()) {
+        collectRustSources(path.join(directory, entry.name), childRelative);
+      } else if (entry.isFile() && entry.name.endsWith('.rs')) {
+        rustSources.push(`wallet-broker/src/${childRelative}`);
+      }
+    }
+  };
+  collectRustSources(sourceRoot, '');
+  const actual = rustSources
+    .filter((relative) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(relative))
+    .sort();
+  assert.deepStrictEqual(actual, WAL008_ZEC_RUST_SOURCE_PATHS);
+  policy.checkWal008RustSourceInventory(WAL008_ZEC_RUST_SOURCE_PATHS);
+  assertRejects(
+    () => policy.checkWal008RustSourceInventory(
+      WAL008_ZEC_RUST_SOURCE_PATHS.filter(
+        (relative) => relative !== 'wallet-broker/src/zec/hardware.rs'
+      )
+    ),
+    /WAL-008|Zcash|source|inventory|missing|hardware/i
+  );
+  assertRejects(
+    () => policy.checkWal008RustSourceInventory([
+      ...WAL008_ZEC_RUST_SOURCE_PATHS,
+      'wallet-broker/src/zec/unlisted.rs',
+    ].sort()),
+    /WAL-008|Zcash|source|inventory|unlisted|extra|unknown/i
+  );
+  assertRejects(
+    () => policy.checkWal008RustSourceInventory([
+      ...WAL008_ZEC_RUST_SOURCE_PATHS,
+      'wallet-broker/src/zec/hardware.rs',
+    ].sort()),
+    /WAL-008|Zcash|source|inventory|duplicate/i
+  );
+  const malformed = [...WAL008_ZEC_RUST_SOURCE_PATHS];
+  malformed[0] = null;
+  assertRejects(
+    () => policy.checkWal008RustSourceInventory(malformed),
+    /WAL-008|Zcash|source|inventory|malformed|string/i
+  );
+  const wrongOrder = [...WAL008_ZEC_RUST_SOURCE_PATHS];
+  [wrongOrder[0], wrongOrder[1]] = [wrongOrder[1], wrongOrder[0]];
+  assertRejects(
+    () => policy.checkWal008RustSourceInventory(wrongOrder),
+    /WAL-008|Zcash|source|inventory|order|sorted/i
+  );
+
+  const hardwareRelative = 'wallet-broker/src/zec/hardware.rs';
+  const hardwareSource = fs.readFileSync(path.join(repoRoot, hardwareRelative), 'utf8');
+  assert.ok(hardwareSource.trim(), `${hardwareRelative} source is empty`);
+  policy.checkRustWalletSource(hardwareSource, hardwareRelative);
+  for (const [label, mutation, rejection] of [
+    ['transport', 'use std::net::TcpStream;', /transport|network|listener|WAL-006|Zcash/i],
+    ['signing', 'pczt.sign(spending_key);', /sign|authority|WAL-006|Zcash/i],
+    ['broadcast', 'broadcast(raw_transaction);', /broadcast|authority|WAL-006|Zcash/i],
+    ['mainnet', 'let network = Network::MainNetwork;', /mainnet|authority|WAL-006|Zcash/i],
+  ]) {
+    const mutated = `${hardwareSource}\n${mutation}\n`;
+    assert.notStrictEqual(mutated, hardwareSource, `${label} mutation did not change hardware source`);
+    assertRejects(
+      () => policy.checkRustWalletSource(mutated, hardwareRelative),
+      rejection
+    );
+  }
 });
 
 const QUOTE_WORKER_PATHS = [
