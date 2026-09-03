@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 SOURCE CORRECTION 01 SOL FILL-IN AUTHORIZED
+State: PHASE C SLICE 5 SOURCE CORRECTION 02 SOL FILL-IN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_02.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_02.md)
+
+Sol's Correction-01 drop is rejected in
+[BBD-WAL-007-SLICE-05-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-01-SOURCE-REVIEW-01.md): the live view cannot emit
+the required locked/unavailable state snapshots, and the test reopen helper transfers a
+raw path rather than exact cleanup ownership. Sol alone may make the two-path focused
+Correction 02. Hermes execution/integration remains unauthorized.
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
