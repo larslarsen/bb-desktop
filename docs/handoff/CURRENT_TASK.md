@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: EXPECTED-RED EVIDENCE CORRECTION 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
+State: PHASE C SLICE 01 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,17 +18,15 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_008_PHASE_C_SLICE_01.md](CODEX_SOL_BBD_WAL_008_PHASE_C_SLICE_01.md)
 
-The expected-red execution and exact four-path integration at `eda78545` are valid,
-but the evidence mistypes one digit of the manifest hash. Hermes alone may correct the
-exact evidence field and update this current-task record under the active handoff.
-Source edits, execution, production work, other actors, broader gates, real-device
-work, and WAL-007 execution remain unauthorized pending reviewer acceptance.
-
-Hermes completed the documentation-only evidence correction in
-[HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md).
-Both the evidence file and this current-task record await reviewer acceptance.
+The Phase-A contract and corrected expected red are accepted in
+[BBD-WAL-008-PHASE-A-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-PHASE-A-EXPECTED-RED-ACCEPTANCE-01.md).
+Grok's owner-reported weekly exhaustion activates the documented fill-in. Sol High
+alone may author the three-path core capability/route slice and fail-closed compile
+scaffolding under the active handoff, then stop without execution or Git. Persistence,
+Hermes, other actors, real-device work, signing, broader gates, and WAL-007 execution
+remain unauthorized pending reviewer source inspection.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

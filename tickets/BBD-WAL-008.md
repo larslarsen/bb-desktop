@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: EXPECTED-RED EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
+Status: PHASE C SLICE 01 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -257,6 +257,15 @@ evidence mistypes one digit of the manifest SHA-256. The bounded finding is reco
 `docs/testing/BBD-WAL-008-PHASE-A-EXPECTED-RED-01-EVIDENCE-REVIEW-01.md`. Hermes alone
 may correct the exact evidence field and current-task state. Production source and all
 execution remain unauthorized pending reviewer acceptance.
+
+## Reviewer acceptance decision 07
+
+The exact Phase-A test contract and expected-red result are accepted at `eda78545`,
+with its evidence hash corrected at `2eb897b0`, in
+`docs/testing/BBD-WAL-008-PHASE-A-EXPECTED-RED-ACCEPTANCE-01.md`. Because Grok's weekly
+usage remains exhausted, Codex Sol High alone may author the three-path Phase-C Slice
+01 core capability/route source. Persistence, hardware I/O, real-device pins, signing,
+execution, integration, and broader gates remain unauthorized pending source review.
 
 ## Acceptance boundary
 
