@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN RESUME 04 HERMES AUTHORIZED
+State: PHASE C SLICE 5 GREEN 01 COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -19,6 +19,11 @@ Owner decision:
 
 Active handoff:
 [HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_04.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_04.md)
+
+Hermes completed Green Resume 04 and recorded the complete green evidence in
+[BBD-WAL-007-SLICE-05-GREEN-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-01.md).
+The implementation and execution are accepted pending reviewer inspection.
+Broader/final acceptance and the real offline local-Monero gate remain unauthorized.
 
 Sol's exact two-path Clippy correction is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md).

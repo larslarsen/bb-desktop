@@ -38,6 +38,53 @@ pub enum XmrNetwork {
     Testnet,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NodeState {
+    Unavailable,
+    Syncing,
+    Ready,
+}
+
+impl NodeState {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Unavailable => "NODE_UNAVAILABLE",
+            Self::Syncing => "NODE_SYNCING",
+            Self::Ready => "READY",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WalletState {
+    Unavailable,
+    Locked,
+    Refreshing,
+    Ready,
+}
+
+impl WalletState {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Unavailable => "UNAVAILABLE",
+            Self::Locked => "LOCKED",
+            Self::Refreshing => "WALLET_REFRESHING",
+            Self::Ready => "READY",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DeviceState {
+    NotApplicable,
+}
+
+impl DeviceState {
+    pub const fn as_str(self) -> &'static str {
+        "NOT_APPLICABLE"
+    }
+}
+
 impl XmrNetwork {
     pub(crate) fn parse(value: &str) -> Result<Self, XmrError> {
         match value {
@@ -122,6 +169,22 @@ impl XmrError {
 
     pub(crate) fn node_unavailable() -> Self {
         Self::new("NODE_UNAVAILABLE", "Monero node is unavailable")
+    }
+
+    pub(crate) fn locked() -> Self {
+        Self::new("LOCKED", "Monero wallet is locked")
+    }
+
+    pub(crate) fn node_syncing() -> Self {
+        Self::new("NODE_SYNCING", "Monero node is still syncing")
+    }
+
+    pub(crate) fn watch_only() -> Self {
+        Self::new("WATCH_ONLY", "Monero watch-only wallet is unavailable")
+    }
+
+    pub(crate) fn wrong_network() -> Self {
+        Self::new("WRONG_NETWORK", "Monero wallet network does not match")
     }
 
     pub fn code(&self) -> &'static str {

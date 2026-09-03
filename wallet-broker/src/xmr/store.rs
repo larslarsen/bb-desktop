@@ -250,6 +250,14 @@ impl StoredIdentity {
         self.greatest_issuance_sequence
     }
 
+    pub fn set_greatest_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        if sequence < 0 {
+            return Err(XmrError::state_corrupt());
+        }
+        self.greatest_issuance_sequence = sequence;
+        self.validate()
+    }
+
     pub fn matches(&self, other: &Self) -> bool {
         self.schema_version == other.schema_version
             && self.account_id == other.account_id
@@ -260,6 +268,88 @@ impl StoredIdentity {
             && self
                 .primary_address
                 .expose(|left| other.primary_address.expose(|right| left == right))
+    }
+}
+
+pub(crate) struct StoredReceiver {
+    request_id: String,
+    account_index: u32,
+    subaddress_index: u32,
+    subaddress: SecretBytes,
+    issued_at_sequence: i64,
+}
+
+impl StoredReceiver {
+    pub fn new(
+        request_id: String,
+        account_index: u32,
+        subaddress_index: u32,
+        subaddress: &str,
+        issued_at_sequence: i64,
+    ) -> Result<Self, XmrError> {
+        let receiver = Self {
+            request_id,
+            account_index,
+            subaddress_index,
+            subaddress: SecretBytes::new(subaddress.as_bytes().to_vec())
+                .map_err(|_| XmrError::state_corrupt())?,
+            issued_at_sequence,
+        };
+        receiver.validate()?;
+        Ok(receiver)
+    }
+
+    pub fn validate(&self) -> Result<(), XmrError> {
+        if self.request_id.len() != 32
+            || !self
+                .request_id
+                .bytes()
+                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+        {
+            return Err(XmrError::state_corrupt());
+        }
+        if self.account_index != 0 || self.subaddress_index == 0 || self.issued_at_sequence <= 0 {
+            return Err(XmrError::state_corrupt());
+        }
+        let address_ok = self.subaddress.expose(primary_bytes_are_well_formed);
+        if !address_ok {
+            return Err(XmrError::state_corrupt());
+        }
+        Ok(())
+    }
+
+    pub fn request_id(&self) -> &str {
+        &self.request_id
+    }
+
+    pub fn account_index(&self) -> u32 {
+        self.account_index
+    }
+
+    pub fn subaddress_index(&self) -> u32 {
+        self.subaddress_index
+    }
+
+    pub fn issued_at_sequence(&self) -> i64 {
+        self.issued_at_sequence
+    }
+
+    pub fn subaddress_text(&self) -> Result<Zeroizing<String>, XmrError> {
+        self.subaddress
+            .expose(|bytes| utf8(bytes).map(|value| Zeroizing::new(value.to_owned())))
+    }
+}
+
+impl std::fmt::Debug for StoredReceiver {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("StoredReceiver")
+            .field("request_id", &"[REDACTED]")
+            .field("account_index", &self.account_index)
+            .field("subaddress_index", &self.subaddress_index)
+            .field("subaddress", &"[REDACTED]")
+            .field("issued_at_sequence", &self.issued_at_sequence)
+            .finish()
     }
 }
 
@@ -293,11 +383,40 @@ pub(crate) trait StoreSurface {
     fn sync_file(&mut self) -> Result<(), XmrError>;
     fn sync_directory(&mut self) -> Result<(), XmrError>;
     fn reopen_existing(&mut self) -> Result<(), XmrError>;
+    fn lookup_receiver(&mut self, request_id: &str) -> Result<Option<StoredReceiver>, XmrError>;
+    fn insert_receiver(&mut self, receiver: &StoredReceiver) -> Result<(), XmrError>;
+    fn update_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError>;
+    fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError>;
+    fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError>;
+    fn delete_receiver(&mut self, request_id: &str) -> Result<(), XmrError>;
 }
 
 pub(crate) struct AccountStore<S: StoreSurface> {
     surface: S,
     initialized: bool,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) struct ReceiverPersistenceProof {
+    committed: bool,
+    file_synced: bool,
+    directory_synced: bool,
+    reopened: bool,
+    binding_proved: bool,
+}
+
+impl ReceiverPersistenceProof {
+    pub(crate) fn committed(self) -> bool {
+        self.committed
+    }
+
+    pub(crate) fn durable_and_proved(self) -> bool {
+        self.committed
+            && self.file_synced
+            && self.directory_synced
+            && self.reopened
+            && self.binding_proved
+    }
 }
 
 impl<S: StoreSurface> AccountStore<S> {
@@ -309,7 +428,7 @@ impl<S: StoreSurface> AccountStore<S> {
     }
 
     pub fn attach_existing(mut surface: S) -> Result<Self, XmrError> {
-        configure_full_synchronous(&mut surface)?;
+        require_full_synchronous(&mut surface)?;
         verify_schema(&mut surface)?;
         Ok(Self {
             surface,
@@ -319,6 +438,10 @@ impl<S: StoreSurface> AccountStore<S> {
 
     pub fn surface_mut(&mut self) -> &mut S {
         &mut self.surface
+    }
+
+    pub(crate) fn into_surface(self) -> S {
+        self.surface
     }
 
     pub fn initialize(&mut self) -> Result<(), XmrError> {
@@ -374,12 +497,225 @@ impl<S: StoreSurface> AccountStore<S> {
     }
 
     pub fn load_identity(&mut self) -> Result<StoredIdentity, XmrError> {
-        configure_full_synchronous(&mut self.surface)?;
+        require_full_synchronous(&mut self.surface)?;
         verify_schema(&mut self.surface)?;
         let identity = self.surface.load_identity()?;
         identity.validate()?;
         Ok(identity)
     }
+
+    pub fn lookup_receiver(
+        &mut self,
+        request_id: &str,
+    ) -> Result<Option<StoredReceiver>, XmrError> {
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        let receiver = self.surface.lookup_receiver(request_id)?;
+        if let Some(receiver) = &receiver {
+            receiver.validate()?;
+        }
+        Ok(receiver)
+    }
+
+    pub fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError> {
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        let receivers = self.surface.list_receivers()?;
+        for receiver in &receivers {
+            receiver.validate()?;
+        }
+        Ok(receivers)
+    }
+
+    pub fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError> {
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        self.surface.max_subaddress_index()
+    }
+
+    pub fn set_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        if sequence < 0 {
+            return Err(XmrError::limit());
+        }
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        self.surface.begin()?;
+        let result = self.surface.update_issuance_sequence(sequence);
+        match result {
+            Ok(()) => self.surface.commit()?,
+            Err(error) => {
+                let _ = self.surface.rollback();
+                return Err(error);
+            }
+        }
+        self.surface.sync_file()?;
+        self.surface.sync_directory()?;
+        Ok(())
+    }
+
+    pub fn persist_receiver(
+        &mut self,
+        receiver: &StoredReceiver,
+    ) -> Result<ReceiverPersistenceProof, XmrError> {
+        receiver.validate()?;
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        let mut identity = self.surface.load_identity()?;
+        identity.validate()?;
+        if receiver.issued_at_sequence() <= identity.greatest_issuance_sequence() {
+            return Err(XmrError::state_corrupt());
+        }
+        identity.set_greatest_issuance_sequence(receiver.issued_at_sequence())?;
+        self.surface
+            .begin()
+            .map_err(|_| XmrError::state_corrupt())?;
+        let result: Result<(), XmrError> = (|| {
+            self.surface.insert_receiver(receiver)?;
+            self.surface
+                .update_issuance_sequence(receiver.issued_at_sequence())?;
+            Ok(())
+        })();
+        match result {
+            Ok(()) => {
+                if self.surface.commit().is_err() {
+                    let _ = self.surface.rollback();
+                    return Err(XmrError::state_corrupt());
+                }
+            }
+            Err(_) => {
+                let _ = self.surface.rollback();
+                return Err(XmrError::state_corrupt());
+            }
+        }
+        self.surface
+            .sync_file()
+            .map_err(|_| XmrError::state_corrupt())?;
+        self.surface
+            .sync_directory()
+            .map_err(|_| XmrError::state_corrupt())?;
+        self.surface
+            .reopen_existing()
+            .map_err(|_| XmrError::state_corrupt())?;
+        require_full_synchronous(&mut self.surface).map_err(|_| XmrError::state_corrupt())?;
+        verify_schema(&mut self.surface).map_err(|_| XmrError::state_corrupt())?;
+        let loaded = self
+            .surface
+            .lookup_receiver(receiver.request_id())?
+            .ok_or_else(XmrError::state_corrupt)?;
+        loaded.validate()?;
+        let loaded_address = loaded.subaddress_text()?;
+        let candidate_address = receiver.subaddress_text()?;
+        let proved_identity = self.surface.load_identity()?;
+        proved_identity.validate()?;
+        if loaded.request_id() != receiver.request_id()
+            || loaded.subaddress_index() != receiver.subaddress_index()
+            || loaded.issued_at_sequence() != receiver.issued_at_sequence()
+            || loaded.account_index() != receiver.account_index()
+            || loaded_address.as_str() != candidate_address.as_str()
+            || !proved_identity.matches(&identity)
+        {
+            return Err(XmrError::state_corrupt());
+        }
+        Ok(ReceiverPersistenceProof {
+            committed: true,
+            file_synced: true,
+            directory_synced: true,
+            reopened: true,
+            binding_proved: true,
+        })
+    }
+
+    pub fn delete_uncommitted_receiver(&mut self, request_id: &str) -> Result<(), XmrError> {
+        self.surface.begin()?;
+        let result = self.surface.delete_receiver(request_id);
+        match result {
+            Ok(()) => self.surface.commit()?,
+            Err(error) => {
+                let _ = self.surface.rollback();
+                return Err(error);
+            }
+        }
+        self.surface.sync_file()?;
+        self.surface.sync_directory()?;
+        Ok(())
+    }
+
+    pub fn prove_durability(&mut self) -> Result<(), XmrError> {
+        require_full_synchronous(&mut self.surface)
+    }
+
+    pub fn reopen(&mut self) -> Result<StoredIdentity, XmrError> {
+        self.surface.reopen_existing()?;
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        let identity = self.surface.load_identity()?;
+        identity.validate()?;
+        Ok(identity)
+    }
+
+    pub fn inspect_receiver_schema(
+        &mut self,
+        file_mode: u32,
+    ) -> Result<ReceiverSchemaView, XmrError> {
+        require_full_synchronous(&mut self.surface)?;
+        verify_schema(&mut self.surface)?;
+        let identity = self.surface.load_identity()?;
+        identity.validate()?;
+        let receiver_sql = self.surface.table_sql("receivers")?;
+        if !receiver_sql.contains("CHECK (account_index = 0)")
+            || !receiver_sql.contains("subaddress_index > 0")
+            || !receiver_sql.contains("issued_at_sequence > 0")
+            || !receiver_sql.contains("issued_at_sequence <= 9223372036854775807")
+        {
+            return Err(XmrError::state_corrupt());
+        }
+        Ok(ReceiverSchemaView {
+            schema_version: identity.schema_version(),
+            synchronous: SYNCHRONOUS_FULL,
+            file_mode,
+            account_columns: [
+                "schema_version",
+                "account_id",
+                "network",
+                "primary_address",
+                "greatest_issuance_sequence",
+            ],
+            receiver_columns: [
+                "request_id",
+                "account_index",
+                "subaddress_index",
+                "subaddress",
+                "issued_at_sequence",
+            ],
+            account_id: identity.account_id().to_owned(),
+            network: identity.network().to_owned(),
+            primary_address: identity.primary_address()?.as_str().to_owned(),
+            independent_unique_constraints: vec![
+                vec!["request_id"],
+                vec!["account_index", "subaddress_index"],
+                vec!["subaddress"],
+                vec!["issued_at_sequence"],
+            ],
+            account_index_check: "account_index = 0",
+            subaddress_index_check: "subaddress_index > 0",
+            issuance_sequence_check: "issued_at_sequence > 0 AND issued_at_sequence <= 9223372036854775807",
+        })
+    }
+}
+
+pub struct ReceiverSchemaView {
+    pub schema_version: i64,
+    pub synchronous: &'static str,
+    pub file_mode: u32,
+    pub account_columns: [&'static str; 5],
+    pub receiver_columns: [&'static str; 5],
+    pub account_id: String,
+    pub network: String,
+    pub primary_address: String,
+    pub independent_unique_constraints: Vec<Vec<&'static str>>,
+    pub account_index_check: &'static str,
+    pub subaddress_index_check: &'static str,
+    pub issuance_sequence_check: &'static str,
 }
 
 pub(crate) struct SqliteSurface {
@@ -463,6 +799,30 @@ impl StoreSurface for SqliteSurface {
 
     fn reopen_existing(&mut self) -> Result<(), XmrError> {
         Ok(())
+    }
+
+    fn lookup_receiver(&mut self, request_id: &str) -> Result<Option<StoredReceiver>, XmrError> {
+        lookup_receiver(&self.connection, request_id)
+    }
+
+    fn insert_receiver(&mut self, receiver: &StoredReceiver) -> Result<(), XmrError> {
+        insert_receiver(&self.connection, receiver)
+    }
+
+    fn update_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        update_issuance_sequence(&self.connection, sequence)
+    }
+
+    fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError> {
+        list_receivers(&self.connection)
+    }
+
+    fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError> {
+        max_subaddress_index(&self.connection)
+    }
+
+    fn delete_receiver(&mut self, request_id: &str) -> Result<(), XmrError> {
+        delete_receiver(&self.connection, request_id)
     }
 }
 
@@ -549,6 +909,22 @@ impl PathSqliteSurface {
         }
     }
 
+    pub fn state_file_mode(&self) -> Result<u32, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = self;
+            Err(XmrError::unavailable())
+        }
+        #[cfg(target_os = "linux")]
+        {
+            let metadata = self
+                .state_handle
+                .metadata()
+                .map_err(|_| XmrError::state_corrupt())?;
+            Ok(metadata.permissions().mode() & 0o777)
+        }
+    }
+
     pub fn open_existing(account_directory: &Path, expected_owner: u32) -> Result<Self, XmrError> {
         #[cfg(not(target_os = "linux"))]
         {
@@ -579,7 +955,6 @@ impl PathSqliteSurface {
                 directory_handle,
                 directory_identity,
             };
-            configure_full_synchronous(&mut surface)?;
             let version = surface.query_i64("PRAGMA user_version")?;
             if version != SCHEMA_VERSION {
                 return Err(XmrError::state_corrupt());
@@ -616,7 +991,7 @@ impl PathSqliteSurface {
         self.connection = connection;
         self.state_handle = state_handle;
         self.state_identity = state_identity;
-        configure_full_synchronous(self)?;
+        require_full_synchronous(self)?;
         verify_schema(self)
     }
 }
@@ -784,6 +1159,64 @@ impl StoreSurface for PathSqliteSurface {
         #[cfg(target_os = "linux")]
         self.reopen_linux()
     }
+
+    fn lookup_receiver(&mut self, request_id: &str) -> Result<Option<StoredReceiver>, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = request_id;
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        lookup_receiver(&self.connection, request_id)
+    }
+
+    fn insert_receiver(&mut self, receiver: &StoredReceiver) -> Result<(), XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = receiver;
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        insert_receiver(&self.connection, receiver)
+    }
+
+    fn update_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = sequence;
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        update_issuance_sequence(&self.connection, sequence)
+    }
+
+    fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        list_receivers(&self.connection)
+    }
+
+    fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        max_subaddress_index(&self.connection)
+    }
+
+    fn delete_receiver(&mut self, request_id: &str) -> Result<(), XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = request_id;
+            return Err(XmrError::unavailable());
+        }
+        #[cfg(target_os = "linux")]
+        delete_receiver(&self.connection, request_id)
+    }
 }
 
 pub(crate) fn state_file_name() -> &'static str {
@@ -815,6 +1248,146 @@ fn insert_identity(connection: &Connection, identity: &StoredIdentity) -> Result
                 restore_height.as_slice(),
                 identity.greatest_issuance_sequence(),
             ],
+        )
+        .map_err(|_| XmrError::state_corrupt())?;
+    Ok(())
+}
+
+fn insert_receiver(connection: &Connection, receiver: &StoredReceiver) -> Result<(), XmrError> {
+    receiver.validate()?;
+    let subaddress = receiver.subaddress_text()?;
+    connection
+        .execute(
+            "INSERT INTO receivers (
+                    request_id,
+                    account_index,
+                    subaddress_index,
+                    subaddress,
+                    issued_at_sequence
+                ) VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![
+                receiver.request_id(),
+                i64::from(receiver.account_index()),
+                i64::from(receiver.subaddress_index()),
+                subaddress.as_str(),
+                receiver.issued_at_sequence(),
+            ],
+        )
+        .map_err(|_| XmrError::state_corrupt())?;
+    Ok(())
+}
+
+fn lookup_receiver(
+    connection: &Connection,
+    request_id: &str,
+) -> Result<Option<StoredReceiver>, XmrError> {
+    let row = connection
+        .query_row(
+            "SELECT request_id, account_index, subaddress_index, subaddress, issued_at_sequence
+             FROM receivers WHERE request_id = ?1",
+            [request_id],
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, i64>(1)?,
+                    row.get::<_, i64>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, i64>(4)?,
+                ))
+            },
+        )
+        .optional()
+        .map_err(|_| XmrError::state_corrupt())?;
+    row.map(
+        |(request_id, account_index, subaddress_index, subaddress, sequence)| {
+            let account_index =
+                u32::try_from(account_index).map_err(|_| XmrError::state_corrupt())?;
+            let subaddress_index =
+                u32::try_from(subaddress_index).map_err(|_| XmrError::state_corrupt())?;
+            StoredReceiver::new(
+                request_id,
+                account_index,
+                subaddress_index,
+                &subaddress,
+                sequence,
+            )
+        },
+    )
+    .transpose()
+}
+
+fn list_receivers(connection: &Connection) -> Result<Vec<StoredReceiver>, XmrError> {
+    let mut statement = connection
+        .prepare(
+            "SELECT request_id, account_index, subaddress_index, subaddress, issued_at_sequence
+             FROM receivers ORDER BY issued_at_sequence",
+        )
+        .map_err(|_| XmrError::state_corrupt())?;
+    let rows = statement
+        .query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, i64>(1)?,
+                row.get::<_, i64>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, i64>(4)?,
+            ))
+        })
+        .map_err(|_| XmrError::state_corrupt())?;
+    let mut receivers = Vec::new();
+    for row in rows {
+        let (request_id, account_index, subaddress_index, subaddress, sequence) =
+            row.map_err(|_| XmrError::state_corrupt())?;
+        let account_index = u32::try_from(account_index).map_err(|_| XmrError::state_corrupt())?;
+        let subaddress_index =
+            u32::try_from(subaddress_index).map_err(|_| XmrError::state_corrupt())?;
+        receivers.push(StoredReceiver::new(
+            request_id,
+            account_index,
+            subaddress_index,
+            &subaddress,
+            sequence,
+        )?);
+    }
+    Ok(receivers)
+}
+
+fn max_subaddress_index(connection: &Connection) -> Result<Option<u32>, XmrError> {
+    let value = connection
+        .query_row("SELECT MAX(subaddress_index) FROM receivers", [], |row| {
+            row.get::<_, Option<i64>>(0)
+        })
+        .map_err(|_| XmrError::state_corrupt())?;
+    match value {
+        Some(index) => u32::try_from(index)
+            .map(Some)
+            .map_err(|_| XmrError::state_corrupt()),
+        None => Ok(None),
+    }
+}
+
+fn update_issuance_sequence(connection: &Connection, sequence: i64) -> Result<(), XmrError> {
+    if sequence < 0 {
+        return Err(XmrError::state_corrupt());
+    }
+    let updated = connection
+        .execute(
+            "UPDATE account_identity SET greatest_issuance_sequence = ?1 WHERE slot = 1",
+            params![sequence],
+        )
+        .map_err(|_| XmrError::state_corrupt())?;
+    if updated == 1 {
+        Ok(())
+    } else {
+        Err(XmrError::state_corrupt())
+    }
+}
+
+fn delete_receiver(connection: &Connection, request_id: &str) -> Result<(), XmrError> {
+    connection
+        .execute(
+            "DELETE FROM receivers WHERE request_id = ?1",
+            params![request_id],
         )
         .map_err(|_| XmrError::state_corrupt())?;
     Ok(())
@@ -968,6 +1541,10 @@ fn unique_column_sets(connection: &Connection, table: &str) -> Result<Vec<Vec<St
 
 fn configure_full_synchronous<S: StoreSurface>(surface: &mut S) -> Result<(), XmrError> {
     surface.execute_batch("PRAGMA synchronous = FULL;")?;
+    require_full_synchronous(surface)
+}
+
+fn require_full_synchronous<S: StoreSurface>(surface: &mut S) -> Result<(), XmrError> {
     let value = surface.query_i64("PRAGMA synchronous")?;
     if value == SYNCHRONOUS_FULL_VALUE {
         Ok(())

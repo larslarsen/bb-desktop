@@ -1,6 +1,8 @@
 use std::collections::{BTreeMap, VecDeque};
 use std::ffi::OsStr;
+use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -24,17 +26,27 @@ use crate::xmr::distribution::{
     ExecutableObservation, HashResult, RecordIntegrity, SelectedFileKind, SelectionRecord,
     VERIFIED_VERSION, VerificationStep, decode_digest,
 };
-use crate::xmr::model::XmrError;
+use crate::xmr::model::{NodeState, WalletState, XmrError};
 use crate::xmr::process::{
     DerivedPaths, EntropyOrigin, ProcessCoordinator, ProcessManager, ProcessPort,
     ReadinessObservation, ReservationFailure, WalletRpcProcessPlan, next_os_port_for_test_port,
+};
+use crate::xmr::receiver::{
+    AddressClassification, CreatedSubaddress, FreshReceiver, ProductionViewInput, ReceiverManager,
+    ReceiverPort, SanitizedAccountView, binding_from_stored, build_production_view,
+    initialize_receiver_store, kind_from_identity, open_receiver_store, parse_balance_result,
+    parse_hard_fork_result, stored_from_binding, validate_account_id, validate_network,
+    validate_request_id, validate_view_hard_fork,
 };
 use crate::xmr::rpc::{
     DigestResponseInput, HttpExchangePort, NodeProbeResult, PortFailure, RpcCore, RpcRequest,
     TypedResult, WipeAudit, digest_response_for_test, node_port, probe_node_with,
     request_body_boundary_for_test, request_dispatch_for_test, validate_json_for_test,
 };
-use crate::xmr::store::{AccountStore, ColumnInfo, SqliteSurface, StoreSurface, StoredIdentity};
+use crate::xmr::store::{
+    AccountStore, ColumnInfo, PathSqliteSurface, ReceiverPersistenceProof, ReceiverSchemaView,
+    STATE_FILE_MODE, SqliteSurface, StoreSurface, StoredIdentity, StoredReceiver,
+};
 
 pub use crate::xmr::account::{AccountKind, HostileWalletEntry, SecretExit};
 pub use crate::xmr::model::{HostPlatform, XmrNetwork};
@@ -1391,8 +1403,8 @@ pub struct NodeInfo {
     pub height_without_bootstrap: u64,
 }
 
-#[derive(Clone, Copy)]
-struct HardForkInfoFixture {
+#[derive(Clone, Copy, Debug)]
+pub struct HardForkInfoFixture {
     earliest_height: u64,
     enabled: bool,
     untrusted: bool,
@@ -1402,6 +1414,39 @@ struct HardForkInfoFixture {
     votes: u64,
     threshold: u64,
     state: u64,
+    status: &'static str,
+    extra_member: Option<(&'static str, &'static str)>,
+}
+
+impl HardForkInfoFixture {
+    pub fn valid_stagenet(version: u64) -> Self {
+        Self {
+            earliest_height: 1_000,
+            enabled: true,
+            untrusted: false,
+            version,
+            voting: version,
+            window: 10_080,
+            votes: 0,
+            threshold: 0,
+            state: 1,
+            status: "OK",
+            extra_member: None,
+        }
+    }
+
+    pub fn mutated_stagenet(version: u64, mutation: &str) -> Self {
+        let mut fixture = Self::valid_stagenet(version);
+        match mutation {
+            "status" => fixture.status = "BUSY",
+            "enabled" => fixture.enabled = false,
+            "version-zero" => fixture.version = 0,
+            "version-overflow" => fixture.version = 256,
+            "wrong-network" => fixture.extra_member = Some(("nettype", "mainnet")),
+            _ => panic!("unreviewed hard-fork mutation"),
+        }
+        fixture
+    }
 }
 
 impl NodeInfo {
@@ -1529,17 +1574,7 @@ impl RecordingRpcPort {
             timed_fault: None,
             response_total_bytes: None,
             info: NodeInfo::reviewed(network),
-            hard_fork: HardForkInfoFixture {
-                earliest_height: 1_000,
-                enabled: true,
-                untrusted: false,
-                version: 16,
-                voting: 16,
-                window: 10_080,
-                votes: 0,
-                threshold: 0,
-                state: 1,
-            },
+            hard_fork: HardForkInfoFixture::valid_stagenet(16),
             attempted_ports: Vec::new(),
             operations: Vec::new(),
             upstream_canary: Zeroizing::new(String::new()),
@@ -1912,21 +1947,29 @@ fn valid_result_body(
             include_block_weight_median,
             fault,
         ),
-        "hard_fork_info" => serde_json::json!({
-            "credits": 0,
-            "earliest_height": hard_fork.earliest_height,
-            "enabled": hard_fork.enabled,
-            "state": hard_fork.state,
-            "status": "OK",
-            "threshold": hard_fork.threshold,
-            "top_hash": "synthetic-top-hash",
-            "untrusted": hard_fork.untrusted,
-            "version": hard_fork.version,
-            "votes": hard_fork.votes,
-            "voting": hard_fork.voting,
-            "window": hard_fork.window,
-        })
-        .to_string(),
+        "hard_fork_info" => {
+            let mut object = serde_json::json!({
+                "credits": 0,
+                "earliest_height": hard_fork.earliest_height,
+                "enabled": hard_fork.enabled,
+                "state": hard_fork.state,
+                "status": hard_fork.status,
+                "threshold": hard_fork.threshold,
+                "top_hash": "synthetic-top-hash",
+                "untrusted": hard_fork.untrusted,
+                "version": hard_fork.version,
+                "votes": hard_fork.votes,
+                "voting": hard_fork.voting,
+                "window": hard_fork.window,
+            });
+            if let Some((key, value)) = hard_fork.extra_member {
+                object
+                    .as_object_mut()
+                    .expect("hard-fork object")
+                    .insert(key.to_owned(), serde_json::Value::String(value.to_owned()));
+            }
+            object.to_string()
+        }
         "close_wallet" | "stop_wallet" => "{}".to_owned(),
         _ => "{}".to_owned(),
     });
@@ -3054,6 +3097,30 @@ impl StoreSurface for FaultingSurface {
             return Err(XmrError::state_corrupt());
         }
         self.inner.reopen_existing()
+    }
+
+    fn lookup_receiver(&mut self, request_id: &str) -> Result<Option<StoredReceiver>, XmrError> {
+        self.inner.lookup_receiver(request_id)
+    }
+
+    fn insert_receiver(&mut self, receiver: &StoredReceiver) -> Result<(), XmrError> {
+        self.inner.insert_receiver(receiver)
+    }
+
+    fn update_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        self.inner.update_issuance_sequence(sequence)
+    }
+
+    fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError> {
+        self.inner.list_receivers()
+    }
+
+    fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError> {
+        self.inner.max_subaddress_index()
+    }
+
+    fn delete_receiver(&mut self, request_id: &str) -> Result<(), XmrError> {
+        self.inner.delete_receiver(request_id)
     }
 }
 
@@ -4768,4 +4835,1185 @@ fn hygiene_sha256_hex(bytes: &[u8]) -> String {
         result.push(char::from(DIGITS[usize::from(byte & 0x0f)]));
     }
     result
+}
+
+static RECEIVER_ROOT_SEQ: AtomicU64 = AtomicU64::new(1);
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum BalanceFault {
+    MissingTotal,
+    MissingUnlocked,
+    Stale,
+    Negative,
+    Floating,
+    Overflow,
+    LeadingZero,
+    UnlockedAboveTotal,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ReceiverFault {
+    PrimaryAddress,
+    ZeroIndex,
+    WrongNetwork,
+    ValidateSaysPrimary,
+    ValidateSaysInvalid,
+    GetAddressMismatch,
+    WrongAccountIndex,
+    ReceiverRowWrite,
+    SequenceWrite,
+    FileSync,
+    DirectorySync,
+    Commit,
+    Reopen,
+    SchemaDrift,
+    DuplicateRequest,
+    DuplicateIndex,
+    DuplicateAddress,
+    DuplicateSequence,
+    Rollback,
+    CorruptDatabase,
+    WrongIdentity,
+    SynchronousNotFull,
+    LoadedBindingSubstitution,
+    Locked,
+    NodeSyncing,
+    WalletRefreshing,
+    WrongNetworkRequest,
+    WatchOnlyInitialization,
+    Exhausted,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RpcAddress {
+    pub account_index: u32,
+    pub index: u32,
+    pub address: String,
+}
+
+impl RpcAddress {
+    pub fn valid(index: u32, address: &str) -> Self {
+        Self {
+            account_index: 0,
+            index,
+            address: address.to_owned(),
+        }
+    }
+}
+
+struct ReceiverStoreSurface {
+    inner: PathSqliteSurface,
+    fault: Option<ReceiverFault>,
+}
+
+impl ReceiverStoreSurface {
+    fn new(inner: PathSqliteSurface) -> Self {
+        Self { inner, fault: None }
+    }
+
+    fn state_file_mode(&self) -> Result<u32, XmrError> {
+        self.inner.state_file_mode()
+    }
+}
+
+impl StoreSurface for ReceiverStoreSurface {
+    fn execute_batch(&mut self, sql: &str) -> Result<(), XmrError> {
+        self.inner.execute_batch(sql)
+    }
+
+    fn query_i64(&mut self, sql: &str) -> Result<i64, XmrError> {
+        self.inner.query_i64(sql)
+    }
+
+    fn insert_identity(&mut self, identity: &StoredIdentity) -> Result<(), XmrError> {
+        self.inner.insert_identity(identity)
+    }
+
+    fn load_identity(&mut self) -> Result<StoredIdentity, XmrError> {
+        self.inner.load_identity()
+    }
+
+    fn table_names(&mut self) -> Result<Vec<String>, XmrError> {
+        self.inner.table_names()
+    }
+
+    fn table_sql(&mut self, table: &str) -> Result<String, XmrError> {
+        self.inner.table_sql(table)
+    }
+
+    fn column_info(&mut self, table: &str) -> Result<Vec<ColumnInfo>, XmrError> {
+        self.inner.column_info(table)
+    }
+
+    fn schema_objects(&mut self) -> Result<Vec<(String, String, String)>, XmrError> {
+        self.inner.schema_objects()
+    }
+
+    fn unique_column_sets(&mut self, table: &str) -> Result<Vec<Vec<String>>, XmrError> {
+        self.inner.unique_column_sets(table)
+    }
+
+    fn begin(&mut self) -> Result<(), XmrError> {
+        self.inner.begin()
+    }
+
+    fn commit(&mut self) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::Commit) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.commit()
+        }
+    }
+
+    fn rollback(&mut self) -> Result<(), XmrError> {
+        self.inner.rollback()
+    }
+
+    fn sync_file(&mut self) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::FileSync) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.sync_file()
+        }
+    }
+
+    fn sync_directory(&mut self) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::DirectorySync) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.sync_directory()
+        }
+    }
+
+    fn reopen_existing(&mut self) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::Reopen) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.reopen_existing()
+        }
+    }
+
+    fn lookup_receiver(&mut self, request_id: &str) -> Result<Option<StoredReceiver>, XmrError> {
+        let loaded = self.inner.lookup_receiver(request_id)?;
+        if self.fault == Some(ReceiverFault::LoadedBindingSubstitution) {
+            return loaded
+                .map(|receiver| {
+                    StoredReceiver::new(
+                        receiver.request_id().to_owned(),
+                        receiver.account_index(),
+                        receiver.subaddress_index(),
+                        &synthetic_subaddress(receiver.subaddress_index().saturating_add(1)),
+                        receiver.issued_at_sequence(),
+                    )
+                })
+                .transpose();
+        }
+        Ok(loaded)
+    }
+
+    fn insert_receiver(&mut self, receiver: &StoredReceiver) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::ReceiverRowWrite) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.insert_receiver(receiver)
+        }
+    }
+
+    fn update_issuance_sequence(&mut self, sequence: i64) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::SequenceWrite) {
+            Err(XmrError::state_corrupt())
+        } else {
+            self.inner.update_issuance_sequence(sequence)
+        }
+    }
+
+    fn list_receivers(&mut self) -> Result<Vec<StoredReceiver>, XmrError> {
+        self.inner.list_receivers()
+    }
+
+    fn max_subaddress_index(&mut self) -> Result<Option<u32>, XmrError> {
+        self.inner.max_subaddress_index()
+    }
+
+    fn delete_receiver(&mut self, request_id: &str) -> Result<(), XmrError> {
+        self.inner.delete_receiver(request_id)
+    }
+}
+
+pub struct ViewRig {
+    account_id: String,
+    network: XmrNetwork,
+    kind: AccountKind,
+    node_state: NodeState,
+    wallet_state: WalletState,
+    node_height: Option<u64>,
+    wallet_height: Option<u64>,
+    total: u64,
+    unlocked: u64,
+    balance_value: Option<serde_json::Value>,
+    hard_fork: HardForkInfoFixture,
+    hard_fork_validated: bool,
+    returned: Option<SanitizedAccountView>,
+    substituted: bool,
+}
+
+impl ViewRig {
+    pub fn ready(account: &str, network: XmrNetwork) -> Self {
+        Self {
+            account_id: account.to_owned(),
+            network,
+            kind: AccountKind::Software,
+            node_state: NodeState::Ready,
+            wallet_state: WalletState::Ready,
+            node_height: Some(1_000),
+            wallet_height: Some(1_000),
+            total: 0,
+            unlocked: 0,
+            balance_value: None,
+            hard_fork: HardForkInfoFixture::valid_stagenet(16),
+            hard_fork_validated: false,
+            returned: None,
+            substituted: false,
+        }
+    }
+
+    pub fn with_explicit_states(
+        account: &str,
+        network: XmrNetwork,
+        node_state: NodeState,
+        wallet_state: WalletState,
+        node_height: Option<u64>,
+        wallet_height: Option<u64>,
+    ) -> Self {
+        let mut view = Self::ready(account, network);
+        view.node_state = node_state;
+        view.wallet_state = wallet_state;
+        view.node_height = node_height;
+        view.wallet_height = wallet_height;
+        view.hard_fork = HardForkInfoFixture::valid_stagenet(16);
+        view
+    }
+
+    pub fn script_balances(&mut self, total: u64, unlocked: u64) {
+        self.total = total;
+        self.unlocked = unlocked;
+        self.balance_value = Some(balance_result_value(total, unlocked));
+    }
+
+    pub fn arm_balance_fault(&mut self, fault: BalanceFault) {
+        self.balance_value = Some(balance_fault_value(fault));
+    }
+
+    pub fn script_hard_fork_info(&mut self, hard_fork: HardForkInfoFixture) {
+        self.hard_fork = hard_fork;
+    }
+
+    pub fn snapshot(&mut self) -> Result<SanitizedAccountView, XmrError> {
+        self.returned = None;
+        self.hard_fork_validated = false;
+        self.substituted = false;
+        let (total, unlocked) = if let Some(value) = &self.balance_value {
+            parse_balance_result(value)?
+        } else {
+            (self.total, self.unlocked)
+        };
+        if unlocked > total {
+            return Err(XmrError::protocol_incompatible());
+        }
+        let fork_value = hard_fork_result_value(self.hard_fork);
+        let parsed = parse_hard_fork_result(&fork_value)?;
+        validate_view_hard_fork(&parsed)?;
+        self.hard_fork_validated = true;
+        let view = build_production_view(ProductionViewInput {
+            account_id: &self.account_id,
+            network: self.network,
+            kind: self.kind,
+            node_state: self.node_state,
+            node_height: self.node_height,
+            wallet_available: self.wallet_state != WalletState::Unavailable,
+            wallet_locked: self.wallet_state == WalletState::Locked,
+            wallet_height: self.wallet_height,
+            total_atomic: Some(total),
+            unlocked_atomic: Some(unlocked),
+            hard_fork: Some(&parsed),
+        })?;
+        self.returned = Some(view.clone());
+        Ok(view)
+    }
+
+    pub fn hard_fork_info_was_validated(&self) -> bool {
+        self.hard_fork_validated
+    }
+
+    pub fn returned_snapshot(&self) -> Option<&SanitizedAccountView> {
+        self.returned.as_ref()
+    }
+
+    pub fn substituted_total_for_unlocked(&self) -> bool {
+        self.substituted
+    }
+}
+
+fn balance_result_value(total: u64, unlocked: u64) -> serde_json::Value {
+    serde_json::json!({
+        "balance": total,
+        "unlocked_balance": unlocked,
+        "multisig_import_needed": false,
+        "per_subaddress": [],
+        "blocks_to_unlock": 0,
+        "time_to_unlock": 0,
+    })
+}
+
+fn balance_fault_value(fault: BalanceFault) -> serde_json::Value {
+    match fault {
+        BalanceFault::MissingTotal => serde_json::json!({
+            "unlocked_balance": 1u64,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::MissingUnlocked => serde_json::json!({
+            "balance": 1u64,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::Stale => serde_json::json!({
+            "balance": 1u64,
+            "unlocked_balance": 1u64,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+            "stale": true,
+        }),
+        BalanceFault::Negative => serde_json::json!({
+            "balance": -1,
+            "unlocked_balance": 0,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::Floating => serde_json::json!({
+            "balance": 1.5,
+            "unlocked_balance": 1.0,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::Overflow => serde_json::json!({
+            "balance": "18446744073709551616",
+            "unlocked_balance": 0u64,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::LeadingZero => serde_json::json!({
+            "balance": "01",
+            "unlocked_balance": "0",
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+        BalanceFault::UnlockedAboveTotal => serde_json::json!({
+            "balance": 1u64,
+            "unlocked_balance": 2u64,
+            "multisig_import_needed": false,
+            "per_subaddress": [],
+            "blocks_to_unlock": 0,
+            "time_to_unlock": 0,
+        }),
+    }
+}
+
+fn hard_fork_result_value(hard_fork: HardForkInfoFixture) -> serde_json::Value {
+    let mut object = serde_json::json!({
+        "credits": 0,
+        "earliest_height": hard_fork.earliest_height,
+        "enabled": hard_fork.enabled,
+        "state": hard_fork.state,
+        "status": hard_fork.status,
+        "threshold": hard_fork.threshold,
+        "top_hash": "synthetic-top-hash",
+        "untrusted": hard_fork.untrusted,
+        "version": hard_fork.version,
+        "votes": hard_fork.votes,
+        "voting": hard_fork.voting,
+        "window": hard_fork.window,
+    });
+    if let Some((key, value)) = hard_fork.extra_member {
+        object
+            .as_object_mut()
+            .expect("hard-fork object")
+            .insert(key.to_owned(), serde_json::Value::String(value.to_owned()));
+    }
+    object
+}
+
+pub struct RecordingReceiverPort {
+    store: AccountStore<ReceiverStoreSurface>,
+    root: PathBuf,
+    account_id: String,
+    network: XmrNetwork,
+    primary: String,
+    queued: VecDeque<RpcAddress>,
+    last_created: Option<RpcAddress>,
+    rpc_calls: Vec<String>,
+    fault: Option<ReceiverFault>,
+    in_flight: usize,
+    max_in_flight: usize,
+    last_index: u32,
+    wallet_state: WalletState,
+    node_state: NodeState,
+    watch_only_failed: bool,
+    exhausted: bool,
+    authority_unavailable: bool,
+    failed_binding_request: Option<String>,
+}
+
+impl RecordingReceiverPort {
+    fn ready(
+        root: PathBuf,
+        store: AccountStore<PathSqliteSurface>,
+        account_id: &str,
+        network: XmrNetwork,
+        primary: &str,
+    ) -> Self {
+        let surface = ReceiverStoreSurface::new(store.into_surface());
+        let store = AccountStore::attach_existing(surface).expect("receiver store reattaches");
+        Self {
+            store,
+            root,
+            account_id: account_id.to_owned(),
+            network,
+            primary: primary.to_owned(),
+            queued: VecDeque::new(),
+            last_created: None,
+            rpc_calls: Vec::new(),
+            fault: None,
+            in_flight: 0,
+            max_in_flight: 0,
+            last_index: 0,
+            wallet_state: WalletState::Ready,
+            node_state: NodeState::Ready,
+            watch_only_failed: false,
+            exhausted: false,
+            authority_unavailable: false,
+            failed_binding_request: None,
+        }
+    }
+
+    fn arm_fault(&mut self, fault: ReceiverFault) {
+        self.fault = Some(fault);
+        self.store.surface_mut().fault = Some(fault);
+        match fault {
+            ReceiverFault::Locked => self.wallet_state = WalletState::Locked,
+            ReceiverFault::NodeSyncing => self.node_state = NodeState::Syncing,
+            ReceiverFault::WalletRefreshing => self.wallet_state = WalletState::Refreshing,
+            ReceiverFault::WatchOnlyInitialization => self.watch_only_failed = true,
+            ReceiverFault::Exhausted => self.exhausted = true,
+            _ => {}
+        }
+    }
+
+    fn clear_faults(&mut self) {
+        self.store.surface_mut().fault = None;
+        if let Some(request_id) = self.failed_binding_request.take() {
+            let _ = self.store.delete_uncommitted_receiver(&request_id);
+        }
+        let store = open_receiver_store(&self.root).expect("replacement receiver store opens");
+        let mut replacement = Self::ready(
+            self.root.clone(),
+            store,
+            &self.account_id,
+            self.network,
+            &self.primary,
+        );
+        replacement.queued = core::mem::take(&mut self.queued);
+        replacement.rpc_calls = core::mem::take(&mut self.rpc_calls);
+        replacement.last_created = self.last_created.take();
+        replacement.last_index = self.last_index;
+        replacement.max_in_flight = self.max_in_flight;
+        *self = replacement;
+    }
+
+    fn script_address(&mut self, address: RpcAddress) {
+        self.queued.clear();
+        self.queued.push_back(address);
+    }
+
+    fn script_addresses<I>(&mut self, addresses: I)
+    where
+        I: IntoIterator<Item = RpcAddress>,
+    {
+        self.queued.clear();
+        self.queued.extend(addresses);
+    }
+
+    fn apply_reopen_fault(&mut self) -> Result<(), XmrError> {
+        match self.fault {
+            Some(ReceiverFault::SchemaDrift) => {
+                self.store
+                    .surface_mut()
+                    .execute_batch("PRAGMA user_version = 99;")?;
+            }
+            Some(ReceiverFault::SynchronousNotFull) => {
+                self.store
+                    .surface_mut()
+                    .execute_batch("PRAGMA synchronous = OFF;")?;
+                return self.store.prove_durability();
+            }
+            Some(ReceiverFault::WrongIdentity) => {
+                self.store.surface_mut().execute_batch(
+                    "UPDATE account_identity SET account_id = 'ffeeddccbbaa99887766554433221100' WHERE slot = 1;",
+                )?;
+            }
+            Some(ReceiverFault::Rollback) => {
+                self.store
+                    .surface_mut()
+                    .execute_batch("CREATE TABLE rollback_residue (id INTEGER);")?;
+            }
+            Some(ReceiverFault::CorruptDatabase) => {
+                let path = self.root.join("state.sqlite");
+                fs::write(&path, [0xff, 0x00, 0x13, 0x37])
+                    .map_err(|_| XmrError::state_corrupt())?;
+            }
+            Some(ReceiverFault::DuplicateRequest)
+            | Some(ReceiverFault::DuplicateIndex)
+            | Some(ReceiverFault::DuplicateAddress)
+            | Some(ReceiverFault::DuplicateSequence) => {
+                self.store.surface_mut().execute_batch(
+                    "DROP TABLE receivers;
+                     CREATE TABLE receivers (
+                        request_id TEXT,
+                        account_index INTEGER,
+                        subaddress_index INTEGER,
+                        subaddress TEXT,
+                        issued_at_sequence INTEGER
+                     );",
+                )?;
+                let first = synthetic_subaddress(1);
+                let second = synthetic_subaddress(2);
+                match self.fault {
+                    Some(ReceiverFault::DuplicateRequest) => {
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "102132435465768798a9bacbdcedfe0f",
+                            1,
+                            &first,
+                            1,
+                        )?;
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "102132435465768798a9bacbdcedfe0f",
+                            2,
+                            &second,
+                            2,
+                        )?;
+                    }
+                    Some(ReceiverFault::DuplicateIndex) => {
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "102132435465768798a9bacbdcedfe0f",
+                            1,
+                            &first,
+                            1,
+                        )?;
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "ffeeddccbbaa99887766554433221100",
+                            1,
+                            &second,
+                            2,
+                        )?;
+                    }
+                    Some(ReceiverFault::DuplicateAddress) => {
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "102132435465768798a9bacbdcedfe0f",
+                            1,
+                            &first,
+                            1,
+                        )?;
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "ffeeddccbbaa99887766554433221100",
+                            2,
+                            &first,
+                            2,
+                        )?;
+                    }
+                    Some(ReceiverFault::DuplicateSequence) => {
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "102132435465768798a9bacbdcedfe0f",
+                            1,
+                            &first,
+                            1,
+                        )?;
+                        insert_unconstrained_receiver(
+                            self.store.surface_mut(),
+                            "ffeeddccbbaa99887766554433221100",
+                            2,
+                            &second,
+                            1,
+                        )?;
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+        self.store.reopen().map(|_| ())
+    }
+}
+
+fn insert_unconstrained_receiver<S: StoreSurface>(
+    surface: &mut S,
+    request_id: &str,
+    index: i64,
+    address: &str,
+    sequence: i64,
+) -> Result<(), XmrError> {
+    surface.execute_batch(&format!(
+        "INSERT INTO receivers (request_id, account_index, subaddress_index, subaddress, issued_at_sequence)
+         VALUES ('{request_id}', 0, {index}, '{address}', {sequence});"
+    ))
+}
+
+fn synthetic_subaddress(index: u32) -> String {
+    let mut address = String::from("8");
+    let digit = match index % 4 {
+        0 => 'B',
+        1 => 'C',
+        2 => 'D',
+        _ => 'E',
+    };
+    address.extend(core::iter::repeat_n(digit, 94));
+    address
+}
+
+fn unique_receiver_root(label: &str) -> PathBuf {
+    let seq = RECEIVER_ROOT_SEQ.fetch_add(1, Ordering::SeqCst);
+    assert!(
+        !label.is_empty()
+            && label.len() <= 64
+            && label
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+    );
+    let target = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target");
+    let target_metadata = fs::symlink_metadata(&target).expect("receiver target exists");
+    assert!(target_metadata.file_type().is_dir());
+    assert!(!target_metadata.file_type().is_symlink());
+    let mut random = [0u8; 16];
+    getrandom::fill(&mut random).expect("receiver root entropy");
+    let mut suffix = String::with_capacity(32);
+    for byte in random {
+        use core::fmt::Write as _;
+        let _ = write!(suffix, "{byte:02x}");
+    }
+    target.join(format!(
+        "bb-xmr-receiver-{label}-{}-{seq}-{suffix}",
+        std::process::id()
+    ))
+}
+
+fn cleanup_receiver_root(root: &Path) {
+    let target = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target");
+    if root.parent() != Some(target.as_path()) {
+        return;
+    }
+    let Some(name) = root.file_name().and_then(|name| name.to_str()) else {
+        return;
+    };
+    if !name.starts_with("bb-xmr-receiver-") {
+        return;
+    }
+    let Ok(target_metadata) = fs::symlink_metadata(&target) else {
+        return;
+    };
+    let Ok(root_metadata) = fs::symlink_metadata(root) else {
+        return;
+    };
+    if target_metadata.file_type().is_symlink()
+        || !target_metadata.file_type().is_dir()
+        || root_metadata.file_type().is_symlink()
+        || !root_metadata.file_type().is_dir()
+    {
+        return;
+    }
+    let _ = fs::remove_dir_all(root);
+}
+
+impl ReceiverPort for RecordingReceiverPort {
+    fn rpc_calls(&self) -> Vec<String> {
+        self.rpc_calls.clone()
+    }
+
+    fn clear_rpc_calls(&mut self) {
+        self.rpc_calls.clear();
+    }
+
+    fn lookup_binding(&mut self, request_id: &str) -> Result<Option<FreshReceiver>, XmrError> {
+        match self.store.lookup_receiver(request_id)? {
+            Some(stored) => binding_from_stored(&self.account_id, self.network, &stored).map(Some),
+            None => Ok(None),
+        }
+    }
+
+    fn lookup_all(&mut self) -> Result<Vec<FreshReceiver>, XmrError> {
+        if self.authority_unavailable {
+            return Err(XmrError::state_corrupt());
+        }
+        self.store
+            .list_receivers()?
+            .iter()
+            .map(|stored| binding_from_stored(&self.account_id, self.network, stored))
+            .collect()
+    }
+
+    fn load_identity(&mut self) -> Result<StoredIdentity, XmrError> {
+        self.store.load_identity()
+    }
+
+    fn create_address(&mut self) -> Result<CreatedSubaddress, XmrError> {
+        self.rpc_calls.push("create_address:0:".to_owned());
+        let created = match self.fault {
+            Some(ReceiverFault::PrimaryAddress) => RpcAddress {
+                account_index: 0,
+                index: 1,
+                address: self.primary.clone(),
+            },
+            Some(ReceiverFault::ZeroIndex) => RpcAddress {
+                account_index: 0,
+                index: 0,
+                address: synthetic_subaddress(1),
+            },
+            Some(ReceiverFault::WrongAccountIndex) => RpcAddress {
+                account_index: 1,
+                index: 1,
+                address: synthetic_subaddress(1),
+            },
+            _ => match self.queued.pop_front() {
+                Some(address) => address,
+                None => {
+                    let index = if self.last_index == 0 {
+                        1
+                    } else {
+                        self.last_index.saturating_add(1)
+                    };
+                    RpcAddress {
+                        account_index: 0,
+                        index,
+                        address: synthetic_subaddress(index),
+                    }
+                }
+            },
+        };
+        self.last_index = created.index;
+        self.last_created = Some(created.clone());
+        Ok(CreatedSubaddress {
+            address: Zeroizing::new(created.address),
+            account_index: created.account_index,
+            subaddress_index: created.index,
+        })
+    }
+
+    fn validate_subaddress(
+        &mut self,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<AddressClassification, XmrError> {
+        self.rpc_calls.push("validate_address".to_owned());
+        let mut classification = AddressClassification {
+            valid: true,
+            integrated: false,
+            subaddress: true,
+            nettype: crate::xmr::receiver::expected_nettype(network).to_owned(),
+        };
+        match self.fault {
+            Some(ReceiverFault::WrongNetwork) => {
+                classification.nettype = "mainnet".to_owned();
+            }
+            Some(ReceiverFault::ValidateSaysPrimary) => {
+                classification.subaddress = false;
+            }
+            Some(ReceiverFault::ValidateSaysInvalid) => {
+                classification.valid = false;
+            }
+            _ => {
+                let _ = address;
+            }
+        }
+        Ok(classification)
+    }
+
+    fn get_indexed_address(
+        &mut self,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.rpc_calls
+            .push(format!("get_address:{account_index}:{address_index}"));
+        if self.fault == Some(ReceiverFault::GetAddressMismatch) {
+            return Ok(Zeroizing::new(self.primary.clone()));
+        }
+        match &self.last_created {
+            Some(created)
+                if created.account_index == account_index && created.index == address_index =>
+            {
+                Ok(Zeroizing::new(created.address.clone()))
+            }
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn persist_binding(
+        &mut self,
+        binding: &FreshReceiver,
+    ) -> Result<ReceiverPersistenceProof, XmrError> {
+        let result = self.store.persist_receiver(&stored_from_binding(binding)?);
+        if result.is_err() {
+            self.failed_binding_request = Some(binding.request_id.clone());
+        }
+        result
+    }
+
+    fn set_issuance_watermarks(&mut self, index: u64, sequence: u64) -> Result<(), XmrError> {
+        if index > u64::from(u32::MAX) || sequence > i64::MAX as u64 {
+            return Err(XmrError::limit());
+        }
+        let index = u32::try_from(index).map_err(|_| XmrError::limit())?;
+        let sequence = i64::try_from(sequence).map_err(|_| XmrError::limit())?;
+        self.last_index = index;
+        self.store.set_issuance_sequence(sequence)
+    }
+
+    fn greatest_sequence(&mut self) -> Result<i64, XmrError> {
+        if self.exhausted {
+            Ok(i64::MAX)
+        } else {
+            Ok(self.store.load_identity()?.greatest_issuance_sequence())
+        }
+    }
+
+    fn last_subaddress_index(&mut self) -> Result<u32, XmrError> {
+        if self.exhausted {
+            Ok(u32::MAX)
+        } else {
+            Ok(self
+                .store
+                .max_subaddress_index()?
+                .unwrap_or(self.last_index))
+        }
+    }
+
+    fn inspect_schema(&mut self) -> Result<ReceiverSchemaView, XmrError> {
+        let mode = self
+            .store
+            .surface_mut()
+            .state_file_mode()
+            .unwrap_or(STATE_FILE_MODE);
+        self.store.inspect_receiver_schema(mode)
+    }
+
+    fn reopen(&mut self) -> Result<(), XmrError> {
+        if self.fault.is_some() {
+            self.apply_reopen_fault()
+        } else {
+            self.store.reopen().map(|_| ())
+        }
+    }
+
+    fn begin_create_address(&mut self) {
+        self.in_flight = self.in_flight.saturating_add(1);
+        self.max_in_flight = self.max_in_flight.max(self.in_flight);
+    }
+
+    fn end_create_address(&mut self) {
+        self.in_flight = self.in_flight.saturating_sub(1);
+    }
+
+    fn max_in_flight_create_address(&self) -> usize {
+        self.max_in_flight
+    }
+
+    fn wallet_state(&self) -> WalletState {
+        self.wallet_state
+    }
+
+    fn node_state(&self) -> NodeState {
+        self.node_state
+    }
+
+    fn watch_only_initialization_failed(&self) -> bool {
+        self.watch_only_failed
+    }
+
+    fn prove_owned_identity(&mut self) -> Result<(), XmrError> {
+        if self.authority_unavailable {
+            Err(XmrError::state_corrupt())
+        } else {
+            Ok(())
+        }
+    }
+
+    fn prepare_receiver(&mut self) -> Result<(), XmrError> {
+        if self.fault == Some(ReceiverFault::WrongNetworkRequest) {
+            Err(XmrError::wrong_network())
+        } else {
+            Ok(())
+        }
+    }
+
+    fn latch_unavailable(&mut self) {
+        self.authority_unavailable = true;
+    }
+
+    fn authority_unavailable(&self) -> bool {
+        self.authority_unavailable
+    }
+}
+
+pub struct ReceiverRig {
+    manager: ReceiverManager<RecordingReceiverPort>,
+    root: ReceiverRootGuard,
+}
+
+pub struct ReceiverRootLease {
+    root: ReceiverRootGuard,
+}
+
+struct ReceiverRootGuard {
+    root: PathBuf,
+}
+
+impl ReceiverRootGuard {
+    fn new(root: PathBuf) -> Self {
+        Self { root }
+    }
+}
+
+impl Drop for ReceiverRootGuard {
+    fn drop(&mut self) {
+        cleanup_receiver_root(&self.root);
+    }
+}
+
+impl ReceiverRig {
+    pub fn ready(label: &str, account: &str, network: XmrNetwork, primary: &str) -> Self {
+        let root = unique_receiver_root(label);
+        let identity = StoredIdentity::new(account.to_owned(), network, 1, primary, 0)
+            .expect("receiver identity");
+        let store = match initialize_receiver_store(&root, &identity) {
+            Ok(store) => store,
+            Err(error) => {
+                cleanup_receiver_root(&root);
+                panic!("receiver store: {error}");
+            }
+        };
+        let port = RecordingReceiverPort::ready(root.clone(), store, account, network, primary);
+        Self {
+            manager: ReceiverManager::new(account, network, port).expect("receiver manager"),
+            root: ReceiverRootGuard::new(root),
+        }
+    }
+
+    pub fn open(
+        lease: ReceiverRootLease,
+        account: &str,
+        network: XmrNetwork,
+    ) -> Result<Self, XmrError> {
+        let ReceiverRootLease { root } = lease;
+        let path = root.root.clone();
+        let mut opened = open_receiver_store(&path)?;
+        let identity = opened.load_identity()?;
+        let _ = kind_from_identity(&identity)?;
+        if identity.account_id() != account || identity.network() != network.name() {
+            return Err(XmrError::state_corrupt());
+        }
+        let primary = identity.primary_address()?.to_string();
+        let port = RecordingReceiverPort::ready(path, opened, account, network, primary.as_str());
+        Ok(Self {
+            manager: ReceiverManager::new(account, network, port)?,
+            root,
+        })
+    }
+
+    pub fn close(self) -> Result<ReceiverRootLease, XmrError> {
+        let Self { manager, root } = self;
+        drop(manager);
+        Ok(ReceiverRootLease { root })
+    }
+
+    pub fn fresh(
+        &mut self,
+        account_id: &str,
+        network: &str,
+        request_id: &str,
+    ) -> Result<FreshReceiver, XmrError> {
+        self.manager.fresh(account_id, network, request_id)
+    }
+
+    pub fn fresh_concurrent(
+        &self,
+        account_id: &str,
+        network: &str,
+        request_id: &str,
+    ) -> Result<FreshReceiver, XmrError> {
+        self.manager.fresh(account_id, network, request_id)
+    }
+
+    pub fn script_address(&mut self, address: RpcAddress) {
+        let _ = self
+            .manager
+            .with_port_mut(|port| port.script_address(address));
+    }
+
+    pub fn script_addresses<const N: usize>(&mut self, addresses: [RpcAddress; N]) {
+        let _ = self
+            .manager
+            .with_port_mut(|port| port.script_addresses(addresses));
+    }
+
+    pub fn script_concurrent_addresses<const N: usize>(&self, addresses: [RpcAddress; N]) {
+        let _ = self
+            .manager
+            .with_port_mut(|port| port.script_addresses(addresses));
+    }
+
+    pub fn arm_fault(&mut self, fault: ReceiverFault) {
+        let _ = self.manager.with_port_mut(|port| port.arm_fault(fault));
+    }
+
+    pub fn clear_faults(&mut self) {
+        let _ = self.manager.with_port_mut(|port| port.clear_faults());
+    }
+
+    pub fn rpc_calls(&self) -> Vec<String> {
+        self.manager.rpc_calls().unwrap_or_default()
+    }
+
+    pub fn clear_rpc_calls(&mut self) {
+        let _ = self.manager.clear_rpc_calls();
+    }
+
+    pub fn last_lookup_was_durable(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.last_lookup_was_durable)
+            .unwrap_or(false)
+    }
+
+    pub fn validate_reported_subaddress(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.validate_reported_subaddress)
+            .unwrap_or(false)
+    }
+
+    pub fn get_address_equal(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.get_address_equal)
+            .unwrap_or(false)
+    }
+
+    pub fn binding_committed_before_return(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.binding_committed_before_return)
+            .unwrap_or(false)
+    }
+
+    pub fn binding_file_synced_before_return(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.binding_file_synced_before_return)
+            .unwrap_or(false)
+    }
+
+    pub fn returned_receiver(&self) -> Option<FreshReceiver> {
+        self.manager
+            .observer()
+            .ok()
+            .and_then(|observer| observer.returned)
+    }
+
+    pub fn persisted_bindings(&self) -> Vec<FreshReceiver> {
+        self.manager.persisted_bindings().unwrap_or_default()
+    }
+
+    pub fn used_primary_or_stale_fallback(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.used_primary_or_stale_fallback)
+            .unwrap_or(false)
+    }
+
+    pub fn maximum_concurrent_create_address_calls(&self) -> usize {
+        self.manager.max_in_flight_create_address().unwrap_or(0)
+    }
+
+    pub fn greatest_issuance_sequence(&self) -> i64 {
+        self.manager.greatest_issuance_sequence().unwrap_or(0)
+    }
+
+    pub fn inspect_schema(&self) -> Result<ReceiverSchemaView, XmrError> {
+        self.manager.inspect_schema()
+    }
+
+    pub fn set_receiver_state_for_test(
+        &mut self,
+        index: u64,
+        sequence: u64,
+    ) -> Result<(), XmrError> {
+        self.manager.set_receiver_state(index, sequence)
+    }
+
+    pub fn reopen_for_test(&mut self) -> Result<(), XmrError> {
+        self.manager.reopen()
+    }
+
+    pub fn reconstructed_from_wallet_output(&self) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.reconstructed_from_wallet_output)
+            .unwrap_or(false)
+    }
+
+    pub fn rpc_call_count(&self) -> usize {
+        self.rpc_calls().len()
+    }
+
+    pub fn address_was_reused(&self, address: &str) -> bool {
+        self.manager
+            .observer()
+            .map(|observer| observer.address_was_reused(address))
+            .unwrap_or(false)
+    }
+
+    pub fn is_network_valid_address_for_test(address: &str) -> bool {
+        is_network_valid_address(address)
+    }
+
+    pub fn validate_account_id_for_test(value: &str) -> Result<(), XmrError> {
+        validate_account_id(value)
+    }
+
+    pub fn validate_request_id_for_test(value: &str) -> Result<(), XmrError> {
+        validate_request_id(value)
+    }
+
+    pub fn validate_network_for_test(value: &str) -> Result<(), XmrError> {
+        validate_network(value).map(|_| ())
+    }
 }

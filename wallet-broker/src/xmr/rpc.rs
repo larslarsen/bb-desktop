@@ -80,6 +80,7 @@ pub(crate) enum RpcRequest {
     GetVersion,
     CloseWallet,
     StopWallet,
+    Refresh,
     GetHeight,
     GetBalance,
     CreateAddress,
@@ -93,7 +94,7 @@ pub(crate) enum RpcRequest {
     QueryKeyMnemonic,
     GetAddress {
         account_index: u32,
-        address_index: &'static [u32],
+        address_index: Vec<u32>,
     },
     ValidateAddress {
         address: RpcSecret,
@@ -146,8 +147,19 @@ impl RpcRequest {
     pub(crate) fn get_address() -> Self {
         Self::GetAddress {
             account_index: 0,
-            address_index: &[],
+            address_index: Vec::new(),
         }
+    }
+
+    pub(crate) fn get_address_at(account_index: u32, address_index: u32) -> Self {
+        Self::GetAddress {
+            account_index,
+            address_index: vec![address_index],
+        }
+    }
+
+    pub(crate) fn create_address() -> Self {
+        Self::CreateAddress
     }
 
     pub(crate) fn validate_address(address: &str) -> Result<Self, XmrError> {
@@ -202,6 +214,7 @@ impl RpcRequest {
             Self::GetVersion => RpcMethod::GetVersion,
             Self::CloseWallet => RpcMethod::CloseWallet,
             Self::StopWallet => RpcMethod::StopWallet,
+            Self::Refresh => RpcMethod::Refresh,
             Self::GetHeight => RpcMethod::GetHeight,
             Self::GetBalance => RpcMethod::GetBalance,
             Self::CreateAddress => RpcMethod::CreateAddress,
@@ -222,6 +235,7 @@ impl RpcRequest {
             Self::GetVersion
             | Self::CloseWallet
             | Self::StopWallet
+            | Self::Refresh
             | Self::GetHeight
             | Self::GetInfo
             | Self::HardForkInfo => Zeroizing::new(b"{}".to_vec()),
@@ -236,7 +250,7 @@ impl RpcRequest {
             Self::GetAddress {
                 account_index,
                 address_index,
-            } => json_get_address(*account_index, address_index),
+            } => json_get_address(*account_index, address_index.as_slice()),
             Self::CreateWallet {
                 filename,
                 password,
@@ -339,6 +353,7 @@ pub(crate) fn request_dispatch_for_test(name: &str) -> bool {
         RpcMethod::GetVersion
             | RpcMethod::CloseWallet
             | RpcMethod::StopWallet
+            | RpcMethod::Refresh
             | RpcMethod::GetHeight
             | RpcMethod::GetBalance
             | RpcMethod::CreateAddress
@@ -592,6 +607,7 @@ pub(crate) struct HardForkInfoResult {
     pub earliest_height: u64,
     pub enabled: bool,
     pub untrusted: bool,
+    pub version: u8,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -614,6 +630,13 @@ pub(crate) struct NodeProbeResult {
     pub state: NodeState,
     pub height: u64,
     pub height_without_bootstrap: u64,
+}
+
+#[derive(Clone, Eq, PartialEq)]
+pub(crate) struct NodeViewProbeResult {
+    pub state: NodeState,
+    pub height: u64,
+    pub hard_fork: HardForkInfoResult,
 }
 
 pub(crate) struct SensitiveRpcText(SecretBytes);
@@ -1381,7 +1404,10 @@ fn validate_upstream_error(value: &Value) -> Result<(), XmrError> {
     Ok(())
 }
 
-fn parse_typed_result(value: &Value, method: RpcMethod) -> Result<TypedResult, XmrError> {
+pub(crate) fn parse_typed_result(
+    value: &Value,
+    method: RpcMethod,
+) -> Result<TypedResult, XmrError> {
     let object = value
         .as_object()
         .ok_or_else(XmrError::protocol_incompatible)?;
@@ -1729,6 +1755,7 @@ fn parse_hard_fork_info(object: &Map<String, Value>) -> Result<HardForkInfoResul
         earliest_height: required_u64(object, "earliest_height")?,
         enabled: required_bool(object, "enabled")?,
         untrusted: required_bool(object, "untrusted")?,
+        version: required_u8(object, "version")?,
     })
 }
 
@@ -1822,10 +1849,9 @@ fn required_sensitive(
         .ok_or_else(XmrError::protocol_incompatible)
 }
 
-pub(crate) fn evaluate_node_policy(
+pub(crate) fn evaluate_node_info(
     network: XmrNetwork,
     info: NodeInfoResult,
-    hard_fork: HardForkInfoResult,
 ) -> Result<NodeProbeResult, XmrError> {
     let network_exact = match network {
         XmrNetwork::Stagenet => {
@@ -1836,13 +1862,11 @@ pub(crate) fn evaluate_node_policy(
         }
     };
     if info.status != "OK"
-        || hard_fork.status != "OK"
         || !network_exact
         || info.offline
         || info.untrusted
         || !info.bootstrap_daemon_address.is_empty()
         || info.height_without_bootstrap > info.height
-        || hard_fork.untrusted
     {
         return Err(XmrError::node_unavailable());
     }
@@ -1855,6 +1879,17 @@ pub(crate) fn evaluate_node_policy(
         height: info.height,
         height_without_bootstrap: info.height_without_bootstrap,
     })
+}
+
+pub(crate) fn evaluate_node_policy(
+    network: XmrNetwork,
+    info: NodeInfoResult,
+    hard_fork: HardForkInfoResult,
+) -> Result<NodeProbeResult, XmrError> {
+    if hard_fork.status != "OK" || hard_fork.untrusted {
+        return Err(XmrError::node_unavailable());
+    }
+    evaluate_node_info(network, info)
 }
 
 pub(crate) fn node_port(network: XmrNetwork) -> u16 {
@@ -1877,6 +1912,27 @@ pub(crate) fn probe_node_with<P: HttpExchangePort>(
     evaluate_node_policy(network, info, hard_fork)
 }
 
+pub(crate) fn probe_node_view_with<P: HttpExchangePort>(
+    core: &mut RpcCore<P>,
+    network: XmrNetwork,
+) -> Result<NodeViewProbeResult, XmrError> {
+    let port = node_port(network);
+    let info = match core.call_node(port, RpcRequest::GetInfo) {
+        Ok(TypedResult::NodeInfo(info)) => info,
+        _ => return Err(XmrError::node_unavailable()),
+    };
+    let hard_fork = match core.call_node(port, RpcRequest::HardForkInfo) {
+        Ok(TypedResult::HardForkInfo(info)) => info,
+        _ => return Err(XmrError::node_unavailable()),
+    };
+    let node = evaluate_node_policy(network, info, hard_fork.clone())?;
+    Ok(NodeViewProbeResult {
+        state: node.state,
+        height: node.height,
+        hard_fork,
+    })
+}
+
 pub fn probe_local_node(network: &str) -> Result<(), XmrError> {
     let network = XmrNetwork::parse(network)?;
     probe_local_node_state(network).map(|_| ())
@@ -1885,6 +1941,11 @@ pub fn probe_local_node(network: &str) -> Result<(), XmrError> {
 pub(crate) fn probe_local_node_state(network: XmrNetwork) -> Result<NodeProbeResult, XmrError> {
     let mut core = RpcCore::new(SystemHttpPort::new());
     probe_node_with(&mut core, network)
+}
+
+pub(crate) fn probe_local_node_view(network: XmrNetwork) -> Result<NodeViewProbeResult, XmrError> {
+    let mut core = RpcCore::new(SystemHttpPort::new());
+    probe_node_view_with(&mut core, network)
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -2046,6 +2107,14 @@ impl WalletRpcControl for SystemWalletRpcControl {
         self.require_empty(RpcRequest::StopWallet)
     }
 
+    fn refresh(&mut self) -> Result<(), XmrError> {
+        self.require_phase(&[WalletRpcPhase::WalletBound])?;
+        match self.session_call(RpcRequest::Refresh)? {
+            TypedResult::Refreshed { .. } => Ok(()),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
     fn close_sockets(&mut self) {
         self.core.close_all();
         self.session = None;
@@ -2151,6 +2220,87 @@ impl WalletRpcControl for SystemWalletRpcControl {
         let primary = Self::primary_from_result(result)?;
         self.set_phase(WalletRpcPhase::WalletBound)?;
         Ok(primary)
+    }
+
+    fn get_height(&mut self) -> Result<u64, XmrError> {
+        self.require_phase(&[
+            WalletRpcPhase::FreshSoftware,
+            WalletRpcPhase::MnemonicConsumed,
+            WalletRpcPhase::WalletBound,
+        ])?;
+        match self.session_call(RpcRequest::GetHeight)? {
+            TypedResult::Height(height) => Ok(height),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn get_balance(&mut self) -> Result<(u64, u64), XmrError> {
+        self.require_phase(&[
+            WalletRpcPhase::FreshSoftware,
+            WalletRpcPhase::MnemonicConsumed,
+            WalletRpcPhase::WalletBound,
+        ])?;
+        match self.session_call(RpcRequest::GetBalance)? {
+            TypedResult::Balance { total, unlocked } => Ok((total, unlocked)),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn create_address(&mut self) -> Result<(Zeroizing<String>, u32), XmrError> {
+        self.require_phase(&[WalletRpcPhase::WalletBound])?;
+        match self.session_call(RpcRequest::create_address())? {
+            TypedResult::CreatedAddress {
+                address,
+                address_index,
+                address_count,
+            } => {
+                if address_count != 1 || address_index == 0 {
+                    return Err(XmrError::protocol_incompatible());
+                }
+                Ok((Zeroizing::new(address.expose()?.to_owned()), address_index))
+            }
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn validate_subaddress(&mut self, address: &str, network: XmrNetwork) -> Result<(), XmrError> {
+        self.require_phase(&[WalletRpcPhase::WalletBound])?;
+        match self.session_call(RpcRequest::validate_address(address)?)? {
+            TypedResult::AddressValidation {
+                valid,
+                integrated,
+                subaddress,
+                nettype,
+            } if valid
+                && !integrated
+                && subaddress
+                && nettype == Self::expected_nettype(network) =>
+            {
+                Ok(())
+            }
+            TypedResult::AddressValidation { .. } => Err(XmrError::protocol_incompatible()),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn get_indexed_address(
+        &mut self,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.require_phase(&[WalletRpcPhase::WalletBound])?;
+        match self.session_call(RpcRequest::get_address_at(account_index, address_index))? {
+            TypedResult::Addresses { primary, addresses } => {
+                drop(primary);
+                match addresses.as_slice() {
+                    [entry] if entry.address_index == address_index => {
+                        Ok(Zeroizing::new(entry.address.expose()?.to_owned()))
+                    }
+                    _ => Err(XmrError::protocol_incompatible()),
+                }
+            }
+            _ => Err(XmrError::protocol_incompatible()),
+        }
     }
 }
 

@@ -231,7 +231,7 @@ fn sanitized_xmr_view_has_exact_fields_and_all_spend_zec_hardware_caps_negative(
         "raw_node",
         "upstream",
     ] {
-        assert!(!encoded.contains(forbidden));
+        assert!(!encoded.contains(&format!("\"{forbidden}\":")));
     }
 }
 

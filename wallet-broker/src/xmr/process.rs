@@ -493,6 +493,37 @@ pub(crate) trait ProcessPort {
     ) -> Result<Zeroizing<String>, XmrError> {
         Err(XmrError::unavailable())
     }
+    fn refresh(&mut self, _child: &mut Self::OwnedChild) -> Result<(), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn get_height(&mut self, _child: &mut Self::OwnedChild) -> Result<u64, XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn get_balance(&mut self, _child: &mut Self::OwnedChild) -> Result<(u64, u64), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn create_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+    ) -> Result<(Zeroizing<String>, u32), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn validate_subaddress(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _address: &str,
+        _network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn get_indexed_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _account_index: u32,
+        _address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        Err(XmrError::unavailable())
+    }
     fn wait_owned_child(
         &mut self,
         child: &mut Self::OwnedChild,
@@ -717,6 +748,54 @@ impl<P: ProcessPort> ProcessManager<P> {
             self.rpc_phase = AccountRpcPhase::NoWallet;
         }
         result
+    }
+
+    pub(crate) fn refresh(&mut self) -> Result<(), XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.refresh(child)
+    }
+
+    pub(crate) fn get_height(&mut self) -> Result<u64, XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.get_height(child)
+    }
+
+    pub(crate) fn get_balance(&mut self) -> Result<(u64, u64), XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.get_balance(child)
+    }
+
+    pub(crate) fn create_address(&mut self) -> Result<(Zeroizing<String>, u32), XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.create_address(child)
+    }
+
+    pub(crate) fn validate_subaddress(&mut self, address: &str) -> Result<(), XmrError> {
+        let network = self.network.clone()?;
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.validate_subaddress(child, address, network)
+    }
+
+    pub(crate) fn get_indexed_address(
+        &mut self,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::WalletBound])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port
+            .get_indexed_address(child, account_index, address_index)
     }
 
     pub(crate) fn credentials_wiped(&self) -> bool {
@@ -1108,6 +1187,43 @@ impl<P: ProcessPort> ProcessCoordinator<P> {
         self.owned_manager(account_id)?.rpc_close_wallet()
     }
 
+    pub(crate) fn refresh(&mut self, account_id: &str) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?.refresh()
+    }
+
+    pub(crate) fn get_height(&mut self, account_id: &str) -> Result<u64, XmrError> {
+        self.owned_manager(account_id)?.get_height()
+    }
+
+    pub(crate) fn get_balance(&mut self, account_id: &str) -> Result<(u64, u64), XmrError> {
+        self.owned_manager(account_id)?.get_balance()
+    }
+
+    pub(crate) fn create_address(
+        &mut self,
+        account_id: &str,
+    ) -> Result<(Zeroizing<String>, u32), XmrError> {
+        self.owned_manager(account_id)?.create_address()
+    }
+
+    pub(crate) fn validate_subaddress(
+        &mut self,
+        account_id: &str,
+        address: &str,
+    ) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?.validate_subaddress(address)
+    }
+
+    pub(crate) fn get_indexed_address(
+        &mut self,
+        account_id: &str,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.owned_manager(account_id)?
+            .get_indexed_address(account_index, address_index)
+    }
+
     pub(crate) fn prove_owned_session(
         &mut self,
         account_id: &str,
@@ -1171,6 +1287,16 @@ pub(crate) trait WalletRpcControl {
         password: &str,
         seed: &str,
         restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError>;
+    fn refresh(&mut self) -> Result<(), XmrError>;
+    fn get_height(&mut self) -> Result<u64, XmrError>;
+    fn get_balance(&mut self) -> Result<(u64, u64), XmrError>;
+    fn create_address(&mut self) -> Result<(Zeroizing<String>, u32), XmrError>;
+    fn validate_subaddress(&mut self, address: &str, network: XmrNetwork) -> Result<(), XmrError>;
+    fn get_indexed_address(
+        &mut self,
+        account_index: u32,
+        address_index: u32,
     ) -> Result<Zeroizing<String>, XmrError>;
 }
 
@@ -1403,6 +1529,44 @@ impl<C: WalletRpcControl> ProcessPort for SystemProcessPort<C> {
     ) -> Result<Zeroizing<String>, XmrError> {
         self.control
             .restore_deterministic_wallet(filename, password, seed, restore_height)
+    }
+
+    fn refresh(&mut self, _child: &mut Self::OwnedChild) -> Result<(), XmrError> {
+        self.control.refresh()
+    }
+
+    fn get_height(&mut self, _child: &mut Self::OwnedChild) -> Result<u64, XmrError> {
+        self.control.get_height()
+    }
+
+    fn get_balance(&mut self, _child: &mut Self::OwnedChild) -> Result<(u64, u64), XmrError> {
+        self.control.get_balance()
+    }
+
+    fn create_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+    ) -> Result<(Zeroizing<String>, u32), XmrError> {
+        self.control.create_address()
+    }
+
+    fn validate_subaddress(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        self.control.validate_subaddress(address, network)
+    }
+
+    fn get_indexed_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.control
+            .get_indexed_address(account_index, address_index)
     }
 
     fn wait_owned_child(
@@ -1650,6 +1814,43 @@ impl<C: WalletRpcControl> WalletRpcProcessPool<C> {
 
     pub(crate) fn close_wallet(&mut self, account_id: &str) -> Result<(), XmrError> {
         self.coordinator.rpc_close_wallet(account_id)
+    }
+
+    pub(crate) fn refresh(&mut self, account_id: &str) -> Result<(), XmrError> {
+        self.coordinator.refresh(account_id)
+    }
+
+    pub(crate) fn get_height(&mut self, account_id: &str) -> Result<u64, XmrError> {
+        self.coordinator.get_height(account_id)
+    }
+
+    pub(crate) fn get_balance(&mut self, account_id: &str) -> Result<(u64, u64), XmrError> {
+        self.coordinator.get_balance(account_id)
+    }
+
+    pub(crate) fn create_address(
+        &mut self,
+        account_id: &str,
+    ) -> Result<(Zeroizing<String>, u32), XmrError> {
+        self.coordinator.create_address(account_id)
+    }
+
+    pub(crate) fn validate_subaddress(
+        &mut self,
+        account_id: &str,
+        address: &str,
+    ) -> Result<(), XmrError> {
+        self.coordinator.validate_subaddress(account_id, address)
+    }
+
+    pub(crate) fn get_indexed_address(
+        &mut self,
+        account_id: &str,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.coordinator
+            .get_indexed_address(account_id, account_index, address_index)
     }
 }
 

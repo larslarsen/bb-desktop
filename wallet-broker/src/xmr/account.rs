@@ -18,14 +18,24 @@ use crate::vault::{
 };
 #[cfg(target_os = "linux")]
 use crate::xmr::distribution::InstallationVerifier;
-use crate::xmr::model::{XmrError, XmrNetwork};
+use crate::xmr::model::{NodeState, WalletState, XmrError, XmrNetwork};
 #[cfg(target_os = "linux")]
 use crate::xmr::process::WalletRpcProcessPool;
 #[cfg(target_os = "linux")]
-use crate::xmr::rpc::{SystemWalletRpcControl, probe_local_node_state};
+use crate::xmr::receiver::{
+    AddressClassification, CreatedSubaddress, ProductionViewInput, ReceiverPort,
+    binding_from_stored, build_production_view, expected_nettype, issue_fresh_with_port,
+    stored_from_binding,
+};
+use crate::xmr::receiver::{FreshReceiver, SanitizedAccountView};
+#[cfg(target_os = "linux")]
+use crate::xmr::rpc::{
+    NodeState as RpcNodeState, SystemWalletRpcControl, probe_local_node_state,
+    probe_local_node_view,
+};
 use crate::xmr::store::{
-    AccountStore, DIRECTORY_MODE, PathSqliteSurface, STATE_FILE_MODE, SYNCHRONOUS_FULL,
-    StoredIdentity, state_file_name,
+    AccountStore, DIRECTORY_MODE, PathSqliteSurface, ReceiverPersistenceProof, ReceiverSchemaView,
+    STATE_FILE_MODE, SYNCHRONOUS_FULL, StoredIdentity, state_file_name,
 };
 
 pub const XMR_SECRET_MAGIC: [u8; 8] = *b"BBXMR001";
@@ -78,7 +88,7 @@ impl AccountKind {
         }
     }
 
-    fn from_code(code: u8) -> Result<Self, XmrError> {
+    pub(crate) fn from_code(code: u8) -> Result<Self, XmrError> {
         match code {
             KIND_SOFTWARE => Ok(Self::Software),
             KIND_WATCH_ONLY => Ok(Self::WatchOnly),
@@ -1667,6 +1677,10 @@ pub(crate) struct SystemAccountPort {
     owner: u32,
     last_password: Option<SecretBytes>,
     attempt: AttemptOwnership,
+    receiver_unavailable: bool,
+    receiver_node_state: NodeState,
+    receiver_wallet_state: WalletState,
+    receiver_last_index: u32,
 }
 
 #[cfg(target_os = "linux")]
@@ -1822,7 +1836,11 @@ impl SystemAccount {
             let result = catch_unwind(AssertUnwindSafe(|| self.manager.open()));
             self.manager.port_mut().wipe_passphrase();
             self.manager.port_mut().wipe_wallet_password();
-            self.resume_or_reconcile(result)
+            let opened = self.resume_or_reconcile(result);
+            if opened.is_ok() {
+                self.manager.port_mut().receiver_wallet_state = WalletState::Ready;
+            }
+            opened
         }
     }
 
@@ -1836,7 +1854,60 @@ impl SystemAccount {
             let result = catch_unwind(AssertUnwindSafe(|| self.manager.lock()));
             self.manager.port_mut().wipe_passphrase();
             self.manager.port_mut().wipe_wallet_password();
-            self.resume_or_reconcile(result)
+            let locked = self.resume_or_reconcile(result);
+            self.manager.port_mut().receiver_wallet_state = WalletState::Locked;
+            locked
+        }
+    }
+
+    pub fn view(
+        &mut self,
+        account_id: &str,
+        network: &str,
+    ) -> Result<SanitizedAccountView, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = (account_id, network);
+            Err(XmrError::unavailable())
+        }
+        #[cfg(target_os = "linux")]
+        {
+            self.manager.require_available()?;
+            let parsed = XmrNetwork::parse(network)?;
+            if !valid_account_id(account_id) || account_id != self.manager.account_id {
+                return Err(XmrError::request_schema());
+            }
+            if parsed != self.manager.port().network {
+                return Err(XmrError::wrong_network());
+            }
+            self.manager.port_mut().production_view(account_id, parsed)
+        }
+    }
+
+    pub fn fresh_receiver(
+        &mut self,
+        account_id: &str,
+        network: &str,
+        request_id: &str,
+    ) -> Result<FreshReceiver, XmrError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = (account_id, network, request_id);
+            Err(XmrError::unavailable())
+        }
+        #[cfg(target_os = "linux")]
+        {
+            self.manager.require_available()?;
+            let owned_account = self.manager.account_id.clone();
+            let owned_network = self.manager.port().network;
+            issue_fresh_with_port(
+                &owned_account,
+                owned_network,
+                account_id,
+                network,
+                request_id,
+                self.manager.port_mut(),
+            )
         }
     }
 
@@ -1892,6 +1963,10 @@ impl SystemAccountPort {
             owner,
             last_password: None,
             attempt: AttemptOwnership::default(),
+            receiver_unavailable: false,
+            receiver_node_state: NodeState::Unavailable,
+            receiver_wallet_state: WalletState::Locked,
+            receiver_last_index: 0,
         })
     }
 
@@ -2178,6 +2253,97 @@ impl SystemAccountPort {
             }
         }
         Ok(())
+    }
+
+    fn live_store(&mut self) -> Result<&mut AccountStore<PathSqliteSurface>, XmrError> {
+        self.store.as_mut().ok_or_else(XmrError::state_corrupt)
+    }
+
+    fn production_view(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<SanitizedAccountView, XmrError> {
+        if self.receiver_unavailable {
+            return Err(XmrError::state_corrupt());
+        }
+        let identity = match self.live_store()?.load_identity() {
+            Ok(identity) => identity,
+            Err(error) => {
+                if error.code() == "STATE_CORRUPT" {
+                    self.receiver_unavailable = true;
+                }
+                return Err(error);
+            }
+        };
+        if identity.account_id() != account_id || identity.network() != network.name() {
+            self.receiver_unavailable = true;
+            return Err(XmrError::state_corrupt());
+        }
+        let kind = AccountKind::from_code(identity.kind())?;
+        let (node_state, node_height, hard_fork) = match probe_local_node_view(network) {
+            Ok(node) => (
+                match node.state {
+                    RpcNodeState::Syncing => NodeState::Syncing,
+                    RpcNodeState::Ready => NodeState::Ready,
+                },
+                Some(node.height),
+                Some(node.hard_fork),
+            ),
+            Err(error) if error.code() == "NODE_UNAVAILABLE" => {
+                (NodeState::Unavailable, None, None)
+            }
+            Err(error) => return Err(error),
+        };
+        let wallet_locked = self.receiver_wallet_state == WalletState::Locked;
+        let wallet_snapshot = if wallet_locked || node_state == NodeState::Unavailable {
+            None
+        } else {
+            (|| -> Result<Option<(u64, u64, u64)>, XmrError> {
+                if let Err(error) = self.pool.prove_owned_session(account_id, network) {
+                    return if error.code() == "UNAVAILABLE" {
+                        Ok(None)
+                    } else {
+                        Err(error)
+                    };
+                }
+                if let Err(error) = self.pool.refresh(account_id) {
+                    return if error.code() == "UNAVAILABLE" {
+                        Ok(None)
+                    } else {
+                        Err(error)
+                    };
+                }
+                let height = match self.pool.get_height(account_id) {
+                    Ok(height) => height,
+                    Err(error) if error.code() == "UNAVAILABLE" => return Ok(None),
+                    Err(error) => return Err(error),
+                };
+                match self.pool.get_balance(account_id) {
+                    Ok((total, unlocked)) => Ok(Some((height, total, unlocked))),
+                    Err(error) if error.code() == "UNAVAILABLE" => Ok(None),
+                    Err(error) => Err(error),
+                }
+            })()?
+        };
+        let (wallet_available, wallet_height, total_atomic, unlocked_atomic) = match wallet_snapshot
+        {
+            Some((height, total, unlocked)) => (true, Some(height), Some(total), Some(unlocked)),
+            None => (false, None, None, None),
+        };
+        build_production_view(ProductionViewInput {
+            account_id,
+            network,
+            kind,
+            node_state,
+            node_height,
+            wallet_available,
+            wallet_locked,
+            wallet_height,
+            total_atomic,
+            unlocked_atomic,
+            hard_fork: hard_fork.as_ref(),
+        })
     }
 }
 
@@ -2557,6 +2723,181 @@ impl AccountPort for SystemAccountPort {
     }
 }
 
+#[cfg(target_os = "linux")]
+impl ReceiverPort for SystemAccountPort {
+    fn rpc_calls(&self) -> Vec<String> {
+        Vec::new()
+    }
+
+    fn clear_rpc_calls(&mut self) {}
+
+    fn lookup_binding(&mut self, request_id: &str) -> Result<Option<FreshReceiver>, XmrError> {
+        let account_id = self.account_id.clone();
+        let network = self.network;
+        match self.live_store()?.lookup_receiver(request_id)? {
+            Some(stored) => binding_from_stored(&account_id, network, &stored).map(Some),
+            None => Ok(None),
+        }
+    }
+
+    fn lookup_all(&mut self) -> Result<Vec<FreshReceiver>, XmrError> {
+        let account_id = self.account_id.clone();
+        let network = self.network;
+        self.live_store()?
+            .list_receivers()?
+            .iter()
+            .map(|stored| binding_from_stored(&account_id, network, stored))
+            .collect()
+    }
+
+    fn load_identity(&mut self) -> Result<StoredIdentity, XmrError> {
+        self.live_store()?.load_identity()
+    }
+
+    fn create_address(&mut self) -> Result<CreatedSubaddress, XmrError> {
+        let (address, subaddress_index) = self.pool.create_address(&self.account_id)?;
+        self.receiver_last_index = subaddress_index;
+        Ok(CreatedSubaddress {
+            address,
+            account_index: 0,
+            subaddress_index,
+        })
+    }
+
+    fn validate_subaddress(
+        &mut self,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<AddressClassification, XmrError> {
+        if network != self.network {
+            return Err(XmrError::wrong_network());
+        }
+        self.pool.validate_subaddress(&self.account_id, address)?;
+        Ok(AddressClassification {
+            valid: true,
+            integrated: false,
+            subaddress: true,
+            nettype: expected_nettype(network).to_owned(),
+        })
+    }
+
+    fn get_indexed_address(
+        &mut self,
+        account_index: u32,
+        address_index: u32,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.pool
+            .get_indexed_address(&self.account_id, account_index, address_index)
+    }
+
+    fn persist_binding(
+        &mut self,
+        binding: &FreshReceiver,
+    ) -> Result<ReceiverPersistenceProof, XmrError> {
+        self.live_store()?
+            .persist_receiver(&stored_from_binding(binding)?)
+    }
+
+    fn set_issuance_watermarks(&mut self, index: u64, sequence: u64) -> Result<(), XmrError> {
+        if index > u64::from(u32::MAX) || sequence > i64::MAX as u64 {
+            return Err(XmrError::limit());
+        }
+        self.receiver_last_index = u32::try_from(index).map_err(|_| XmrError::limit())?;
+        let sequence = i64::try_from(sequence).map_err(|_| XmrError::limit())?;
+        self.live_store()?.set_issuance_sequence(sequence)
+    }
+
+    fn greatest_sequence(&mut self) -> Result<i64, XmrError> {
+        Ok(self
+            .live_store()?
+            .load_identity()?
+            .greatest_issuance_sequence())
+    }
+
+    fn last_subaddress_index(&mut self) -> Result<u32, XmrError> {
+        let retained = self.receiver_last_index;
+        Ok(self
+            .live_store()?
+            .max_subaddress_index()?
+            .unwrap_or(retained)
+            .max(retained))
+    }
+
+    fn inspect_schema(&mut self) -> Result<ReceiverSchemaView, XmrError> {
+        let mode = self.live_store()?.surface_mut().state_file_mode()?;
+        self.live_store()?.inspect_receiver_schema(mode)
+    }
+
+    fn reopen(&mut self) -> Result<(), XmrError> {
+        self.live_store()?.reopen().map(|_| ())
+    }
+
+    fn begin_create_address(&mut self) {}
+
+    fn end_create_address(&mut self) {}
+
+    fn max_in_flight_create_address(&self) -> usize {
+        usize::from(self.child_count > 0)
+    }
+
+    fn wallet_state(&self) -> WalletState {
+        self.receiver_wallet_state
+    }
+
+    fn node_state(&self) -> NodeState {
+        self.receiver_node_state
+    }
+
+    fn watch_only_initialization_failed(&self) -> bool {
+        false
+    }
+
+    fn prove_owned_identity(&mut self) -> Result<(), XmrError> {
+        if self.receiver_unavailable {
+            return Err(XmrError::state_corrupt());
+        }
+        if self.receiver_wallet_state == WalletState::Locked {
+            return Err(XmrError::locked());
+        }
+        let account_id = self.account_id.clone();
+        self.pool.prove_owned_session(&account_id, self.network)
+    }
+
+    fn prepare_receiver(&mut self) -> Result<(), XmrError> {
+        if self.receiver_unavailable {
+            return Err(XmrError::state_corrupt());
+        }
+        let account_id = self.account_id.clone();
+        self.pool.prove_owned_session(&account_id, self.network)?;
+        let node = probe_local_node_view(self.network)?;
+        self.receiver_node_state = match node.state {
+            RpcNodeState::Syncing => NodeState::Syncing,
+            RpcNodeState::Ready => NodeState::Ready,
+        };
+        if self.receiver_node_state == NodeState::Syncing {
+            return Ok(());
+        }
+        self.pool.refresh(&account_id)?;
+        let wallet_height = self.pool.get_height(&account_id)?;
+        self.receiver_wallet_state = if wallet_height < node.height {
+            WalletState::Refreshing
+        } else if wallet_height == node.height {
+            WalletState::Ready
+        } else {
+            return Err(XmrError::protocol_incompatible());
+        };
+        Ok(())
+    }
+
+    fn latch_unavailable(&mut self) {
+        self.receiver_unavailable = true;
+    }
+
+    fn authority_unavailable(&self) -> bool {
+        self.receiver_unavailable
+    }
+}
+
 fn encode_frame(
     kind: AccountKind,
     restore_height: u64,
@@ -2632,7 +2973,7 @@ fn utf8(bytes: &[u8]) -> Result<&str, XmrError> {
 }
 
 #[cfg(target_os = "linux")]
-fn current_uid() -> Result<u32, XmrError> {
+pub(crate) fn current_uid() -> Result<u32, XmrError> {
     fs::metadata("/proc/self")
         .map(|metadata| metadata.uid())
         .map_err(|_| XmrError::internal())
@@ -2734,7 +3075,7 @@ fn preflight_broker_tree(
 }
 
 #[cfg(target_os = "linux")]
-fn ensure_private_directory(path: &Path, owner: u32) -> Result<(), XmrError> {
+pub(crate) fn ensure_private_directory(path: &Path, owner: u32) -> Result<(), XmrError> {
     let created = match fs::create_dir(path) {
         Ok(()) => {
             fs::set_permissions(path, fs::Permissions::from_mode(DIRECTORY_MODE))
