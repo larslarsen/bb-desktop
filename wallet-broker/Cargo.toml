@@ -84,6 +84,10 @@ name = "zec_hygiene"
 path = "tests/zec_hygiene.rs"
 
 [[test]]
+name = "zec_hardware"
+path = "tests/zec_hardware.rs"
+
+[[test]]
 name = "xmr_distribution"
 path = "tests/xmr_distribution.rs"
 

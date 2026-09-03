@@ -33,6 +33,18 @@ park Phase D while a separate user node syncs. The offline gate does not depend 
 node and remains available through a future explicit Hermes handoff. No Monero actor or
 execution is currently authorized.
 
+Hermes completed Phase-B Expected Red 02 in
+[HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md](HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md)
+and recorded the exact absent-contract failure in
+[BBD-WAL-008-PHASE-A-EXPECTED-RED-01.md](../testing/BBD-WAL-008-PHASE-A-EXPECTED-RED-01.md).
+The formatter check passed with exit 0 and no mutation. The expected-red test exited 101
+with no test execution, diagnostics limited to the unresolved new `zec::test_support`
+hardware items and the intentionally absent `src/zec/hardware.rs` referenced by the
+production-inventory assertion. The exact frozen source identities and an unchanged
+lockfile are confirmed. Hermes may stage the exact two source paths plus the evidence and
+current-task records, commit, push, then stop for reviewer acceptance. Production source,
+broader gates, real-device work, and WAL-007 execution remain unauthorized.
+
 ## Historical record (superseded by the active state above)
 
 Slice 5 is accepted at `64811dea`, with its evidence corrected at `04472f10`, in
