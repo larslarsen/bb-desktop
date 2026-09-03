@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN 01 EVIDENCE CORRECTED — REVIEW REQUIRED
+State: PHASE D LOCAL MONERO ROOT REQUIRED — NO ACTOR AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (documentation only)
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,14 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01_EVIDENCE_CORRECTION_01.md)
+[BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md)
+
+Slice 5 is accepted at `64811dea`, with its evidence corrected at `04472f10`, in
+[BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md).
+All five Phase-C slices are accepted. No actor or execution is authorized. Phase D
+requires the owner to supply the exact extracted official Monero root outside source
+for reviewer identity verification before a real offline local-gate handoff can be
+opened. Broader/final acceptance also remains unauthorized.
 
 Hermes completed Green Resume 04 and integrated the exact eleven-path drop at
 `64811dea`. The implementation and exact pre-integration green execution are accepted,
