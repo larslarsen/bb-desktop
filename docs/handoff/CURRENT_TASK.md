@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 POLICY TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+State: WAL-008 POLICY EXPECTED RED AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_008_POLICY_TESTS_01.md](CODEX_SOL_BBD_WAL_008_POLICY_TESTS_01.md)
+[HERMES_BBD_WAL_008_POLICY_EXPECTED_RED_01.md](HERMES_BBD_WAL_008_POLICY_EXPECTED_RED_01.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
@@ -42,10 +42,12 @@ cause, command-wrapper deviation, and prohibited post-stop read-only command are
 recorded in
 [BBD-WAL-008-SLICE-02-GREEN-RESUME-03-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-03-STOP-REVIEW-01.md).
 
-Grok remains owner-reported usage-exhausted. Sol High alone may author the one-path
-test-first WAL-008 policy contract. Production policy, execution, integration, the
-three accepted Slice-02 source paths, real-device work, and WAL-007 remain frozen. The
-superseded Resume-03 authorization is closed.
+Grok remains owner-reported usage-exhausted. Sol High's one-path policy-test drop is
+accepted in
+[BBD-WAL-008-POLICY-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-POLICY-TEST-SOURCE-REVIEW-01.md).
+Hermes alone may run and integrate the exact test-only expected red. Production policy,
+the three accepted Slice-02 source paths, broader execution, real-device work, and
+WAL-007 remain frozen. The superseded Resume-03 and Sol source authorizations are closed.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

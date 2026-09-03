@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: POLICY TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+Status: POLICY EXPECTED RED AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -346,6 +346,16 @@ accepted persistence paths remain exact; this is not a source defect. Because Gr
 weekly usage remains exhausted, Codex Sol High alone may author the one-path policy
 test contract in `test/securityPolicy.node.js`. Production policy, execution,
 integration, and all other paths remain unauthorized pending reviewer source review.
+
+## Reviewer source decision 16
+
+Sol's one-path policy-test drop is accepted in
+`docs/testing/BBD-WAL-008-POLICY-TEST-SOURCE-REVIEW-01.md`. It preserves WAL-006's
+historical contracts while independently requiring the WAL-008 target, complete
+eight-path inventory, new production exports/checker, repository scan, and authority
+mutation negatives. Hermes alone may run the frozen focused Node expected-red command
+and integrate the test-only drop on exactly 80 `ok` and the seven specified `not ok`.
+Production policy and all other work remain unauthorized pending reviewer acceptance.
 
 ## Acceptance boundary
 
