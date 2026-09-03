@@ -6,7 +6,7 @@ use std::io::Write;
 #[cfg(target_os = "linux")]
 use std::net::{Ipv4Addr, TcpListener};
 #[cfg(target_os = "linux")]
-use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
+use std::os::unix::fs::{FileTypeExt, MetadataExt, OpenOptionsExt, PermissionsExt};
 #[cfg(target_os = "linux")]
 use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
@@ -46,6 +46,10 @@ const ENTROPY_BYTES: usize = 16;
 const WALLET_PASSWORD_BYTES: usize = 32;
 const DIRECTORY_MODE: u32 = 0o700;
 const PRIVATE_FILE_MODE: u32 = 0o600;
+#[cfg(target_os = "linux")]
+const LINUX_O_NOFOLLOW: i32 = 0o400_000;
+#[cfg(target_os = "linux")]
+const LINUX_O_DIRECTORY: i32 = 0o200_000;
 
 static LAST_RANDOM_PORT: AtomicU16 = AtomicU16::new(0);
 
@@ -148,20 +152,35 @@ pub struct WalletRpcProcessPlan {
     password_from_entropy: bool,
 }
 
+struct WalletRpcProcessPlanBuild<'a> {
+    executable: VerifiedExecutable,
+    account_id: &'a str,
+    network: XmrNetwork,
+    root: &'a Path,
+    rpc_port: u16,
+    rpc_username: SecretText,
+    rpc_password: SecretText,
+    wallet_password: SecretText,
+    port_from_entropy: bool,
+    username_from_entropy: bool,
+    password_from_entropy: bool,
+}
+
 impl WalletRpcProcessPlan {
-    fn build(
-        executable: VerifiedExecutable,
-        account_id: &str,
-        network: XmrNetwork,
-        root: &Path,
-        rpc_port: u16,
-        rpc_username: SecretText,
-        rpc_password: SecretText,
-        wallet_password: SecretText,
-        port_from_entropy: bool,
-        username_from_entropy: bool,
-        password_from_entropy: bool,
-    ) -> Result<Self, XmrError> {
+    fn build(input: WalletRpcProcessPlanBuild<'_>) -> Result<Self, XmrError> {
+        let WalletRpcProcessPlanBuild {
+            executable,
+            account_id,
+            network,
+            root,
+            rpc_port,
+            rpc_username,
+            rpc_password,
+            wallet_password,
+            port_from_entropy,
+            username_from_entropy,
+            password_from_entropy,
+        } = input;
         let paths = DerivedPaths::new(root, account_id, network)?;
         let wallet = path_text(&paths.wallet)?;
         let ring = path_text(&paths.ring)?;
@@ -416,6 +435,64 @@ pub(crate) trait ProcessPort {
     ) -> Result<bool, XmrError>;
     fn close_wallet(&mut self, child: &mut Self::OwnedChild) -> Result<(), XmrError>;
     fn stop_wallet(&mut self, child: &mut Self::OwnedChild) -> Result<(), XmrError>;
+    fn create_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _filename: &str,
+        _password: &str,
+    ) -> Result<(), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn query_mnemonic(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn get_primary_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _network: XmrNetwork,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn validate_primary_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _address: &str,
+        _network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn generate_from_keys(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _filename: &str,
+        _password: &str,
+        _address: &str,
+        _viewkey: &str,
+        _restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn open_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _filename: &str,
+        _password: &str,
+    ) -> Result<(), XmrError> {
+        Err(XmrError::unavailable())
+    }
+    fn restore_deterministic_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        _filename: &str,
+        _password: &str,
+        _seed: &str,
+        _restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        Err(XmrError::unavailable())
+    }
     fn wait_owned_child(
         &mut self,
         child: &mut Self::OwnedChild,
@@ -425,6 +502,14 @@ pub(crate) trait ProcessPort {
     fn reap_owned_child(&mut self, child: Self::OwnedChild) -> Result<(), XmrError>;
     fn close_sockets(&mut self);
     fn remove_runtime_secrets(&mut self, paths: &DerivedPaths) -> Result<(), XmrError>;
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum AccountRpcPhase {
+    NoWallet,
+    FreshSoftware,
+    MnemonicConsumed,
+    WalletBound,
 }
 
 pub(crate) struct ProcessManager<P: ProcessPort> {
@@ -440,6 +525,7 @@ pub(crate) struct ProcessManager<P: ProcessPort> {
     readiness_authenticated: bool,
     readiness_version_exact: bool,
     forced_kill: bool,
+    rpc_phase: AccountRpcPhase,
 }
 
 impl<P: ProcessPort> ProcessManager<P> {
@@ -463,6 +549,7 @@ impl<P: ProcessPort> ProcessManager<P> {
             readiness_authenticated: false,
             readiness_version_exact: false,
             forced_kill: false,
+            rpc_phase: AccountRpcPhase::NoWallet,
         }
     }
 
@@ -480,6 +567,156 @@ impl<P: ProcessPort> ProcessManager<P> {
 
     pub(crate) fn child_count(&self) -> usize {
         usize::from(self.child.is_some())
+    }
+
+    pub(crate) fn account_id(&self) -> &str {
+        &self.account_id
+    }
+
+    fn ensure_owned_session(&mut self) -> Result<(), XmrError> {
+        if !self.readiness_authenticated || self.credentials_wiped {
+            return Err(XmrError::unavailable());
+        }
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        if !self.port.child_is_alive(child)? {
+            return Err(XmrError::unavailable());
+        }
+        Ok(())
+    }
+
+    fn require_rpc_phase(&self, allowed: &[AccountRpcPhase]) -> Result<(), XmrError> {
+        if allowed.contains(&self.rpc_phase) {
+            Ok(())
+        } else {
+            Err(XmrError::request_schema())
+        }
+    }
+
+    pub(crate) fn prove_owned_session(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        if self.account_id != account_id {
+            return Err(XmrError::state_corrupt());
+        }
+        match self.network {
+            Ok(owned) if owned == network => {}
+            _ => return Err(XmrError::state_corrupt()),
+        }
+        self.ensure_owned_session()
+    }
+
+    pub(crate) fn create_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError> {
+        if filename != self.account_id {
+            return Err(XmrError::request_schema());
+        }
+        self.require_rpc_phase(&[AccountRpcPhase::NoWallet])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.create_wallet(child, filename, password)?;
+        self.rpc_phase = AccountRpcPhase::FreshSoftware;
+        Ok(())
+    }
+
+    pub(crate) fn query_mnemonic(&mut self) -> Result<Zeroizing<String>, XmrError> {
+        self.require_rpc_phase(&[AccountRpcPhase::FreshSoftware])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        let mnemonic = self.port.query_mnemonic(child)?;
+        self.rpc_phase = AccountRpcPhase::MnemonicConsumed;
+        Ok(mnemonic)
+    }
+
+    pub(crate) fn get_primary_address(&mut self) -> Result<Zeroizing<String>, XmrError> {
+        let network = self.network.clone()?;
+        self.require_rpc_phase(&[
+            AccountRpcPhase::FreshSoftware,
+            AccountRpcPhase::MnemonicConsumed,
+            AccountRpcPhase::WalletBound,
+        ])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.get_primary_address(child, network)
+    }
+
+    pub(crate) fn validate_primary_address(&mut self, address: &str) -> Result<(), XmrError> {
+        let network = self.network.clone()?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.validate_primary_address(child, address, network)
+    }
+
+    pub(crate) fn generate_from_keys(
+        &mut self,
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        if filename != self.account_id {
+            return Err(XmrError::request_schema());
+        }
+        self.require_rpc_phase(&[AccountRpcPhase::NoWallet])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        let primary = self.port.generate_from_keys(
+            child,
+            filename,
+            password,
+            address,
+            viewkey,
+            restore_height,
+        )?;
+        self.rpc_phase = AccountRpcPhase::WalletBound;
+        Ok(primary)
+    }
+
+    pub(crate) fn open_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError> {
+        if filename != self.account_id {
+            return Err(XmrError::request_schema());
+        }
+        self.require_rpc_phase(&[AccountRpcPhase::NoWallet])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        self.port.open_wallet(child, filename, password)?;
+        self.rpc_phase = AccountRpcPhase::WalletBound;
+        Ok(())
+    }
+
+    pub(crate) fn restore_deterministic_wallet(
+        &mut self,
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        if filename != self.account_id {
+            return Err(XmrError::request_schema());
+        }
+        self.require_rpc_phase(&[AccountRpcPhase::NoWallet])?;
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        let primary = self.port.restore_deterministic_wallet(
+            child,
+            filename,
+            password,
+            seed,
+            restore_height,
+        )?;
+        self.rpc_phase = AccountRpcPhase::WalletBound;
+        Ok(primary)
+    }
+
+    pub(crate) fn rpc_close_wallet(&mut self) -> Result<(), XmrError> {
+        self.ensure_owned_session()?;
+        let child = self.child.as_mut().ok_or_else(XmrError::unavailable)?;
+        let result = self.port.close_wallet(child);
+        if result.is_ok() {
+            self.rpc_phase = AccountRpcPhase::NoWallet;
+        }
+        result
     }
 
     pub(crate) fn credentials_wiped(&self) -> bool {
@@ -517,19 +754,19 @@ impl<P: ProcessPort> ProcessManager<P> {
         let (wallet_password, _) = random_secret(&mut self.port, WALLET_PASSWORD_BYTES)?;
         let (rpc_port, reservation, port_from_entropy) = reserve_port(&mut self.port)?;
         let executable = self.executable.take().ok_or_else(XmrError::internal)?;
-        let plan = WalletRpcProcessPlan::build(
+        let plan = WalletRpcProcessPlan::build(WalletRpcProcessPlanBuild {
             executable,
-            &self.account_id,
+            account_id: &self.account_id,
             network,
-            &self.root,
+            root: &self.root,
             rpc_port,
             rpc_username,
             rpc_password,
             wallet_password,
             port_from_entropy,
-            username_origin == EntropyOrigin::Os,
-            password_origin == EntropyOrigin::Os,
-        )?;
+            username_from_entropy: username_origin == EntropyOrigin::Os,
+            password_from_entropy: password_origin == EntropyOrigin::Os,
+        })?;
         self.plan = Some(plan);
         self.reservation = Some(reservation);
         self.credentials_wiped = false;
@@ -576,6 +813,7 @@ impl<P: ProcessPort> ProcessManager<P> {
         }
         self.readiness_authenticated = true;
         self.readiness_version_exact = true;
+        self.rpc_phase = AccountRpcPhase::NoWallet;
         if !self
             .port
             .child_is_alive(self.child.as_mut().ok_or_else(XmrError::internal)?)?
@@ -597,7 +835,10 @@ impl<P: ProcessPort> ProcessManager<P> {
         self.port.note_operation("stop-new-calls");
         let child = self.child.as_mut().ok_or_else(XmrError::internal)?;
         self.port.note_operation("close-wallet");
-        let _ = self.port.close_wallet(child);
+        if self.rpc_phase != AccountRpcPhase::NoWallet {
+            let _ = self.port.close_wallet(child);
+            self.rpc_phase = AccountRpcPhase::NoWallet;
+        }
         self.port.note_operation("stop-wallet");
         let _stop_result = self.port.stop_wallet(child);
         self.port.note_operation("wait-2s");
@@ -672,6 +913,7 @@ impl<P: ProcessPort> ProcessManager<P> {
             Ok(())
         };
         self.credentials_wiped = true;
+        self.rpc_phase = AccountRpcPhase::NoWallet;
         cleanup
     }
 }
@@ -771,17 +1013,6 @@ impl<P: ProcessPort> ProcessCoordinator<P> {
         manager.broker_exit()
     }
 
-    pub(crate) fn broker_exit_all(&mut self) -> Result<(), XmrError> {
-        let active = core::mem::take(&mut self.active);
-        let mut first_error = None;
-        for (_, mut manager) in active {
-            if let Err(error) = manager.broker_exit() {
-                first_error.get_or_insert(error);
-            }
-        }
-        first_error.map_or(Ok(()), Err)
-    }
-
     pub(crate) fn len(&self) -> usize {
         self.active.len()
     }
@@ -792,6 +1023,98 @@ impl<P: ProcessPort> ProcessCoordinator<P> {
 
     pub(crate) fn manager_mut(&mut self, account_id: &str) -> Option<&mut ProcessManager<P>> {
         self.active.get_mut(account_id)
+    }
+
+    fn owned_manager(&mut self, account_id: &str) -> Result<&mut ProcessManager<P>, XmrError> {
+        if !valid_account_id(account_id) {
+            return Err(XmrError::request_schema());
+        }
+        let manager = self
+            .active
+            .get_mut(account_id)
+            .ok_or_else(XmrError::unavailable)?;
+        if manager.account_id() != account_id {
+            return Err(XmrError::request_schema());
+        }
+        Ok(manager)
+    }
+
+    pub(crate) fn create_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+    ) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?
+            .create_wallet(account_id, password)
+    }
+
+    pub(crate) fn query_mnemonic(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.owned_manager(account_id)?.query_mnemonic()
+    }
+
+    pub(crate) fn get_primary_address(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.owned_manager(account_id)?.get_primary_address()
+    }
+
+    pub(crate) fn validate_primary_address(
+        &mut self,
+        account_id: &str,
+        address: &str,
+    ) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?
+            .validate_primary_address(address)
+    }
+
+    pub(crate) fn generate_from_keys(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.owned_manager(account_id)?.generate_from_keys(
+            account_id,
+            password,
+            address,
+            viewkey,
+            restore_height,
+        )
+    }
+
+    pub(crate) fn open_wallet(&mut self, account_id: &str, password: &str) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?
+            .open_wallet(account_id, password)
+    }
+
+    pub(crate) fn restore_deterministic_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.owned_manager(account_id)?
+            .restore_deterministic_wallet(account_id, password, seed, restore_height)
+    }
+
+    pub(crate) fn rpc_close_wallet(&mut self, account_id: &str) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?.rpc_close_wallet()
+    }
+
+    pub(crate) fn prove_owned_session(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        self.owned_manager(account_id)?
+            .prove_owned_session(account_id, network)
     }
 }
 
@@ -814,7 +1137,7 @@ pub struct ReadinessStatus {
     pub elapsed_millis: u64,
 }
 
-pub trait WalletRpcControl {
+pub(crate) trait WalletRpcControl {
     fn readiness(
         &mut self,
         rpc_port: u16,
@@ -825,10 +1148,34 @@ pub trait WalletRpcControl {
     fn close_wallet(&mut self) -> Result<(), XmrError>;
     fn stop_wallet(&mut self) -> Result<(), XmrError>;
     fn close_sockets(&mut self);
+    fn create_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError>;
+    fn query_mnemonic(&mut self) -> Result<Zeroizing<String>, XmrError>;
+    fn get_primary_address(&mut self, network: XmrNetwork) -> Result<Zeroizing<String>, XmrError>;
+    fn validate_primary_address(
+        &mut self,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError>;
+    fn generate_from_keys(
+        &mut self,
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError>;
+    fn open_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError>;
+    fn restore_deterministic_wallet(
+        &mut self,
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError>;
 }
 
 #[cfg(target_os = "linux")]
-pub struct SystemProcessPort<C: WalletRpcControl> {
+pub(crate) struct SystemProcessPort<C: WalletRpcControl> {
     control: C,
 }
 
@@ -885,7 +1232,7 @@ impl<C: WalletRpcControl> ProcessPort for SystemProcessPort<C> {
             || metadata.ino() != expected.inode
             || metadata.len() != expected.length
             || metadata.mtime() != expected.modified_seconds
-            || metadata.mtime_nsec() != i64::from(expected.modified_nanoseconds)
+            || metadata.mtime_nsec() != expected.modified_nanoseconds
             || metadata.mode() != expected.mode
             || metadata.uid() != expected.owner
             || metadata.gid() != expected.group
@@ -991,6 +1338,73 @@ impl<C: WalletRpcControl> ProcessPort for SystemProcessPort<C> {
         self.control.stop_wallet()
     }
 
+    fn create_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        filename: &str,
+        password: &str,
+    ) -> Result<(), XmrError> {
+        self.control.create_wallet(filename, password)
+    }
+
+    fn query_mnemonic(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.control.query_mnemonic()
+    }
+
+    fn get_primary_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        network: XmrNetwork,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.control.get_primary_address(network)
+    }
+
+    fn validate_primary_address(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        self.control.validate_primary_address(address, network)
+    }
+
+    fn generate_from_keys(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.control
+            .generate_from_keys(filename, password, address, viewkey, restore_height)
+    }
+
+    fn open_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        filename: &str,
+        password: &str,
+    ) -> Result<(), XmrError> {
+        self.control.open_wallet(filename, password)
+    }
+
+    fn restore_deterministic_wallet(
+        &mut self,
+        _child: &mut Self::OwnedChild,
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.control
+            .restore_deterministic_wallet(filename, password, seed, restore_height)
+    }
+
     fn wait_owned_child(
         &mut self,
         child: &mut Self::OwnedChild,
@@ -1032,13 +1446,50 @@ impl<C: WalletRpcControl> ProcessPort for SystemProcessPort<C> {
 }
 
 #[cfg(target_os = "linux")]
+fn current_uid() -> Result<u32, XmrError> {
+    fs::metadata("/proc/self")
+        .map(|metadata| metadata.uid())
+        .map_err(|_| XmrError::internal())
+}
+
+#[cfg(target_os = "linux")]
 fn ensure_private_root(derived_base: &Path) -> Result<(), XmrError> {
     let root = derived_base
         .ancestors()
         .nth(3)
         .ok_or_else(XmrError::request_schema)?;
-    let metadata = fs::symlink_metadata(root).map_err(|_| XmrError::state_corrupt())?;
-    if !metadata.file_type().is_dir() || metadata.permissions().mode() & 0o777 != DIRECTORY_MODE {
+    let owner = current_uid()?;
+    validate_private_directory(root, owner)
+}
+
+#[cfg(target_os = "linux")]
+fn validate_private_directory(path: &Path, owner: u32) -> Result<(), XmrError> {
+    let listed = fs::symlink_metadata(path).map_err(|_| XmrError::state_corrupt())?;
+    if listed.file_type().is_symlink()
+        || listed.file_type().is_fifo()
+        || listed.file_type().is_socket()
+        || listed.file_type().is_block_device()
+        || listed.file_type().is_char_device()
+        || !listed.file_type().is_dir()
+        || listed.permissions().mode() & 0o777 != DIRECTORY_MODE
+        || listed.uid() != owner
+    {
+        return Err(XmrError::state_corrupt());
+    }
+    let directory = OpenOptions::new()
+        .read(true)
+        .custom_flags(LINUX_O_NOFOLLOW | LINUX_O_DIRECTORY)
+        .open(path)
+        .map_err(|_| XmrError::state_corrupt())?;
+    let metadata = directory
+        .metadata()
+        .map_err(|_| XmrError::state_corrupt())?;
+    if !metadata.file_type().is_dir()
+        || metadata.uid() != owner
+        || metadata.permissions().mode() & 0o777 != DIRECTORY_MODE
+        || metadata.dev() != listed.dev()
+        || metadata.ino() != listed.ino()
+    {
         return Err(XmrError::state_corrupt());
     }
     Ok(())
@@ -1046,23 +1497,39 @@ fn ensure_private_root(derived_base: &Path) -> Result<(), XmrError> {
 
 #[cfg(target_os = "linux")]
 fn create_private_directory(path: &Path) -> Result<(), XmrError> {
-    match fs::create_dir(path) {
-        Ok(()) => {}
-        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {}
+    let owner = current_uid()?;
+    let created = match fs::create_dir(path) {
+        Ok(()) => {
+            fs::set_permissions(path, fs::Permissions::from_mode(DIRECTORY_MODE))
+                .map_err(|_| XmrError::internal())?;
+            true
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => false,
         Err(_) => return Err(XmrError::internal()),
+    };
+    validate_private_directory(path, owner)?;
+    if created {
+        let parent = path.parent().ok_or_else(XmrError::internal)?;
+        sync_directory_nofollow(parent, owner)?;
     }
-    let metadata = fs::symlink_metadata(path).map_err(|_| XmrError::internal())?;
-    if !metadata.file_type().is_dir() {
-        return Err(XmrError::state_corrupt());
-    }
-    fs::set_permissions(path, fs::Permissions::from_mode(DIRECTORY_MODE))
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn sync_directory_nofollow(path: &Path, owner: u32) -> Result<(), XmrError> {
+    let directory = OpenOptions::new()
+        .read(true)
+        .custom_flags(LINUX_O_NOFOLLOW | LINUX_O_DIRECTORY)
+        .open(path)
         .map_err(|_| XmrError::internal())?;
-    let metadata = fs::symlink_metadata(path).map_err(|_| XmrError::internal())?;
-    if metadata.file_type().is_dir() && metadata.permissions().mode() & 0o777 == DIRECTORY_MODE {
-        Ok(())
-    } else {
-        Err(XmrError::state_corrupt())
+    let metadata = directory.metadata().map_err(|_| XmrError::internal())?;
+    if !metadata.file_type().is_dir()
+        || metadata.uid() != owner
+        || metadata.permissions().mode() & 0o777 != DIRECTORY_MODE
+    {
+        return Err(XmrError::internal());
     }
+    directory.sync_all().map_err(|_| XmrError::internal())
 }
 
 #[cfg(target_os = "linux")]
@@ -1078,7 +1545,7 @@ fn remove_if_file(path: &Path) -> Result<(), XmrError> {
 }
 
 #[cfg(target_os = "linux")]
-pub struct WalletRpcProcessPool<C: WalletRpcControl> {
+pub(crate) struct WalletRpcProcessPool<C: WalletRpcControl> {
     coordinator: ProcessCoordinator<SystemProcessPort<C>>,
 }
 
@@ -1111,29 +1578,83 @@ impl<C: WalletRpcControl> WalletRpcProcessPool<C> {
         self.coordinator.start_account(account_id, manager)
     }
 
-    pub fn poll_health(&mut self, account_id: &str) -> Result<(), XmrError> {
-        self.coordinator.poll_health(account_id)
-    }
-
     pub fn stop_account(&mut self, account_id: &str) -> Result<(), XmrError> {
         self.coordinator.stop_account(account_id)
     }
 
-    pub fn broker_exit_account(&mut self, account_id: &str) -> Result<(), XmrError> {
-        self.coordinator.broker_exit_account(account_id)
+    pub(crate) fn create_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+    ) -> Result<(), XmrError> {
+        self.coordinator.create_wallet(account_id, password)
     }
 
-    pub fn broker_exit(&mut self) -> Result<(), XmrError> {
-        self.coordinator.broker_exit_all()
+    pub(crate) fn query_mnemonic(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.coordinator.query_mnemonic(account_id)
     }
 
-    pub fn child_count(&self) -> usize {
-        self.coordinator.len()
+    pub(crate) fn get_primary_address(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.coordinator.get_primary_address(account_id)
+    }
+
+    pub(crate) fn validate_primary_address(
+        &mut self,
+        account_id: &str,
+        address: &str,
+    ) -> Result<(), XmrError> {
+        self.coordinator
+            .validate_primary_address(account_id, address)
+    }
+
+    pub(crate) fn generate_from_keys(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.coordinator
+            .generate_from_keys(account_id, password, address, viewkey, restore_height)
+    }
+
+    pub(crate) fn open_wallet(&mut self, account_id: &str, password: &str) -> Result<(), XmrError> {
+        self.coordinator.open_wallet(account_id, password)
+    }
+
+    pub(crate) fn restore_deterministic_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.coordinator
+            .restore_deterministic_wallet(account_id, password, seed, restore_height)
+    }
+
+    pub(crate) fn prove_owned_session(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        self.coordinator.prove_owned_session(account_id, network)
+    }
+
+    pub(crate) fn close_wallet(&mut self, account_id: &str) -> Result<(), XmrError> {
+        self.coordinator.rpc_close_wallet(account_id)
     }
 }
 
 #[cfg(not(target_os = "linux"))]
-pub struct WalletRpcProcessPool<C: WalletRpcControl> {
+pub(crate) struct WalletRpcProcessPool<C: WalletRpcControl> {
     _marker: core::marker::PhantomData<C>,
 }
 
@@ -1155,27 +1676,85 @@ impl<C: WalletRpcControl> WalletRpcProcessPool<C> {
         Err(XmrError::unavailable())
     }
 
-    pub fn poll_health(&mut self, account_id: &str) -> Result<(), XmrError> {
-        let _ = account_id;
-        Err(XmrError::unavailable())
-    }
-
     pub fn stop_account(&mut self, account_id: &str) -> Result<(), XmrError> {
         let _ = account_id;
         Err(XmrError::unavailable())
     }
 
-    pub fn broker_exit_account(&mut self, account_id: &str) -> Result<(), XmrError> {
+    pub(crate) fn create_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+    ) -> Result<(), XmrError> {
+        let _ = (account_id, password);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn query_mnemonic(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
         let _ = account_id;
         Err(XmrError::unavailable())
     }
 
-    pub fn broker_exit(&mut self) -> Result<(), XmrError> {
+    pub(crate) fn get_primary_address(
+        &mut self,
+        account_id: &str,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        let _ = account_id;
         Err(XmrError::unavailable())
     }
 
-    pub fn child_count(&self) -> usize {
-        0
+    pub(crate) fn validate_primary_address(
+        &mut self,
+        account_id: &str,
+        address: &str,
+    ) -> Result<(), XmrError> {
+        let _ = (account_id, address);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn generate_from_keys(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        let _ = (account_id, password, address, viewkey, restore_height);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn open_wallet(&mut self, account_id: &str, password: &str) -> Result<(), XmrError> {
+        let _ = (account_id, password);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn restore_deterministic_wallet(
+        &mut self,
+        account_id: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        let _ = (account_id, password, seed, restore_height);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn prove_owned_session(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        let _ = (account_id, network);
+        Err(XmrError::unavailable())
+    }
+
+    pub(crate) fn close_wallet(&mut self, account_id: &str) -> Result<(), XmrError> {
+        let _ = account_id;
+        Err(XmrError::unavailable())
     }
 }
 

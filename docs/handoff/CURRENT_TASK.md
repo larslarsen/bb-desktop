@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 FORMAT CORRECTION 03 ACCEPTED — HERMES GREEN RESUME 07 AUTHORIZED
+State: PHASE C SLICE 4 GREEN 01 COMPLETE — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -283,6 +283,8 @@ Spark's exact two-region correction is accepted in
 Hermes alone may run Green Resume 07 and integrate only on exact success. Grok, Spark,
 Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate are not
 authorized.
+Hermes completed Green Resume 07 and recorded the complete green evidence in
+[BBD-WAL-007-SLICE-04-GREEN-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01.md).
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).

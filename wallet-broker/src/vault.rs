@@ -56,6 +56,7 @@ pub enum Network {
     ZecTestnet,
     ZecRegtest,
     XmrStagenet,
+    XmrTestnet,
 }
 
 impl Network {
@@ -64,6 +65,7 @@ impl Network {
             Self::ZecTestnet => "zec-testnet",
             Self::ZecRegtest => "zec-regtest",
             Self::XmrStagenet => "xmr-stagenet",
+            Self::XmrTestnet => "xmr-testnet",
         }
     }
 
@@ -72,6 +74,7 @@ impl Network {
             "zec-testnet" => Ok(Self::ZecTestnet),
             "zec-regtest" => Ok(Self::ZecRegtest),
             "xmr-stagenet" => Ok(Self::XmrStagenet),
+            "xmr-testnet" => Ok(Self::XmrTestnet),
             _ => Err(VaultError::schema()),
         }
     }
@@ -705,7 +708,7 @@ fn validate_wire_profile(wire: &WireEnvelope) -> Result<(), VaultError> {
 fn validate_asset_network(asset: Asset, network: Network) -> Result<(), VaultError> {
     match (asset, network) {
         (Asset::Zec, Network::ZecTestnet | Network::ZecRegtest)
-        | (Asset::Xmr, Network::XmrStagenet) => Ok(()),
+        | (Asset::Xmr, Network::XmrStagenet | Network::XmrTestnet) => Ok(()),
         _ => Err(VaultError::wrong_network()),
     }
 }

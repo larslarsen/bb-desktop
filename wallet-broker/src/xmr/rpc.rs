@@ -1,3 +1,4 @@
+use core::fmt;
 use std::collections::BTreeSet;
 use std::io::{Read, Write};
 use std::net::{Ipv4Addr, Shutdown, SocketAddrV4, TcpStream};
@@ -25,10 +26,11 @@ pub const MAX_JSON_NESTING: usize = 16;
 const JSON_RPC_ID: &str = "bitbook-xmr-v1";
 const JSON_RPC_PATH: &str = "/json_rpc";
 const MAX_CHALLENGE_BYTES: usize = 4 * 1_024;
-const MAX_CHALLENGE_VALUE_BYTES: usize = 1 * 1_024;
+const MAX_CHALLENGE_VALUE_BYTES: usize = 1_024;
 const MAX_NODE_VERSION_BYTES: usize = 128;
 pub const WALLET_RPC_VERSION: u64 = (1 << 16) | 31;
 const READINESS_RETRY_MILLIS: u64 = 25;
+const ENGLISH_LANGUAGE: &str = "English";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum RpcMethod {
@@ -50,6 +52,30 @@ pub(crate) enum RpcMethod {
     HardForkInfo,
 }
 
+pub(crate) struct RpcSecret(Zeroizing<String>);
+
+impl RpcSecret {
+    fn new(value: &str) -> Result<Self, XmrError> {
+        if value.is_empty() || value.len() > MAX_REQUEST_BODY_BYTES {
+            return Err(XmrError::request_schema());
+        }
+        if value.bytes().any(|byte| byte < 0x20 || byte == 0x7f) {
+            return Err(XmrError::request_schema());
+        }
+        Ok(Self(Zeroizing::new(value.to_owned())))
+    }
+
+    fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl fmt::Debug for RpcSecret {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("RpcSecret([REDACTED])")
+    }
+}
+
 pub(crate) enum RpcRequest {
     GetVersion,
     CloseWallet,
@@ -59,9 +85,118 @@ pub(crate) enum RpcRequest {
     CreateAddress,
     GetInfo,
     HardForkInfo,
+    CreateWallet {
+        filename: String,
+        password: RpcSecret,
+        language: &'static str,
+    },
+    QueryKeyMnemonic,
+    GetAddress {
+        account_index: u32,
+        address_index: &'static [u32],
+    },
+    ValidateAddress {
+        address: RpcSecret,
+    },
+    GenerateFromKeys {
+        filename: String,
+        password: RpcSecret,
+        address: RpcSecret,
+        viewkey: RpcSecret,
+        restore_height: u64,
+        spendkey: &'static str,
+        language: &'static str,
+    },
+    OpenWallet {
+        filename: String,
+        password: RpcSecret,
+    },
+    RestoreDeterministicWallet {
+        filename: String,
+        password: RpcSecret,
+        seed: RpcSecret,
+        restore_height: u64,
+        language: &'static str,
+        seed_offset: &'static str,
+    },
+}
+
+impl fmt::Debug for RpcRequest {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("RpcRequest")
+            .field("method", &self.method().name())
+            .finish()
+    }
 }
 
 impl RpcRequest {
+    pub(crate) fn create_wallet(filename: &str, password: &str) -> Result<Self, XmrError> {
+        Ok(Self::CreateWallet {
+            filename: validated_wallet_filename(filename)?,
+            password: RpcSecret::new(password)?,
+            language: ENGLISH_LANGUAGE,
+        })
+    }
+
+    pub(crate) fn query_key_mnemonic() -> Self {
+        Self::QueryKeyMnemonic
+    }
+
+    pub(crate) fn get_address() -> Self {
+        Self::GetAddress {
+            account_index: 0,
+            address_index: &[],
+        }
+    }
+
+    pub(crate) fn validate_address(address: &str) -> Result<Self, XmrError> {
+        Ok(Self::ValidateAddress {
+            address: RpcSecret::new(address)?,
+        })
+    }
+
+    pub(crate) fn generate_from_keys(
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Self, XmrError> {
+        Ok(Self::GenerateFromKeys {
+            filename: validated_wallet_filename(filename)?,
+            password: RpcSecret::new(password)?,
+            address: RpcSecret::new(address)?,
+            viewkey: RpcSecret::new(viewkey)?,
+            restore_height,
+            spendkey: "",
+            language: "",
+        })
+    }
+
+    pub(crate) fn open_wallet(filename: &str, password: &str) -> Result<Self, XmrError> {
+        Ok(Self::OpenWallet {
+            filename: validated_wallet_filename(filename)?,
+            password: RpcSecret::new(password)?,
+        })
+    }
+
+    pub(crate) fn restore_deterministic_wallet(
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Self, XmrError> {
+        Ok(Self::RestoreDeterministicWallet {
+            filename: validated_wallet_filename(filename)?,
+            password: RpcSecret::new(password)?,
+            seed: RpcSecret::new(seed)?,
+            restore_height,
+            language: ENGLISH_LANGUAGE,
+            seed_offset: "",
+        })
+    }
+
     const fn method(&self) -> RpcMethod {
         match self {
             Self::GetVersion => RpcMethod::GetVersion,
@@ -72,21 +207,82 @@ impl RpcRequest {
             Self::CreateAddress => RpcMethod::CreateAddress,
             Self::GetInfo => RpcMethod::GetInfo,
             Self::HardForkInfo => RpcMethod::HardForkInfo,
+            Self::CreateWallet { .. } => RpcMethod::CreateWallet,
+            Self::QueryKeyMnemonic => RpcMethod::QueryKey,
+            Self::GetAddress { .. } => RpcMethod::GetAddress,
+            Self::ValidateAddress { .. } => RpcMethod::ValidateAddress,
+            Self::GenerateFromKeys { .. } => RpcMethod::GenerateFromKeys,
+            Self::OpenWallet { .. } => RpcMethod::OpenWallet,
+            Self::RestoreDeterministicWallet { .. } => RpcMethod::RestoreDeterministicWallet,
         }
     }
 
-    fn params(&self) -> &'static [u8] {
+    fn params(&self) -> Zeroizing<Vec<u8>> {
         match self {
             Self::GetVersion
             | Self::CloseWallet
             | Self::StopWallet
             | Self::GetHeight
             | Self::GetInfo
-            | Self::HardForkInfo => b"{}",
-            Self::GetBalance => {
+            | Self::HardForkInfo => Zeroizing::new(b"{}".to_vec()),
+            Self::GetBalance => Zeroizing::new(
                 br#"{"account_index":0,"address_indices":[],"all_accounts":false,"strict":true}"#
+                    .to_vec(),
+            ),
+            Self::CreateAddress => {
+                Zeroizing::new(br#"{"account_index":0,"label":"","count":1}"#.to_vec())
             }
-            Self::CreateAddress => br#"{"account_index":0,"label":"","count":1}"#,
+            Self::QueryKeyMnemonic => Zeroizing::new(br#"{"key_type":"mnemonic"}"#.to_vec()),
+            Self::GetAddress {
+                account_index,
+                address_index,
+            } => json_get_address(*account_index, address_index),
+            Self::CreateWallet {
+                filename,
+                password,
+                language,
+            } => json_object(&[
+                ("filename", filename.as_str()),
+                ("password", password.as_str()),
+                ("language", language),
+            ]),
+            Self::ValidateAddress { address } => json_validate_address(address.as_str()),
+            Self::GenerateFromKeys {
+                filename,
+                password,
+                address,
+                viewkey,
+                restore_height,
+                spendkey,
+                language,
+            } => json_generate_from_keys(
+                filename,
+                password.as_str(),
+                address.as_str(),
+                viewkey.as_str(),
+                *restore_height,
+                spendkey,
+                language,
+            ),
+            Self::OpenWallet { filename, password } => json_object(&[
+                ("filename", filename.as_str()),
+                ("password", password.as_str()),
+            ]),
+            Self::RestoreDeterministicWallet {
+                filename,
+                password,
+                seed,
+                restore_height,
+                language,
+                seed_offset,
+            } => json_restore_params(
+                filename,
+                password.as_str(),
+                seed.as_str(),
+                *restore_height,
+                language,
+                seed_offset,
+            ),
         }
     }
 }
@@ -148,6 +344,13 @@ pub(crate) fn request_dispatch_for_test(name: &str) -> bool {
             | RpcMethod::CreateAddress
             | RpcMethod::GetInfo
             | RpcMethod::HardForkInfo
+            | RpcMethod::CreateWallet
+            | RpcMethod::QueryKey
+            | RpcMethod::GetAddress
+            | RpcMethod::ValidateAddress
+            | RpcMethod::GenerateFromKeys
+            | RpcMethod::OpenWallet
+            | RpcMethod::RestoreDeterministicWallet
     )
 }
 
@@ -184,7 +387,7 @@ pub(crate) struct SystemHttpPort {
 }
 
 impl SystemHttpPort {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             readiness_started: None,
             last_failure_not_listening: false,
@@ -626,19 +829,148 @@ fn port_error(error: PortFailure) -> XmrError {
 
 fn request_body(request: &RpcRequest) -> Result<Zeroizing<Vec<u8>>, XmrError> {
     let method = request.method();
+    let params = request.params();
     let mut body = Zeroizing::new(Vec::with_capacity(256));
     body.extend_from_slice(b"{\"jsonrpc\":\"2.0\",\"id\":\"");
     body.extend_from_slice(JSON_RPC_ID.as_bytes());
     body.extend_from_slice(b"\",\"method\":\"");
     body.extend_from_slice(method.name().as_bytes());
     body.extend_from_slice(b"\",\"params\":");
-    body.extend_from_slice(request.params());
+    body.extend_from_slice(&params);
     body.push(b'}');
     if body.len() > MAX_REQUEST_BODY_BYTES {
         Err(XmrError::limit())
     } else {
         Ok(body)
     }
+}
+
+fn validated_wallet_filename(filename: &str) -> Result<String, XmrError> {
+    if filename.len() == 32
+        && filename
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+        && !filename.contains('/')
+        && !filename.contains("..")
+    {
+        Ok(filename.to_owned())
+    } else {
+        Err(XmrError::request_schema())
+    }
+}
+
+fn json_object(fields: &[(&str, &str)]) -> Zeroizing<Vec<u8>> {
+    let mut params = Zeroizing::new(Vec::new());
+    params.push(b'{');
+    for (index, (key, value)) in fields.iter().enumerate() {
+        if index > 0 {
+            params.push(b',');
+        }
+        json_string(&mut params, key);
+        params.push(b':');
+        json_string(&mut params, value);
+    }
+    params.push(b'}');
+    params
+}
+
+fn json_validate_address(address: &str) -> Zeroizing<Vec<u8>> {
+    let mut params = Zeroizing::new(Vec::new());
+    params.extend_from_slice(b"{\"address\":");
+    json_string(&mut params, address);
+    params.extend_from_slice(b",\"any_net_type\":false,\"allow_openalias\":false}");
+    params
+}
+
+fn json_get_address(account_index: u32, address_index: &[u32]) -> Zeroizing<Vec<u8>> {
+    let mut params = Zeroizing::new(Vec::new());
+    params.extend_from_slice(b"{\"account_index\":");
+    params.extend_from_slice(account_index.to_string().as_bytes());
+    params.extend_from_slice(b",\"address_index\":[");
+    for (index, value) in address_index.iter().enumerate() {
+        if index > 0 {
+            params.push(b',');
+        }
+        params.extend_from_slice(value.to_string().as_bytes());
+    }
+    params.extend_from_slice(b"]}");
+    params
+}
+
+fn json_generate_from_keys(
+    filename: &str,
+    password: &str,
+    address: &str,
+    viewkey: &str,
+    restore_height: u64,
+    spendkey: &str,
+    language: &str,
+) -> Zeroizing<Vec<u8>> {
+    let mut params = Zeroizing::new(Vec::new());
+    params.extend_from_slice(b"{\"filename\":");
+    json_string(&mut params, filename);
+    params.extend_from_slice(b",\"password\":");
+    json_string(&mut params, password);
+    params.extend_from_slice(b",\"address\":");
+    json_string(&mut params, address);
+    params.extend_from_slice(b",\"spendkey\":");
+    json_string(&mut params, spendkey);
+    params.extend_from_slice(b",\"viewkey\":");
+    json_string(&mut params, viewkey);
+    params.extend_from_slice(b",\"restore_height\":");
+    params.extend_from_slice(restore_height.to_string().as_bytes());
+    params.extend_from_slice(b",\"language\":");
+    json_string(&mut params, language);
+    params.push(b'}');
+    params
+}
+
+fn json_restore_params(
+    filename: &str,
+    password: &str,
+    seed: &str,
+    restore_height: u64,
+    language: &str,
+    seed_offset: &str,
+) -> Zeroizing<Vec<u8>> {
+    let mut params = Zeroizing::new(Vec::new());
+    params.extend_from_slice(b"{\"filename\":");
+    json_string(&mut params, filename);
+    params.extend_from_slice(b",\"password\":");
+    json_string(&mut params, password);
+    params.extend_from_slice(b",\"seed\":");
+    json_string(&mut params, seed);
+    params.extend_from_slice(b",\"seed_offset\":");
+    json_string(&mut params, seed_offset);
+    params.extend_from_slice(b",\"restore_height\":");
+    params.extend_from_slice(restore_height.to_string().as_bytes());
+    params.extend_from_slice(b",\"language\":");
+    json_string(&mut params, language);
+    params.push(b'}');
+    params
+}
+
+fn json_string(output: &mut Vec<u8>, value: &str) {
+    output.push(b'"');
+    for byte in value.bytes() {
+        match byte {
+            b'"' | b'\\' => {
+                output.push(b'\\');
+                output.push(byte);
+            }
+            b'\n' => output.extend_from_slice(b"\\n"),
+            b'\r' => output.extend_from_slice(b"\\r"),
+            b'\t' => output.extend_from_slice(b"\\t"),
+            byte if byte < 0x20 => {
+                const HEX: &[u8; 16] = b"0123456789abcdef";
+                output.extend_from_slice(b"\\u00");
+                output.push(HEX[(byte >> 4) as usize]);
+                output.push(HEX[(byte & 0x0f) as usize]);
+            }
+            byte => output.push(byte),
+        }
+    }
+    output.push(b'"');
 }
 
 fn build_http_request(
@@ -1547,16 +1879,29 @@ pub(crate) fn probe_node_with<P: HttpExchangePort>(
 
 pub fn probe_local_node(network: &str) -> Result<(), XmrError> {
     let network = XmrNetwork::parse(network)?;
+    probe_local_node_state(network).map(|_| ())
+}
+
+pub(crate) fn probe_local_node_state(network: XmrNetwork) -> Result<NodeProbeResult, XmrError> {
     let mut core = RpcCore::new(SystemHttpPort::new());
-    probe_node_with(&mut core, network).map(|_| ())
+    probe_node_with(&mut core, network)
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum WalletRpcPhase {
+    Authenticated,
+    FreshSoftware,
+    MnemonicConsumed,
+    WalletBound,
 }
 
 struct WalletSession {
     port: u16,
     credentials: WalletCredentials,
+    phase: WalletRpcPhase,
 }
 
-pub struct SystemWalletRpcControl {
+pub(crate) struct SystemWalletRpcControl {
     core: RpcCore<SystemHttpPort>,
     session: Option<WalletSession>,
 }
@@ -1577,6 +1922,60 @@ impl SystemWalletRpcControl {
             session.credentials.password.text()?,
             request,
         )
+    }
+
+    fn require_phase(&self, allowed: &[WalletRpcPhase]) -> Result<WalletRpcPhase, XmrError> {
+        let phase = self
+            .session
+            .as_ref()
+            .map(|session| session.phase)
+            .ok_or_else(XmrError::unavailable)?;
+        if allowed.contains(&phase) {
+            Ok(phase)
+        } else {
+            Err(XmrError::request_schema())
+        }
+    }
+
+    fn set_phase(&mut self, phase: WalletRpcPhase) -> Result<(), XmrError> {
+        let session = self.session.as_mut().ok_or_else(XmrError::unavailable)?;
+        session.phase = phase;
+        Ok(())
+    }
+
+    fn require_empty(&mut self, request: RpcRequest) -> Result<(), XmrError> {
+        match self.session_call(request)? {
+            TypedResult::Empty => Ok(()),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn primary_from_result(result: TypedResult) -> Result<Zeroizing<String>, XmrError> {
+        match result {
+            TypedResult::Addresses { primary, addresses } => {
+                let text = Zeroizing::new(primary.expose()?.to_owned());
+                drop(addresses);
+                if text.len() != 95 {
+                    return Err(XmrError::protocol_incompatible());
+                }
+                Ok(text)
+            }
+            TypedResult::Generated { address } | TypedResult::Restore { address, .. } => {
+                let text = Zeroizing::new(address.expose()?.to_owned());
+                if text.len() != 95 {
+                    return Err(XmrError::protocol_incompatible());
+                }
+                Ok(text)
+            }
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn expected_nettype(network: XmrNetwork) -> &'static str {
+        match network {
+            XmrNetwork::Stagenet => "stagenet",
+            XmrNetwork::Testnet => "testnet",
+        }
     }
 }
 
@@ -1604,6 +2003,7 @@ impl WalletRpcControl for SystemWalletRpcControl {
                 username: SecretBytes::new(username.as_bytes().to_vec(), None),
                 password: SecretBytes::new(password.as_bytes().to_vec(), None),
             },
+            phase: WalletRpcPhase::Authenticated,
         });
         let started = Instant::now();
         let session = self.session.as_ref().ok_or_else(XmrError::unavailable)?;
@@ -1635,22 +2035,122 @@ impl WalletRpcControl for SystemWalletRpcControl {
     }
 
     fn close_wallet(&mut self) -> Result<(), XmrError> {
-        match self.session_call(RpcRequest::CloseWallet)? {
-            TypedResult::Empty => Ok(()),
-            _ => Err(XmrError::protocol_incompatible()),
+        let result = self.require_empty(RpcRequest::CloseWallet);
+        if result.is_ok() {
+            let _ = self.set_phase(WalletRpcPhase::Authenticated);
         }
+        result
     }
 
     fn stop_wallet(&mut self) -> Result<(), XmrError> {
-        match self.session_call(RpcRequest::StopWallet)? {
-            TypedResult::Empty => Ok(()),
-            _ => Err(XmrError::protocol_incompatible()),
-        }
+        self.require_empty(RpcRequest::StopWallet)
     }
 
     fn close_sockets(&mut self) {
         self.core.close_all();
         self.session = None;
+    }
+
+    fn create_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError> {
+        self.require_phase(&[WalletRpcPhase::Authenticated])?;
+        self.require_empty(RpcRequest::create_wallet(filename, password)?)?;
+        self.set_phase(WalletRpcPhase::FreshSoftware)
+    }
+
+    fn query_mnemonic(&mut self) -> Result<Zeroizing<String>, XmrError> {
+        self.require_phase(&[WalletRpcPhase::FreshSoftware])?;
+        let mnemonic = match self.session_call(RpcRequest::query_key_mnemonic())? {
+            TypedResult::Key(key) => Zeroizing::new(key.expose()?.to_owned()),
+            _ => return Err(XmrError::protocol_incompatible()),
+        };
+        self.set_phase(WalletRpcPhase::MnemonicConsumed)?;
+        Ok(mnemonic)
+    }
+
+    fn get_primary_address(&mut self, network: XmrNetwork) -> Result<Zeroizing<String>, XmrError> {
+        self.require_phase(&[
+            WalletRpcPhase::FreshSoftware,
+            WalletRpcPhase::MnemonicConsumed,
+            WalletRpcPhase::WalletBound,
+        ])?;
+        let address = Self::primary_from_result(self.session_call(RpcRequest::get_address())?)?;
+        self.validate_primary_address(&address, network)?;
+        Ok(address)
+    }
+
+    fn validate_primary_address(
+        &mut self,
+        address: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        self.require_phase(&[
+            WalletRpcPhase::Authenticated,
+            WalletRpcPhase::FreshSoftware,
+            WalletRpcPhase::MnemonicConsumed,
+            WalletRpcPhase::WalletBound,
+        ])?;
+        match self.session_call(RpcRequest::validate_address(address)?)? {
+            TypedResult::AddressValidation {
+                valid,
+                integrated,
+                subaddress,
+                nettype,
+            } if valid
+                && !integrated
+                && !subaddress
+                && nettype == Self::expected_nettype(network) =>
+            {
+                Ok(())
+            }
+            TypedResult::AddressValidation { .. } => Err(XmrError::protocol_incompatible()),
+            _ => Err(XmrError::protocol_incompatible()),
+        }
+    }
+
+    fn generate_from_keys(
+        &mut self,
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.require_phase(&[WalletRpcPhase::Authenticated])?;
+        let result = self.session_call(RpcRequest::generate_from_keys(
+            filename,
+            password,
+            address,
+            viewkey,
+            restore_height,
+        )?)?;
+        let primary = Self::primary_from_result(result)?;
+        self.set_phase(WalletRpcPhase::WalletBound)?;
+        Ok(primary)
+    }
+
+    fn open_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError> {
+        self.require_phase(&[WalletRpcPhase::Authenticated])?;
+        self.require_empty(RpcRequest::open_wallet(filename, password)?)?;
+        self.set_phase(WalletRpcPhase::WalletBound)
+    }
+
+    fn restore_deterministic_wallet(
+        &mut self,
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<Zeroizing<String>, XmrError> {
+        self.require_phase(&[WalletRpcPhase::Authenticated])?;
+        let result = self.session_call(RpcRequest::restore_deterministic_wallet(
+            filename,
+            password,
+            seed,
+            restore_height,
+        )?)?;
+        let primary = Self::primary_from_result(result)?;
+        self.set_phase(WalletRpcPhase::WalletBound)?;
+        Ok(primary)
     }
 }
 
@@ -1660,17 +2160,30 @@ impl Drop for SystemWalletRpcControl {
     }
 }
 
-pub(crate) fn digest_response_for_test(
-    username: &str,
-    password: &str,
-    realm: &str,
-    nonce: &str,
-    uri: &str,
-    method: &str,
-    qop: &str,
-    nc: &str,
-    cnonce: &str,
-) -> Result<String, XmrError> {
+pub(crate) struct DigestResponseInput<'a> {
+    pub(crate) username: &'a str,
+    pub(crate) password: &'a str,
+    pub(crate) realm: &'a str,
+    pub(crate) nonce: &'a str,
+    pub(crate) uri: &'a str,
+    pub(crate) method: &'a str,
+    pub(crate) qop: &'a str,
+    pub(crate) nc: &'a str,
+    pub(crate) cnonce: &'a str,
+}
+
+pub(crate) fn digest_response_for_test(input: DigestResponseInput<'_>) -> Result<String, XmrError> {
+    let DigestResponseInput {
+        username,
+        password,
+        realm,
+        nonce,
+        uri,
+        method,
+        qop,
+        nc,
+        cnonce,
+    } = input;
     if qop != "auth" || nc != "00000001" {
         return Err(XmrError::unauth());
     }

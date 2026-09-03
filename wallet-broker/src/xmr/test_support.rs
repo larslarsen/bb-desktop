@@ -1,26 +1,43 @@
 use std::collections::{BTreeMap, VecDeque};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
+use sha2::{Digest, Sha256};
+use zeroize::{Zeroize, Zeroizing};
+
+use crate::vault::{
+    Asset, Network as VaultNetwork, OsEntropy, SecretBytes, VaultError, VaultMetadata,
+    VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, parse_vault, seal_vault,
+    valid_account_id,
+};
+use crate::xmr::account::{
+    AccountManager, AccountPathsView, AccountPort, AccountRpcCall, CreatedAccount,
+    WalletPasswordObservation, WalletPresence, WalletRpcObservation, XmrSecretV1,
+    generate_wallet_password, is_network_valid_address, is_spendable_mnemonic,
+    validate_password_hex_length, validate_primary_address_length, validate_total_length,
+    validate_view_key_hex_length,
+};
 use crate::xmr::distribution::{
     DistributionManager, DistributionPort, EXECUTABLE_BYTES, EXECUTABLE_SHA256,
     ExecutableObservation, HashResult, RecordIntegrity, SelectedFileKind, SelectionRecord,
     VERIFIED_VERSION, VerificationStep, decode_digest,
 };
 use crate::xmr::model::XmrError;
-pub use crate::xmr::model::{HostPlatform, XmrNetwork};
 use crate::xmr::process::{
     DerivedPaths, EntropyOrigin, ProcessCoordinator, ProcessManager, ProcessPort,
     ReadinessObservation, ReservationFailure, WalletRpcProcessPlan, next_os_port_for_test_port,
 };
 use crate::xmr::rpc::{
-    HttpExchangePort, NodeProbeResult, PortFailure, RpcCore, RpcRequest, TypedResult, WipeAudit,
-    digest_response_for_test, node_port, probe_node_with, request_body_boundary_for_test,
-    request_dispatch_for_test, validate_json_for_test,
+    DigestResponseInput, HttpExchangePort, NodeProbeResult, PortFailure, RpcCore, RpcRequest,
+    TypedResult, WipeAudit, digest_response_for_test, node_port, probe_node_with,
+    request_body_boundary_for_test, request_dispatch_for_test, validate_json_for_test,
 };
-use std::sync::Arc;
-use std::time::Duration;
-use zeroize::{Zeroize, Zeroizing};
+use crate::xmr::store::{AccountStore, ColumnInfo, SqliteSurface, StoreSurface, StoredIdentity};
+
+pub use crate::xmr::account::{AccountKind, HostileWalletEntry, SecretExit};
+pub use crate::xmr::model::{HostPlatform, XmrNetwork};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum InstallationKind {
@@ -1200,6 +1217,29 @@ impl RpcMethod {
         }
     }
 
+    fn production(self) -> crate::xmr::rpc::RpcMethod {
+        match self {
+            Self::GetVersion => crate::xmr::rpc::RpcMethod::GetVersion,
+            Self::CreateWallet => crate::xmr::rpc::RpcMethod::CreateWallet,
+            Self::RestoreDeterministicWallet => {
+                crate::xmr::rpc::RpcMethod::RestoreDeterministicWallet
+            }
+            Self::GenerateFromKeys => crate::xmr::rpc::RpcMethod::GenerateFromKeys,
+            Self::OpenWallet => crate::xmr::rpc::RpcMethod::OpenWallet,
+            Self::CloseWallet => crate::xmr::rpc::RpcMethod::CloseWallet,
+            Self::StopWallet => crate::xmr::rpc::RpcMethod::StopWallet,
+            Self::QueryKey => crate::xmr::rpc::RpcMethod::QueryKey,
+            Self::Refresh => crate::xmr::rpc::RpcMethod::Refresh,
+            Self::GetHeight => crate::xmr::rpc::RpcMethod::GetHeight,
+            Self::GetBalance => crate::xmr::rpc::RpcMethod::GetBalance,
+            Self::GetAddress => crate::xmr::rpc::RpcMethod::GetAddress,
+            Self::CreateAddress => crate::xmr::rpc::RpcMethod::CreateAddress,
+            Self::ValidateAddress => crate::xmr::rpc::RpcMethod::ValidateAddress,
+            Self::GetInfo => crate::xmr::rpc::RpcMethod::GetInfo,
+            Self::HardForkInfo => crate::xmr::rpc::RpcMethod::HardForkInfo,
+        }
+    }
+
     pub fn wallet_allowlist() -> [&'static str; 14] {
         [
             "get_version",
@@ -1568,7 +1608,7 @@ impl RecordingRpcPort {
         let mut body = Zeroizing::new(if self.rpc_fault == Some(RpcFault::UpstreamError) {
             format!(
                 r#"{{"jsonrpc":"2.0","id":"bitbook-xmr-v1","error":{{"code":-1,"message":"{}"}}}}"#,
-                &*self.upstream_canary
+                *self.upstream_canary
             )
             .into_bytes()
         } else {
@@ -1862,12 +1902,10 @@ fn valid_result_body(
     let result = Zeroizing::new(match method {
         "get_version" => r#"{"version":65567,"release":true}"#.to_owned(),
         "get_height" => r#"{"height":1000}"#.to_owned(),
-        "get_balance" => concat!(
-            r#"{"balance":1000,"unlocked_balance":900,"multisig_import_needed":false,"per_subaddress":[{"account_index":0,"address_index":7,"address":"synthetic-xmr-address","balance":1000,"unlocked_balance":900,"label":"","num_unspent_outputs":3,"blocks_to_unlock":0,"time_to_unlock":0}],"blocks_to_unlock":0,"time_to_unlock":0}"#
-        ).to_owned(),
-        "create_address" => concat!(
-            r#"{"address":"synthetic-xmr-address","address_index":7,"addresses":["synthetic-xmr-address"],"address_indices":[7]}"#
-        ).to_owned(),
+        "get_balance" => r#"{"balance":1000,"unlocked_balance":900,"multisig_import_needed":false,"per_subaddress":[{"account_index":0,"address_index":7,"address":"synthetic-xmr-address","balance":1000,"unlocked_balance":900,"label":"","num_unspent_outputs":3,"blocks_to_unlock":0,"time_to_unlock":0}],"blocks_to_unlock":0,"time_to_unlock":0}"#
+            .to_owned(),
+        "create_address" => r#"{"address":"synthetic-xmr-address","address_index":7,"addresses":["synthetic-xmr-address"],"address_indices":[7]}"#
+            .to_owned(),
         "get_info" => valid_get_info_result(
             info,
             include_block_weight_limit,
@@ -1894,7 +1932,7 @@ fn valid_result_body(
     });
     format!(
         r#"{{"jsonrpc":"2.0","id":"bitbook-xmr-v1","result":{}}}"#,
-        &*result,
+        *result,
     )
     .into_bytes()
 }
@@ -2163,17 +2201,17 @@ impl RpcTransportRig {
         {
             return Err(XmrError::unauth());
         }
-        digest_response_for_test(
-            vector.username,
-            vector.password,
-            vector.realm,
-            vector.nonce,
-            vector.uri,
-            vector.method,
-            vector.qop,
-            vector.nc,
-            vector.cnonce,
-        )
+        digest_response_for_test(DigestResponseInput {
+            username: vector.username,
+            password: vector.password,
+            realm: vector.realm,
+            nonce: vector.nonce,
+            uri: vector.uri,
+            method: vector.method,
+            qop: vector.qop,
+            nc: vector.nc,
+            cnonce: vector.cnonce,
+        })
     }
 
     pub fn call(&mut self, method: RpcMethod) -> Result<(), XmrError> {
@@ -2188,7 +2226,7 @@ impl RpcTransportRig {
         let result = if let Some(nesting) = self.json_nesting.take() {
             let mut nested = vec![b'['; nesting];
             nested.extend_from_slice(b"null");
-            nested.extend(std::iter::repeat(b']').take(nesting));
+            nested.extend(std::iter::repeat_n(b']', nesting));
             validate_json_for_test(&nested).map(|_| RpcResultObservation::default())
         } else if self.wallet {
             self.core
@@ -2702,4 +2740,2032 @@ fn observe_typed_result(result: TypedResult) -> Result<RpcResultObservation, Xmr
         }
     }
     Ok(observation)
+}
+
+const ACCOUNT_FIXTURE_PRIMARY: &str = concat!(
+    "BBBBBBBBBBBBBBBBBBBB",
+    "BBBBBBBBBBBBBBBBBBBB",
+    "BBBBBBBBBBBBBBBBBBBB",
+    "BBBBBBBBBBBBBBBBBBBB",
+    "BBBBBBBBBBBBBBB",
+);
+const ACCOUNT_FIXTURE_MNEMONIC: &str = concat!(
+    "abbey abducts ability ablaze abnormal abort abrasive absorb abstract absurd abuse academy ",
+    "aces ache acidic acoustic acquire across actress adapt adept adhesive adjusted adopt adorned",
+);
+const ACCOUNT_FIXTURE_VIEW_KEY: &str =
+    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+const MISMATCH_PRIMARY: &str = concat!(
+    "CCCCCCCCCCCCCCCCCCCC",
+    "CCCCCCCCCCCCCCCCCCCC",
+    "CCCCCCCCCCCCCCCCCCCC",
+    "CCCCCCCCCCCCCCCCCCCC",
+    "CCCCCCCCCCCCCCC",
+);
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AccountFault {
+    ReturnedPrimaryMismatch,
+    ReportedNotWatchOnly,
+    VaultSeal,
+    StateWrite,
+    StateFileSync,
+    StateDirectorySync,
+    RollbackCleanup,
+}
+
+pub struct XmrSecretFixture {
+    kind: AccountKind,
+    restore_height: u64,
+    password: Zeroizing<String>,
+    primary: Zeroizing<String>,
+    secret: Zeroizing<String>,
+}
+
+impl PartialEq for XmrSecretFixture {
+    fn eq(&self, other: &Self) -> bool {
+        self.kind == other.kind
+            && self.restore_height == other.restore_height
+            && self.password == other.password
+            && self.primary == other.primary
+            && self.secret == other.secret
+    }
+}
+
+impl Eq for XmrSecretFixture {}
+
+impl std::fmt::Debug for XmrSecretFixture {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("XmrSecretFixture([REDACTED])")
+    }
+}
+
+impl XmrSecretFixture {
+    pub fn software(restore_height: u64, password: &str, primary: &str, mnemonic: &str) -> Self {
+        Self {
+            kind: AccountKind::Software,
+            restore_height,
+            password: Zeroizing::new(password.to_owned()),
+            primary: Zeroizing::new(primary.to_owned()),
+            secret: Zeroizing::new(mnemonic.to_owned()),
+        }
+    }
+
+    pub fn watch_only(restore_height: u64, password: &str, primary: &str, view_key: &str) -> Self {
+        Self {
+            kind: AccountKind::WatchOnly,
+            restore_height,
+            password: Zeroizing::new(password.to_owned()),
+            primary: Zeroizing::new(primary.to_owned()),
+            secret: Zeroizing::new(view_key.to_owned()),
+        }
+    }
+
+    pub fn encode(&self) -> Result<Zeroizing<Vec<u8>>, XmrError> {
+        self.to_secret()?.encode()
+    }
+
+    pub fn decode(bytes: &[u8]) -> Result<Self, XmrError> {
+        Self::from_secret(XmrSecretV1::decode(bytes)?)
+    }
+
+    pub fn mutated_encoding(&self, mutation: &str) -> Zeroizing<Vec<u8>> {
+        let mut bytes = self.encode().expect("fixture encodes");
+        match mutation {
+            "bad-magic" => bytes[0] ^= 1,
+            "unknown-kind" => bytes[8] = 3,
+            "bad-password-length" => bytes[17..19].copy_from_slice(&63_u16.to_be_bytes()),
+            "bad-address-length" => bytes[83..85].copy_from_slice(&94_u16.to_be_bytes()),
+            "bad-secret-length" => bytes[180..182].copy_from_slice(&0_u16.to_be_bytes()),
+            "uppercase-password" => bytes[19] = b'A',
+            "uppercase-view-key" => {
+                if let Some(last) = bytes.last_mut() {
+                    *last = last.to_ascii_uppercase();
+                }
+            }
+            "trailing-byte" => bytes.push(0),
+            "truncated" => {
+                bytes.pop();
+            }
+            "over-2048" => bytes.resize(2_049, 0),
+            _ => {}
+        }
+        bytes
+    }
+
+    pub fn validate_password_hex_length_for_test(length: usize) -> Result<(), XmrError> {
+        validate_password_hex_length(length)
+    }
+
+    pub fn validate_view_key_hex_length_for_test(length: usize) -> Result<(), XmrError> {
+        validate_view_key_hex_length(length)
+    }
+
+    pub fn validate_primary_address_length_for_test(length: usize) -> Result<(), XmrError> {
+        validate_primary_address_length(length)
+    }
+
+    pub fn validate_total_length_for_test(length: usize) -> Result<(), XmrError> {
+        validate_total_length(length)
+    }
+
+    pub fn is_network_valid_address_for_test(address: &str) -> bool {
+        is_network_valid_address(address)
+    }
+
+    pub fn is_spendable_mnemonic_for_test(mnemonic: &str) -> bool {
+        is_spendable_mnemonic(mnemonic)
+    }
+
+    fn to_secret(&self) -> Result<XmrSecretV1, XmrError> {
+        match self.kind {
+            AccountKind::Software => XmrSecretV1::software(
+                self.restore_height,
+                self.password.as_str(),
+                self.primary.as_str(),
+                self.secret.as_str(),
+            ),
+            AccountKind::WatchOnly => XmrSecretV1::watch_only(
+                self.restore_height,
+                self.password.as_str(),
+                self.primary.as_str(),
+                self.secret.as_str(),
+            ),
+        }
+    }
+
+    fn from_secret(secret: XmrSecretV1) -> Result<Self, XmrError> {
+        let payload = match secret.kind() {
+            AccountKind::Software => secret
+                .copy_mnemonic()?
+                .ok_or_else(XmrError::state_corrupt)?,
+            AccountKind::WatchOnly => secret
+                .copy_private_view_key()?
+                .ok_or_else(XmrError::state_corrupt)?,
+        };
+        Ok(Self {
+            kind: secret.kind(),
+            restore_height: secret.restore_height(),
+            password: secret.copy_wallet_password()?,
+            primary: secret.copy_primary_address()?,
+            secret: payload,
+        })
+    }
+}
+
+pub struct SealedSecretView {
+    pub restore_height: u64,
+}
+
+pub struct SealedRecordView {
+    restore_height: u64,
+    password: Zeroizing<String>,
+    primary: Zeroizing<String>,
+    mnemonic: Option<Zeroizing<String>>,
+    view_key: Option<Zeroizing<String>>,
+}
+
+impl Drop for SealedRecordView {
+    fn drop(&mut self) {
+        self.password.zeroize();
+        self.primary.zeroize();
+        if let Some(mnemonic) = &mut self.mnemonic {
+            mnemonic.zeroize();
+        }
+        if let Some(view_key) = &mut self.view_key {
+            view_key.zeroize();
+        }
+    }
+}
+
+impl std::fmt::Debug for SealedRecordView {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("SealedRecordView([REDACTED])")
+    }
+}
+
+impl SealedRecordView {
+    fn from_secret(secret: &XmrSecretV1) -> Result<Self, XmrError> {
+        Ok(Self {
+            restore_height: secret.restore_height(),
+            password: secret.copy_wallet_password()?,
+            primary: secret.copy_primary_address()?,
+            mnemonic: secret.copy_mnemonic()?,
+            view_key: secret.copy_private_view_key()?,
+        })
+    }
+
+    pub fn restore_height(&self) -> u64 {
+        self.restore_height
+    }
+
+    pub fn wallet_password(&self) -> &str {
+        self.password.as_str()
+    }
+
+    pub fn primary_address(&self) -> &str {
+        self.primary.as_str()
+    }
+
+    pub fn mnemonic(&self) -> Option<&str> {
+        self.mnemonic.as_deref().map(String::as_str)
+    }
+
+    pub fn private_view_key(&self) -> Option<&str> {
+        self.view_key.as_deref().map(String::as_str)
+    }
+}
+
+struct FaultingSurface {
+    inner: SqliteSurface,
+    faults: Vec<AccountFault>,
+}
+
+impl StoreSurface for FaultingSurface {
+    fn execute_batch(&mut self, sql: &str) -> Result<(), XmrError> {
+        self.inner.execute_batch(sql)
+    }
+
+    fn query_i64(&mut self, sql: &str) -> Result<i64, XmrError> {
+        self.inner.query_i64(sql)
+    }
+
+    fn insert_identity(&mut self, identity: &StoredIdentity) -> Result<(), XmrError> {
+        if self.faults.contains(&AccountFault::StateWrite) {
+            return Err(XmrError::state_corrupt());
+        }
+        self.inner.insert_identity(identity)
+    }
+
+    fn load_identity(&mut self) -> Result<StoredIdentity, XmrError> {
+        self.inner.load_identity()
+    }
+
+    fn table_names(&mut self) -> Result<Vec<String>, XmrError> {
+        self.inner.table_names()
+    }
+
+    fn table_sql(&mut self, table: &str) -> Result<String, XmrError> {
+        self.inner.table_sql(table)
+    }
+
+    fn column_info(&mut self, table: &str) -> Result<Vec<ColumnInfo>, XmrError> {
+        self.inner.column_info(table)
+    }
+
+    fn schema_objects(&mut self) -> Result<Vec<(String, String, String)>, XmrError> {
+        self.inner.schema_objects()
+    }
+
+    fn unique_column_sets(&mut self, table: &str) -> Result<Vec<Vec<String>>, XmrError> {
+        self.inner.unique_column_sets(table)
+    }
+
+    fn begin(&mut self) -> Result<(), XmrError> {
+        self.inner.begin()
+    }
+
+    fn commit(&mut self) -> Result<(), XmrError> {
+        self.inner.commit()
+    }
+
+    fn rollback(&mut self) -> Result<(), XmrError> {
+        self.inner.rollback()
+    }
+
+    fn sync_file(&mut self) -> Result<(), XmrError> {
+        if self.faults.contains(&AccountFault::StateFileSync) {
+            return Err(XmrError::state_corrupt());
+        }
+        self.inner.sync_file()
+    }
+
+    fn sync_directory(&mut self) -> Result<(), XmrError> {
+        if self.faults.contains(&AccountFault::StateDirectorySync) {
+            return Err(XmrError::state_corrupt());
+        }
+        self.inner.sync_directory()
+    }
+
+    fn reopen_existing(&mut self) -> Result<(), XmrError> {
+        if self.faults.contains(&AccountFault::StateFileSync)
+            || self.faults.contains(&AccountFault::StateDirectorySync)
+        {
+            return Err(XmrError::state_corrupt());
+        }
+        self.inner.reopen_existing()
+    }
+}
+
+const TEST_VAULT_PASSPHRASE: &[u8] = b"bitbook-xmr-account-test-pass";
+
+struct RecordingWipe {
+    events: Arc<Mutex<Vec<WipeEvent>>>,
+}
+
+impl WipeObserver for RecordingWipe {
+    fn observe(&mut self, event: WipeEvent) {
+        if let Ok(mut events) = self.events.lock() {
+            events.push(event);
+        }
+    }
+}
+
+struct RecordingWork;
+
+impl VaultWorkObserver for RecordingWork {
+    fn before_allocation(&mut self, _bytes: usize) -> Result<(), VaultError> {
+        Ok(())
+    }
+
+    fn before_kdf(&mut self) {}
+}
+
+#[derive(Clone, Default)]
+struct RecordingAttempt {
+    vault: bool,
+    state: bool,
+    wallet: bool,
+    keys: bool,
+}
+
+struct RecordingAccountPort {
+    account_id: String,
+    network: XmrNetwork,
+    primary: Zeroizing<String>,
+    mnemonic: Zeroizing<String>,
+    view_key: Zeroizing<String>,
+    restore_height: u64,
+    local_height: u64,
+    operations: Vec<&'static str>,
+    calls: Vec<AccountRpcCall>,
+    faults: Vec<AccountFault>,
+    presence: WalletPresence,
+    child_count: usize,
+    handles: usize,
+    replaced_hostile: bool,
+    sealed_bytes: Option<Vec<u8>>,
+    last_password: Option<SecretBytes>,
+    open_mutation: Option<&'static str>,
+    store: AccountStore<FaultingSurface>,
+    wipe_events: Arc<Mutex<Vec<WipeEvent>>>,
+    passphrase: SecretBytes,
+    attempt: RecordingAttempt,
+    wallet_open: bool,
+}
+
+impl RecordingAccountPort {
+    fn new(account_id: &str, network: XmrNetwork) -> Self {
+        let surface = FaultingSurface {
+            inner: SqliteSurface::memory().expect("in-memory account store"),
+            faults: Vec::new(),
+        };
+        Self {
+            account_id: account_id.to_owned(),
+            network,
+            primary: Zeroizing::new(ACCOUNT_FIXTURE_PRIMARY.to_owned()),
+            mnemonic: Zeroizing::new(ACCOUNT_FIXTURE_MNEMONIC.to_owned()),
+            view_key: Zeroizing::new(ACCOUNT_FIXTURE_VIEW_KEY.to_owned()),
+            restore_height: 900,
+            local_height: 1_000,
+            operations: Vec::new(),
+            calls: Vec::new(),
+            faults: Vec::new(),
+            presence: WalletPresence::Missing,
+            child_count: 0,
+            handles: 0,
+            replaced_hostile: false,
+            sealed_bytes: None,
+            last_password: None,
+            open_mutation: None,
+            store: AccountStore::new(surface),
+            wipe_events: Arc::new(Mutex::new(Vec::new())),
+            passphrase: SecretBytes::new(TEST_VAULT_PASSPHRASE.to_vec())
+                .expect("test vault passphrase"),
+            attempt: RecordingAttempt::default(),
+            wallet_open: false,
+        }
+    }
+
+    fn replace_text(slot: &mut Zeroizing<String>, value: &str) {
+        slot.zeroize();
+        *slot = Zeroizing::new(value.to_owned());
+    }
+
+    fn has_fault(&self, fault: AccountFault) -> bool {
+        self.faults.contains(&fault)
+    }
+
+    fn arm_fault(&mut self, fault: AccountFault) {
+        if !self.faults.contains(&fault) {
+            self.faults.push(fault);
+        }
+        if !self.store.surface_mut().faults.contains(&fault) {
+            self.store.surface_mut().faults.push(fault);
+        }
+    }
+
+    fn remember_password(&mut self, password: &str) -> Result<(), XmrError> {
+        self.last_password =
+            Some(SecretBytes::new(password.as_bytes().to_vec()).map_err(|_| XmrError::internal())?);
+        Ok(())
+    }
+
+    fn observation(&self, method: &str) -> WalletRpcObservation {
+        let mut primary = Zeroizing::new(self.primary.as_str().to_owned());
+        let mut verified_primary = Zeroizing::new(primary.as_str().to_owned());
+        let mut watch_only = method == "generate_from_keys";
+        if self.has_fault(AccountFault::ReturnedPrimaryMismatch) && method == "get_address" {
+            verified_primary.zeroize();
+            verified_primary = Zeroizing::new(MISMATCH_PRIMARY.to_owned());
+        }
+        if self.has_fault(AccountFault::ReportedNotWatchOnly) {
+            watch_only = false;
+        }
+        if self.open_mutation == Some("primary-address") {
+            primary.zeroize();
+            primary = Zeroizing::new(MISMATCH_PRIMARY.to_owned());
+            verified_primary.zeroize();
+            verified_primary = Zeroizing::new(primary.as_str().to_owned());
+        }
+        WalletRpcObservation {
+            primary,
+            verified_primary,
+            watch_only,
+        }
+    }
+
+    fn vault_metadata(&self) -> Result<VaultMetadata, XmrError> {
+        let mut id = [0u8; 16];
+        if self.account_id.len() == 32 {
+            for (index, chunk) in self
+                .account_id
+                .as_bytes()
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .enumerate()
+            {
+                let hi = hex_nibble(chunk[0]);
+                let lo = hex_nibble(chunk[1]);
+                if let (Some(hi), Some(lo)) = (hi, lo) {
+                    id[index] = (hi << 4) | lo;
+                }
+            }
+        }
+        VaultMetadata::new(
+            id,
+            Asset::Xmr,
+            match self.network {
+                XmrNetwork::Stagenet => VaultNetwork::XmrStagenet,
+                XmrNetwork::Testnet => VaultNetwork::XmrTestnet,
+            },
+            1,
+        )
+        .map_err(|_| XmrError::state_corrupt())
+    }
+}
+
+fn hex_nibble(value: u8) -> Option<u8> {
+    match value {
+        b'0'..=b'9' => Some(value - b'0'),
+        b'a'..=b'f' => Some(value - b'a' + 10),
+        _ => None,
+    }
+}
+
+impl AccountPort for RecordingAccountPort {
+    fn note(&mut self, operation: &'static str) {
+        self.operations.push(operation);
+    }
+
+    fn operations(&self) -> &[&'static str] {
+        &self.operations
+    }
+
+    fn fill_entropy(&mut self, output: &mut [u8]) -> Result<(), XmrError> {
+        getrandom::fill(output).map_err(|_| XmrError::internal())
+    }
+
+    fn local_height_without_bootstrap(&mut self) -> Result<u64, XmrError> {
+        Ok(self.local_height)
+    }
+
+    fn begin_attempt(&mut self) {
+        self.attempt = RecordingAttempt::default();
+    }
+
+    fn commit_attempt(&mut self) {
+        self.attempt = RecordingAttempt::default();
+    }
+
+    fn preflight_create_new(&mut self, _paths: &AccountPathsView) -> Result<(), XmrError> {
+        if self.sealed_bytes.is_some() || matches!(self.presence, WalletPresence::Hostile(_)) {
+            return Err(XmrError::state_corrupt());
+        }
+        Ok(())
+    }
+
+    fn preflight_open_existing(
+        &mut self,
+        _paths: &AccountPathsView,
+    ) -> Result<WalletPresence, XmrError> {
+        if self.sealed_bytes.is_none() {
+            return Err(XmrError::state_corrupt());
+        }
+        if self.open_mutation == Some("partial-wallet-set") {
+            return Ok(WalletPresence::Partial);
+        }
+        if matches!(self.presence, WalletPresence::Hostile(_)) {
+            return Err(XmrError::state_corrupt());
+        }
+        Ok(self.presence)
+    }
+
+    fn create_private_layout_after_preflight(&mut self) -> Result<(), XmrError> {
+        Ok(())
+    }
+
+    fn create_missing_wallet_layout(&mut self) -> Result<(), XmrError> {
+        self.attempt.wallet = true;
+        self.attempt.keys = true;
+        Ok(())
+    }
+
+    fn inspect_wallet(&mut self, _paths: &AccountPathsView) -> Result<WalletPresence, XmrError> {
+        if self.open_mutation == Some("partial-wallet-set") {
+            return Ok(WalletPresence::Partial);
+        }
+        Ok(self.presence)
+    }
+
+    fn create_wallet_files(&mut self, _paths: &AccountPathsView) -> Result<(), XmrError> {
+        if matches!(self.presence, WalletPresence::Hostile(_)) {
+            return Err(XmrError::state_corrupt());
+        }
+        self.presence = WalletPresence::Complete;
+        self.attempt.wallet = true;
+        self.attempt.keys = true;
+        Ok(())
+    }
+
+    fn rollback_owned_artifacts(&mut self) -> Result<(), XmrError> {
+        if self.attempt.wallet || self.attempt.keys {
+            self.presence = WalletPresence::Missing;
+        }
+        if self.attempt.vault {
+            self.sealed_bytes = None;
+        }
+        if self.attempt.state {
+            let surface = FaultingSurface {
+                inner: SqliteSurface::memory().expect("in-memory account store"),
+                faults: self.faults.clone(),
+            };
+            self.store = AccountStore::new(surface);
+        }
+        if self.has_fault(AccountFault::RollbackCleanup) {
+            Err(XmrError::internal())
+        } else {
+            self.attempt = RecordingAttempt::default();
+            Ok(())
+        }
+    }
+
+    fn start_child(&mut self) -> Result<(), XmrError> {
+        self.child_count = 1;
+        Ok(())
+    }
+
+    fn create_wallet(&mut self, filename: &str, password: &str) -> Result<(), XmrError> {
+        self.remember_password(password)?;
+        self.calls
+            .push(AccountRpcCall::create_wallet(filename, password));
+        self.handles = self.handles.saturating_add(1);
+        self.presence = WalletPresence::Complete;
+        self.wallet_open = true;
+        self.attempt.wallet = true;
+        self.attempt.keys = true;
+        Ok(())
+    }
+
+    fn query_mnemonic(&mut self) -> Result<Zeroizing<String>, XmrError> {
+        self.calls.push(AccountRpcCall::query_key_mnemonic());
+        Ok(self.mnemonic.clone())
+    }
+
+    fn get_primary_address(&mut self) -> Result<WalletRpcObservation, XmrError> {
+        self.calls.push(AccountRpcCall::get_address());
+        Ok(self.observation("get_address"))
+    }
+
+    fn validate_primary_for_network(&mut self, _address: &str) -> Result<(), XmrError> {
+        Ok(())
+    }
+
+    fn generate_from_keys(
+        &mut self,
+        filename: &str,
+        password: &str,
+        address: &str,
+        viewkey: &str,
+        restore_height: u64,
+    ) -> Result<WalletRpcObservation, XmrError> {
+        self.remember_password(password)?;
+        Self::replace_text(&mut self.primary, address);
+        Self::replace_text(&mut self.view_key, viewkey);
+        self.restore_height = restore_height;
+        self.calls.push(AccountRpcCall::generate_from_keys(
+            filename,
+            password,
+            address,
+            viewkey,
+            restore_height,
+        ));
+        self.handles = self.handles.saturating_add(1);
+        self.presence = WalletPresence::Complete;
+        self.wallet_open = true;
+        self.attempt.wallet = true;
+        self.attempt.keys = true;
+        Ok(self.observation("generate_from_keys"))
+    }
+
+    fn open_wallet(
+        &mut self,
+        filename: &str,
+        password: &str,
+    ) -> Result<WalletRpcObservation, XmrError> {
+        self.remember_password(password)?;
+        self.calls
+            .push(AccountRpcCall::open_wallet(filename, password));
+        self.handles = self.handles.saturating_add(1);
+        self.wallet_open = true;
+        Ok(self.observation("open_wallet"))
+    }
+
+    fn restore_deterministic_wallet(
+        &mut self,
+        filename: &str,
+        password: &str,
+        seed: &str,
+        restore_height: u64,
+    ) -> Result<WalletRpcObservation, XmrError> {
+        self.remember_password(password)?;
+        self.restore_height = restore_height;
+        self.calls
+            .push(AccountRpcCall::restore_deterministic_wallet(
+                filename,
+                password,
+                seed,
+                restore_height,
+            ));
+        self.handles = self.handles.saturating_add(1);
+        self.presence = WalletPresence::Complete;
+        self.wallet_open = true;
+        self.attempt.wallet = true;
+        self.attempt.keys = true;
+        Ok(self.observation("restore_deterministic_wallet"))
+    }
+
+    fn close_wallet(&mut self) -> Result<(), XmrError> {
+        self.calls.push(AccountRpcCall::close_wallet());
+        self.handles = 0;
+        self.wallet_open = false;
+        Ok(())
+    }
+
+    fn recorded_calls(&self) -> &[AccountRpcCall] {
+        &self.calls
+    }
+
+    fn seal_vault(&mut self, secret: &XmrSecretV1) -> Result<(), XmrError> {
+        if self.has_fault(AccountFault::VaultSeal) {
+            return Err(XmrError::state_corrupt());
+        }
+        let metadata = self.vault_metadata()?;
+        let mut plaintext =
+            SecretBytes::new(secret.encode()?.to_vec()).map_err(|_| XmrError::state_corrupt())?;
+        let mut passphrase = SecretBytes::new(self.passphrase.expose(|bytes| bytes.to_vec()))
+            .map_err(|_| XmrError::state_corrupt())?;
+        let mut entropy = OsEntropy;
+        let mut observer = RecordingWipe {
+            events: self.wipe_events.clone(),
+        };
+        let envelope = seal_vault(
+            &metadata,
+            &mut passphrase,
+            &mut plaintext,
+            &mut entropy,
+            &mut observer,
+        )
+        .map_err(|_| XmrError::state_corrupt())?;
+        self.sealed_bytes = Some(envelope.as_bytes().to_vec());
+        self.attempt.vault = true;
+        Ok(())
+    }
+
+    fn open_vault(&mut self) -> Result<XmrSecretV1, XmrError> {
+        let bytes = self.sealed_bytes.as_ref().ok_or_else(XmrError::unauth)?;
+        let mut passphrase = SecretBytes::new(self.passphrase.expose(|value| value.to_vec()))
+            .map_err(|_| XmrError::unauth())?;
+        let mut work = RecordingWork;
+        let mut observer = RecordingWipe {
+            events: self.wipe_events.clone(),
+        };
+        let plaintext = open_vault_bytes(bytes, &mut passphrase, &mut work, &mut observer)
+            .map_err(|_| XmrError::unauth())?;
+        plaintext.expose(XmrSecretV1::decode)
+    }
+
+    fn persist_state(&mut self, identity: &StoredIdentity) -> Result<(), XmrError> {
+        self.attempt.state = true;
+        self.store.persist_identity(identity)
+    }
+
+    fn load_state(&mut self) -> Result<StoredIdentity, XmrError> {
+        let loaded = self.store.load_identity()?;
+        let primary = loaded.primary_address()?;
+        match self.open_mutation {
+            Some("network") => {
+                let network = if self.network == XmrNetwork::Stagenet {
+                    XmrNetwork::Testnet
+                } else {
+                    XmrNetwork::Stagenet
+                };
+                StoredIdentity::new(
+                    loaded.account_id().to_owned(),
+                    network,
+                    loaded.kind(),
+                    primary.as_str(),
+                    loaded.restore_height(),
+                )
+            }
+            Some("kind") => {
+                let kind = if loaded.kind() == 1 { 2 } else { 1 };
+                StoredIdentity::new(
+                    loaded.account_id().to_owned(),
+                    self.network,
+                    kind,
+                    primary.as_str(),
+                    loaded.restore_height(),
+                )
+            }
+            Some("restore-height") => StoredIdentity::new(
+                loaded.account_id().to_owned(),
+                self.network,
+                loaded.kind(),
+                primary.as_str(),
+                loaded.restore_height().saturating_add(1),
+            ),
+            Some("account-id") => StoredIdentity::new(
+                "ffeeddccbbaa99887766554433221100".to_owned(),
+                self.network,
+                loaded.kind(),
+                primary.as_str(),
+                loaded.restore_height(),
+            ),
+            _ => Ok(loaded),
+        }
+    }
+
+    fn stop_and_reap_child(&mut self) -> Result<(), XmrError> {
+        self.teardown_owned()
+    }
+
+    fn teardown_owned(&mut self) -> Result<(), XmrError> {
+        if self.child_count > 0 {
+            if self.wallet_open {
+                self.calls.push(AccountRpcCall::close_wallet());
+                self.wallet_open = false;
+            }
+            self.calls.push(AccountRpcCall::stop_wallet());
+        }
+        self.child_count = 0;
+        self.handles = 0;
+        if self.has_fault(AccountFault::RollbackCleanup) {
+            Err(XmrError::internal())
+        } else {
+            Ok(())
+        }
+    }
+
+    fn prove_owned_session(
+        &mut self,
+        account_id: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        if self.account_id == account_id && self.network == network {
+            Ok(())
+        } else {
+            Err(XmrError::state_corrupt())
+        }
+    }
+
+    fn wipe_wallet_password(&mut self) {
+        if let Some(mut password) = self.last_password.take() {
+            let mut observer = RecordingWipe {
+                events: self.wipe_events.clone(),
+            };
+            password.wipe_with("xmr-wallet-password", &mut observer);
+        }
+    }
+
+    fn wipe_events(&self) -> Vec<WipeEvent> {
+        self.wipe_events
+            .lock()
+            .map(|events| events.clone())
+            .unwrap_or_default()
+    }
+
+    fn active_child_count(&self) -> usize {
+        self.child_count
+    }
+
+    fn open_handle_count(&self) -> usize {
+        self.handles
+    }
+
+    fn replaced_hostile_entry(&self) -> bool {
+        self.replaced_hostile
+    }
+}
+
+impl Drop for RecordingAccountPort {
+    fn drop(&mut self) {
+        self.primary.zeroize();
+        self.mnemonic.zeroize();
+        self.view_key.zeroize();
+        self.wipe_wallet_password();
+    }
+}
+
+pub struct AccountRig {
+    manager: AccountManager<RecordingAccountPort>,
+    wipe_events: Arc<Mutex<Vec<WipeEvent>>>,
+}
+
+impl AccountRig {
+    pub fn software(account: &str, network: XmrNetwork) -> Self {
+        Self::new(account, network.name(), "software", network)
+    }
+
+    pub fn watch_only(account: &str, network: XmrNetwork) -> Self {
+        Self::new(account, network.name(), "watch_only", network)
+    }
+
+    pub fn unvalidated(account_id: &str, network: &str, kind: &str) -> Self {
+        let parsed_network = XmrNetwork::parse(network).unwrap_or(XmrNetwork::Stagenet);
+        Self::new(account_id, network, kind, parsed_network)
+    }
+
+    pub fn sealed(account: &str, network: XmrNetwork, kind: AccountKind) -> Self {
+        let mut rig = match kind {
+            AccountKind::Software => Self::software(account, network),
+            AccountKind::WatchOnly => Self::watch_only(account, network),
+        };
+        rig.install_sealed(kind);
+        rig
+    }
+
+    pub fn with_hostile_entry(
+        account: &str,
+        network: XmrNetwork,
+        entry: HostileWalletEntry,
+    ) -> Self {
+        let mut rig = Self::sealed(account, network, AccountKind::Software);
+        rig.manager.port_mut().presence = WalletPresence::Hostile(entry);
+        rig
+    }
+
+    fn new(account_id: &str, network_text: &str, kind_text: &str, network: XmrNetwork) -> Self {
+        let port = RecordingAccountPort::new(account_id, network);
+        Self {
+            wipe_events: port.wipe_events.clone(),
+            manager: AccountManager::new(account_id, network_text, kind_text, port),
+        }
+    }
+
+    fn install_sealed(&mut self, kind: AccountKind) {
+        let mut observation = generate_wallet_password(self.manager.port_mut())
+            .expect("sealed password")
+            .observation();
+        let mut password = Zeroizing::new(std::mem::take(&mut observation.encoded));
+        let secret = match kind {
+            AccountKind::Software => XmrSecretV1::software(
+                900,
+                &password,
+                ACCOUNT_FIXTURE_PRIMARY,
+                ACCOUNT_FIXTURE_MNEMONIC,
+            ),
+            AccountKind::WatchOnly => XmrSecretV1::watch_only(
+                900,
+                &password,
+                ACCOUNT_FIXTURE_PRIMARY,
+                ACCOUNT_FIXTURE_VIEW_KEY,
+            ),
+        }
+        .expect("sealed secret");
+        password.zeroize();
+        self.manager
+            .port_mut()
+            .seal_vault(&secret)
+            .expect("seal sealed account");
+        let identity = StoredIdentity::new(
+            self.manager.port().account_id.clone(),
+            self.manager.port().network,
+            kind.code(),
+            ACCOUNT_FIXTURE_PRIMARY,
+            900,
+        )
+        .expect("sealed identity");
+        self.manager
+            .port_mut()
+            .persist_state(&identity)
+            .expect("persist sealed identity");
+        self.manager.port_mut().presence = WalletPresence::Complete;
+        self.manager.port_mut().restore_height = 900;
+        RecordingAccountPort::replace_text(
+            &mut self.manager.port_mut().primary,
+            ACCOUNT_FIXTURE_PRIMARY,
+        );
+    }
+
+    pub fn set_local_height_without_bootstrap(&mut self, height: u64) {
+        self.manager.port_mut().local_height = height;
+    }
+
+    pub fn arm_fault(&mut self, fault: AccountFault) {
+        self.manager.port_mut().arm_fault(fault);
+    }
+
+    pub fn create_software(&mut self) -> Result<CreatedAccount, XmrError> {
+        self.manager.create_software()
+    }
+
+    pub fn import_watch_only(
+        &mut self,
+        primary: &str,
+        view_key: &str,
+        restore_height: u64,
+    ) -> Result<CreatedAccount, XmrError> {
+        self.manager
+            .import_watch_only(primary, view_key, restore_height)
+    }
+
+    pub fn create(&mut self) -> Result<CreatedAccount, XmrError> {
+        self.manager.create()
+    }
+
+    pub fn open(&mut self) -> Result<CreatedAccount, XmrError> {
+        self.manager.open()
+    }
+
+    pub fn lock(&mut self) -> Result<(), XmrError> {
+        self.manager.lock()
+    }
+
+    pub fn rpc_calls(&self) -> Vec<&'static str> {
+        self.manager
+            .port()
+            .recorded_calls()
+            .iter()
+            .map(AccountRpcCall::method)
+            .collect()
+    }
+
+    pub fn rpc_field_names(&self, method: &str) -> Vec<&'static str> {
+        self.lookup_call(method)
+            .map(AccountRpcCall::field_names)
+            .unwrap_or_default()
+    }
+
+    pub fn rpc_argument(&self, method: &str, field: &str) -> Option<&str> {
+        self.lookup_call(method)
+            .and_then(|call| call.argument(field))
+    }
+
+    pub fn rpc_argument_matches_secret(&self, method: &str, field: &str, expected: &str) -> bool {
+        self.rpc_argument(method, field) == Some(expected)
+    }
+
+    pub fn sealed_secret_for_test(&self) -> SealedSecretView {
+        SealedSecretView {
+            restore_height: self
+                .sealed_record()
+                .map(|record| record.restore_height())
+                .unwrap_or(0),
+        }
+    }
+
+    pub fn authenticated_sealed_record_for_test(&self) -> Result<SealedRecordView, XmrError> {
+        self.sealed_record()
+    }
+
+    pub fn vault_sealed_before_account_state(&self) -> bool {
+        self.manager.vault_sealed_before_account_state()
+    }
+
+    pub fn account_state_durable_before_return(&self) -> bool {
+        self.manager.account_state_durable_before_return()
+    }
+
+    pub fn returned_account(&self) -> Option<&CreatedAccount> {
+        self.manager.returned_account()
+    }
+
+    pub fn vault_committed(&self) -> bool {
+        self.manager.vault_committed()
+    }
+
+    pub fn account_state_committed(&self) -> bool {
+        self.manager.account_state_committed()
+    }
+
+    pub fn active_child_count(&self) -> usize {
+        self.manager.active_child_count()
+    }
+
+    pub fn open_handle_count(&self) -> usize {
+        self.manager.open_handle_count()
+    }
+
+    pub fn generated_wallet_removed_or_quarantined(&self) -> bool {
+        self.manager.generated_wallet_removed_or_quarantined()
+    }
+
+    pub fn creation_secrets_wiped(&self) -> bool {
+        self.manager.creation_secrets_wiped()
+    }
+
+    pub fn rpc_reported_watch_only(&self) -> bool {
+        self.manager.rpc_reported_watch_only()
+    }
+
+    pub fn remove_wallet_files_for_test(&mut self) {
+        self.manager.port_mut().presence = WalletPresence::Missing;
+    }
+
+    pub fn vault_authenticated_before_recovery(&self) -> bool {
+        self.manager.vault_authenticated_before_recovery()
+    }
+
+    pub fn recovery_created_files(&self) -> bool {
+        self.manager.recovery_created_files()
+    }
+
+    pub fn identity_verified_after_open(&self) -> bool {
+        self.manager.identity_verified_after_open()
+    }
+
+    pub fn mutate_open_identity(&mut self, mutation: &'static str) {
+        self.manager.port_mut().open_mutation = Some(mutation);
+    }
+
+    pub fn inspect_paths(&self) -> AccountPathsView {
+        self.manager.inspect_paths().expect("derived account paths")
+    }
+
+    pub fn operations(&self) -> &[&'static str] {
+        self.manager.operations()
+    }
+
+    pub fn replaced_hostile_entry(&self) -> bool {
+        self.manager.replaced_hostile_entry()
+    }
+
+    pub fn account_unavailable(&self) -> bool {
+        self.manager.account_unavailable()
+    }
+
+    pub fn last_rpc_calls(&self) -> &[&'static str] {
+        self.manager.last_rpc_calls()
+    }
+
+    pub fn wallet_password_wiped(&self) -> bool {
+        self.manager.wallet_password_wiped()
+    }
+
+    pub fn may_retain_process(&self) -> bool {
+        self.manager.may_retain_process()
+    }
+
+    pub fn simulate_cold_restart(&mut self) {
+        self.manager.simulate_cold_restart();
+    }
+
+    pub fn requires_authenticated_vault_for_password(&self) -> bool {
+        self.manager.requires_authenticated_vault_for_password()
+    }
+
+    pub fn fresh_wallet_password_for_test() -> Result<WalletPasswordObservation, XmrError> {
+        let mut port =
+            RecordingAccountPort::new("00112233445566778899aabbccddeeff", XmrNetwork::Stagenet);
+        generate_wallet_password(&mut port).map(|password| password.observation())
+    }
+
+    pub fn exercise_secret_exit(&mut self, exit: SecretExit, secrets: Vec<SecretBytes>) {
+        self.wipe_events = Arc::new(Mutex::new(Vec::new()));
+        let _ = crate::xmr::account::run_secret_exit(secrets, exit, self.wipe_events.clone());
+        let _ = self.manager.port_mut().stop_and_reap_child();
+        self.manager.port_mut().wipe_wallet_password();
+    }
+
+    pub fn all_secret_wipes_observed(&self, _exit: SecretExit) -> bool {
+        let events = self.wipe_events.lock().expect("wipe events");
+        events.len() == 4
+            && events
+                .iter()
+                .all(|event| event.all_zero && event.length > 0)
+    }
+
+    fn lookup_call(&self, method: &str) -> Option<&AccountRpcCall> {
+        self.manager
+            .port()
+            .recorded_calls()
+            .iter()
+            .rev()
+            .find(|call| call.method() == method)
+    }
+
+    fn sealed_record(&self) -> Result<SealedRecordView, XmrError> {
+        let port = self.manager.port();
+        let bytes = port
+            .sealed_bytes
+            .as_ref()
+            .ok_or_else(XmrError::state_corrupt)?;
+        let mut work = RecordingWork;
+        let envelope = parse_vault(bytes, &mut work).map_err(|_| XmrError::state_corrupt())?;
+        let expected = port.vault_metadata()?;
+        if envelope.metadata() != &expected {
+            return Err(XmrError::state_corrupt());
+        }
+        let mut passphrase =
+            SecretBytes::new(TEST_VAULT_PASSPHRASE.to_vec()).map_err(|_| XmrError::unauth())?;
+        let mut observer = RecordingWipe {
+            events: Arc::new(Mutex::new(Vec::new())),
+        };
+        let plaintext = open_vault_bytes(bytes, &mut passphrase, &mut work, &mut observer)
+            .map_err(|_| XmrError::unauth())?;
+        let secret = plaintext.expose(XmrSecretV1::decode)?;
+        SealedRecordView::from_secret(&secret)
+    }
+}
+
+const XMR_PHASE_SEVEN_OPERATIONS: [&str; 7] = [
+    "xmr.installation.select-native",
+    "xmr.account.create-native",
+    "xmr.account.import-watch-only-native",
+    "xmr.account.open",
+    "xmr.account.lock",
+    "xmr.account.view",
+    "xmr.receiver.fresh",
+];
+
+const PUBLIC_DIAGNOSTIC_FIELDS: [&str; 5] = ["operation", "account_id", "asset", "network", "code"];
+
+const HYGIENE_WIPE_LABELS: [&str; 10] = [
+    "rpc-username",
+    "rpc-password",
+    "digest-ha1",
+    "digest-cnonce",
+    "digest-challenge",
+    "digest-authorization",
+    "wallet-password",
+    "mnemonic",
+    "private-view-key",
+    "native-import",
+];
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum MnemonicPhase {
+    Idle,
+    FreshSoftware,
+    MnemonicConsumed,
+    Finished,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HygieneExit {
+    Success,
+    Error,
+    Cancellation,
+    Replacement,
+    PanicUnwind,
+    Drop,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ObservableSecretClass {
+    SelectedPath,
+    ArgvConfig,
+    EndpointPort,
+    RpcRealmNonce,
+    RpcLogin,
+    Authorization,
+    WalletPassword,
+    Mnemonic,
+    ViewKey,
+    SpendKey,
+    PrimaryAddress,
+    FreshReceiver,
+    RequestId,
+    RawHttpJson,
+    NodeResponse,
+    WalletFile,
+    SqliteRow,
+    UpstreamError,
+}
+
+impl ObservableSecretClass {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::SelectedPath => "selected-path",
+            Self::ArgvConfig => "argv-config",
+            Self::EndpointPort => "endpoint-port",
+            Self::RpcRealmNonce => "rpc-realm-nonce",
+            Self::RpcLogin => "rpc-login",
+            Self::Authorization => "authorization",
+            Self::WalletPassword => "wallet-password",
+            Self::Mnemonic => "mnemonic",
+            Self::ViewKey => "view-key",
+            Self::SpendKey => "spend-key",
+            Self::PrimaryAddress => "primary-address",
+            Self::FreshReceiver => "fresh-receiver",
+            Self::RequestId => "request-id",
+            Self::RawHttpJson => "raw-http-json",
+            Self::NodeResponse => "node-response",
+            Self::WalletFile => "wallet-file",
+            Self::SqliteRow => "sqlite-row",
+            Self::UpstreamError => "upstream-error",
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct ObservableCanary<'a> {
+    class: ObservableSecretClass,
+    value: &'a str,
+}
+
+impl<'a> ObservableCanary<'a> {
+    pub fn new(class: ObservableSecretClass, value: &'a str) -> Self {
+        Self { class, value }
+    }
+
+    pub fn class(&self) -> ObservableSecretClass {
+        self.class
+    }
+
+    pub fn value(&self) -> &str {
+        self.value
+    }
+}
+
+impl core::fmt::Debug for ObservableCanary<'_> {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("ObservableCanary")
+            .field("class", &self.class.as_str())
+            .finish()
+    }
+}
+
+pub struct CanaryCommitment {
+    pub class: &'static str,
+    pub byte_length: usize,
+    pub sha256: String,
+}
+
+impl core::fmt::Debug for CanaryCommitment {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("CanaryCommitment")
+            .field("class", &self.class)
+            .field("byte_length", &self.byte_length)
+            .field("sha256", &self.sha256)
+            .finish()
+    }
+}
+
+pub struct ObservableCanaryReceipt {
+    commitments: Vec<CanaryCommitment>,
+}
+
+impl ObservableCanaryReceipt {
+    pub fn commitments(&self) -> &[CanaryCommitment] {
+        &self.commitments
+    }
+}
+
+impl core::fmt::Debug for ObservableCanaryReceipt {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("ObservableCanaryReceipt")
+            .field(
+                "classes",
+                &self
+                    .commitments
+                    .iter()
+                    .map(|commitment| commitment.class)
+                    .collect::<Vec<_>>(),
+            )
+            .finish()
+    }
+}
+
+pub struct ImmediateFailure {
+    pub failed_immediately: bool,
+    pub method: String,
+    pub bytes_read_after_method: usize,
+    pub state_transitions_after_method: usize,
+    pub returned_bytes: usize,
+}
+
+impl core::fmt::Debug for ImmediateFailure {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("ImmediateFailure")
+            .field("failed_immediately", &self.failed_immediately)
+            .field("method", &self.method)
+            .field("bytes_read_after_method", &self.bytes_read_after_method)
+            .finish()
+    }
+}
+
+pub struct AuthorityRig {
+    account_id: String,
+    network_text: String,
+    phase_operations: [&'static str; 7],
+    operations: Vec<&'static str>,
+    typed_calls: Vec<String>,
+    returned_values: Vec<&'static str>,
+    raw_request_count: usize,
+    side_effects: usize,
+    observed_side_effects: usize,
+    mnemonic_queries: usize,
+    node_requests: usize,
+    wallet_requests: usize,
+    children: usize,
+    handles: usize,
+    phase: MnemonicPhase,
+    wallet: Option<RpcTransportRig>,
+    node: Option<RpcTransportRig>,
+}
+
+impl core::fmt::Debug for AuthorityRig {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("AuthorityRig")
+            .field("account_id", &self.account_id)
+            .field("network", &self.network_text)
+            .field("typed_calls", &self.typed_calls.len())
+            .finish()
+    }
+}
+
+impl AuthorityRig {
+    pub fn xmr_phase_seven() -> Self {
+        Self {
+            account_id: String::new(),
+            network_text: String::new(),
+            phase_operations: XMR_PHASE_SEVEN_OPERATIONS,
+            operations: Vec::new(),
+            typed_calls: Vec::new(),
+            returned_values: Vec::new(),
+            raw_request_count: 0,
+            side_effects: 0,
+            observed_side_effects: 0,
+            mnemonic_queries: 0,
+            node_requests: 0,
+            wallet_requests: 0,
+            children: 0,
+            handles: 0,
+            phase: MnemonicPhase::Idle,
+            wallet: Some(RpcTransportRig::wallet()),
+            node: Some(RpcTransportRig::node()),
+        }
+    }
+
+    pub fn from_product_input(account: &str, network: &str) -> Self {
+        Self {
+            account_id: account.to_owned(),
+            network_text: network.to_owned(),
+            phase_operations: XMR_PHASE_SEVEN_OPERATIONS,
+            operations: Vec::new(),
+            typed_calls: Vec::new(),
+            returned_values: Vec::new(),
+            raw_request_count: 0,
+            side_effects: 0,
+            observed_side_effects: 0,
+            mnemonic_queries: 0,
+            node_requests: 0,
+            wallet_requests: 0,
+            children: 0,
+            handles: 0,
+            phase: MnemonicPhase::Idle,
+            wallet: None,
+            node: None,
+        }
+    }
+
+    pub fn public_operations(&self) -> [&'static str; 7] {
+        self.phase_operations
+    }
+
+    pub fn invoke_for_test(&self, operation: &str) -> Result<(), XmrError> {
+        if self.phase_operations.contains(&operation) {
+            return Ok(());
+        }
+        Err(XmrError::request_schema())
+    }
+
+    pub fn side_effect_count(&self) -> usize {
+        self.side_effects
+    }
+
+    pub fn side_effect_count_since_last_observation(&self) -> usize {
+        self.side_effects.saturating_sub(self.observed_side_effects)
+    }
+
+    pub fn call(&mut self, method: RpcMethod) -> Result<(), XmrError> {
+        let production = method.production();
+        if !request_dispatch_for_test(production.name()) {
+            return Err(XmrError::request_schema());
+        }
+        method.request()?;
+        let label = if production.is_wallet() {
+            self.wallet
+                .as_mut()
+                .ok_or_else(XmrError::unavailable)?
+                .call(method)?;
+            self.wallet_requests = self.wallet_requests.saturating_add(1);
+            format!("wallet:{}", production.name())
+        } else {
+            self.node
+                .as_mut()
+                .ok_or_else(XmrError::unavailable)?
+                .call(method)?;
+            self.node_requests = self.node_requests.saturating_add(1);
+            format!("node:{}", production.name())
+        };
+        self.typed_calls.push(label);
+        self.note_effect();
+        Ok(())
+    }
+
+    pub fn typed_calls(&self) -> &[String] {
+        &self.typed_calls
+    }
+
+    pub fn raw_request_count(&self) -> usize {
+        self.raw_request_count
+    }
+
+    pub fn invoke_fake_unlisted_and_capture(&mut self, method: &str) -> ImmediateFailure {
+        if request_dispatch_for_test(method) {
+            ImmediateFailure {
+                failed_immediately: false,
+                method: method.to_owned(),
+                bytes_read_after_method: 0,
+                state_transitions_after_method: 0,
+                returned_bytes: 0,
+            }
+        } else {
+            ImmediateFailure {
+                failed_immediately: true,
+                method: method.to_owned(),
+                bytes_read_after_method: 0,
+                state_transitions_after_method: 0,
+                returned_bytes: 0,
+            }
+        }
+    }
+
+    pub fn begin_fresh_software_creation(
+        &mut self,
+        account: &str,
+        network: XmrNetwork,
+    ) -> Result<(), XmrError> {
+        if !valid_account_id(account) {
+            return Err(XmrError::request_schema());
+        }
+        let _ = XmrNetwork::parse(network.name())?;
+        if self.phase != MnemonicPhase::Idle {
+            return Err(XmrError::request_schema());
+        }
+        self.account_id = account.to_owned();
+        self.network_text = network.name().to_owned();
+        self.phase = MnemonicPhase::FreshSoftware;
+        self.note_effect();
+        self.observe();
+        Ok(())
+    }
+
+    pub fn query_mnemonic_once(&mut self) -> Result<(), XmrError> {
+        if self.phase != MnemonicPhase::FreshSoftware || self.mnemonic_queries != 0 {
+            return Err(XmrError::request_schema());
+        }
+        if !request_dispatch_for_test(crate::xmr::rpc::RpcMethod::QueryKey.name()) {
+            return Err(XmrError::request_schema());
+        }
+        if !matches!(
+            RpcRequest::query_key_mnemonic(),
+            RpcRequest::QueryKeyMnemonic
+        ) {
+            return Err(XmrError::request_schema());
+        }
+        self.mnemonic_queries = self.mnemonic_queries.saturating_add(1);
+        self.phase = MnemonicPhase::MnemonicConsumed;
+        self.note_effect();
+        self.observe();
+        Ok(())
+    }
+
+    pub fn query_key_for_test(&mut self, key_type: &str) -> Result<(), XmrError> {
+        if key_type != "mnemonic" {
+            return Err(XmrError::request_schema());
+        }
+        self.query_mnemonic_once()
+    }
+
+    pub fn finish_fresh_software_creation(&mut self) -> Result<(), XmrError> {
+        if self.phase != MnemonicPhase::MnemonicConsumed {
+            return Err(XmrError::request_schema());
+        }
+        self.phase = MnemonicPhase::Finished;
+        self.note_effect();
+        self.observe();
+        Ok(())
+    }
+
+    pub fn mnemonic_query_count(&self) -> usize {
+        self.mnemonic_queries
+    }
+
+    pub fn open(&mut self) -> Result<(), XmrError> {
+        if !valid_account_id(&self.account_id) {
+            return Err(XmrError::request_schema());
+        }
+        let _ = XmrNetwork::parse(&self.network_text)?;
+        self.operations.push("xmr.account.open");
+        self.note_effect();
+        Ok(())
+    }
+
+    pub fn operations(&self) -> &[&'static str] {
+        &self.operations
+    }
+
+    pub fn node_request_count(&self) -> usize {
+        self.node_requests
+    }
+
+    pub fn wallet_request_count(&self) -> usize {
+        self.wallet_requests
+    }
+
+    pub fn child_count(&self) -> usize {
+        self.children
+    }
+
+    pub fn open_handle_count(&self) -> usize {
+        self.handles
+    }
+
+    pub fn returned_values(&self) -> &[&'static str] {
+        &self.returned_values
+    }
+
+    fn note_effect(&mut self) {
+        self.side_effects = self.side_effects.saturating_add(1);
+    }
+
+    fn observe(&mut self) {
+        self.observed_side_effects = self.side_effects;
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NonXmrSnapshot {
+    zec: usize,
+    social: usize,
+    electron: usize,
+    quote: usize,
+}
+
+pub struct HygieneRig {
+    account_id: String,
+    network: XmrNetwork,
+    process: ProcessRig,
+    installed: Vec<(ObservableSecretClass, Zeroizing<String>)>,
+    wipes: Arc<Mutex<Vec<WipeEvent>>>,
+    last_exit: Option<HygieneExit>,
+    last_error: Option<XmrError>,
+    logs: Vec<&'static str>,
+    diagnostics: Vec<&'static str>,
+    panic_output: Option<&'static str>,
+    teardown_output: Option<&'static str>,
+    diagnostic_fields: [&'static str; 5],
+    snapshot: NonXmrSnapshot,
+    zec_calls: usize,
+    social_calls: usize,
+    electron_calls: usize,
+    quote_calls: usize,
+    reaped_owned_group: bool,
+}
+
+impl core::fmt::Debug for HygieneRig {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("HygieneRig")
+            .field("account_id", &self.account_id)
+            .field("network", &self.network)
+            .field("child_count", &self.child_count())
+            .finish()
+    }
+}
+
+impl HygieneRig {
+    pub fn new(account: &str, network: XmrNetwork) -> Self {
+        Self {
+            account_id: account.to_owned(),
+            network,
+            process: ProcessRig::new_unvalidated(account, network.name()),
+            installed: Vec::new(),
+            wipes: Arc::new(Mutex::new(Vec::new())),
+            last_exit: None,
+            last_error: None,
+            logs: Vec::new(),
+            diagnostics: Vec::new(),
+            panic_output: None,
+            teardown_output: None,
+            diagnostic_fields: PUBLIC_DIAGNOSTIC_FIELDS,
+            snapshot: NonXmrSnapshot {
+                zec: 0,
+                social: 0,
+                electron: 0,
+                quote: 0,
+            },
+            zec_calls: 0,
+            social_calls: 0,
+            electron_calls: 0,
+            quote_calls: 0,
+            reaped_owned_group: false,
+        }
+    }
+
+    pub fn with_isolation_snapshots(account: &str, network: XmrNetwork) -> Self {
+        let mut process = ProcessRig::with_isolation_observer();
+        let _ = process.start_account(account, network);
+        Self {
+            account_id: account.to_owned(),
+            network,
+            process,
+            installed: Vec::new(),
+            wipes: Arc::new(Mutex::new(Vec::new())),
+            last_exit: None,
+            last_error: None,
+            logs: Vec::new(),
+            diagnostics: Vec::new(),
+            panic_output: None,
+            teardown_output: None,
+            diagnostic_fields: PUBLIC_DIAGNOSTIC_FIELDS,
+            snapshot: NonXmrSnapshot {
+                zec: 1,
+                social: 1,
+                electron: 1,
+                quote: 1,
+            },
+            zec_calls: 0,
+            social_calls: 0,
+            electron_calls: 0,
+            quote_calls: 0,
+            reaped_owned_group: false,
+        }
+    }
+
+    pub fn install_canaries(
+        &mut self,
+        canaries: &[ObservableCanary<'_>],
+    ) -> Result<ObservableCanaryReceipt, XmrError> {
+        const EXPECTED: [ObservableSecretClass; 18] = [
+            ObservableSecretClass::SelectedPath,
+            ObservableSecretClass::ArgvConfig,
+            ObservableSecretClass::EndpointPort,
+            ObservableSecretClass::RpcRealmNonce,
+            ObservableSecretClass::RpcLogin,
+            ObservableSecretClass::Authorization,
+            ObservableSecretClass::WalletPassword,
+            ObservableSecretClass::Mnemonic,
+            ObservableSecretClass::ViewKey,
+            ObservableSecretClass::SpendKey,
+            ObservableSecretClass::PrimaryAddress,
+            ObservableSecretClass::FreshReceiver,
+            ObservableSecretClass::RequestId,
+            ObservableSecretClass::RawHttpJson,
+            ObservableSecretClass::NodeResponse,
+            ObservableSecretClass::WalletFile,
+            ObservableSecretClass::SqliteRow,
+            ObservableSecretClass::UpstreamError,
+        ];
+        if canaries.len() != EXPECTED.len()
+            || !canaries
+                .iter()
+                .zip(EXPECTED)
+                .all(|(canary, class)| canary.class == class && !canary.value.is_empty())
+        {
+            return Err(XmrError::request_schema());
+        }
+        let commitments = canaries
+            .iter()
+            .map(|canary| CanaryCommitment {
+                class: canary.class.as_str(),
+                byte_length: canary.value.len(),
+                sha256: hygiene_sha256_hex(canary.value.as_bytes()),
+            })
+            .collect::<Vec<_>>();
+        self.installed = canaries
+            .iter()
+            .map(|canary| (canary.class, Zeroizing::new(canary.value.to_owned())))
+            .collect();
+        Ok(ObservableCanaryReceipt { commitments })
+    }
+
+    pub fn exercise_success_and_failure(&mut self) -> Result<(), XmrError> {
+        if self.installed.iter().any(|(_, value)| value.is_empty()) {
+            return Err(XmrError::internal());
+        }
+        let mut wallet = RpcTransportRig::wallet();
+        wallet.call(RpcMethod::GetVersion)?;
+        let mut authority = AuthorityRig::xmr_phase_seven();
+        let failure = authority.invoke_fake_unlisted_and_capture("transfer");
+        if !failure.failed_immediately {
+            return Err(XmrError::internal());
+        }
+        self.last_error = Some(XmrError::request_schema());
+        self.logs.clear();
+        self.diagnostics = Vec::from(self.diagnostic_fields);
+        Ok(())
+    }
+
+    pub fn last_error(&self) -> Option<&XmrError> {
+        self.last_error.as_ref()
+    }
+
+    pub fn error_chain(&self) -> Vec<String> {
+        let mut chain = Vec::new();
+        let mut current = self
+            .last_error
+            .as_ref()
+            .map(|error| error as &dyn std::error::Error);
+        while let Some(error) = current {
+            chain.push(error.to_string());
+            current = error.source();
+        }
+        chain
+    }
+
+    pub fn logs(&self) -> &[&'static str] {
+        &self.logs
+    }
+
+    pub fn diagnostics(&self) -> &[&'static str] {
+        &self.diagnostics
+    }
+
+    pub fn panic_output(&self) -> Option<&'static str> {
+        self.panic_output
+    }
+
+    pub fn teardown_output(&self) -> Option<&'static str> {
+        self.teardown_output
+    }
+
+    pub fn public_diagnostic_fields(&self) -> [&'static str; 5] {
+        self.diagnostic_fields
+    }
+
+    pub fn encode_diagnostic_field_for_test(
+        &self,
+        field: &str,
+        value: &str,
+    ) -> Result<(), XmrError> {
+        if !self.diagnostic_fields.contains(&field) {
+            return Err(XmrError::request_schema());
+        }
+        if value.is_empty() || value.bytes().any(|byte| byte < 0x20 || byte == 0x7f) {
+            return Err(XmrError::request_schema());
+        }
+        Ok(())
+    }
+
+    pub fn exercise_exit(&mut self, exit: HygieneExit) {
+        self.last_exit = Some(exit);
+        let mut owner = HygieneSecretOwner::install(self.wipes.clone());
+        match exit {
+            HygieneExit::Success => owner.wipe_all(),
+            HygieneExit::Error => {
+                self.last_error = Some(XmrError::unavailable());
+                owner.wipe_all();
+            }
+            HygieneExit::Cancellation => owner.wipe_all(),
+            HygieneExit::Replacement => {
+                owner.replace_all();
+                owner.wipe_all();
+            }
+            HygieneExit::PanicUnwind => {
+                let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    let _owner = owner;
+                    panic!("xmr hygiene secret unwind");
+                }))
+                .is_err();
+                if panicked {
+                    self.panic_output = Some("[REDACTED]");
+                }
+            }
+            HygieneExit::Drop => drop(owner),
+        }
+    }
+
+    pub fn wipe_observed(&self, label: &str, exit: HygieneExit) -> bool {
+        self.last_exit == Some(exit)
+            && self.wipes.lock().is_ok_and(|events| {
+                events
+                    .iter()
+                    .any(|event| event.label == label && event.all_zero && event.length > 0)
+            })
+    }
+
+    pub fn start_child(&mut self) -> Result<(), XmrError> {
+        self.process.start()?;
+        self.reaped_owned_group = false;
+        Ok(())
+    }
+
+    pub fn teardown_for_test(&mut self, cause: &str) {
+        match cause {
+            "lock" => {
+                let _ = self.process.teardown(TeardownCause::Lock);
+            }
+            "broker-exit" => {
+                let _ = self.process.broker_exit_for_test();
+            }
+            "executable-missing" => {
+                self.process.arm_fault(ProcessFault::ExecutableRemoved);
+                let _ = self.process.poll_health();
+            }
+            "executable-changed" => {
+                self.process.arm_fault(ProcessFault::ExecutableChanged);
+                let _ = self.process.poll_health();
+            }
+            "authentication-failure" | "malformed-rpc" => {
+                let _ = self.process.teardown(TeardownCause::Failure);
+            }
+            "unexpected-child-exit" => {
+                self.process.set_child_exit(ChildExit::Unexpected);
+                let _ = self.process.teardown(TeardownCause::Failure);
+            }
+            "panic-unwind" => {
+                let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    panic!("xmr hygiene process unwind");
+                }))
+                .is_err();
+                if panicked {
+                    self.panic_output = Some("[REDACTED]");
+                }
+                let _ = self.process.teardown(TeardownCause::Failure);
+            }
+            _ => {
+                let _ = self.process.teardown(TeardownCause::Failure);
+            }
+        }
+        self.reaped_owned_group = self.process.child_count() == 0;
+        self.teardown_output = Some("[REDACTED]");
+    }
+
+    pub fn child_count(&self) -> usize {
+        self.process.child_count()
+    }
+
+    pub fn open_handle_count(&self) -> usize {
+        self.process
+            .manager
+            .as_ref()
+            .map(|manager| manager.port().open_handles)
+            .unwrap_or(0)
+    }
+
+    pub fn process_group_reaped(&self) -> bool {
+        self.reaped_owned_group
+    }
+
+    pub fn runtime_secrets_removed(&self) -> bool {
+        self.process
+            .manager
+            .as_ref()
+            .map(|manager| manager.port().runtime_secrets_removed)
+            .unwrap_or(false)
+    }
+
+    pub fn credentials_wiped(&self) -> bool {
+        self.process
+            .manager
+            .as_ref()
+            .map(ProcessManager::credentials_wiped)
+            .unwrap_or(false)
+    }
+
+    pub fn touched_nonowned_process(&self) -> bool {
+        self.process.manager.as_ref().is_some_and(|manager| {
+            let port = manager.port();
+            match port.killed_child_identity {
+                Some(killed) => port.owned_child_identity != Some(killed),
+                None => false,
+            }
+        })
+    }
+
+    pub fn fail_xmr_child_for_test(&mut self) {
+        let _ = self
+            .process
+            .fail_account(&self.account_id, ProcessFault::UnexpectedExit);
+        self.last_error = Some(XmrError::unavailable());
+    }
+
+    pub fn non_xmr_snapshot(&self) -> NonXmrSnapshot {
+        self.snapshot
+    }
+
+    pub fn zec_call_count(&self) -> usize {
+        self.zec_calls
+    }
+
+    pub fn social_call_count(&self) -> usize {
+        self.social_calls
+    }
+
+    pub fn electron_call_count(&self) -> usize {
+        self.electron_calls
+    }
+
+    pub fn quote_worker_call_count(&self) -> usize {
+        self.quote_calls
+    }
+}
+
+struct HygieneSecretOwner {
+    secrets: Vec<(&'static str, SecretBytes)>,
+    events: Arc<Mutex<Vec<WipeEvent>>>,
+}
+
+impl HygieneSecretOwner {
+    fn install(events: Arc<Mutex<Vec<WipeEvent>>>) -> Self {
+        let secrets = HYGIENE_WIPE_LABELS
+            .iter()
+            .map(|label| {
+                (
+                    *label,
+                    SecretBytes::new(label.as_bytes().to_vec()).expect("hygiene secret"),
+                )
+            })
+            .collect();
+        Self { secrets, events }
+    }
+
+    fn wipe_all(&mut self) {
+        let mut observer = RecordingWipe {
+            events: self.events.clone(),
+        };
+        for (label, secret) in &mut self.secrets {
+            secret.wipe_with(label, &mut observer);
+        }
+        self.secrets.clear();
+    }
+
+    fn replace_all(&mut self) {
+        let mut observer = RecordingWipe {
+            events: self.events.clone(),
+        };
+        for (label, secret) in &mut self.secrets {
+            let _ = secret.replace(label.as_bytes().to_vec(), label, &mut observer);
+        }
+    }
+}
+
+impl Drop for HygieneSecretOwner {
+    fn drop(&mut self) {
+        if !self.secrets.is_empty() {
+            self.wipe_all();
+        }
+    }
+}
+
+fn hygiene_sha256_hex(bytes: &[u8]) -> String {
+    const DIGITS: &[u8; 16] = b"0123456789abcdef";
+    let digest = Sha256::digest(bytes);
+    let mut result = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        result.push(char::from(DIGITS[usize::from(byte >> 4)]));
+        result.push(char::from(DIGITS[usize::from(byte & 0x0f)]));
+    }
+    result
 }
