@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: SLICE 01 FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
+State: SLICE 01 GREEN RESUME 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,14 +18,14 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SPARK_BBD_WAL_008_SLICE_01_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_008_SLICE_01_FORMAT_CORRECTION_01.md)
+[HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_02.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_02.md)
 
-Hermes stopped correctly when the first Slice-01 formatter check exited 1. The
-unchanged-source stop is recorded in
-[BBD-WAL-008-SLICE-01-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-01-GREEN-STOP-REVIEW-01.md).
-Spark High alone may run the exact pinned formatter on `zec/hardware.rs` and
-`zec/test_support.rs`, then stop. Hermes, semantic edits, tests, persistence, other
-actors, real-device work, broader gates, and WAL-007 remain unauthorized.
+Spark's exact two-file formatter output is accepted in
+[BBD-WAL-008-SLICE-01-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-01-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
+Hermes alone may freshly run the formatter, exact AND-to-OR falsification with
+restoration, and 12-test partial green, then integrate only on exact success.
+Persistence, semantic repair, other actors, broader gates, real-device work, and
+WAL-007 remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

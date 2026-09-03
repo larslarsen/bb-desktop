@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE 01 FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
+Status: SLICE 01 GREEN RESUME 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -283,6 +283,15 @@ No falsification, test, mutation, or integration ran. The unchanged-source stop 
 recorded in `docs/testing/BBD-WAL-008-SLICE-01-GREEN-STOP-REVIEW-01.md`. Codex Spark
 High alone may run the pinned formatter on those two files. Further execution and all
 later work remain unauthorized pending reviewer inspection.
+
+## Reviewer source decision 10
+
+Spark's two-file Rust 1.98 formatter output is accepted in
+`docs/testing/BBD-WAL-008-SLICE-01-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md`; its
+unnecessary `cd` command prefix is recorded. Hermes alone may restart the exact
+formatter, intersection falsification/restoration, and 12-test partial green under
+Resume 02 and integrate only on exact success. Persistence and broader work remain
+unauthorized.
 
 ## Acceptance boundary
 
