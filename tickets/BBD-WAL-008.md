@@ -214,6 +214,14 @@ canaries non-vacuous and byte-safe, prove persisted narrowing cannot silently ex
 cover directory-sync failure, and freeze the fingerprint alphabet. No execution or
 production source is authorized.
 
+## Reviewer source decision 02
+
+Correction 01 resolves the substantive capability and persistence findings. One
+redaction-oracle correction remains: canary touch counts must be zero immediately after
+installation and positive only after the exercised sensitive flows. See
+`docs/testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-02.md`. No execution or production
+source is authorized.
+
 ## Acceptance boundary
 
 Completion proves only a fail-closed Zcash hardware capability/route-selection boundary
