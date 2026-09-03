@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: SLICE 01 GREEN 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
+State: SLICE 01 EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes (complete)
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,17 +18,13 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md)
+[HERMES_BBD_WAL_008_SLICE_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_SLICE_01_EVIDENCE_CORRECTION_01.md)
 
-Hermes completed Green Resume 03 on the exact two fresh commands: the formatter
-check exited 0 without mutation, and the 13-test partial green exited 0 with 13
-passed, 0 failed, 5 filtered out. The accepted Resume-02 AND-to-OR
-falsification/restoration is recorded separately and was not repeated. The
-evidence is recorded in
-[BBD-WAL-008-SLICE-01-GREEN-01.md](../testing/BBD-WAL-008-SLICE-01-GREEN-01.md).
-The exact three source paths plus the evidence and current-task records are
-staged, committed, and pushed. Persistence, other actors, broader gates,
-real-device work, and WAL-007 remain unauthorized.
+Slice-01 source and outcomes are integrated at `d55edcec`, but transcript audit found
+that both gate commands used unrecorded `cd` wrappers and Hermes ran an unrequested
+Node.js version command. Hermes alone may correct the green evidence and this current
+task under the active handoff. Source, execution, persistence, other actors, broader
+gates, real-device work, and WAL-007 remain unauthorized pending acceptance.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

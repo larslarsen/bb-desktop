@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE 01 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
+Status: SLICE 01 EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -302,6 +302,14 @@ source remained exactly restored and unintegrated. The result and accepted
 falsification are recorded in
 `docs/testing/BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md`. Hermes alone may
 run Resume 03 with the corrected 13-test count and integrate on exact success.
+
+## Reviewer evidence decision 12
+
+Resume 03 passed and integrated at `d55edcec`, but its evidence abbreviates the gate
+commands and falsely claims no wrappers; transcript audit also found an unrequested
+Node.js version command. The bounded evidence correction is specified in
+`docs/testing/BBD-WAL-008-SLICE-01-GREEN-01-EVIDENCE-REVIEW-01.md`. Hermes alone may
+correct the two documentation paths. Source and further execution remain closed.
 
 ## Acceptance boundary
 
