@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 COMPILE CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 4 COMPILE CORRECTION ACCEPTED — HERMES GREEN RESUME 02 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_COMPILE_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_COMPILE_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_02.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -223,6 +223,12 @@ recorded in
 [BBD-WAL-007-SLICE-04-GREEN-RESUME-01-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-01-STOP-REVIEW-01.md).
 Grok 4.6 High alone may make the exact two-path compile repair. Sol is not needed or
 authorized. Hermes execution/integration remains blocked pending XHigh acceptance.
+Grok's exact three-call and no-clone zeroizing extraction repair is accepted at XHigh
+in
+[BBD-WAL-007-SLICE-04-COMPILE-CORRECTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-COMPILE-CORRECTION-SOURCE-REVIEW-01.md).
+Hermes alone may run the fresh strict formatter/falsification/green resume. Commands
+may not be wrapped, redirected, or repeated after a mismatch. Grok, Sol, Slice 5,
+broader/final acceptance, and the real offline local-Monero gate are not authorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
