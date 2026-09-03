@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 SLICE-02 EVIDENCE CORRECTION AUTHORIZED — HERMES ONLY
+State: WAL-008 SLICE-02 EVIDENCE CORRECTION 01 AWAITING REVIEWER ACCEPTANCE — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -35,8 +35,15 @@ then ran two unrequested hash checks and repeated the focused test twice after t
 required final stop. Source and gate outcomes remain valid; the incomplete evidence is
 reviewed in
 [BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
-Hermes alone may correct the two named records without rerunning any gate. All source,
+Hermes corrected the two named records without rerunning any gate. All source,
 tests, execution, other documentation, real-device work, and WAL-007 remain frozen.
+
+Correction 01 is complete and awaits reviewer acceptance. The exact four
+post-integration commands are disclosed in
+[BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md).
+The governing review is
+[BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
+The authorized integration commit `369d811c` is unchanged.
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).

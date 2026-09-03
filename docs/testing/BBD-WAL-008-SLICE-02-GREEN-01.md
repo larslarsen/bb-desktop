@@ -136,3 +136,19 @@ The four accepted source paths remain dirty at their frozen identities:
 Integration only. No source, test, manifest, or lockfile mutation. No broader
 suite, audit, scanner, or WAL-007 execution. No Grok/Sol/Spark invocation. No
 real-device or transport work.
+
+## Transcript deviation
+
+After the required final repository proof, Hermes did not stop and ran these four
+unrequested post-integration commands, in exact order:
+
+1. `sha256sum wallet-broker/src/zec/store.rs` — returned
+   `1ab107367c3f7af4581bba770dbb1943955b6ebe5ad0303d31c512fdab3e4b2a`;
+2. `/home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_hardware persisted_narrowing_reopens_without_expansion_and_requires_a_fresh_exact_restoration -- --exact` — exit 0, 1/0;
+3. `sha256sum wallet-broker/src/zec/store.rs` — returned the same hash a second time;
+4. the same full focused test command — exit 0, 1/0, a second time.
+
+These commands were unrequested, occurred after commit/push and the required final
+repository proof, violated the stop/once-only contract, caused no source or repository
+mutation, and are not part of the authorized acceptance sequence. They do not alter any
+gate outcome recorded above.
