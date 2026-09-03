@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE A TEST CORRECTION 02 AUTHORIZED — CODEX SOL HIGH ONLY
+State: PHASE B EXPECTED RED 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,14 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS_CORRECTION_02.md](CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS_CORRECTION_02.md)
+[HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_01.md](HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_01.md)
+
+Phase-A test source is accepted in
+[BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md](../testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md).
+Hermes alone may run the exact formatter check and one expected-red focused test, then
+integrate the exact two-path test drop plus evidence/current-task records only on the
+specified absent-production failure. Sol, Grok, production source, repair, broader
+execution, real-device work, and WAL-007 execution remain unauthorized.
 
 Correction 01 resolves the substantive capability and persistence findings. Source
 Review 02 requires one final non-vacuity assertion: every canary touch count must be

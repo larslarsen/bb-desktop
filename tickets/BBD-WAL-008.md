@@ -222,6 +222,14 @@ installation and positive only after the exercised sensitive flows. See
 `docs/testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-02.md`. No execution or production
 source is authorized.
 
+## Reviewer source decision 03
+
+Correction 02 establishes the required zero-to-positive canary observation. The exact
+117-line manifest and 752-line, 17-test source identities are accepted in
+`docs/testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md`. Hermes alone may run the
+separately committed formatter and expected-red handoff. Production and every broader
+gate remain unauthorized.
+
 ## Acceptance boundary
 
 Completion proves only a fail-closed Zcash hardware capability/route-selection boundary
