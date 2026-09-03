@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 GREEN 01 COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 4 GREEN 01 INTEGRATED — EVIDENCE CORRECTION AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes, documentation only
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_07.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_07.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -285,6 +285,12 @@ Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate a
 authorized.
 Hermes completed Green Resume 07 and recorded the complete green evidence in
 [BBD-WAL-007-SLICE-04-GREEN-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01.md).
+The implementation and execution at `3aed346e` are accepted, but transcript audit
+requires the documentation-only corrections in
+[BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md).
+Hermes alone may correct the two documentation paths. Source/tests, execution, Grok,
+Spark, Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate
+are not authorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
