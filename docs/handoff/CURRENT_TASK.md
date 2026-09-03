@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE C SLICE 02 GREEN RESUME 02 AUTHORIZED — HERMES ONLY
+State: PHASE C SLICE 02 CLIPPY CORRECTION AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_02.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_02.md)
+[CODEX_SOL_BBD_WAL_008_SLICE_02_CLIPPY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_008_SLICE_02_CLIPPY_CORRECTION_01.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
@@ -28,10 +28,13 @@ Hermes stopped correctly at the first formatter mismatch, reviewed in
 [BBD-WAL-008-SLICE-02-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-STOP-REVIEW-01.md).
 Spark's exact mechanical correction is accepted in
 [BBD-WAL-008-SLICE-02-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
-Hermes alone may restart the complete formatter, stale-expansion falsification,
-focused/affected green, compile, and Node policy sequence and integrate only on exact
-success. Spark, Grok, Sol, other actors, broader/final acceptance, real-device work,
-and WAL-007 remain unauthorized.
+Hermes Resume 02 passed the formatter, exact stale-expansion falsification, and all 45
+focused/affected Rust tests, then stopped on one warning-denied nested-`if` Clippy lint;
+the result and post-stop read-only command deviation are reviewed in
+[BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md).
+Grok remains usage-exhausted, so Codex Sol High alone may make the exact one-region
+`store.rs` Clippy correction. Hermes, Spark, other actors, execution, integration,
+broader/final acceptance, real-device work, and WAL-007 remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
