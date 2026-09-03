@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 POLICY EXPECTED RED 01 INTEGRATED — AWAITING REVIEWER ACCEPTANCE
+State: WAL-008 POLICY PRODUCTION SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,10 +18,15 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_POLICY_EXPECTED_RED_01.md](HERMES_BBD_WAL_008_POLICY_EXPECTED_RED_01.md)
+[CODEX_SOL_BBD_WAL_008_POLICY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_008_POLICY_PRODUCTION_01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
+
+The exact 80/7 expected red and transcript are accepted in
+[BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).
+Sol High alone may implement the matching one-file production policy. Execution,
+integration, every other source, real-device work, and WAL-007 remain frozen.
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).

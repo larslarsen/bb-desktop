@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: POLICY EXPECTED RED AUTHORIZED — HERMES ONLY
+Status: POLICY PRODUCTION SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -356,6 +356,15 @@ eight-path inventory, new production exports/checker, repository scan, and autho
 mutation negatives. Hermes alone may run the frozen focused Node expected-red command
 and integrate the test-only drop on exactly 80 `ok` and the seven specified `not ok`.
 Production policy and all other work remain unauthorized pending reviewer acceptance.
+
+## Reviewer acceptance decision 17
+
+The policy test and exact 80/7 expected red are accepted at `9c7ef290` in
+`docs/testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md`. Transcript audit
+confirms the focused command, causes, integration scope, and final repository state.
+Because Grok remains usage-exhausted, Codex Sol High alone may implement the matching
+one-file production contract in `scripts/security-policy.js`. Tests, execution,
+integration, and all other paths remain unauthorized pending source review.
 
 ## Acceptance boundary
 
