@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 SLICE-02/POLICY GREEN AUTHORIZED — HERMES ONLY
+State: WAL-008 SLICE-02/POLICY GREEN COMPLETED — HERMES INTEGRATED — AWAITING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -22,6 +22,7 @@ Active handoff:
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
+[BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md)
 
 The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).

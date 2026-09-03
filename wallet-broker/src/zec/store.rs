@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::fmt::Write as _;
 use std::fs::{self, OpenOptions};
 use std::io::Read;
 use std::os::unix::fs::{DirBuilderExt, FileTypeExt, MetadataExt, OpenOptionsExt, PermissionsExt};
@@ -36,6 +37,11 @@ use crate::vault::{SecretBytes, WipeObserver};
 
 use super::address;
 use super::fixture::ValidatedFixture;
+use super::hardware::{
+    self, ALL_CAPABILITY_FLAGS, CapabilityFlag, DecisionStatus, HardwareCapabilities,
+    HardwareDecision, HardwareError, HardwarePrivacy, HardwareRoute, ReviewedProfile, SigningPool,
+    VerifiedField,
+};
 use super::prepare::{PcztInspection, sha256_hex};
 use super::scan::{self, ScanFaultPort, ScanInspection, ScanMetrics, ScanRequest};
 use super::{
@@ -47,6 +53,7 @@ const ACCOUNT_TABLE: &str = "ext_bitbook_accounts";
 const RECEIVER_TABLE: &str = "ext_bitbook_receiver_state";
 const SEQUENCE_TABLE: &str = "ext_bitbook_sequence_state";
 const STORE_TABLE: &str = "ext_bitbook_store_state";
+const HARDWARE_DECISION_TABLE: &str = "ext_bitbook_hardware_decision";
 
 const ACCOUNT_SCHEMA: &str = "
 CREATE TABLE ext_bitbook_accounts (
@@ -73,6 +80,41 @@ CREATE TABLE ext_bitbook_store_state (
     scan_tip INTEGER,
     checkpoint_receiver_sequence INTEGER NOT NULL
 );";
+const HARDWARE_DECISION_SCHEMA: &str = "
+CREATE TABLE ext_bitbook_hardware_decision (
+    singleton INTEGER PRIMARY KEY NOT NULL CHECK (singleton = 1),
+    record BLOB NOT NULL,
+    record_generation INTEGER NOT NULL CHECK (record_generation > 0),
+    generation_check TEXT NOT NULL CHECK (
+        length(generation_check) = 64
+        AND generation_check NOT GLOB '*[^0-9a-f]*'
+    )
+);";
+const HARDWARE_RECORD_SCHEMA_REVISION: &str = "1";
+const HARDWARE_RECORD_CHECK_DOMAIN: &[u8] = b"bitbook.zec.hardware.decision.record.v1";
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum HardwarePersistenceFault {
+    Write,
+    FileSync,
+    DirectorySync,
+    Commit,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum HardwareRecordMutation {
+    UnknownField,
+    DuplicateVerifiedField,
+    InvalidBoolean,
+    OutOfRangeTransactionVersion,
+    InvalidFingerprintDigest,
+    UnknownStatus,
+    SchemaRevisionDrift,
+    PartialWrite,
+    Rollback,
+    TableRevisionDrift,
+    ConsensusDrift,
+}
 
 #[derive(Clone)]
 pub(crate) struct StateRoot {
@@ -364,8 +406,8 @@ impl AddressAccount {
     ) -> Result<PreparedBuild, ZecError> {
         let _guard = mutex_lock(&self.gate);
         validate_account_paths(&self.root, &self.paths)?;
-        if preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
-            != BrokerSchemaVersion::V1
+        if !preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
+            .has_store_state()
         {
             return Err(ZecError::state_corrupt());
         }
@@ -414,11 +456,12 @@ impl AddressAccount {
         let transaction = connection
             .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|_| ZecError::state_corrupt())?;
-        if validate_extension_and_binding_with_connection(
+        if !validate_extension_and_binding_with_connection(
             &transaction,
             &self.account_id,
             self.network,
-        )? != BrokerSchemaVersion::V1
+        )?
+        .has_store_state()
         {
             return Err(ZecError::state_corrupt());
         }
@@ -479,7 +522,7 @@ impl AddressAccount {
         let version = preflight_store(&self.root, &self.paths, &self.account_id, self.network)?;
         let connection = open_read_only_connection(&self.root, &self.paths.wallet)?;
         let receiver = read_receiver_state_with_connection(&connection, &self.account_id)?;
-        let scan_tip = if version == BrokerSchemaVersion::V1 {
+        let scan_tip = if version.has_store_state() {
             connection
                 .query_row(
                     "SELECT scan_tip FROM ext_bitbook_store_state WHERE account_id = ?1",
@@ -555,8 +598,8 @@ impl AddressAccount {
 
     pub(crate) fn persist_checkpoint(&self, height: u32) -> Result<(), ZecError> {
         let _guard = mutex_lock(&self.gate);
-        if preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
-            != BrokerSchemaVersion::V1
+        if !preflight_store(&self.root, &self.paths, &self.account_id, self.network)?
+            .has_store_state()
         {
             return Err(ZecError::state_corrupt());
         }
@@ -567,11 +610,12 @@ impl AddressAccount {
             .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|_| ZecError::state_corrupt())?;
         validate_upstream_schema(&transaction)?;
-        if validate_extension_and_binding_with_connection(
+        if !validate_extension_and_binding_with_connection(
             &transaction,
             &self.account_id,
             self.network,
-        )? != BrokerSchemaVersion::V1
+        )?
+        .has_store_state()
         {
             return Err(ZecError::state_corrupt());
         }
@@ -599,6 +643,198 @@ impl AddressAccount {
             return Err(ZecError::internal());
         }
         transaction.commit().map_err(|_| ZecError::state_corrupt())
+    }
+
+    pub(crate) fn persist_hardware_decision(
+        &self,
+        profiles: &[ReviewedProfile],
+        decision: &HardwareDecision,
+        expansion_authorized: bool,
+        fault: Option<HardwarePersistenceFault>,
+    ) -> Result<(), HardwareError> {
+        let _guard = mutex_lock(&self.gate);
+        hardware::validate_persisted_decision(profiles, decision)?;
+        validate_account_paths(&self.root, &self.paths)
+            .map_err(|_| HardwareError::state_corrupt())?;
+        let mut connection = open_read_write_no_create_connection(&self.root, &self.paths.wallet)
+            .map_err(|_| HardwareError::state_corrupt())?;
+        configure_full_synchronous(&connection).map_err(|_| HardwareError::state_corrupt())?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|_| HardwareError::internal())?;
+        validate_upstream_schema(&transaction).map_err(|_| HardwareError::state_corrupt())?;
+        let version = validate_extension_and_binding_with_connection(
+            &transaction,
+            &self.account_id,
+            self.network,
+        )
+        .map_err(|_| HardwareError::state_corrupt())?;
+        if !version.has_store_state() {
+            return Err(HardwareError::state_corrupt());
+        }
+
+        let prior = if version == BrokerSchemaVersion::V2 {
+            Some(load_hardware_record(&transaction, profiles)?)
+        } else {
+            None
+        };
+        if let Some(prior) = &prior
+            && !hardware::decision_narrows(&prior.decision, decision)
+            && !expansion_authorized
+        {
+            return Err(HardwareError::state_corrupt());
+        }
+        let generation = match prior.as_ref() {
+            Some(prior) => prior
+                .generation
+                .checked_add(1)
+                .ok_or_else(HardwareError::state_corrupt)?,
+            None => 1,
+        };
+        let encoded = encode_hardware_record(decision, generation)?;
+        let generation_i64 =
+            i64::try_from(generation).map_err(|_| HardwareError::state_corrupt())?;
+
+        let changed = if version == BrokerSchemaVersion::V1 {
+            transaction
+                .execute_batch(HARDWARE_DECISION_SCHEMA)
+                .map_err(|_| HardwareError::internal())?;
+            transaction
+                .execute(
+                    "INSERT INTO ext_bitbook_hardware_decision
+                     (singleton, record, record_generation, generation_check)
+                     VALUES (1, ?1, ?2, ?3)",
+                    params![encoded.bytes, generation_i64, encoded.generation_check],
+                )
+                .map_err(|_| HardwareError::internal())?
+        } else {
+            transaction
+                .execute(
+                    "UPDATE ext_bitbook_hardware_decision
+                     SET record = ?1, record_generation = ?2, generation_check = ?3
+                     WHERE singleton = 1",
+                    params![encoded.bytes, generation_i64, encoded.generation_check],
+                )
+                .map_err(|_| HardwareError::internal())?
+        };
+        if changed != 1 || fault == Some(HardwarePersistenceFault::Write) {
+            return Err(HardwareError::internal());
+        }
+        if recognize_extension_schema(&transaction).map_err(|_| HardwareError::state_corrupt())?
+            != BrokerSchemaVersion::V2
+        {
+            return Err(HardwareError::state_corrupt());
+        }
+        let stored = load_hardware_record(&transaction, profiles)?;
+        if stored.decision != *decision || stored.generation != generation {
+            return Err(HardwareError::state_corrupt());
+        }
+
+        if fault == Some(HardwarePersistenceFault::FileSync) {
+            return Err(HardwareError::internal());
+        }
+        OpenOptions::new()
+            .read(true)
+            .open(&self.paths.wallet)
+            .and_then(|file| file.sync_all())
+            .map_err(|_| HardwareError::internal())?;
+        if fault == Some(HardwarePersistenceFault::DirectorySync) {
+            return Err(HardwareError::internal());
+        }
+        fs::File::open(&self.paths.directory)
+            .and_then(|directory| directory.sync_all())
+            .map_err(|_| HardwareError::internal())?;
+        if fault == Some(HardwarePersistenceFault::Commit) {
+            return Err(HardwareError::internal());
+        }
+        transaction.commit().map_err(|_| HardwareError::internal())
+    }
+
+    pub(crate) fn load_hardware_decision(
+        &self,
+        profiles: &[ReviewedProfile],
+    ) -> Result<Option<HardwareDecision>, HardwareError> {
+        let _guard = mutex_lock(&self.gate);
+        let record = open_hardware_record(
+            &self.root,
+            &self.paths,
+            &self.account_id,
+            self.network,
+            profiles,
+        )?;
+        Ok(record.map(|record| record.decision))
+    }
+
+    pub(crate) fn persisted_hardware_bytes(
+        &self,
+        profiles: &[ReviewedProfile],
+    ) -> Result<Vec<u8>, HardwareError> {
+        let _guard = mutex_lock(&self.gate);
+        let record = open_hardware_record(
+            &self.root,
+            &self.paths,
+            &self.account_id,
+            self.network,
+            profiles,
+        )?;
+        Ok(record.map_or_else(Vec::new, |record| record.bytes))
+    }
+
+    pub(crate) fn mutate_hardware_record_for_test(
+        &self,
+        mutation: HardwareRecordMutation,
+    ) -> Result<(), HardwareError> {
+        let _guard = mutex_lock(&self.gate);
+        validate_account_paths(&self.root, &self.paths)
+            .map_err(|_| HardwareError::state_corrupt())?;
+        let mut connection = open_read_write_no_create_connection(&self.root, &self.paths.wallet)
+            .map_err(|_| HardwareError::state_corrupt())?;
+        configure_full_synchronous(&connection).map_err(|_| HardwareError::state_corrupt())?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|_| HardwareError::internal())?;
+        validate_upstream_schema(&transaction).map_err(|_| HardwareError::state_corrupt())?;
+        if validate_extension_and_binding_with_connection(
+            &transaction,
+            &self.account_id,
+            self.network,
+        )
+        .map_err(|_| HardwareError::state_corrupt())?
+            != BrokerSchemaVersion::V2
+        {
+            return Err(HardwareError::state_corrupt());
+        }
+        if mutation == HardwareRecordMutation::Rollback {
+            let changed = transaction
+                .execute(
+                    "UPDATE ext_bitbook_hardware_decision
+                     SET record_generation = record_generation + 1 WHERE singleton = 1",
+                    [],
+                )
+                .map_err(|_| HardwareError::internal())?;
+            if changed != 1 {
+                return Err(HardwareError::state_corrupt());
+            }
+        } else {
+            let bytes = transaction
+                .query_row(
+                    "SELECT record FROM ext_bitbook_hardware_decision WHERE singleton = 1",
+                    [],
+                    |row| row.get::<_, Vec<u8>>(0),
+                )
+                .map_err(|_| HardwareError::state_corrupt())?;
+            let mutated = mutate_hardware_record_bytes(bytes, mutation)?;
+            let changed = transaction
+                .execute(
+                    "UPDATE ext_bitbook_hardware_decision SET record = ?1 WHERE singleton = 1",
+                    [mutated],
+                )
+                .map_err(|_| HardwareError::internal())?;
+            if changed != 1 {
+                return Err(HardwareError::state_corrupt());
+            }
+        }
+        transaction.commit().map_err(|_| HardwareError::internal())
     }
 
     pub(crate) fn mutate_sqlite_for_test(&self, mutation: &str) -> Result<(), ZecError> {
@@ -788,6 +1024,473 @@ pub(crate) struct SqliteInspectionData {
     pub decoded_rows: usize,
     pub value_kinds: Vec<&'static str>,
     pub decoded_values: Vec<Vec<u8>>,
+}
+
+struct EncodedHardwareRecord {
+    bytes: Vec<u8>,
+    generation_check: String,
+}
+
+struct DecodedHardwareRecord {
+    decision: HardwareDecision,
+    generation: u64,
+    generation_check: String,
+    bytes: Vec<u8>,
+}
+
+fn open_hardware_record(
+    root: &StateRoot,
+    paths: &AccountPaths,
+    account_id: &AccountId,
+    network: Network,
+    profiles: &[ReviewedProfile],
+) -> Result<Option<DecodedHardwareRecord>, HardwareError> {
+    validate_account_paths(root, paths).map_err(|_| HardwareError::state_corrupt())?;
+    let connection = open_read_only_connection(root, &paths.wallet)
+        .map_err(|_| HardwareError::state_corrupt())?;
+    validate_upstream_schema(&connection).map_err(|_| HardwareError::state_corrupt())?;
+    let version = validate_extension_and_binding_with_connection(&connection, account_id, network)
+        .map_err(|_| HardwareError::state_corrupt())?;
+    match version {
+        BrokerSchemaVersion::V1 => Ok(None),
+        BrokerSchemaVersion::V2 => load_hardware_record(&connection, profiles).map(Some),
+        BrokerSchemaVersion::V0 => Err(HardwareError::state_corrupt()),
+    }
+}
+
+fn load_hardware_record(
+    connection: &Connection,
+    profiles: &[ReviewedProfile],
+) -> Result<DecodedHardwareRecord, HardwareError> {
+    let (bytes, stored_generation, stored_check, record_type, generation_type, check_type) =
+        connection
+            .query_row(
+                "SELECT record, record_generation, generation_check,
+                    typeof(record), typeof(record_generation), typeof(generation_check)
+             FROM ext_bitbook_hardware_decision WHERE singleton = 1",
+                [],
+                |row| {
+                    Ok((
+                        row.get::<_, Vec<u8>>(0)?,
+                        row.get::<_, i64>(1)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, String>(3)?,
+                        row.get::<_, String>(4)?,
+                        row.get::<_, String>(5)?,
+                    ))
+                },
+            )
+            .map_err(|_| HardwareError::state_corrupt())?;
+    if (
+        record_type.as_str(),
+        generation_type.as_str(),
+        check_type.as_str(),
+    ) != ("blob", "integer", "text")
+    {
+        return Err(HardwareError::state_corrupt());
+    }
+    let decoded = decode_hardware_record(&bytes)?;
+    if i64::try_from(decoded.generation).ok() != Some(stored_generation)
+        || decoded.generation_check != stored_check
+    {
+        return Err(HardwareError::state_corrupt());
+    }
+    hardware::validate_persisted_decision(profiles, &decoded.decision)?;
+    Ok(decoded)
+}
+
+fn encode_hardware_record(
+    decision: &HardwareDecision,
+    generation: u64,
+) -> Result<EncodedHardwareRecord, HardwareError> {
+    if generation == 0 || generation > i64::MAX as u64 {
+        return Err(HardwareError::state_corrupt());
+    }
+    let mut record = String::new();
+    append_hardware_field(
+        &mut record,
+        "schema_revision",
+        HARDWARE_RECORD_SCHEMA_REVISION,
+    )?;
+    append_hardware_field(
+        &mut record,
+        "fingerprint_digest",
+        &decision.fingerprint_digest,
+    )?;
+    append_hardware_field(&mut record, "table_revision", &decision.table_revision)?;
+    append_hardware_field(&mut record, "status", decision.status.code())?;
+    append_hardware_field(&mut record, "privacy", decision.privacy.as_str())?;
+    for capability in ALL_CAPABILITY_FLAGS {
+        append_hardware_field(
+            &mut record,
+            capability_field_name(capability),
+            canonical_bool(decision.capabilities.contains(capability)),
+        )?;
+    }
+    append_hardware_field(
+        &mut record,
+        "transaction_version",
+        &decision.capabilities.transaction_version,
+    )?;
+    append_hardware_field(
+        &mut record,
+        "consensus_branch",
+        &decision.capabilities.consensus_branch,
+    )?;
+    append_hardware_field(
+        &mut record,
+        "pczt_encoding_version",
+        &decision.capabilities.pczt_encoding_version,
+    )?;
+    append_hardware_field(
+        &mut record,
+        "signing_pools",
+        &join_signing_pools(&decision.capabilities.allowed_signing_pools),
+    )?;
+    append_hardware_field(
+        &mut record,
+        "verified_fields",
+        &join_verified_fields(&decision.verified_fields),
+    )?;
+    append_hardware_field(
+        &mut record,
+        "host_trusting_fields",
+        &join_verified_fields(&decision.host_trusting_fields),
+    )?;
+    append_hardware_field(
+        &mut record,
+        "route",
+        decision.route.map_or("none", HardwareRoute::as_str),
+    )?;
+    append_hardware_field(
+        &mut record,
+        "pay_eligible",
+        canonical_bool(decision.pay_eligible),
+    )?;
+    append_hardware_field(
+        &mut record,
+        "electron_verified_fields",
+        canonical_bool(decision.electron_verified_fields),
+    )?;
+    append_hardware_field(&mut record, "generation", &generation.to_string())?;
+    let generation_check = hardware_record_check(record.as_bytes());
+    append_hardware_field(&mut record, "generation_check", &generation_check)?;
+    Ok(EncodedHardwareRecord {
+        bytes: record.into_bytes(),
+        generation_check,
+    })
+}
+
+fn decode_hardware_record(bytes: &[u8]) -> Result<DecodedHardwareRecord, HardwareError> {
+    if bytes.is_empty() || bytes.len() > 16 * 1024 || bytes.last() != Some(&b'\n') {
+        return Err(HardwareError::state_corrupt());
+    }
+    let text = std::str::from_utf8(bytes).map_err(|_| HardwareError::state_corrupt())?;
+    let mut lines = text.split_terminator('\n');
+    if take_hardware_field(&mut lines, "schema_revision")? != HARDWARE_RECORD_SCHEMA_REVISION {
+        return Err(HardwareError::state_corrupt());
+    }
+    let fingerprint_digest = take_hardware_field(&mut lines, "fingerprint_digest")?.to_owned();
+    let table_revision = take_hardware_field(&mut lines, "table_revision")?.to_owned();
+    let status = parse_decision_status(take_hardware_field(&mut lines, "status")?)?;
+    let privacy = parse_hardware_privacy(take_hardware_field(&mut lines, "privacy")?)?;
+    let mut capabilities = HardwareCapabilities::default();
+    for capability in ALL_CAPABILITY_FLAGS {
+        let value = take_hardware_field(&mut lines, capability_field_name(capability))?;
+        capabilities.set(capability, parse_canonical_bool(value)?);
+    }
+    capabilities.transaction_version =
+        take_hardware_field(&mut lines, "transaction_version")?.to_owned();
+    capabilities.consensus_branch = take_hardware_field(&mut lines, "consensus_branch")?.to_owned();
+    capabilities.pczt_encoding_version =
+        take_hardware_field(&mut lines, "pczt_encoding_version")?.to_owned();
+    capabilities.allowed_signing_pools =
+        parse_signing_pools(take_hardware_field(&mut lines, "signing_pools")?)?;
+    let verified_fields =
+        parse_verified_fields(take_hardware_field(&mut lines, "verified_fields")?)?;
+    let host_trusting_fields =
+        parse_verified_fields(take_hardware_field(&mut lines, "host_trusting_fields")?)?;
+    let route = parse_hardware_route(take_hardware_field(&mut lines, "route")?)?;
+    let pay_eligible = parse_canonical_bool(take_hardware_field(&mut lines, "pay_eligible")?)?;
+    let electron_verified_fields =
+        parse_canonical_bool(take_hardware_field(&mut lines, "electron_verified_fields")?)?;
+    let generation_text = take_hardware_field(&mut lines, "generation")?;
+    let generation = generation_text
+        .parse::<u64>()
+        .map_err(|_| HardwareError::state_corrupt())?;
+    if generation == 0 || generation > i64::MAX as u64 || generation.to_string() != generation_text
+    {
+        return Err(HardwareError::state_corrupt());
+    }
+    let generation_check = take_hardware_field(&mut lines, "generation_check")?.to_owned();
+    if lines.next().is_some() {
+        return Err(HardwareError::state_corrupt());
+    }
+    let decision = HardwareDecision {
+        fingerprint_digest,
+        table_revision,
+        status,
+        privacy,
+        capabilities,
+        verified_fields,
+        host_trusting_fields,
+        route,
+        route_claims: Vec::new(),
+        pay_eligible,
+        electron_verified_fields,
+    };
+    let canonical = encode_hardware_record(&decision, generation)?;
+    if canonical.bytes != bytes || canonical.generation_check != generation_check {
+        return Err(HardwareError::state_corrupt());
+    }
+    Ok(DecodedHardwareRecord {
+        decision,
+        generation,
+        generation_check,
+        bytes: bytes.to_vec(),
+    })
+}
+
+fn append_hardware_field(
+    target: &mut String,
+    name: &str,
+    value: &str,
+) -> Result<(), HardwareError> {
+    if value
+        .bytes()
+        .any(|byte| matches!(byte, b'\n' | b'\r' | b'='))
+    {
+        return Err(HardwareError::state_corrupt());
+    }
+    writeln!(target, "{name}={value}").map_err(|_| HardwareError::internal())
+}
+
+fn take_hardware_field<'a>(
+    lines: &mut impl Iterator<Item = &'a str>,
+    name: &str,
+) -> Result<&'a str, HardwareError> {
+    let line = lines.next().ok_or_else(HardwareError::state_corrupt)?;
+    let value = line
+        .strip_prefix(name)
+        .and_then(|suffix| suffix.strip_prefix('='))
+        .ok_or_else(HardwareError::state_corrupt)?;
+    if line.as_bytes().get(name.len()) != Some(&b'=') {
+        return Err(HardwareError::state_corrupt());
+    }
+    Ok(value)
+}
+
+fn canonical_bool(value: bool) -> &'static str {
+    if value { "1" } else { "0" }
+}
+
+fn parse_canonical_bool(value: &str) -> Result<bool, HardwareError> {
+    match value {
+        "0" => Ok(false),
+        "1" => Ok(true),
+        _ => Err(HardwareError::state_corrupt()),
+    }
+}
+
+fn capability_field_name(capability: CapabilityFlag) -> &'static str {
+    match capability {
+        CapabilityFlag::CanView => "can_view",
+        CapabilityFlag::CanDeriveFreshReceiver => "can_derive_fresh_receiver",
+        CapabilityFlag::CanReceivePrivate => "can_receive_private",
+        CapabilityFlag::CanReceiveOrchard => "can_receive_orchard",
+        CapabilityFlag::CanReceiveIronwood => "can_receive_ironwood",
+        CapabilityFlag::CanPrepareTx => "can_prepare_tx",
+        CapabilityFlag::CanSignSpend => "can_sign_spend",
+        CapabilityFlag::CanSignOrchard => "can_sign_orchard",
+        CapabilityFlag::CanSignIronwood => "can_sign_ironwood",
+        CapabilityFlag::CanTxV6 => "can_tx_v6",
+        CapabilityFlag::CanMigrateOrchardToIronwood => "can_migrate_orchard_to_ironwood",
+        CapabilityFlag::CanSignTransparent => "can_sign_transparent",
+        CapabilityFlag::CanDisplayAmountOnDevice => "can_display_amount_on_device",
+        CapabilityFlag::CanDisplayRecipientOnDevice => "can_display_recipient_on_device",
+        CapabilityFlag::CanDisplayNetworkOnDevice => "can_display_network_on_device",
+        CapabilityFlag::CanVerifyPcztOnDevice => "can_verify_pczt_on_device",
+        CapabilityFlag::CanExportViewingMaterial => "can_export_viewing_material",
+        CapabilityFlag::CanBroadcast => "can_broadcast",
+    }
+}
+
+fn join_signing_pools(values: &[SigningPool]) -> String {
+    values
+        .iter()
+        .copied()
+        .map(SigningPool::as_str)
+        .collect::<Vec<_>>()
+        .join(",")
+}
+
+fn join_verified_fields(values: &[VerifiedField]) -> String {
+    values
+        .iter()
+        .copied()
+        .map(VerifiedField::as_str)
+        .collect::<Vec<_>>()
+        .join(",")
+}
+
+fn parse_signing_pools(value: &str) -> Result<Vec<SigningPool>, HardwareError> {
+    parse_hardware_list(value, |item| match item {
+        "transparent" => Some(SigningPool::Transparent),
+        "orchard" => Some(SigningPool::Orchard),
+        "ironwood" => Some(SigningPool::Ironwood),
+        _ => None,
+    })
+}
+
+fn parse_verified_fields(value: &str) -> Result<Vec<VerifiedField>, HardwareError> {
+    parse_hardware_list(value, |item| match item {
+        "amount" => Some(VerifiedField::Amount),
+        "recipient" => Some(VerifiedField::Recipient),
+        "network" => Some(VerifiedField::Network),
+        "fee" => Some(VerifiedField::Fee),
+        "memo" => Some(VerifiedField::Memo),
+        _ => None,
+    })
+}
+
+fn parse_hardware_list<T: Copy + Ord>(
+    value: &str,
+    parse: impl Fn(&str) -> Option<T>,
+) -> Result<Vec<T>, HardwareError> {
+    if value.is_empty() {
+        return Ok(Vec::new());
+    }
+    let values = value
+        .split(',')
+        .map(|item| parse(item).ok_or_else(HardwareError::state_corrupt))
+        .collect::<Result<Vec<_>, _>>()?;
+    if values.windows(2).any(|pair| pair[0] >= pair[1]) {
+        return Err(HardwareError::state_corrupt());
+    }
+    Ok(values)
+}
+
+fn parse_decision_status(value: &str) -> Result<DecisionStatus, HardwareError> {
+    match value {
+        "DEVICE_DISCONNECTED" => Ok(DecisionStatus::DeviceDisconnected),
+        "CAPABILITY_MISSING" => Ok(DecisionStatus::CapabilityMissing),
+        "PROTOCOL_INCOMPATIBLE" => Ok(DecisionStatus::ProtocolIncompatible),
+        "READY" => Ok(DecisionStatus::Ready),
+        _ => Err(HardwareError::state_corrupt()),
+    }
+}
+
+fn parse_hardware_privacy(value: &str) -> Result<HardwarePrivacy, HardwareError> {
+    match value {
+        "unavailable" => Ok(HardwarePrivacy::Unavailable),
+        "private" => Ok(HardwarePrivacy::Private),
+        "transparent_not_private" => Ok(HardwarePrivacy::TransparentNotPrivate),
+        _ => Err(HardwareError::state_corrupt()),
+    }
+}
+
+fn parse_hardware_route(value: &str) -> Result<Option<HardwareRoute>, HardwareError> {
+    match value {
+        "none" => Ok(None),
+        "keystone_pczt_v2" => Ok(Some(HardwareRoute::KeystonePcztV2)),
+        _ => Err(HardwareError::state_corrupt()),
+    }
+}
+
+fn hardware_record_check(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(HARDWARE_RECORD_CHECK_DOMAIN);
+    hasher.update((bytes.len() as u64).to_be_bytes());
+    hasher.update(bytes);
+    let digest = hasher.finalize();
+    let mut encoded = String::with_capacity(digest.len() * 2);
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    for byte in digest {
+        encoded.push(char::from(HEX[usize::from(byte >> 4)]));
+        encoded.push(char::from(HEX[usize::from(byte & 0x0f)]));
+    }
+    encoded
+}
+
+fn mutate_hardware_record_bytes(
+    bytes: Vec<u8>,
+    mutation: HardwareRecordMutation,
+) -> Result<Vec<u8>, HardwareError> {
+    if mutation == HardwareRecordMutation::PartialWrite {
+        return Ok(bytes[..bytes.len() / 2].to_vec());
+    }
+    let mut record = String::from_utf8(bytes).map_err(|_| HardwareError::state_corrupt())?;
+    match mutation {
+        HardwareRecordMutation::UnknownField => record.push_str("unknown_field=1\n"),
+        HardwareRecordMutation::DuplicateVerifiedField => {
+            replace_hardware_record_value(
+                &mut record,
+                "verified_fields=amount,recipient,network,fee,memo",
+                "verified_fields=amount,amount,recipient,network,fee,memo",
+            )?;
+        }
+        HardwareRecordMutation::InvalidBoolean => {
+            replace_hardware_record_value(&mut record, "can_view=1", "can_view=2")?;
+        }
+        HardwareRecordMutation::OutOfRangeTransactionVersion => {
+            replace_hardware_record_value(
+                &mut record,
+                "transaction_version=6",
+                "transaction_version=18446744073709551616",
+            )?;
+        }
+        HardwareRecordMutation::InvalidFingerprintDigest => {
+            let start = record
+                .find("fingerprint_digest=")
+                .ok_or_else(HardwareError::state_corrupt)?;
+            let value_start = start + "fingerprint_digest=".len();
+            let value_end = record[value_start..]
+                .find('\n')
+                .map(|offset| value_start + offset)
+                .ok_or_else(HardwareError::state_corrupt)?;
+            record.replace_range(value_start..value_end, &"g".repeat(64));
+        }
+        HardwareRecordMutation::UnknownStatus => {
+            replace_hardware_record_value(&mut record, "status=READY", "status=UNKNOWN")?;
+        }
+        HardwareRecordMutation::SchemaRevisionDrift => {
+            replace_hardware_record_value(&mut record, "schema_revision=1", "schema_revision=2")?;
+        }
+        HardwareRecordMutation::TableRevisionDrift => {
+            let start = record
+                .find("table_revision=")
+                .ok_or_else(HardwareError::state_corrupt)?;
+            let value_start = start + "table_revision=".len();
+            let value_end = record[value_start..]
+                .find('\n')
+                .map(|offset| value_start + offset)
+                .ok_or_else(HardwareError::state_corrupt)?;
+            record.replace_range(value_start..value_end, "wal008-drift-table-r1");
+        }
+        HardwareRecordMutation::ConsensusDrift => {
+            replace_hardware_record_value(
+                &mut record,
+                "consensus_branch=37a5165b",
+                "consensus_branch=37a5165a",
+            )?;
+        }
+        HardwareRecordMutation::PartialWrite | HardwareRecordMutation::Rollback => {
+            return Err(HardwareError::state_corrupt());
+        }
+    }
+    Ok(record.into_bytes())
+}
+
+fn replace_hardware_record_value(
+    record: &mut String,
+    old: &str,
+    new: &str,
+) -> Result<(), HardwareError> {
+    let Some(position) = record.find(old) else {
+        return Err(HardwareError::state_corrupt());
+    };
+    record.replace_range(position..position + old.len(), new);
+    Ok(())
 }
 
 fn migrate_extension(
@@ -1233,13 +1936,28 @@ fn validate_extension_and_binding_with_connection(
     if row_counts != (1, 1, 1) {
         return Err(ZecError::state_corrupt());
     }
-    if version == BrokerSchemaVersion::V1 {
+    if version.has_store_state() {
         let store_count = connection
             .query_row("SELECT COUNT(*) FROM ext_bitbook_store_state", [], |row| {
                 row.get::<_, i64>(0)
             })
             .map_err(|_| ZecError::state_corrupt())?;
         if store_count != 1 {
+            return Err(ZecError::state_corrupt());
+        }
+    }
+    if version == BrokerSchemaVersion::V2 {
+        let hardware_counts = connection
+            .query_row(
+                "SELECT COUNT(*),
+                        COALESCE(SUM(CASE WHEN singleton = 1 AND typeof(singleton) = 'integer'
+                                          THEN 1 ELSE 0 END), 0)
+                 FROM ext_bitbook_hardware_decision",
+                [],
+                |row| Ok((row.get::<_, i64>(0)?, row.get::<_, i64>(1)?)),
+            )
+            .map_err(|_| ZecError::state_corrupt())?;
+        if hardware_counts != (1, 1) {
             return Err(ZecError::state_corrupt());
         }
     }
@@ -1277,7 +1995,7 @@ fn validate_extension_and_binding_with_connection(
     }
     address::derive_orchard_receiver(network, &ufvk, 0).map_err(|_| ZecError::state_corrupt())?;
     let receiver_state = read_receiver_state_with_connection(connection, account_id)?;
-    if version == BrokerSchemaVersion::V1 {
+    if version.has_store_state() {
         validate_store_state_with_connection(
             connection,
             account_id,
@@ -1293,7 +2011,7 @@ pub(crate) fn validate_scan_binding(
     network: Network,
 ) -> Result<(), ZecError> {
     if validate_extension_and_binding_with_connection(connection, account_id, network)?
-        == BrokerSchemaVersion::V1
+        .has_store_state()
     {
         Ok(())
     } else {
@@ -1360,6 +2078,7 @@ fn extension_objects(connection: &Connection) -> Result<Vec<SchemaObject>, ZecEr
 enum BrokerSchemaVersion {
     V0,
     V1,
+    V2,
 }
 
 impl BrokerSchemaVersion {
@@ -1367,7 +2086,12 @@ impl BrokerSchemaVersion {
         match self {
             Self::V0 => "0",
             Self::V1 => "1",
+            Self::V2 => "2",
         }
+    }
+
+    fn has_store_state(self) -> bool {
+        matches!(self, Self::V1 | Self::V2)
     }
 }
 
@@ -1377,15 +2101,21 @@ fn expected_extension_objects(version: BrokerSchemaVersion) -> Vec<SchemaObject>
         expected_autoindex(RECEIVER_TABLE),
         expected_autoindex(SEQUENCE_TABLE),
     ];
-    if version == BrokerSchemaVersion::V1 {
+    if version.has_store_state() {
         objects.push(expected_autoindex(STORE_TABLE));
     }
+    objects.push(expected_table(ACCOUNT_TABLE, ACCOUNT_SCHEMA));
+    if version == BrokerSchemaVersion::V2 {
+        objects.push(expected_table(
+            HARDWARE_DECISION_TABLE,
+            HARDWARE_DECISION_SCHEMA,
+        ));
+    }
     objects.extend([
-        expected_table(ACCOUNT_TABLE, ACCOUNT_SCHEMA),
         expected_table(RECEIVER_TABLE, RECEIVER_SCHEMA),
         expected_table(SEQUENCE_TABLE, SEQUENCE_SCHEMA),
     ]);
-    if version == BrokerSchemaVersion::V1 {
+    if version.has_store_state() {
         objects.push(expected_table(STORE_TABLE, STORE_SCHEMA));
     }
     objects
@@ -1423,6 +2153,8 @@ fn recognize_extension_schema(connection: &Connection) -> Result<BrokerSchemaVer
         BrokerSchemaVersion::V0
     } else if objects == expected_extension_objects(BrokerSchemaVersion::V1) {
         BrokerSchemaVersion::V1
+    } else if objects == expected_extension_objects(BrokerSchemaVersion::V2) {
+        BrokerSchemaVersion::V2
     } else {
         return Err(ZecError::state_corrupt());
     };
@@ -1454,7 +2186,7 @@ fn recognize_extension_schema(connection: &Connection) -> Result<BrokerSchemaVer
             ("issued_at_sequence", "INTEGER", true, false),
         ],
     )?;
-    if version == BrokerSchemaVersion::V1 {
+    if version.has_store_state() {
         validate_columns(
             connection,
             STORE_TABLE,
@@ -1462,6 +2194,18 @@ fn recognize_extension_schema(connection: &Connection) -> Result<BrokerSchemaVer
                 ("account_id", "TEXT", true, true),
                 ("scan_tip", "INTEGER", false, false),
                 ("checkpoint_receiver_sequence", "INTEGER", true, false),
+            ],
+        )?;
+    }
+    if version == BrokerSchemaVersion::V2 {
+        validate_columns(
+            connection,
+            HARDWARE_DECISION_TABLE,
+            &[
+                ("singleton", "INTEGER", true, true),
+                ("record", "BLOB", true, false),
+                ("record_generation", "INTEGER", true, false),
+                ("generation_check", "TEXT", true, false),
             ],
         )?;
     }
@@ -1515,8 +2259,8 @@ fn issue_receiver(
     let transaction = connection
         .transaction_with_behavior(TransactionBehavior::Immediate)
         .map_err(|_| ZecError::state_corrupt())?;
-    if validate_extension_and_binding_with_connection(&transaction, account_id, network)?
-        != BrokerSchemaVersion::V1
+    if !validate_extension_and_binding_with_connection(&transaction, account_id, network)?
+        .has_store_state()
     {
         return Err(ZecError::state_corrupt());
     }
@@ -1584,8 +2328,8 @@ fn read_receiver_state(
 ) -> Result<ReceiverState, ZecError> {
     validate_account_paths(root, paths)?;
     let connection = open_read_only_connection(root, &paths.wallet)?;
-    if validate_extension_and_binding_with_connection(&connection, account_id, network)?
-        != BrokerSchemaVersion::V1
+    if !validate_extension_and_binding_with_connection(&connection, account_id, network)?
+        .has_store_state()
     {
         return Err(ZecError::state_corrupt());
     }

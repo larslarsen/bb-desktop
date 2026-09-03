@@ -385,6 +385,19 @@ const WAL006_ALLOWED_RUST_SOURCE_PATHS = [
   'wallet-broker/src/zec/store.rs',
   'wallet-broker/src/zec/test_support.rs',
 ];
+const WAL008_TEST_TARGETS = [
+  'zec_hardware',
+];
+const WAL008_ZEC_RUST_SOURCE_PATHS = [
+  'wallet-broker/src/zec.rs',
+  'wallet-broker/src/zec/address.rs',
+  'wallet-broker/src/zec/fixture.rs',
+  'wallet-broker/src/zec/hardware.rs',
+  'wallet-broker/src/zec/prepare.rs',
+  'wallet-broker/src/zec/scan.rs',
+  'wallet-broker/src/zec/store.rs',
+  'wallet-broker/src/zec/test_support.rs',
+];
 
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
@@ -2098,6 +2111,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'zec_scan:tests/zec_scan.rs',
     'zec_prepare:tests/zec_prepare.rs',
     'zec_hygiene:tests/zec_hygiene.rs',
+    'zec_hardware:tests/zec_hardware.rs',
     'xmr_distribution:tests/xmr_distribution.rs',
     'xmr_process:tests/xmr_process.rs',
     'xmr_rpc:tests/xmr_rpc.rs',
@@ -2223,6 +2237,33 @@ function checkWal006RustSourceInventory(actual) {
   }
   if (JSON.stringify(actual) !== JSON.stringify(WAL006_ALLOWED_RUST_SOURCE_PATHS)) {
     throw new PolicyError('WAL-006 Zcash Rust source inventory is missing, unlisted, or extra');
+  }
+}
+
+function checkWal008RustSourceInventory(actual) {
+  if (!Array.isArray(actual)) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory must be an array');
+  }
+  if (actual.some((rel) => typeof rel !== 'string' || !rel)) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory contains a malformed string path');
+  }
+  if (new Set(actual).size !== actual.length) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory contains a duplicate path');
+  }
+  if (!actual.includes('wallet-broker/src/zec/hardware.rs')) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory is missing hardware');
+  }
+  if (JSON.stringify(actual) !== JSON.stringify(WAL008_ZEC_RUST_SOURCE_PATHS) &&
+      actual.length === WAL008_ZEC_RUST_SOURCE_PATHS.length &&
+      sameSet(actual, WAL008_ZEC_RUST_SOURCE_PATHS)) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory must retain exact sorted order');
+  }
+  const unlisted = actual.filter((rel) => !WAL008_ZEC_RUST_SOURCE_PATHS.includes(rel));
+  if (unlisted.length) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory contains an unlisted extra path');
+  }
+  if (JSON.stringify(actual) !== JSON.stringify(WAL008_ZEC_RUST_SOURCE_PATHS)) {
+    throw new PolicyError('WAL-008 Zcash Rust source inventory is missing a reviewed path');
   }
 }
 
@@ -2551,11 +2592,11 @@ function checkRepository(root) {
     }
   };
   collectRustSources(rustSourceDirectory, 'wallet-broker/src');
-  const wal006RustSources = recursiveRustSources
+  const wal008RustSources = recursiveRustSources
     .filter((rel) => /^wallet-broker\/src\/zec(?:[_.\/])/.test(rel))
     .sort();
-  checkWal006RustSourceInventory(wal006RustSources);
-  for (const rel of WAL006_ALLOWED_RUST_SOURCE_PATHS) {
+  checkWal008RustSourceInventory(wal008RustSources);
+  for (const rel of WAL008_ZEC_RUST_SOURCE_PATHS) {
     const sourcePath = path.join(root, rel);
     if (!fs.existsSync(sourcePath)) throw new PolicyError(`missing ${rel}`);
     checkRustWalletSource(fs.readFileSync(sourcePath, 'utf8'), rel);
@@ -2661,6 +2702,8 @@ module.exports = {
   WAL006_FORBIDDEN_FEATURES,
   WAL006_EXPECTED_COMPILED_PCZT_CAPABILITIES,
   WAL006_ALLOWED_RUST_SOURCE_PATHS,
+  WAL008_TEST_TARGETS,
+  WAL008_ZEC_RUST_SOURCE_PATHS,
   parseYaml,
   loadWorkflow,
   eventTriggers,
@@ -2681,6 +2724,7 @@ module.exports = {
   checkRustWalletSourceInventory,
   checkWal006ResolvedFeatures,
   checkWal006RustSourceInventory,
+  checkWal008RustSourceInventory,
   checkRustWalletSource,
   checkWalletBrokerDenyPolicy,
   checkRepository,

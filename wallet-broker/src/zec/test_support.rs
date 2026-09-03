@@ -25,7 +25,8 @@ use super::prepare::{
 };
 use super::scan::{ScanBalances as InnerScanBalances, ScanFaultPort, ScanInspection, ScanRequest};
 use super::store::{
-    AddressAccount, AddressFaultPort, HostileEntryKind, SqliteInspectionData, StateRoot,
+    AddressAccount, AddressFaultPort, HardwarePersistenceFault, HardwareRecordMutation,
+    HostileEntryKind, SqliteInspectionData, StateRoot,
 };
 use super::{
     AccountId, FreshReceiverV1, HandleBinding, HandleInvalidation, Network, PrepareZecV1,
@@ -2058,18 +2059,54 @@ pub enum PersistedDecisionMutation {
     ConsensusDrift,
 }
 
-static NEXT_HARDWARE_STATE_ROOT: AtomicU64 = AtomicU64::new(1);
+impl From<HardwareStoreFault> for HardwarePersistenceFault {
+    fn from(value: HardwareStoreFault) -> Self {
+        match value {
+            HardwareStoreFault::Write => Self::Write,
+            HardwareStoreFault::FileSync => Self::FileSync,
+            HardwareStoreFault::DirectorySync => Self::DirectorySync,
+            HardwareStoreFault::Commit => Self::Commit,
+        }
+    }
+}
 
-#[derive(Clone, Eq, PartialEq)]
+impl From<PersistedDecisionMutation> for HardwareRecordMutation {
+    fn from(value: PersistedDecisionMutation) -> Self {
+        match value {
+            PersistedDecisionMutation::UnknownField => Self::UnknownField,
+            PersistedDecisionMutation::DuplicateVerifiedField => Self::DuplicateVerifiedField,
+            PersistedDecisionMutation::InvalidBoolean => Self::InvalidBoolean,
+            PersistedDecisionMutation::OutOfRangeTransactionVersion => {
+                Self::OutOfRangeTransactionVersion
+            }
+            PersistedDecisionMutation::InvalidFingerprintDigest => Self::InvalidFingerprintDigest,
+            PersistedDecisionMutation::UnknownStatus => Self::UnknownStatus,
+            PersistedDecisionMutation::SchemaRevisionDrift => Self::SchemaRevisionDrift,
+            PersistedDecisionMutation::PartialWrite => Self::PartialWrite,
+            PersistedDecisionMutation::Rollback => Self::Rollback,
+            PersistedDecisionMutation::TableRevisionDrift => Self::TableRevisionDrift,
+            PersistedDecisionMutation::ConsensusDrift => Self::ConsensusDrift,
+        }
+    }
+}
+
+static NEXT_HARDWARE_STATE_ROOT: AtomicU64 = AtomicU64::new(1);
+const HARDWARE_ACCOUNT_ID: &str = "88008800880088008800880088008800";
+
+fn hardware_account_id() -> Result<AccountId, HardwareError> {
+    AccountId::parse(HARDWARE_ACCOUNT_ID).map_err(|_| HardwareError::internal())
+}
+
+#[derive(Clone)]
 pub struct HardwareStateRoot {
-    token: u64,
+    inner: StateRoot,
 }
 
 impl HardwareStateRoot {
-    pub fn fresh(_label: &str) -> Self {
-        Self {
-            token: NEXT_HARDWARE_STATE_ROOT.fetch_add(1, Ordering::Relaxed),
-        }
+    pub fn fresh(label: &str) -> Self {
+        let sequence = NEXT_HARDWARE_STATE_ROOT.fetch_add(1, Ordering::Relaxed);
+        let root = TestStateRoot::fresh(&format!("wal008-{label}-{sequence}"));
+        Self { inner: root.inner }
     }
 }
 
@@ -2081,10 +2118,12 @@ impl core::fmt::Debug for HardwareStateRoot {
 
 pub struct HardwareTestHarness {
     root: HardwareStateRoot,
+    account: AddressAccount,
     profiles: Vec<ReviewedProfile>,
     persistence_attempts: usize,
     ready_decision: Option<HardwareDecision>,
     published_ready_count: usize,
+    fresh_expansion_authorization: Option<HardwareDecision>,
     canaries: Option<InstalledHardwareCanaries>,
 }
 
@@ -2104,12 +2143,25 @@ impl HardwareTestHarness {
         }) {
             return Err(HardwareError::schema());
         }
+        let account_id = hardware_account_id()?;
+        let seed = SecretBytes::new(vec![0; 32]).map_err(|_| HardwareError::internal())?;
+        let mut observer = IgnoreWipes;
+        let account = AddressAccount::bootstrap(
+            root.inner.clone(),
+            account_id,
+            Network::Testnet,
+            seed,
+            &mut observer,
+        )
+        .map_err(|_| HardwareError::internal())?;
         Ok(Self {
             root,
+            account,
             profiles,
             persistence_attempts: 0,
             ready_decision: None,
             published_ready_count: 0,
+            fresh_expansion_authorization: None,
             canaries: None,
         })
     }
@@ -2152,7 +2204,12 @@ impl HardwareTestHarness {
         probe: &LiveProbe,
     ) -> Result<HardwareDecision, HardwareError> {
         self.touch_all_canaries();
-        super::hardware::decide(&self.profiles, fingerprint, probe)
+        let decision = super::hardware::decide(&self.profiles, fingerprint, probe)?;
+        self.fresh_expansion_authorization =
+            super::hardware::validate_persisted_decision(&self.profiles, &decision)
+                .is_ok()
+                .then_some(decision.clone());
+        Ok(decision)
     }
 
     pub fn select_route(
@@ -2166,33 +2223,88 @@ impl HardwareTestHarness {
         self.persistence_attempts
     }
 
-    pub fn persist(&mut self, _decision: &HardwareDecision) -> Result<(), HardwareError> {
+    pub fn persist(&mut self, decision: &HardwareDecision) -> Result<(), HardwareError> {
         self.persistence_attempts += 1;
-        Err(HardwareError::state_corrupt())
+        self.touch_all_canaries();
+        let expansion_authorized = self
+            .fresh_expansion_authorization
+            .take()
+            .as_ref()
+            .is_some_and(|authorized| authorized == decision);
+        self.account.persist_hardware_decision(
+            &self.profiles,
+            decision,
+            expansion_authorized,
+            None,
+        )?;
+        self.ready_decision = Some(decision.clone());
+        self.published_ready_count = 1;
+        Ok(())
     }
 
     pub fn persist_with_fault(
         &mut self,
-        _decision: &HardwareDecision,
-        _fault: HardwareStoreFault,
+        decision: &HardwareDecision,
+        fault: HardwareStoreFault,
     ) -> Result<(), HardwareError> {
         self.persistence_attempts += 1;
-        Err(HardwareError::internal())
+        self.touch_all_canaries();
+        let expansion_authorized = self
+            .fresh_expansion_authorization
+            .take()
+            .as_ref()
+            .is_some_and(|authorized| authorized == decision);
+        self.account.persist_hardware_decision(
+            &self.profiles,
+            decision,
+            expansion_authorized,
+            Some(fault.into()),
+        )
     }
 
     pub fn persisted_bytes(&self) -> Result<Vec<u8>, HardwareError> {
-        Ok(Vec::new())
+        self.account.persisted_hardware_bytes(&self.profiles)
     }
 
     pub fn reopen(&self) -> Result<Self, HardwareError> {
-        let _ = self.root.token;
-        Err(HardwareError::state_corrupt())
+        let account = AddressAccount::open_viewing_with_network(
+            self.root.inner.clone(),
+            hardware_account_id()?,
+            Network::Testnet,
+        )
+        .map_err(|_| HardwareError::state_corrupt())?;
+        let ready_decision = account
+            .load_hardware_decision(&self.profiles)?
+            .ok_or_else(HardwareError::state_corrupt)?;
+        Ok(Self {
+            root: self.root.clone(),
+            account,
+            profiles: self.profiles.clone(),
+            persistence_attempts: 0,
+            ready_decision: Some(ready_decision),
+            published_ready_count: 1,
+            fresh_expansion_authorization: None,
+            canaries: None,
+        })
     }
 
     pub fn reopen_in_place(&mut self) -> Result<(), HardwareError> {
         self.ready_decision = None;
         self.published_ready_count = 0;
-        Err(HardwareError::state_corrupt())
+        self.fresh_expansion_authorization = None;
+        let account = AddressAccount::open_viewing_with_network(
+            self.root.inner.clone(),
+            hardware_account_id()?,
+            Network::Testnet,
+        )
+        .map_err(|_| HardwareError::state_corrupt())?;
+        let ready_decision = account
+            .load_hardware_decision(&self.profiles)?
+            .ok_or_else(HardwareError::state_corrupt)?;
+        self.account = account;
+        self.ready_decision = Some(ready_decision);
+        self.published_ready_count = 1;
+        Ok(())
     }
 
     pub fn ready_decision(&self) -> Option<&HardwareDecision> {
@@ -2205,11 +2317,14 @@ impl HardwareTestHarness {
 
     pub fn mutate_persisted_for_test(
         &mut self,
-        _mutation: PersistedDecisionMutation,
+        mutation: PersistedDecisionMutation,
     ) -> Result<(), HardwareError> {
+        self.account
+            .mutate_hardware_record_for_test(mutation.into())?;
         self.ready_decision = None;
         self.published_ready_count = 0;
-        Err(HardwareError::state_corrupt())
+        self.fresh_expansion_authorization = None;
+        Ok(())
     }
 
     pub fn software_fallback_count(&self) -> usize {

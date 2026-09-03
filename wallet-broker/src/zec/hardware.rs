@@ -326,7 +326,7 @@ impl HardwareCapabilities {
     }
 }
 
-const ALL_CAPABILITY_FLAGS: [CapabilityFlag; 18] = [
+pub(crate) const ALL_CAPABILITY_FLAGS: [CapabilityFlag; 18] = [
     CapabilityFlag::CanView,
     CapabilityFlag::CanDeriveFreshReceiver,
     CapabilityFlag::CanReceivePrivate,
@@ -700,6 +700,62 @@ pub(crate) fn select_route(
     })
 }
 
+pub(crate) fn validate_persisted_decision(
+    profiles: &[ReviewedProfile],
+    decision: &HardwareDecision,
+) -> Result<(), HardwareError> {
+    if decision.fingerprint_digest.len() != 64
+        || !decision
+            .fingerprint_digest
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+        || decision.table_revision.is_empty()
+        || decision.table_revision.len() > 64
+        || !decision
+            .table_revision
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'+' | b'-'))
+        || !strictly_ordered(&decision.capabilities.allowed_signing_pools)
+        || !strictly_ordered(&decision.verified_fields)
+        || decision.host_trusting_fields
+            != VerifiedField::ALL
+                .iter()
+                .copied()
+                .filter(|field| !decision.verified_fields.contains(field))
+                .collect::<Vec<_>>()
+    {
+        return Err(HardwareError::state_corrupt());
+    }
+    select_route(profiles, decision)?;
+    Ok(())
+}
+
+pub(crate) fn decision_narrows(prior: &HardwareDecision, candidate: &HardwareDecision) -> bool {
+    candidate.fingerprint_digest == prior.fingerprint_digest
+        && candidate.table_revision == prior.table_revision
+        && candidate.status == prior.status
+        && candidate.privacy == prior.privacy
+        && candidate.route == prior.route
+        && candidate.pay_eligible == prior.pay_eligible
+        && candidate.electron_verified_fields == prior.electron_verified_fields
+        && candidate.route_claims == prior.route_claims
+        && candidate.capabilities.transaction_version == prior.capabilities.transaction_version
+        && candidate.capabilities.consensus_branch == prior.capabilities.consensus_branch
+        && candidate.capabilities.pczt_encoding_version == prior.capabilities.pczt_encoding_version
+        && ALL_CAPABILITY_FLAGS.iter().all(|flag| {
+            !candidate.capabilities.contains(*flag) || prior.capabilities.contains(*flag)
+        })
+        && candidate
+            .capabilities
+            .allowed_signing_pools
+            .iter()
+            .all(|pool| prior.capabilities.allowed_signing_pools.contains(pool))
+        && candidate
+            .verified_fields
+            .iter()
+            .all(|field| prior.verified_fields.contains(field))
+}
+
 fn narrowed_decision(
     profile: &ReviewedProfile,
     probe: &LiveProbe,
@@ -796,6 +852,10 @@ fn has_duplicates<T: Eq>(values: &[T]) -> bool {
         .iter()
         .enumerate()
         .any(|(index, value)| values[index + 1..].contains(value))
+}
+
+fn strictly_ordered<T: Ord>(values: &[T]) -> bool {
+    values.windows(2).all(|pair| pair[0] < pair[1])
 }
 
 fn update_length_prefixed(hasher: &mut Sha256, bytes: &[u8]) {
