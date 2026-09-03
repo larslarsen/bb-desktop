@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE 01 EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
+Status: SLICE 01 EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -310,6 +310,13 @@ commands and falsely claims no wrappers; transcript audit also found an unreques
 Node.js version command. The bounded evidence correction is specified in
 `docs/testing/BBD-WAL-008-SLICE-01-GREEN-01-EVIDENCE-REVIEW-01.md`. Hermes alone may
 correct the two documentation paths. Source and further execution remain closed.
+
+## Reviewer evidence decision 13
+
+Correction 01 disclosed the deviations but still abbreviates both gate commands and
+left stale current-task prose. Evidence Review 02 authorizes Hermes alone to insert the
+two complete literal command strings and correct current-task state. Source, execution,
+and Slice 02 remain closed.
 
 ## Acceptance boundary
 
