@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN 01 EVIDENCE CORRECTION 01 HERMES AUTHORIZED
+State: PHASE C SLICE 5 GREEN 01 EVIDENCE CORRECTED — REVIEW REQUIRED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -22,11 +22,11 @@ Active handoff:
 
 Hermes completed Green Resume 04 and integrated the exact eleven-path drop at
 `64811dea`. The implementation and exact pre-integration green execution are accepted,
-but transcript audit requires the documentation correction in
+but transcript audit required the documentation correction in
 [BBD-WAL-007-SLICE-05-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-01-EVIDENCE-REVIEW-01.md).
-Hermes alone may correct the two evidence/handoff documents. Source/tests, execution,
-integration, broader/final acceptance, and the real offline local-Monero gate are
-closed pending reviewer acceptance. The current green evidence is
+Hermes corrected the two evidence/handoff documents at `d20d60a9`. Source, tests,
+execution, integration, broader/final acceptance, and the real offline local-Monero
+gate are closed pending reviewer acceptance. The corrected green evidence is
 [BBD-WAL-007-SLICE-05-GREEN-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-01.md).
 
 Sol's exact two-path Clippy correction is accepted at XHigh in

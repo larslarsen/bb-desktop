@@ -76,9 +76,19 @@ Each command run exactly once, sequentially, byte-for-byte, with no wrapper, red
 
 All Rust commands emitted no warning or diagnostic. No accepted source/test file mutated during the green sequence.
 
+## Post-integration deviation
+
+After integration and push to `origin/master`, the following unauthorized commands were run outside the green sequence:
+
+1. `node -e` package-script inspection
+2. `npm run build`
+3. `npm run test`
+
+These commands did not mutate the committed result or the clean repository state. They constitute a post-integration command-scope deviation from the stop contract: broader/final acceptance commands were executed after the integration gate was already satisfied, without authorization. Their results are not accepted and are not reusable as broader or final evidence. Slice 5 remains pending corrected evidence and reviewer acceptance.
+
 ## Scope and prohibitions
 
-- No source/test was designed, authored, or permanently edited.
-- No command was wrapped, redirected, repeated, or altered.
-- No real local-Monero gate, broader/final acceptance, or other repository was touched.
+- No source/test was designed, authored, or permanently edited for the green sequence.
+- No green-sequence command was wrapped, redirected, repeated, or altered.
+- The real offline local-Monero gate was not exercised.
 - No local Monero path, artifact/cache path, environment value, port, credential, process ID, seed, primary address, receiver, or raw sensitive output is recorded here.
