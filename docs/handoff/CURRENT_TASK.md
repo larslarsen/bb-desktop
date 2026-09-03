@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE A FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
+State: PHASE B EXPECTED RED 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,15 +18,14 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SPARK_BBD_WAL_008_PHASE_A_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_008_PHASE_A_FORMAT_CORRECTION_01.md)
+[HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md](HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md)
 
-Hermes stopped correctly when the first Phase-B command, the Rust 1.98 formatter
-check, exited 1. The valid unchanged-source stop is recorded in
-[BBD-WAL-008-PHASE-B-FORMAT-STOP-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-B-FORMAT-STOP-REVIEW-01.md).
-Spark High alone may run the exact one-file pinned formatter mutation and then stop.
-The manifest and test semantics remain frozen. Hermes, Sol, Grok, production source,
-further execution/integration, broader gates, real-device work, and WAL-007 execution
-remain unauthorized pending reviewer inspection.
+Spark's exact one-file Rust 1.98 formatter drop is accepted in
+[BBD-WAL-008-PHASE-A-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-A-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
+Hermes alone may freshly run the exact formatter check and expected-red test, then
+integrate the exact two-path test drop plus evidence/current-task records only on the
+specified absent-production-contract failure. Spark, Sol, Grok, production source,
+broader gates, real-device work, and WAL-007 execution remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

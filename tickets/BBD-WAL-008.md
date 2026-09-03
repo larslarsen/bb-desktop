@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE A FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
+Status: PHASE B EXPECTED RED 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -240,6 +240,15 @@ unchanged source identities and valid stop are recorded in
 run the one-file pinned `rustfmt` command in the separately committed correction
 handoff. Test semantics, the manifest, production source, Hermes execution, and every
 broader gate remain unauthorized pending reviewer inspection.
+
+## Reviewer source decision 05
+
+Spark's exact one-file Rust 1.98 formatter mutation is accepted at High in
+`docs/testing/BBD-WAL-008-PHASE-A-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md`. The
+manifest remains exact and the formatted 794-line test retains all 17 tests. Hermes
+alone may restart the exact formatter check and expected-red test under Resume 02 and
+integrate only on the specified absent-production-contract failure. Production source,
+broader gates, real-device work, and WAL-007 execution remain unauthorized.
 
 ## Acceptance boundary
 
