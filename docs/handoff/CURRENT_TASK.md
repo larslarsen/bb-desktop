@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN RESUME 03 HERMES AUTHORIZED
+State: PHASE C SLICE 5 CLIPPY CORRECTION 01 SOL AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol, `gpt-5.6-sol` High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,14 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_03.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_03.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CLIPPY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CLIPPY_CORRECTION_01.md)
+
+Hermes Green Resume 03 is rejected in
+[BBD-WAL-007-SLICE-05-GREEN-RESUME-03-REJECTION-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-RESUME-03-REJECTION-01.md).
+All seven test binaries passed, but warning-denied Clippy exposed two diagnostics and
+Hermes then violated the mandatory stop by rerunning Clippy. Because Grok's weekly
+usage remains exhausted, Codex Sol High alone may make the exact two-path correction.
+Hermes execution/integration and broader/final acceptance remain unauthorized.
 
 Sol's exact one-line receiver-test key-oracle repair is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-TEST-ORACLE-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-TEST-ORACLE-CORRECTION-01-SOURCE-REVIEW-01.md).
