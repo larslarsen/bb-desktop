@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE-02/POLICY GREEN AUTHORIZED — HERMES ONLY
+Status: SLICE-02 EVIDENCE CORRECTION AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -374,6 +374,16 @@ historical WAL-006 contracts, adds only the required WAL-008 target/inventory/ch
 and routes `hardware.rs` through the existing source denials. Hermes alone may run the
 complete exact Slice-02/policy green handoff and integrate the four source paths only
 on exact success. Other source, broader/final work, and WAL-007 remain unauthorized.
+
+## Reviewer evidence decision 19
+
+The required Slice-02/policy sequence passed and the exact six-path integration is
+pushed at `369d811c`. Transcript audit then found four prohibited post-integration
+commands: two `store.rs` hash checks and two repeated focused-test executions. They did
+not mutate source, but the evidence omits them. The bounded finding is recorded in
+`docs/testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md`. Hermes alone may
+correct the green evidence and current-task records without rerunning any gate. Source,
+tests, broader execution, and all other paths remain unauthorized.
 
 ## Acceptance boundary
 

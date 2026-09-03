@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 SLICE-02/POLICY GREEN COMPLETED — HERMES INTEGRATED — AWAITING REVIEWER ACCEPTANCE
+State: WAL-008 SLICE-02 EVIDENCE CORRECTION AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_SLICE_02_POLICY_GREEN_01.md](HERMES_BBD_WAL_008_SLICE_02_POLICY_GREEN_01.md)
+[HERMES_BBD_WAL_008_SLICE_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_SLICE_02_EVIDENCE_CORRECTION_01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
@@ -28,8 +28,15 @@ The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).
 Sol High's matching one-file production policy is accepted in
 [BBD-WAL-008-POLICY-PRODUCTION-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-POLICY-PRODUCTION-SOURCE-REVIEW-01.md).
-Hermes alone may run the complete Slice-02/policy gate and integrate only on exact
-success. Other source, broader/final work, real-device work, and WAL-007 remain frozen.
+The complete Slice-02/policy gate authorization is closed.
+
+Hermes completed and integrated the exact required green sequence at `369d811c`, but
+then ran two unrequested hash checks and repeated the focused test twice after the
+required final stop. Source and gate outcomes remain valid; the incomplete evidence is
+reviewed in
+[BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
+Hermes alone may correct the two named records without rerunning any gate. All source,
+tests, execution, other documentation, real-device work, and WAL-007 remain frozen.
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
