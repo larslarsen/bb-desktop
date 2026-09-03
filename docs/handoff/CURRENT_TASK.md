@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE C SLICE 02 GREEN AUTHORIZED — HERMES ONLY
+State: PHASE C SLICE 02 FORMAT CORRECTION AUTHORIZED — CODEX SPARK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,16 +18,18 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_01.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_01.md)
+[CODEX_SPARK_BBD_WAL_008_SLICE_02_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_008_SLICE_02_FORMAT_CORRECTION_01.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
 The three-path Slice-02 persistence drop is accepted for execution in
 [BBD-WAL-008-SLICE-02-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-SOURCE-REVIEW-01.md).
-Hermes alone may run the exact formatter, stale-expansion falsification, focused and
-affected green gates, then integrate only on exact success. Grok, Sol, other actors,
-transport, signing, real-device work, broader/final acceptance, and WAL-007 remain
-unauthorized.
+Hermes stopped correctly at the first formatter mismatch, reviewed in
+[BBD-WAL-008-SLICE-02-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-STOP-REVIEW-01.md).
+Codex Spark High alone may run one pinned rustfmt mutation on `hardware.rs` and
+`store.rs`, then stop for reviewer inspection. Hermes, Grok, Sol, other actors, tests,
+integration, transport, signing, real-device work, broader/final acceptance, and
+WAL-007 remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
