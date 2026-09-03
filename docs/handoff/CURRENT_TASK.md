@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN 01 COMPLETE — REVIEW REQUIRED
+State: PHASE C SLICE 5 GREEN 01 EVIDENCE CORRECTION 01 HERMES AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes (documentation only)
 
 Protected governance parent: the commit containing this task update
 
@@ -18,12 +18,16 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_04.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_04.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01_EVIDENCE_CORRECTION_01.md)
 
-Hermes completed Green Resume 04 and recorded the complete green evidence in
+Hermes completed Green Resume 04 and integrated the exact eleven-path drop at
+`64811dea`. The implementation and exact pre-integration green execution are accepted,
+but transcript audit requires the documentation correction in
+[BBD-WAL-007-SLICE-05-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-01-EVIDENCE-REVIEW-01.md).
+Hermes alone may correct the two evidence/handoff documents. Source/tests, execution,
+integration, broader/final acceptance, and the real offline local-Monero gate are
+closed pending reviewer acceptance. The current green evidence is
 [BBD-WAL-007-SLICE-05-GREEN-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-01.md).
-The implementation and execution are accepted pending reviewer inspection.
-Broader/final acceptance and the real offline local-Monero gate remain unauthorized.
 
 Sol's exact two-path Clippy correction is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md).
