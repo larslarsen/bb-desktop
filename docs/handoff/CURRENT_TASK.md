@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 COMPILE CORRECTION 01 GROK AUTHORIZED
+State: PHASE C SLICE 5 COMPILE CORRECTION 01 SOL FILL-IN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Sr Dev — Grok Build, Grok 4.6 High
+Authorized source actor: Principal Dev — Codex Sol, `gpt-5.6-sol` High
 
 Authorized integration actor: none
 
@@ -18,7 +18,16 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md)
+
+Grok Build stopped without a usable compile correction because its weekly usage is
+exhausted. The valid no-edit stop and unchanged accepted source identity are recorded
+in
+[BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-GROK-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-GROK-STOP-REVIEW-01.md).
+This satisfies the documented fill-in condition. Codex Sol at High alone may make the
+same exact one-line `xmr/store.rs` type-annotation repair. Hermes
+execution/integration, Grok, Spark, broader/final acceptance, and the real offline
+local-Monero gate remain unauthorized pending XHigh source review.
 
 Hermes Green Resume 01 stopped at the required first mismatch when the exact
 durable-replay falsification command exposed one `E0282` compile error before any test
