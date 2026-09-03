@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: SLICE 01 EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
+State: SLICE 01 EVIDENCE CORRECTION 02 COMPLETE — AWAITING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -20,11 +20,10 @@ Parked predecessor:
 Active handoff:
 [HERMES_BBD_WAL_008_SLICE_01_EVIDENCE_CORRECTION_02.md](HERMES_BBD_WAL_008_SLICE_01_EVIDENCE_CORRECTION_02.md)
 
-Correction 01 disclosed the command wrappers and unrequested Node.js probe, but still
-abbreviated both gate commands and left this active narrative stale. Hermes alone may
-insert the two complete literal commands and update this record under Correction 02.
-Source, execution, persistence, other actors, broader gates, real-device work, and
-WAL-007 remain unauthorized pending acceptance.
+Correction 02 is complete: the two complete literal gate commands are recorded in the
+green evidence and this record is updated accordingly. Source, execution, persistence,
+other actors, broader gates, real-device work, and WAL-007 remain unauthorized pending
+acceptance.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

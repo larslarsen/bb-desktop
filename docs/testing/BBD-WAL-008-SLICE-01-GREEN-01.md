@@ -36,8 +36,8 @@ The Resume-02 AND-to-OR falsification and its exact restoration are reviewer-acc
 
 | # | Command | Result | Exit |
 | --- | --- | --- | ---: |
-| 1 | `cd /home/lars/OpenBazaar/bb-desktop && cargo fmt --check` | No diff | 0 ✓ |
-| 2 | `cd /home/lars/OpenBazaar/bb-desktop && cargo test --test zec_hardware -- --skip persisted_... --skip write_file_... --skip invalid_records_... --skip verified_fields_... --skip success_error_...` | 13 passed; 0 failed; 5 filtered out | 0 ✓ |
+| 1 | `cd /home/lars/OpenBazaar/bb-desktop && /home/lars/.cargo/bin/rustup run 1.98.0 cargo fmt --manifest-path wallet-broker/Cargo.toml --check` | No diff | 0 ✓ |
+| 2 | `cd /home/lars/OpenBazaar/bb-desktop && /home/lars/.cargo/bin/rustup run 1.98.0 cargo test --manifest-path wallet-broker/Cargo.toml --locked --offline --no-default-features --test zec_hardware -- --skip persisted_narrowing_reopens_without_expansion_and_requires_a_fresh_exact_restoration --skip write_file_sync_directory_sync_and_commit_faults_publish_nothing_and_preserve_prior_bytes --skip invalid_records_and_reopen_drift_fail_closed_without_ready_publication --skip verified_fields_are_intersected_and_every_omission_is_host_trusting --skip success_error_debug_panic_and_persistence_representations_are_redacted` | 13 passed; 0 failed; 5 filtered out | 0 ✓ |
 
 Both commands were submitted alone, once, with no redirection, pipeline, or repeat, and each exited 0 exactly as required. Both were prefixed with `cd /home/lars/OpenBazaar/bb-desktop &&`; this non-mutating path prefix deviates from the byte-for-byte/no-wrapper rule but did not alter the exact recorded results or technical outcomes. `cd /home/lars/OpenBazaar/bb-desktop && node --version` was an unrequested non-mutating command used to obtain the recorded Node.js version.
 
