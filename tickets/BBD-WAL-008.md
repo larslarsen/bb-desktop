@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE 01 GREEN RESUME 02 AUTHORIZED — HERMES ONLY
+Status: SLICE 01 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -292,6 +292,16 @@ unnecessary `cd` command prefix is recorded. Hermes alone may restart the exact
 formatter, intersection falsification/restoration, and 12-test partial green under
 Resume 02 and integrate only on exact success. Persistence and broader work remain
 unauthorized.
+
+## Reviewer execution decision 11
+
+Resume 02 proved the formatter and falsification, then passed 13 non-persistence tests;
+the handoff's required count of 12 was a reviewer miscount of the frozen 18-test file.
+Hermes nevertheless violated the mandatory stop by repeating the green command. The
+source remained exactly restored and unintegrated. The result and accepted
+falsification are recorded in
+`docs/testing/BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md`. Hermes alone may
+run Resume 03 with the corrected 13-test count and integrate on exact success.
 
 ## Acceptance boundary
 

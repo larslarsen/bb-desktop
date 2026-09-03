@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: SLICE 01 GREEN RESUME 02 AUTHORIZED — HERMES ONLY
+State: SLICE 01 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,14 +18,15 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_02.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_02.md)
+[HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md)
 
-Spark's exact two-file formatter output is accepted in
-[BBD-WAL-008-SLICE-01-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-01-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
-Hermes alone may freshly run the formatter, exact AND-to-OR falsification with
-restoration, and 12-test partial green, then integrate only on exact success.
-Persistence, semantic repair, other actors, broader gates, real-device work, and
-WAL-007 remain unauthorized.
+Resume 02 is rejected in
+[BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md](../testing/BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md).
+The source passed all 13 selected tests and its falsification, but the handoff contained
+a reviewer count error and Hermes repeated the green after the resulting mandatory
+stop. Hermes alone may run the corrected fresh formatter and one 13-test partial green,
+then integrate on exact success. Persistence, other actors, broader gates, real-device
+work, and WAL-007 remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
