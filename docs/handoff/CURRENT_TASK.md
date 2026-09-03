@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: SLICE 01 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
+State: SLICE 01 GREEN 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: Jr Dev — Hermes (complete)
 
 Protected governance parent: the commit containing this task update
 
@@ -20,13 +20,15 @@ Parked predecessor:
 Active handoff:
 [HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_01_GREEN_RESUME_03.md)
 
-Resume 02 is rejected in
-[BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md](../testing/BBD-WAL-008-SLICE-01-GREEN-RESUME-02-REJECTION-01.md).
-The source passed all 13 selected tests and its falsification, but the handoff contained
-a reviewer count error and Hermes repeated the green after the resulting mandatory
-stop. Hermes alone may run the corrected fresh formatter and one 13-test partial green,
-then integrate on exact success. Persistence, other actors, broader gates, real-device
-work, and WAL-007 remain unauthorized.
+Hermes completed Green Resume 03 on the exact two fresh commands: the formatter
+check exited 0 without mutation, and the 13-test partial green exited 0 with 13
+passed, 0 failed, 5 filtered out. The accepted Resume-02 AND-to-OR
+falsification/restoration is recorded separately and was not repeated. The
+evidence is recorded in
+[BBD-WAL-008-SLICE-01-GREEN-01.md](../testing/BBD-WAL-008-SLICE-01-GREEN-01.md).
+The exact three source paths plus the evidence and current-task records are
+staged, committed, and pushed. Persistence, other actors, broader gates,
+real-device work, and WAL-007 remain unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

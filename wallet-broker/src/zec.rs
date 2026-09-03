@@ -2,6 +2,7 @@ use core::fmt;
 
 mod address;
 mod fixture;
+mod hardware;
 mod prepare;
 mod scan;
 mod store;

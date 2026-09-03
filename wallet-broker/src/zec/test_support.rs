@@ -13,6 +13,12 @@ use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
 use super::address::{self, DecodedReceiver, SeedExit};
 use super::fixture;
+use super::hardware::PRODUCTION_REVIEWED_PROFILES;
+pub use super::hardware::{
+    CapabilityFlag, ClaimedRoute, DecisionStatus, DeviceFingerprint, DeviceVendor,
+    FingerprintField, HardwareCapabilities, HardwareDecision, HardwareError, HardwarePrivacy,
+    HardwareRoute, HardwareRouteMetadata, LiveProbe, ReviewedProfile, SigningPool, VerifiedField,
+};
 use super::prepare::{
     PcztInspection, PoolInventoryData, PrepareState, PrepareWipeLog, normalize_diagnostic,
     parse_canonical_positive_u64,
@@ -1827,4 +1833,553 @@ fn mutex_lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+const SYNTHETIC_MODEL: &str = "BITBOOKSYNTHETICKEYSTONE";
+const SYNTHETIC_APP: &str = "BITBOOKZECTESTAPP";
+const SYNTHETIC_APP_VERSION: &str = "000TESTONLY";
+const HARDWARE_BRANCH: &str = "37a5165b";
+const HARDWARE_TRANSACTION_VERSION: &str = "6";
+const HARDWARE_PCZT_ENCODING_VERSION: &str = "2";
+
+impl DeviceFingerprint {
+    pub fn with_vendor_for_test(&self, vendor: DeviceVendor) -> Self {
+        self.replacing_vendor(vendor)
+    }
+
+    pub fn with_component_for_test(
+        &self,
+        field: FingerprintField,
+        value: &str,
+    ) -> Result<Self, HardwareError> {
+        self.replacing_component(field, value)
+    }
+}
+
+impl ReviewedProfile {
+    pub fn synthetic_keystone_test_only() -> Self {
+        reviewed_profile(
+            DeviceVendor::Keystone,
+            SYNTHETIC_MODEL,
+            SYNTHETIC_APP,
+            SYNTHETIC_APP_VERSION,
+            keystone_capabilities(),
+            VerifiedField::ALL.to_vec(),
+        )
+    }
+
+    pub fn synthetic_trezor_transparent_negative() -> Self {
+        let mut capabilities = protocol_capabilities();
+        capabilities.can_sign_transparent = true;
+        reviewed_profile(
+            DeviceVendor::Trezor,
+            "BITBOOKSYNTHETICTREZOR",
+            "BITBOOKZECTRANSPARENTTEST",
+            "000TESTONLY",
+            capabilities,
+            Vec::new(),
+        )
+    }
+
+    pub fn synthetic_ledger_unverified_negative() -> Self {
+        reviewed_profile(
+            DeviceVendor::Ledger,
+            "BITBOOKSYNTHETICLEDGER",
+            "BITBOOKZECUNVERIFIEDTEST",
+            "000TESTONLY",
+            protocol_capabilities(),
+            Vec::new(),
+        )
+    }
+
+    pub fn without_capability_for_test(mut self, capability: CapabilityFlag) -> Self {
+        self.capabilities.set(capability, false);
+        self
+    }
+
+    pub fn without_signing_pool_for_test(mut self, pool: SigningPool) -> Self {
+        self.capabilities
+            .allowed_signing_pools
+            .retain(|candidate| *candidate != pool);
+        self
+    }
+
+    pub fn without_verified_field_for_test(mut self, field: VerifiedField) -> Self {
+        self.verified_fields.retain(|candidate| *candidate != field);
+        self
+    }
+}
+
+impl LiveProbe {
+    pub fn synthetic_keystone_test_only() -> Self {
+        live_probe(keystone_capabilities(), VerifiedField::ALL.to_vec())
+    }
+
+    pub fn synthetic_trezor_transparent() -> Self {
+        let mut capabilities = protocol_capabilities();
+        capabilities.can_sign_transparent = true;
+        live_probe(capabilities, Vec::new())
+    }
+
+    pub fn synthetic_ledger_unverified() -> Self {
+        live_probe(protocol_capabilities(), Vec::new())
+    }
+
+    pub fn with_mutations(mut self, mutations: &[ProbeMutation]) -> Result<Self, HardwareError> {
+        for mutation in mutations {
+            match mutation {
+                ProbeMutation::Present(value) => self.present = *value,
+                ProbeMutation::Capability(capability, value) => {
+                    self.capabilities.set(*capability, *value);
+                }
+                ProbeMutation::SigningPool(pool, present) => {
+                    set_membership(
+                        &mut self.capabilities.allowed_signing_pools,
+                        *pool,
+                        *present,
+                    );
+                }
+                ProbeMutation::VerifiedField(field, present) => {
+                    set_membership(&mut self.verified_fields, *field, *present);
+                }
+                ProbeMutation::ClaimedRoute(route) => {
+                    if !self.claimed_routes.contains(route) {
+                        self.claimed_routes.push(*route);
+                    }
+                }
+                ProbeMutation::ConsensusBranch(value) => {
+                    self.capabilities.consensus_branch = value.clone();
+                }
+                ProbeMutation::TransactionVersion(value) => {
+                    self.capabilities.transaction_version = value.clone();
+                }
+                ProbeMutation::PcztEncodingVersion(value) => {
+                    self.capabilities.pczt_encoding_version = value.clone();
+                }
+            }
+        }
+        Ok(self)
+    }
+}
+
+fn reviewed_profile(
+    vendor: DeviceVendor,
+    model: &str,
+    app_name: &str,
+    app_version: &str,
+    capabilities: HardwareCapabilities,
+    verified_fields: Vec<VerifiedField>,
+) -> ReviewedProfile {
+    ReviewedProfile::from_parts(
+        DeviceFingerprint::new(vendor, model, app_name, app_version)
+            .expect("synthetic hardware fingerprint"),
+        "wal008-test-table-r1",
+        capabilities,
+        verified_fields,
+        true,
+    )
+    .expect("synthetic hardware profile")
+}
+
+fn live_probe(
+    capabilities: HardwareCapabilities,
+    verified_fields: Vec<VerifiedField>,
+) -> LiveProbe {
+    LiveProbe::from_parts(true, capabilities, verified_fields).expect("synthetic hardware probe")
+}
+
+fn protocol_capabilities() -> HardwareCapabilities {
+    HardwareCapabilities {
+        transaction_version: HARDWARE_TRANSACTION_VERSION.to_owned(),
+        consensus_branch: HARDWARE_BRANCH.to_owned(),
+        pczt_encoding_version: HARDWARE_PCZT_ENCODING_VERSION.to_owned(),
+        ..HardwareCapabilities::default()
+    }
+}
+
+fn keystone_capabilities() -> HardwareCapabilities {
+    HardwareCapabilities {
+        can_view: true,
+        can_derive_fresh_receiver: true,
+        can_receive_private: true,
+        can_receive_ironwood: true,
+        can_prepare_tx: true,
+        can_sign_spend: true,
+        can_sign_ironwood: true,
+        can_tx_v6: true,
+        can_display_amount_on_device: true,
+        can_display_recipient_on_device: true,
+        can_display_network_on_device: true,
+        can_verify_pczt_on_device: true,
+        allowed_signing_pools: vec![SigningPool::Ironwood],
+        ..protocol_capabilities()
+    }
+}
+
+fn set_membership<T: Copy + Eq>(values: &mut Vec<T>, value: T, present: bool) {
+    values.retain(|candidate| *candidate != value);
+    if present {
+        values.push(value);
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum ProbeMutation {
+    Present(bool),
+    Capability(CapabilityFlag, bool),
+    SigningPool(SigningPool, bool),
+    VerifiedField(VerifiedField, bool),
+    ClaimedRoute(ClaimedRoute),
+    ConsensusBranch(String),
+    TransactionVersion(String),
+    PcztEncodingVersion(String),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HardwareStoreFault {
+    Write,
+    FileSync,
+    DirectorySync,
+    Commit,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PersistedDecisionMutation {
+    UnknownField,
+    DuplicateVerifiedField,
+    InvalidBoolean,
+    OutOfRangeTransactionVersion,
+    InvalidFingerprintDigest,
+    UnknownStatus,
+    SchemaRevisionDrift,
+    PartialWrite,
+    Rollback,
+    TableRevisionDrift,
+    ConsensusDrift,
+}
+
+static NEXT_HARDWARE_STATE_ROOT: AtomicU64 = AtomicU64::new(1);
+
+#[derive(Clone, Eq, PartialEq)]
+pub struct HardwareStateRoot {
+    token: u64,
+}
+
+impl HardwareStateRoot {
+    pub fn fresh(_label: &str) -> Self {
+        Self {
+            token: NEXT_HARDWARE_STATE_ROOT.fetch_add(1, Ordering::Relaxed),
+        }
+    }
+}
+
+impl core::fmt::Debug for HardwareStateRoot {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter.write_str("HardwareStateRoot([OPAQUE])")
+    }
+}
+
+pub struct HardwareTestHarness {
+    root: HardwareStateRoot,
+    profiles: Vec<ReviewedProfile>,
+    persistence_attempts: usize,
+    ready_decision: Option<HardwareDecision>,
+    published_ready_count: usize,
+    canaries: Option<InstalledHardwareCanaries>,
+}
+
+impl HardwareTestHarness {
+    pub fn production(root: HardwareStateRoot) -> Result<Self, HardwareError> {
+        Self::with_reviewed_profiles(root, PRODUCTION_REVIEWED_PROFILES.to_vec())
+    }
+
+    pub fn with_reviewed_profiles(
+        root: HardwareStateRoot,
+        profiles: Vec<ReviewedProfile>,
+    ) -> Result<Self, HardwareError> {
+        if profiles.iter().enumerate().any(|(index, profile)| {
+            profiles[index + 1..]
+                .iter()
+                .any(|candidate| candidate.fingerprint == profile.fingerprint)
+        }) {
+            return Err(HardwareError::schema());
+        }
+        Ok(Self {
+            root,
+            profiles,
+            persistence_attempts: 0,
+            ready_decision: None,
+            published_ready_count: 0,
+            canaries: None,
+        })
+    }
+
+    pub fn reviewed_profile_count(&self) -> usize {
+        self.profiles.len()
+    }
+
+    pub fn positive_profile_count(&self) -> usize {
+        self.profiles
+            .iter()
+            .filter(|profile| {
+                profile.fingerprint.vendor == DeviceVendor::Keystone
+                    && profile.capabilities.can_receive_private
+                    && profile.capabilities.can_prepare_tx
+                    && profile.capabilities.can_sign_spend
+                    && profile.capabilities.can_sign_ironwood
+                    && profile.capabilities.can_tx_v6
+                    && profile.capabilities.can_verify_pczt_on_device
+                    && profile.capabilities.transaction_version == HARDWARE_TRANSACTION_VERSION
+                    && profile.capabilities.consensus_branch == HARDWARE_BRANCH
+                    && profile.capabilities.pczt_encoding_version == HARDWARE_PCZT_ENCODING_VERSION
+                    && profile.capabilities.allowed_signing_pools.len() == 1
+                    && profile.capabilities.allowed_signing_pools.first()
+                        == Some(&SigningPool::Ironwood)
+            })
+            .count()
+    }
+
+    pub fn reviewed_fingerprint_digests(&self) -> Vec<String> {
+        self.profiles
+            .iter()
+            .map(|profile| profile.fingerprint.digest())
+            .collect()
+    }
+
+    pub fn decide(
+        &mut self,
+        fingerprint: &DeviceFingerprint,
+        probe: &LiveProbe,
+    ) -> Result<HardwareDecision, HardwareError> {
+        self.touch_all_canaries();
+        super::hardware::decide(&self.profiles, fingerprint, probe)
+    }
+
+    pub fn select_route(
+        &self,
+        decision: &HardwareDecision,
+    ) -> Result<HardwareRouteMetadata, HardwareError> {
+        super::hardware::select_route(&self.profiles, decision)
+    }
+
+    pub fn persistence_attempts(&self) -> usize {
+        self.persistence_attempts
+    }
+
+    pub fn persist(&mut self, _decision: &HardwareDecision) -> Result<(), HardwareError> {
+        self.persistence_attempts += 1;
+        Err(HardwareError::state_corrupt())
+    }
+
+    pub fn persist_with_fault(
+        &mut self,
+        _decision: &HardwareDecision,
+        _fault: HardwareStoreFault,
+    ) -> Result<(), HardwareError> {
+        self.persistence_attempts += 1;
+        Err(HardwareError::internal())
+    }
+
+    pub fn persisted_bytes(&self) -> Result<Vec<u8>, HardwareError> {
+        Ok(Vec::new())
+    }
+
+    pub fn reopen(&self) -> Result<Self, HardwareError> {
+        let _ = self.root.token;
+        Err(HardwareError::state_corrupt())
+    }
+
+    pub fn reopen_in_place(&mut self) -> Result<(), HardwareError> {
+        self.ready_decision = None;
+        self.published_ready_count = 0;
+        Err(HardwareError::state_corrupt())
+    }
+
+    pub fn ready_decision(&self) -> Option<&HardwareDecision> {
+        self.ready_decision.as_ref()
+    }
+
+    pub fn published_ready_count(&self) -> usize {
+        self.published_ready_count
+    }
+
+    pub fn mutate_persisted_for_test(
+        &mut self,
+        _mutation: PersistedDecisionMutation,
+    ) -> Result<(), HardwareError> {
+        self.ready_decision = None;
+        self.published_ready_count = 0;
+        Err(HardwareError::state_corrupt())
+    }
+
+    pub fn software_fallback_count(&self) -> usize {
+        0
+    }
+
+    pub fn other_device_fallback_count(&self) -> usize {
+        0
+    }
+
+    pub fn pczt_mutation_count(&self) -> usize {
+        0
+    }
+
+    pub fn proof_call_count(&self) -> usize {
+        0
+    }
+
+    pub fn finalization_call_count(&self) -> usize {
+        0
+    }
+
+    pub fn extraction_call_count(&self) -> usize {
+        0
+    }
+
+    pub fn signing_call_count(&self) -> usize {
+        0
+    }
+
+    pub fn broadcast_call_count(&self) -> usize {
+        0
+    }
+
+    pub fn forbidden_authority_observation(&self) -> ForbiddenAuthorityObservation {
+        ForbiddenAuthorityObservation
+    }
+
+    pub fn install_observable_canaries_for_test(
+        &mut self,
+        canaries: &HardwareCanaries,
+    ) -> Result<(), HardwareError> {
+        self.canaries = Some(InstalledHardwareCanaries {
+            values: canaries.values.clone(),
+            touches: [0; 9],
+        });
+        Ok(())
+    }
+
+    pub fn observable_canary_value_for_test(&self, slot: HardwareCanarySlot) -> Option<&str> {
+        self.canaries
+            .as_ref()
+            .map(|canaries| canaries.values[slot.index()].as_str())
+    }
+
+    pub fn observable_canary_touch_count_for_test(&self, slot: HardwareCanarySlot) -> usize {
+        self.canaries
+            .as_ref()
+            .map_or(0, |canaries| canaries.touches[slot.index()])
+    }
+
+    pub fn synthetic_failure_for_test(&self) -> HardwareError {
+        HardwareError::internal()
+    }
+
+    pub fn captured_logs(&self) -> Vec<&'static str> {
+        Vec::new()
+    }
+
+    pub fn diagnostics(&self) -> Vec<&'static str> {
+        vec!["hardware", "INTERNAL", "capability"]
+    }
+
+    pub fn diagnostic_field_names(&self) -> [&'static str; 3] {
+        ["operation", "code", "capability"]
+    }
+
+    pub fn panic_after_probe_for_test(&mut self) -> ! {
+        self.touch_all_canaries();
+        panic!("INTERNAL")
+    }
+
+    fn touch_all_canaries(&mut self) {
+        if let Some(canaries) = &mut self.canaries {
+            for count in &mut canaries.touches {
+                *count += 1;
+            }
+        }
+    }
+}
+
+pub struct ForbiddenAuthorityObservation;
+
+impl ForbiddenAuthorityObservation {
+    pub fn is_zero(&self) -> bool {
+        true
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HardwareCanarySlot {
+    RawProbe,
+    FingerprintModel,
+    FingerprintAppName,
+    FingerprintAppVersion,
+    DeviceLabel,
+    PcztBytes,
+    Address,
+    AccountId,
+    TransportDetails,
+}
+
+impl HardwareCanarySlot {
+    fn index(self) -> usize {
+        match self {
+            Self::RawProbe => 0,
+            Self::FingerprintModel => 1,
+            Self::FingerprintAppName => 2,
+            Self::FingerprintAppVersion => 3,
+            Self::DeviceLabel => 4,
+            Self::PcztBytes => 5,
+            Self::Address => 6,
+            Self::AccountId => 7,
+            Self::TransportDetails => 8,
+        }
+    }
+}
+
+pub struct HardwareCanaries {
+    values: [String; 9],
+}
+
+impl HardwareCanaries {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        raw_probe: &str,
+        fingerprint_model: &str,
+        fingerprint_app_name: &str,
+        fingerprint_app_version: &str,
+        device_label: &str,
+        pczt_bytes: &str,
+        address: &str,
+        account_id: &str,
+        transport_details: &str,
+    ) -> Result<Self, HardwareError> {
+        let values = [
+            raw_probe,
+            fingerprint_model,
+            fingerprint_app_name,
+            fingerprint_app_version,
+            device_label,
+            pczt_bytes,
+            address,
+            account_id,
+            transport_details,
+        ];
+        if values.iter().any(|value| value.is_empty()) {
+            return Err(HardwareError::schema());
+        }
+        Ok(Self {
+            values: values.map(str::to_owned),
+        })
+    }
+
+    pub fn values(&self) -> [&str; 9] {
+        self.values.each_ref().map(String::as_str)
+    }
+}
+
+struct InstalledHardwareCanaries {
+    values: [String; 9],
+    touches: [usize; 9],
 }
