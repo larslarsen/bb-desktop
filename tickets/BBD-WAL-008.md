@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE B EXPECTED RED 02 AUTHORIZED — HERMES ONLY
+Status: EXPECTED-RED EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -249,6 +249,14 @@ manifest remains exact and the formatted 794-line test retains all 17 tests. Her
 alone may restart the exact formatter check and expected-red test under Resume 02 and
 integrate only on the specified absent-production-contract failure. Production source,
 broader gates, real-device work, and WAL-007 execution remain unauthorized.
+
+## Reviewer evidence decision 06
+
+Hermes's exact gate outcomes and four-path integration at `eda78545` are valid, but the
+evidence mistypes one digit of the manifest SHA-256. The bounded finding is recorded in
+`docs/testing/BBD-WAL-008-PHASE-A-EXPECTED-RED-01-EVIDENCE-REVIEW-01.md`. Hermes alone
+may correct the exact evidence field and current-task state. Production source and all
+execution remain unauthorized pending reviewer acceptance.
 
 ## Acceptance boundary
 

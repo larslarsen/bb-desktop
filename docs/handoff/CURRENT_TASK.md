@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE B EXPECTED RED 02 AUTHORIZED — HERMES ONLY
+State: EXPECTED-RED EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,14 +18,13 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md](HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_02.md)
+[HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md)
 
-Spark's exact one-file Rust 1.98 formatter drop is accepted in
-[BBD-WAL-008-PHASE-A-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-A-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
-Hermes alone may freshly run the exact formatter check and expected-red test, then
-integrate the exact two-path test drop plus evidence/current-task records only on the
-specified absent-production-contract failure. Spark, Sol, Grok, production source,
-broader gates, real-device work, and WAL-007 execution remain unauthorized.
+The expected-red execution and exact four-path integration at `eda78545` are valid,
+but the evidence mistypes one digit of the manifest hash. Hermes alone may correct the
+exact evidence field and update this current-task record under the active handoff.
+Source edits, execution, production work, other actors, broader gates, real-device
+work, and WAL-007 execution remain unauthorized pending reviewer acceptance.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
