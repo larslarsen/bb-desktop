@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 AUTHORITY CORRECTION 01 ACCEPTED — HERMES GREEN RESUME 05 AUTHORIZED
+State: PHASE C SLICE 4 CLIPPY CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_05.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_05.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CLIPPY_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CLIPPY_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -263,6 +263,12 @@ Grok's immutable, side-effect-free authority validation probe is accepted in
 Hermes alone may run the wholly fresh Green Resume 05 and integrate only on exact
 success. Grok, Spark, Sol, Slice 5, broader/final acceptance, and the real offline
 local-Monero gate are not authorized.
+Hermes Resume 05 is rejected in
+[BBD-WAL-007-SLICE-04-GREEN-RESUME-05-REJECTION-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-05-REJECTION-01.md).
+All eleven test binaries passed, but warning-denied Clippy exposed 23 diagnostics and
+Hermes did not satisfy the full execution protocol. Grok 4.6 High alone may make the
+bounded six-path warning correction. Hermes, Spark, Sol, tests, and further execution
+are unauthorized pending source review.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
