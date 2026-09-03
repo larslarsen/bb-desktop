@@ -1,24 +1,39 @@
 # Current Task
 
-Ticket: BBD-WAL-007
+Ticket: BBD-WAL-008
 
-State: PHASE D LOCAL MONERO ROOT REQUIRED — NO ACTOR AUTHORIZED
+State: PHASE A TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
-Ticket: [BBD-WAL-007.md](../../tickets/BBD-WAL-007.md)
+Ticket: [BBD-WAL-008.md](../../tickets/BBD-WAL-008.md)
 
-Owner decision:
-[BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
+Parked predecessor:
+[BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md)
+[CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS.md](CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS.md)
+
+BBD-WAL-008 now owns the active Zcash-only hardware capability test-source phase. Grok
+Build remains unavailable because its weekly usage is exhausted, so the documented Sol
+fill-in applies. Sol may edit only the two paths in the active handoff, runs no command,
+and stops for reviewer source inspection. Hermes, production source, test execution,
+real-device work, signing, broader acceptance, and every later phase remain
+unauthorized.
+
+BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
+root whose required members match the exact reviewed byte/hash pins, but elected to
+park Phase D while a separate user node syncs. The offline gate does not depend on that
+node and remains available through a future explicit Hermes handoff. No Monero actor or
+execution is currently authorized.
+
+## Historical record (superseded by the active state above)
 
 Slice 5 is accepted at `64811dea`, with its evidence corrected at `04472f10`, in
 [BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md).

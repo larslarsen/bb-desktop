@@ -4,7 +4,7 @@ This is the durable assignment queue for the accepted BBD-WAL-001 architecture. 
 changes no product source and does not authorize a queued ticket by itself. The active
 repository handoff remains `docs/handoff/CURRENT_TASK.md`.
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+Reviewer: Lead Engineer/Reviewer — Codex at High
 
 ## Priority and dependency order
 
@@ -16,8 +16,8 @@ Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 | P2 complete | BBD-RATE-001 | Grok Build, High | Bounded untrusted-provider parser/worker and deterministic single-source selection after the process split exists | Production accepted at `c7d91c69`; local falsification/green evidence and GitHub Actions run `33578112536` passed |
 | P2 complete | BBD-WAL-005 | Codex Sol, High | The view model touches the security-sensitive shared snapshot sanitizer; two bounded Grok Build attempts produced no file changes and were stopped, so the reviewer re-routed the unchanged source task | Production accepted at `0b51c73f`; final falsification evidence at `3e1e0b14` |
 | P2 complete | BBD-WAL-006 | Codex Sol, High | ZEC consensus, PCZT, Ironwood, SQLite viewing state, and librustzcash adapter | Reviewer-accepted at `996444e9`; final evidence at `14a68187` |
-| P3 active | BBD-WAL-007 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Slice 3 formatting correction active |
-| P3 | BBD-WAL-008 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Hardware capability attestation and device trust | Applicable coin adapter accepted |
+| P3 parked | BBD-WAL-007 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Phase C accepted; reviewed local root available; owner deferred the real offline gate |
+| P3 active | BBD-WAL-008 | Codex Sol, High, as documented fill-in while Grok weekly usage is exhausted | Zcash hardware capability attestation and device trust | Phase-A test source authorized; no real-device positive pin |
 | P3 | BBD-WAL-009 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR prepare/sign/verify plus cross-coin broadcast, concurrency, cancellation races, and crash recovery | Coin adapters accepted |
 | P4 | BBD-WAL-010 | Codex Spark, High for explicitly delegated DOM/CSS/state boilerplate; Grok for senior/authority-bearing source; Sol only by documented escalation | User-facing composition after authority and state-machine behavior are executable | WAL-005, RATE-001, and payment flow accepted |
 | P4 | BBD-WAL-011 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
