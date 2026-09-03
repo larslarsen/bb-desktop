@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE C SLICE 01 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+Status: PHASE C SLICE 01 PARTIAL GREEN AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -266,6 +266,14 @@ with its evidence hash corrected at `2eb897b0`, in
 usage remains exhausted, Codex Sol High alone may author the three-path Phase-C Slice
 01 core capability/route source. Persistence, hardware I/O, real-device pins, signing,
 execution, integration, and broader gates remain unauthorized pending source review.
+
+## Reviewer source decision 08
+
+Sol's exact three-path capability/route source is accepted at High in
+`docs/testing/BBD-WAL-008-SLICE-01-SOURCE-REVIEW-01.md`. Hermes alone may run the
+formatter, exact intersection falsification/restoration, and 12-test partial green,
+then integrate only on exact success. Persistence and its five tests, real-device
+work, signing, regressions, broader gates, and WAL-007 remain unauthorized.
 
 ## Acceptance boundary
 
