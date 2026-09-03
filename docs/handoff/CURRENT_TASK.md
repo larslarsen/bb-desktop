@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 SOURCE CORRECTION 04 SOL FILL-IN AUTHORIZED
+State: PHASE C SLICE 5 GREEN 01 HERMES AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol at High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,14 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_04.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_04.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md)
+
+Sol's exact one-line Correction-04 replay-order repair is accepted at XHigh in
+[BBD-WAL-007-SLICE-05-CORRECTION-04-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-04-SOURCE-REVIEW-01.md).
+Hermes alone may run the exact formatter, durable-replay falsification, focused Slice-5
+green and affected regressions, warning-denied Clippy, native check, and policy checks,
+then integrate only on exact success. Grok, Sol, Spark, broader/final acceptance, and
+the real offline local-Monero gate remain unauthorized.
 
 Sol's Correction-03 node-gate repair is accepted, but its complete drop is rejected in
 [BBD-WAL-007-SLICE-05-CORRECTION-03-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-03-SOURCE-REVIEW-01.md): exact durable replay still
