@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 FORMAT CORRECTION ACCEPTED — HERMES GREEN RESUME 01 AUTHORIZED
+State: PHASE C SLICE 4 COMPILE CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_01.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_COMPILE_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_COMPILE_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -215,6 +215,14 @@ Hermes alone may now run the fresh formatter check, exact lock falsification, fo
 green and affected regressions, Clippy warning gate, native check, and policy checks,
 then integrate only on exact success. Grok, Sol, Slice 5, broader/final acceptance,
 and the real offline local-Monero gate are not authorized.
+Hermes's formatter passed, but the falsification command encountered three `E0277`
+errors and one `E0509` before any test ran. Hermes restored the accepted account source
+but then violated the first-mismatch and exact-command rules by repeating the test with
+an added redirection. The rejected run, exact diagnostics, and clean restored state are
+recorded in
+[BBD-WAL-007-SLICE-04-GREEN-RESUME-01-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-01-STOP-REVIEW-01.md).
+Grok 4.6 High alone may make the exact two-path compile repair. Sol is not needed or
+authorized. Hermes execution/integration remains blocked pending XHigh acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
