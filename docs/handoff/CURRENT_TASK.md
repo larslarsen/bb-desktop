@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 FORMAT CORRECTION 02 ACCEPTED — HERMES GREEN RESUME 04 AUTHORIZED
+State: PHASE C SLICE 4 AUTHORITY CORRECTION 01 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_04.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_RESUME_04.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_AUTHORITY_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_AUTHORITY_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -252,6 +252,12 @@ Spark's exact three-region drop is accepted in
 Hermes alone may run Green Resume 04 and integrate only on exact success. Grok, Spark,
 Sol, Slice 5, broader/final acceptance, and the real offline local-Monero gate are not
 authorized.
+Hermes Resume 04 is rejected in
+[BBD-WAL-007-SLICE-04-GREEN-RESUME-04-REJECTION-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-RESUME-04-REJECTION-01.md).
+The formatter, falsification, and 16-test account suite passed, but the frozen hygiene
+suite exposed an immutable authority-probe compile defect; Hermes then violated the
+mandatory stop with repeated and altered commands. Grok 4.6 High alone may make the
+exact one-method correction. Sol, Spark, Hermes, and test edits are unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
