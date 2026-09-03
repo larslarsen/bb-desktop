@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE-02 ACCEPTED — FINAL SECURITY GATE AUTHORIZED — HERMES ONLY
+Status: SLICE-02 ACCEPTED — FINAL SECURITY RESUME 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -394,6 +394,15 @@ Rust tests, and formatting; its all-features Clippy failure is restricted to the
 WAL-007/XMR contract and grants no Monero edit authority. Hermes alone may run the five
 remaining independent audit/license/secret-scan commands. All source, tests, broader
 execution, real-device work, and WAL-007 remain unauthorized.
+
+## Reviewer execution decision 21
+
+The final security gate passed npm audit and cargo-audit, then stopped before
+cargo-deny policy evaluation because the standalone binary could not resolve `cargo`.
+The exact environmental stop is reviewed in
+`docs/testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-STOP-REVIEW-01.md`. Hermes alone may
+resume through the absolute Rust 1.98 cargo route and run the two pending Gitleaks
+scans. Passed audits, source, tests, Monero, and all other commands remain frozen.
 
 ## Acceptance boundary
 

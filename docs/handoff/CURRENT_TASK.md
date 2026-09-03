@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY GATE AUTHORIZED — HERMES ONLY
+State: WAL-008 FINAL SECURITY GATE RESUME 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_01.md)
+[HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_RESUME_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_RESUME_01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
@@ -53,6 +53,13 @@ passed build, all Node suites, full no-default Rust tests, and formatting; its
 repository-wide all-features Clippy failure is confined to the parked WAL-007/XMR
 boundary. Hermes alone may run the five independent final security commands. Monero,
 source, tests, and broader execution remain frozen.
+
+Hermes passed npm audit and cargo-audit, then stopped before policy evaluation because
+the standalone cargo-deny binary could not resolve its `cargo` child. The valid
+environmental stop is reviewed in
+[BBD-WAL-008-FINAL-SECURITY-GATE-01-STOP-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-STOP-REVIEW-01.md).
+Resume 01 preserves those two results and authorizes only cargo-deny through the Rust
+1.98 cargo route plus the two unrun Gitleaks scans. All other work remains frozen.
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
