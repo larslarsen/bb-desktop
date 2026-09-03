@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: POLICY PRODUCTION SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+Status: SLICE-02/POLICY GREEN AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -365,6 +365,15 @@ confirms the focused command, causes, integration scope, and final repository st
 Because Grok remains usage-exhausted, Codex Sol High alone may implement the matching
 one-file production contract in `scripts/security-policy.js`. Tests, execution,
 integration, and all other paths remain unauthorized pending source review.
+
+## Reviewer source decision 18
+
+Sol's exact one-file production policy is accepted in
+`docs/testing/BBD-WAL-008-POLICY-PRODUCTION-SOURCE-REVIEW-01.md`. It preserves the
+historical WAL-006 contracts, adds only the required WAL-008 target/inventory/checker,
+and routes `hardware.rs` through the existing source denials. Hermes alone may run the
+complete exact Slice-02/policy green handoff and integrate the four source paths only
+on exact success. Other source, broader/final work, and WAL-007 remain unauthorized.
 
 ## Acceptance boundary
 
