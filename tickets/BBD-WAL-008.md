@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE A TEST SOURCE AUTHORIZED — NO EXECUTION OR PRODUCTION SOURCE AUTHORIZED
+Status: PHASE A FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -229,6 +229,17 @@ Correction 02 establishes the required zero-to-positive canary observation. The 
 `docs/testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md`. Hermes alone may run the
 separately committed formatter and expected-red handoff. Production and every broader
 gate remain unauthorized.
+
+## Reviewer execution decision 04
+
+Hermes's first Phase-B command stopped at the required first mismatch: the exact Rust
+1.98 formatter check exited 1 with mechanical layout differences in the new test file.
+The expected-red test did not run and no mutation or integration occurred. The exact
+unchanged source identities and valid stop are recorded in
+`docs/testing/BBD-WAL-008-PHASE-B-FORMAT-STOP-REVIEW-01.md`. Codex Spark High alone may
+run the one-file pinned `rustfmt` command in the separately committed correction
+handoff. Test semantics, the manifest, production source, Hermes execution, and every
+broader gate remain unauthorized pending reviewer inspection.
 
 ## Acceptance boundary
 

@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE B EXPECTED RED 01 AUTHORIZED — HERMES ONLY
+State: PHASE A FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,33 +18,15 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_01.md](HERMES_BBD_WAL_008_PHASE_B_EXPECTED_RED_01.md)
+[CODEX_SPARK_BBD_WAL_008_PHASE_A_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_008_PHASE_A_FORMAT_CORRECTION_01.md)
 
-Phase-A test source is accepted in
-[BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md](../testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-03.md).
-Hermes alone may run the exact formatter check and one expected-red focused test, then
-integrate the exact two-path test drop plus evidence/current-task records only on the
-specified absent-production failure. Sol, Grok, production source, repair, broader
-execution, real-device work, and WAL-007 execution remain unauthorized.
-
-Correction 01 resolves the substantive capability and persistence findings. Source
-Review 02 requires one final non-vacuity assertion: every canary touch count must be
-zero immediately after installation and positive after the exercised paths. Sol may
-edit only `wallet-broker/tests/zec_hardware.rs`; no execution or Git is authorized.
-
-The initial Phase-A drop is reviewed in
-[BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-01.md).
-Its manifest edit is accepted and frozen; the test source requires five bounded oracle
-corrections. Sol may edit only `wallet-broker/tests/zec_hardware.rs`, may run no Git or
-execution command, and must stop for reviewer inspection. Hermes, expected red,
-production, broader acceptance, and real-device work remain unauthorized.
-
-BBD-WAL-008 now owns the active Zcash-only hardware capability test-source phase. Grok
-Build remains unavailable because its weekly usage is exhausted, so the documented Sol
-fill-in applies. Sol may edit only the two paths in the active handoff, runs no command,
-and stops for reviewer source inspection. Hermes, production source, test execution,
-real-device work, signing, broader acceptance, and every later phase remain
-unauthorized.
+Hermes stopped correctly when the first Phase-B command, the Rust 1.98 formatter
+check, exited 1. The valid unchanged-source stop is recorded in
+[BBD-WAL-008-PHASE-B-FORMAT-STOP-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-B-FORMAT-STOP-REVIEW-01.md).
+Spark High alone may run the exact one-file pinned formatter mutation and then stop.
+The manifest and test semantics remain frozen. Hermes, Sol, Grok, production source,
+further execution/integration, broader gates, real-device work, and WAL-007 execution
+remain unauthorized pending reviewer inspection.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
