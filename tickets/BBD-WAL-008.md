@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE-02 EVIDENCE CORRECTION AUTHORIZED — HERMES ONLY
+Status: SLICE-02 ACCEPTED — FINAL SECURITY GATE AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -384,6 +384,16 @@ not mutate source, but the evidence omits them. The bounded finding is recorded 
 `docs/testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md`. Hermes alone may
 correct the green evidence and current-task records without rerunning any gate. Source,
 tests, broader execution, and all other paths remain unauthorized.
+
+## Reviewer acceptance decision 20
+
+Slice-02 persistence/policy source, required gates, integration, and corrected evidence
+are accepted in `docs/testing/BBD-WAL-008-SLICE-02-ACCEPTANCE-01.md`. GitHub run
+`33813477614` independently passed build, all maintained Node suites, full no-default
+Rust tests, and formatting; its all-features Clippy failure is restricted to the parked
+WAL-007/XMR contract and grants no Monero edit authority. Hermes alone may run the five
+remaining independent audit/license/secret-scan commands. All source, tests, broader
+execution, real-device work, and WAL-007 remain unauthorized.
 
 ## Acceptance boundary
 

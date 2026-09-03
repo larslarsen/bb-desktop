@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 SLICE-02 EVIDENCE CORRECTION 01 AWAITING REVIEWER ACCEPTANCE — HERMES ONLY
+State: WAL-008 FINAL SECURITY GATE AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_SLICE_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_SLICE_02_EVIDENCE_CORRECTION_01.md)
+[HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_GATE_01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
@@ -44,6 +44,15 @@ post-integration commands are disclosed in
 The governing review is
 [BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
 The authorized integration commit `369d811c` is unchanged.
+
+Evidence Correction 01 is accepted with the correction transcript's unnecessary
+read-only `git log --oneline -3` recorded in
+[BBD-WAL-008-SLICE-02-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-02-ACCEPTANCE-01.md).
+The Slice-02 persistence and policy implementation is accepted. GitHub independently
+passed build, all Node suites, full no-default Rust tests, and formatting; its
+repository-wide all-features Clippy failure is confined to the parked WAL-007/XMR
+boundary. Hermes alone may run the five independent final security commands. Monero,
+source, tests, and broader execution remain frozen.
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
