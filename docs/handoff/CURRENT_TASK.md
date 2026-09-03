@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE C SLICE 02 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+State: PHASE C SLICE 02 GREEN AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,14 +18,16 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_008_PHASE_C_SLICE_02.md](CODEX_SOL_BBD_WAL_008_PHASE_C_SLICE_02.md)
+[HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_01.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_01.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
-Grok remains usage-exhausted, so Sol High alone may implement the three-path durable
-decision-store slice through the existing per-account SQLite boundary, then stop
-without execution or Git. Tests, Hermes, other actors, transport, signing, real-device
-work, broader gates, and WAL-007 remain unauthorized pending source inspection.
+The three-path Slice-02 persistence drop is accepted for execution in
+[BBD-WAL-008-SLICE-02-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-SOURCE-REVIEW-01.md).
+Hermes alone may run the exact formatter, stale-expansion falsification, focused and
+affected green gates, then integrate only on exact success. Grok, Sol, other actors,
+transport, signing, real-device work, broader/final acceptance, and WAL-007 remain
+unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

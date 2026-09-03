@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE C SLICE 02 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+Status: PHASE C SLICE 02 GREEN AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
