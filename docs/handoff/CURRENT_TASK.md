@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY GATE 01 PASSED — AWAITING REVIEWER ACCEPTANCE
+State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -17,12 +17,25 @@ Ticket: [BBD-WAL-008.md](../../tickets/BBD-WAL-008.md)
 Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Active evidence:
+Active handoff:
+[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_01.md)
+
+Evidence under correction:
 [BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md)
+
+Governing review:
+[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
 [BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md)
+
+All five final security results are valid, but the integrated evidence has three
+material metadata errors: the Resume-01 protected parent, Hermes upstream hash, and
+provider/model. Transcript audit also found bounded read-only/process deviations.
+Hermes alone may correct the two named evidence records without rerunning any gate.
+Source, tests, policy, manifests, locks, workflows, deny/ignore rules, ticket, review
+documents, real-device work, and WAL-007/Monero remain frozen.
 
 The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).

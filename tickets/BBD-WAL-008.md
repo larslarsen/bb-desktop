@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE-02 ACCEPTED — FINAL SECURITY RESUME 01 AUTHORIZED — HERMES ONLY
+Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -403,6 +403,18 @@ The exact environmental stop is reviewed in
 `docs/testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-STOP-REVIEW-01.md`. Hermes alone may
 resume through the absolute Rust 1.98 cargo route and run the two pending Gitleaks
 scans. Passed audits, source, tests, Monero, and all other commands remain frozen.
+
+## Reviewer evidence decision 22
+
+Hermes completed and integrated all five final security results at `404a438e`, but the
+evidence records the wrong Resume-01 protected parent, mistypes one digit of the Hermes
+upstream hash, and falsely identifies the provider/model. Transcript audit also found
+bounded read-only/process deviations. The results remain valid; the exact correction
+is governed by
+`docs/testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md`. Hermes alone
+may correct the final-security evidence and current-task records without rerunning any
+gate. Source, tests, policy, other documentation, real-device work, and WAL-007/Monero
+remain frozen.
 
 ## Acceptance boundary
 
