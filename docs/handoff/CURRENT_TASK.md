@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 GREEN 01 EVIDENCE CORRECTED — REVIEW REQUIRED
+State: PHASE C SLICE 5 VIEWING/RECEIVER SOURCE AUTHORIZED
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh
+Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
 
 Authorized integration actor: none
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_04_GREEN_01_EVIDENCE_CORRECTION_01.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_RECEIVER.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_RECEIVER.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -299,6 +299,11 @@ The XHigh evidence review requiring these corrections is
 [BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-04-GREEN-01-EVIDENCE-REVIEW-01.md).
 The documentation-only correction stopped with source and integration closed pending
 reviewer acceptance.
+Slice 4 is accepted at `3aed346e`, with its evidence corrected at `118cd61a`, in
+[BBD-WAL-007-SLICE-04-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-04-ACCEPTANCE-01.md).
+Only the linked Slice-5 viewing/fresh-receiver source handoff is authorized to Grok 4.6
+High. Hermes execution/integration, broader/final acceptance, and the real offline
+local-Monero gate remain unauthorized pending reviewer source acceptance.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
