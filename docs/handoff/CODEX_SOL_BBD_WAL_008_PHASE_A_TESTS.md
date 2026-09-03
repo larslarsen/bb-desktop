@@ -30,10 +30,12 @@ target a typed `zec::test_support` harness expected to be absent before producti
 not substitute local test implementations that make the suite green.
 
 Do not edit production/test-support source, existing tests, fixtures, `Cargo.lock`,
-Node/Electron, policy, docs, evidence, workflows, packages, or any other path. Do not
-run a command, formatter, test, build, dependency resolver, Git, GitHub, network, or
-another actor. Do not create stubs, ignored tests, conditional passes, real-device
-claims, transport, PCZT signing/extraction, or a production capability pin.
+Node/Electron, policy, docs, evidence, workflows, packages, or any other path. Read-only
+source inspection and final `wc -l`/`sha256sum` over the two authorized paths are
+allowed. Do not run a formatter, test, build, dependency resolver, product binary, Git,
+GitHub, network, or another actor. Do not create stubs, ignored tests, conditional
+passes, real-device claims, transport, PCZT signing/extraction, or a production
+capability pin.
 
 Stop after editing. Report the two changed paths with exact line counts and SHA-256,
 plus a concise mapping from every test to the ticket requirement it proves.

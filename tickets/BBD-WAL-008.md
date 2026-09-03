@@ -156,7 +156,8 @@ Codex Sol may edit only:
 
 No dependency, feature, build script, production source, fixture, lockfile, Node,
 Electron, policy, workflow, documentation, evidence, Git, or other path may change.
-Sol runs no command, formatter, test, build, dependency resolution, Git, or network and
+Sol may use read-only source inspection and final line/hash reporting. It runs no
+formatter, test, build, dependency resolution, product binary, Git, or network and
 stops with exact path/line/hash reporting.
 
 ### Phase B — expected red (future Hermes handoff)
