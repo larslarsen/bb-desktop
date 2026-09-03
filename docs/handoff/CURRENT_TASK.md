@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 SOURCE CORRECTION 01 AUTHORIZED
+State: PHASE C SLICE 5 SOURCE CORRECTION 01 SOL FILL-IN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Sr Dev — Grok Build using Grok 4.6 High
+Authorized source actor: Principal Dev — Codex Sol at High
 
 Authorized integration actor: none
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_01.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -312,6 +312,12 @@ durability failures do not latch unavailable, loaded bindings are incompletely p
 FULL drift is healed, the model boundary is circumvented, and test roots are unsafe
 across reruns. Grok 4.6 High alone may make the bounded eight-path Correction 01. Hermes,
 Sol, Spark, tests, and execution/integration remain unauthorized.
+Grok stopped Correction 01 without an edit when its provider returned HTTP 402 for an
+exhausted usage balance. The valid no-edit stop and unchanged identities are recorded in
+[BBD-WAL-007-SLICE-05-CORRECTION-01-GROK-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-01-GROK-STOP-REVIEW-01.md).
+This satisfies the role policy's stopped-without-a-usable-drop condition. Codex Sol at
+High alone may perform the same bounded eight-path Correction 01. Hermes, Grok, Spark,
+tests, and execution/integration remain unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
