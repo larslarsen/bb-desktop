@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE C SLICE 01 PARTIAL GREEN AUTHORIZED — HERMES ONLY
+Status: SLICE 01 FORMAT CORRECTION 01 AUTHORIZED — CODEX SPARK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -274,6 +274,15 @@ Sol's exact three-path capability/route source is accepted at High in
 formatter, exact intersection falsification/restoration, and 12-test partial green,
 then integrate only on exact success. Persistence and its five tests, real-device
 work, signing, regressions, broader gates, and WAL-007 remain unauthorized.
+
+## Reviewer execution decision 09
+
+Hermes stopped correctly when the first Slice-01 command, the exact formatter check,
+exited 1 with mechanical differences in `zec/hardware.rs` and `zec/test_support.rs`.
+No falsification, test, mutation, or integration ran. The unchanged-source stop is
+recorded in `docs/testing/BBD-WAL-008-SLICE-01-GREEN-STOP-REVIEW-01.md`. Codex Spark
+High alone may run the pinned formatter on those two files. Further execution and all
+later work remain unauthorized pending reviewer inspection.
 
 ## Acceptance boundary
 
