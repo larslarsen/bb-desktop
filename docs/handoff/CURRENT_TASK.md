@@ -2,9 +2,9 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 SOURCE CORRECTION 02 SOL FILL-IN AUTHORIZED
+State: PHASE C SLICE 5 SOURCE CORRECTION 03 SOL FILL-IN AUTHORIZED
 
-Reviewer: Lead Engineer/Reviewer — Codex at High
+Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Authorized source actor: Principal Dev — Codex Sol at High
 
@@ -18,7 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_02.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_02.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_03.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_03.md)
+
+Sol's Correction-02 drop is rejected in
+[BBD-WAL-007-SLICE-05-CORRECTION-02-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-02-SOURCE-REVIEW-01.md): the view path still calls
+wallet RPC after the local node has been rejected as unavailable. The opaque cleanup
+lease is accepted. Sol alone may make the one-file Correction 03. Hermes execution and
+integration remain unauthorized.
 
 Sol's Correction-01 drop is rejected in
 [BBD-WAL-007-SLICE-05-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-01-SOURCE-REVIEW-01.md): the live view cannot emit
