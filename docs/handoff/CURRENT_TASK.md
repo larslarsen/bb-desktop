@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 COMPILE CORRECTION 01 SOL FILL-IN AUTHORIZED
+State: PHASE C SLICE 5 GREEN RESUME 02 HERMES AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: Principal Dev — Codex Sol, `gpt-5.6-sol` High
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,13 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md)
+[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_02.md)
+
+Sol's exact one-line `xmr/store.rs` type-annotation repair is accepted at XHigh in
+[BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-SOURCE-REVIEW-01.md).
+Hermes alone may now run Green Resume 02 from the beginning and integrate only on exact
+success. Grok, Sol, Spark, broader/final acceptance, and the real offline local-Monero
+gate remain unauthorized.
 
 Grok Build stopped without a usable compile correction because its weekly usage is
 exhausted. The valid no-edit stop and unchanged accepted source identity are recorded
