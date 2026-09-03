@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 SOURCE CORRECTION 03 SOL FILL-IN AUTHORIZED
+State: PHASE C SLICE 5 SOURCE CORRECTION 04 SOL FILL-IN AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,7 +18,12 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_03.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_03.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_04.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_CORRECTION_04.md)
+
+Sol's Correction-03 node-gate repair is accepted, but its complete drop is rejected in
+[BBD-WAL-007-SLICE-05-CORRECTION-03-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-03-SOURCE-REVIEW-01.md): exact durable replay still
+requires a live unlocked child. Sol alone may make the one-file Correction 04. Hermes
+execution and integration remain unauthorized.
 
 Sol's Correction-02 drop is rejected in
 [BBD-WAL-007-SLICE-05-CORRECTION-02-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-02-SOURCE-REVIEW-01.md): the view path still calls
