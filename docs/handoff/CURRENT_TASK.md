@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE A TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
+State: PHASE A TEST CORRECTION 01 AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,7 +18,14 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS.md](CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS.md)
+[CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS_CORRECTION_01.md](CODEX_SOL_BBD_WAL_008_PHASE_A_TESTS_CORRECTION_01.md)
+
+The initial Phase-A drop is reviewed in
+[BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-01.md).
+Its manifest edit is accepted and frozen; the test source requires five bounded oracle
+corrections. Sol may edit only `wallet-broker/tests/zec_hardware.rs`, may run no Git or
+execution command, and must stop for reviewer inspection. Hermes, expected red,
+production, broader acceptance, and real-device work remain unauthorized.
 
 BBD-WAL-008 now owns the active Zcash-only hardware capability test-source phase. Grok
 Build remains unavailable because its weekly usage is exhausted, so the documented Sol

@@ -66,10 +66,11 @@ The production module owns typed values equivalent to:
 - persisted decision: fingerprint digest, table revision, narrowed capability set, and
   decision status.
 
-Fingerprint components are 1–64 bytes of visible ASCII, use exact byte equality, and
-reject controls, whitespace, separators, NUL, non-ASCII, truncation, case folding,
-normalization, prefixes, ranges, wildcards, and unknown fields. They contain no serial,
-USB path, account identity, public key, address, or other stable device identifier.
+Fingerprint components are 1–64 bytes from the exact alphabet `A-Za-z0-9._+-`, use
+exact byte equality, and reject controls, whitespace, every other separator, NUL,
+non-ASCII, truncation, case folding, normalization, prefixes, ranges, wildcards, and
+unknown fields. They contain no serial, USB path, account identity, public key,
+address, or other stable device identifier.
 
 The only positive test profile is unmistakably synthetic and is injected through
 `zec::test_support`; it represents a Keystone-like device with exact branch
@@ -88,6 +89,12 @@ narrowed = reviewed AND live
 Live data cannot introduce an entry, vendor, pool, branch, version, route, or verified
 field absent from the reviewed profile. A later probe may further narrow a persisted
 decision. It cannot restore a capability without a fresh exact reviewed-table match.
+
+This hardware decision owns device-derived signing and display authority, not the
+account's separately stored viewing material. Disconnection always removes every
+device spend/route/verified-field capability and forbids fallback, but this module must
+not claim that broker-held viewing material was destroyed or decide whether it can
+continue to view or derive receivers. Account composition remains outside this ticket.
 
 Decision precedence is fixed:
 
@@ -196,6 +203,16 @@ Required falsifications include independently enabling a vendor-name shortcut,
 replacing reviewed/live intersection with union, accepting PCZT v1, marking the
 transparent Trezor fixture private, and reopening a stale persisted decision. Each must
 make its intended test fail and be exactly restored before green execution.
+
+## Reviewer source decision 01
+
+The manifest-only test-target edit is accepted. The initial 614-line test source needs
+the bounded correction in
+`docs/testing/BBD-WAL-008-PHASE-A-TEST-SOURCE-REVIEW-01.md`: separate spend authority
+from viewing state, complete the positive-case forbidden assertions, make redaction
+canaries non-vacuous and byte-safe, prove persisted narrowing cannot silently expand,
+cover directory-sync failure, and freeze the fingerprint alphabet. No execution or
+production source is authorized.
 
 ## Acceptance boundary
 
