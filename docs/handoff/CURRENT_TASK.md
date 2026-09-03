@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE C SLICE 02 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
+State: WAL-008 POLICY TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_03.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_03.md)
+[CODEX_SOL_BBD_WAL_008_POLICY_TESTS_01.md](CODEX_SOL_BBD_WAL_008_POLICY_TESTS_01.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
@@ -34,9 +34,18 @@ the result and post-stop read-only command deviation are reviewed in
 [BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md).
 Sol's exact let-chain correction is accepted in
 [BBD-WAL-008-SLICE-02-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md).
-Hermes alone may restart the complete gate and integrate only on exact success. Grok,
-Sol, Spark, other actors, broader/final acceptance, real-device work, and WAL-007 remain
-unauthorized.
+Hermes Resume 03 then proved the formatter, exact stale-expansion falsification, all 45
+focused/affected Rust tests, warning-denied Clippy, native compilation, and all 48
+wallet-contract tests. It stopped on the repository policy's omitted WAL-008
+manifest/source inventory transition: 79 `ok`, seven `not ok`. The valid stop, exact
+cause, command-wrapper deviation, and prohibited post-stop read-only command are
+recorded in
+[BBD-WAL-008-SLICE-02-GREEN-RESUME-03-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-03-STOP-REVIEW-01.md).
+
+Grok remains owner-reported usage-exhausted. Sol High alone may author the one-path
+test-first WAL-008 policy contract. Production policy, execution, integration, the
+three accepted Slice-02 source paths, real-device work, and WAL-007 remain frozen. The
+superseded Resume-03 authorization is closed.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to

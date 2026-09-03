@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: PHASE C SLICE 02 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
+Status: POLICY TEST SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -186,6 +186,15 @@ Slice C1 owns typed fingerprints, the empty production table, fake injected prof
 intersection, decisions, and route metadata. Slice C2 owns atomic persistence and
 reopen/fault behavior. No slice may add real transport, real-device pins, or signing.
 
+### Policy transition — test first (authorized by reviewer decision 15)
+
+The historical WAL-006 six-target and seven-path inventories remain exact. WAL-008 adds
+an independently named policy contract for the single `zec_hardware` test target and
+the complete eight-path ZEC production inventory, including `zec/hardware.rs`.
+Test source is integrated and proved red before `scripts/security-policy.js` may change.
+The production checker must eventually scan the new module and preserve all existing
+transport, signing, broadcast, network, and mainnet denials.
+
 ## Planned gates
 
 The focused green is:
@@ -326,6 +335,17 @@ tests. Because Grok remains usage-exhausted, Codex Sol High alone may author the
 three-path Slice-02 durable SQLite decision store. Tests, execution, integration,
 transport, signing, real-device work, and broader gates remain unauthorized pending
 source review.
+
+## Reviewer execution decision 15
+
+Hermes Resume 03 passed the Slice-02 Rust, Clippy, native, and wallet-contract gates,
+then stopped when repository policy exposed an omitted WAL-008 transition. The exact
+79/7 result and transcript deviations are recorded in
+`docs/testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-03-STOP-REVIEW-01.md`. The three
+accepted persistence paths remain exact; this is not a source defect. Because Grok's
+weekly usage remains exhausted, Codex Sol High alone may author the one-path policy
+test contract in `test/securityPolicy.node.js`. Production policy, execution,
+integration, and all other paths remain unauthorized pending reviewer source review.
 
 ## Acceptance boundary
 
