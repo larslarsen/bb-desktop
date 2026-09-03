@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN 01 HERMES AUTHORIZED
+State: PHASE C SLICE 5 FORMAT CORRECTION 01 SPARK AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Implementation Dev — Codex Spark, GPT-5.3-Codex-Spark High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,16 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md)
+[CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_05_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_007_PHASE_C_SLICE_05_FORMAT_CORRECTION_01.md)
+
+Hermes stopped at the required first mismatch because Rust 1.98 `cargo fmt --check`
+exited 1 without changing any accepted source or test. The stop and Hermes's untracked
+stop-draft deviation are reviewed in
+[BBD-WAL-007-SLICE-05-GREEN-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-STOP-REVIEW-01.md).
+Codex Spark High alone may run the exact pinned formatter mutation over the seven named
+source paths. Hermes, Grok, Sol, tests, further execution/integration, broader/final
+acceptance, and the real offline local-Monero gate remain unauthorized pending source
+review.
 
 Sol's exact one-line Correction-04 replay-order repair is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-CORRECTION-04-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-CORRECTION-04-SOURCE-REVIEW-01.md).
