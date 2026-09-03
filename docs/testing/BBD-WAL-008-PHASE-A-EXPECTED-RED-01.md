@@ -20,7 +20,7 @@ Frozen identities:
 
 | Path | Lines | SHA-256 |
 | --- | ---: | --- |
-| `wallet-broker/Cargo.toml` | 117 | `7d89a7e98fde65c69392a91e633436ccf93b65a2f8e826e22b5e8ec27804da530` |
+| `wallet-broker/Cargo.toml` | 117 | `7d89a7e98fde65c69392a91e633436ccf93b65a2f8e826e22b5eec27804da530` |
 | `wallet-broker/tests/zec_hardware.rs` | 794 | `32959949c9da01834fe10ab1328777ab906fb9f8c7bc3e8ef66945f6961ad7a7` |
 
 ## Exact commands and outcomes

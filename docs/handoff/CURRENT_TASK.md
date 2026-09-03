@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: EXPECTED-RED EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
+State: EXPECTED-RED EVIDENCE CORRECTION 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -25,6 +25,10 @@ but the evidence mistypes one digit of the manifest hash. Hermes alone may corre
 exact evidence field and update this current-task record under the active handoff.
 Source edits, execution, production work, other actors, broader gates, real-device
 work, and WAL-007 execution remain unauthorized pending reviewer acceptance.
+
+Hermes completed the documentation-only evidence correction in
+[HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_PHASE_A_EXPECTED_RED_EVIDENCE_CORRECTION_01.md).
+Both the evidence file and this current-task record await reviewer acceptance.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
