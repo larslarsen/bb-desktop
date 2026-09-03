@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN RESUME 01 HERMES AUTHORIZED
+State: PHASE C SLICE 5 COMPILE CORRECTION 01 GROK AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build, Grok 4.6 High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,15 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_01.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_05_COMPILE_CORRECTION_01.md)
+
+Hermes Green Resume 01 stopped at the required first mismatch when the exact
+durable-replay falsification command exposed one `E0282` compile error before any test
+ran. The valid stop and exact restored source identity are reviewed in
+[BBD-WAL-007-SLICE-05-GREEN-RESUME-01-STOP-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-RESUME-01-STOP-REVIEW-01.md).
+Grok Build 4.6 High alone may make the exact one-line `xmr/store.rs` type-annotation
+repair. Hermes execution/integration, Sol, Spark, broader/final acceptance, and the
+real offline local-Monero gate remain unauthorized pending XHigh source review.
 
 Spark's exact seven-path Rust 1.98 formatter drop is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-FORMAT-CORRECTION-01-SOURCE-REVIEW-01.md).
