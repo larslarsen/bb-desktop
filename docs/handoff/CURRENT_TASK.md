@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-008
 
-State: PHASE C SLICE 02 CLIPPY CORRECTION AUTHORIZED — CODEX SOL HIGH ONLY
+State: PHASE C SLICE 02 GREEN RESUME 03 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,7 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_008_SLICE_02_CLIPPY_CORRECTION_01.md](CODEX_SOL_BBD_WAL_008_SLICE_02_CLIPPY_CORRECTION_01.md)
+[HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_03.md](HERMES_BBD_WAL_008_PHASE_C_SLICE_02_GREEN_RESUME_03.md)
 
 Slice 01 is accepted in
 [BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md).
@@ -32,9 +32,11 @@ Hermes Resume 02 passed the formatter, exact stale-expansion falsification, and 
 focused/affected Rust tests, then stopped on one warning-denied nested-`if` Clippy lint;
 the result and post-stop read-only command deviation are reviewed in
 [BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-RESUME-02-STOP-REVIEW-01.md).
-Grok remains usage-exhausted, so Codex Sol High alone may make the exact one-region
-`store.rs` Clippy correction. Hermes, Spark, other actors, execution, integration,
-broader/final acceptance, real-device work, and WAL-007 remain unauthorized.
+Sol's exact let-chain correction is accepted in
+[BBD-WAL-008-SLICE-02-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-CLIPPY-CORRECTION-01-SOURCE-REVIEW-01.md).
+Hermes alone may restart the complete gate and integrate only on exact success. Grok,
+Sol, Spark, other actors, broader/final acceptance, real-device work, and WAL-007 remain
+unauthorized.
 
 BBD-WAL-007 Phase C remains accepted. The owner supplied an extracted official Monero
 root whose required members match the exact reviewed byte/hash pins, but elected to
