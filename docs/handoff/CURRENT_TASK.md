@@ -2,13 +2,13 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 5 GREEN RESUME 02 HERMES AUTHORIZED
+State: PHASE C SLICE 5 TEST-ORACLE CORRECTION 01 SOL AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol, `gpt-5.6-sol` High
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
@@ -18,7 +18,16 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_02.md](HERMES_BBD_WAL_007_PHASE_C_SLICE_05_GREEN_RESUME_02.md)
+[CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_TEST_ORACLE_CORRECTION_01.md](CODEX_SOL_BBD_WAL_007_PHASE_C_SLICE_05_TEST_ORACLE_CORRECTION_01.md)
+
+Hermes Green Resume 02 is rejected in
+[BBD-WAL-007-SLICE-05-GREEN-RESUME-02-REJECTION-01.md](../testing/BBD-WAL-007-SLICE-05-GREEN-RESUME-02-REJECTION-01.md).
+The formatter and exact durable-replay falsification succeeded, but the first full
+receiver green exposed a one-line forbidden-field substring-oracle defect; Hermes also
+altered all three execution commands with prohibited wrappers/redirection. Because
+Grok's weekly usage remains exhausted, Codex Sol at High alone may make the exact
+one-line receiver-test oracle repair. Production source and further Hermes execution
+remain unauthorized pending XHigh source review.
 
 Sol's exact one-line `xmr/store.rs` type-annotation repair is accepted at XHigh in
 [BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-SOURCE-REVIEW-01.md](../testing/BBD-WAL-007-SLICE-05-COMPILE-CORRECTION-01-SOURCE-REVIEW-01.md).
