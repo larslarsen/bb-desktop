@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: SLICE 01 EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
+Status: PHASE C SLICE 02 SOURCE AUTHORIZED — CODEX SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -317,6 +317,15 @@ Correction 01 disclosed the deviations but still abbreviates both gate commands 
 left stale current-task prose. Evidence Review 02 authorizes Hermes alone to insert the
 two complete literal command strings and correct current-task state. Source, execution,
 and Slice 02 remain closed.
+
+## Reviewer acceptance decision 14
+
+Slice 01 is accepted at `d55edcec`, with exact evidence corrected through `03d3213f`,
+in `docs/testing/BBD-WAL-008-SLICE-01-ACCEPTANCE-01.md`. The accepted file has 18
+tests. Because Grok remains usage-exhausted, Codex Sol High alone may author the
+three-path Slice-02 durable SQLite decision store. Tests, execution, integration,
+transport, signing, real-device work, and broader gates remain unauthorized pending
+source review.
 
 ## Acceptance boundary
 
