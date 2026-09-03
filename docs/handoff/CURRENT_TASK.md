@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-007
 
-State: PHASE C SLICE 4 ACCOUNT SOURCE CORRECTION 03 AUTHORIZED
+State: PHASE C SLICE 4 ACCOUNT SOURCE CORRECTION 04 AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
@@ -18,7 +18,7 @@ Owner decision:
 [BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md](../architecture/BBD-WAL-007-XMR-RPC-DISTRIBUTION-DECISION.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_03.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_03.md)
+[GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_04.md](GROK_BUILD_BBD_WAL_007_PHASE_C_SLICE_04_CORRECTION_04.md)
 
 Slice 1 is complete and accepted at `c139641a` in
 [BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-01-ACCEPTANCE-01.md).
@@ -178,7 +178,14 @@ creates directories, derived preflight follows node/vault work, vault/quarantine
 namespace operations can overwrite races, SQLite/schema proof remains partial, and
 secret/public-authority cleanup is incomplete. Grok 4.6 High alone may correct the same
 seven exact source paths in Correction 03. Sol is not authorized. Hermes
-execution/integration remains unauthorized.
+execution/integration remains unauthorized. Grok's Correction-03 drop is rejected at
+XHigh in
+[BBD-WAL-007-SLICE-04-SOURCE-REVIEW-04.md](../testing/BBD-WAL-007-SLICE-04-SOURCE-REVIEW-04.md).
+It is unparsable and still loses exact vault/state/wallet ownership on material failure
+edges, fails to reconcile operation state on unwind, defers primary binding until after
+child start, and omits process-directory owner/parent-sync proof. Grok 4.6 High alone
+may make the bounded Correction 04 in the same seven source paths. Sol is not
+authorized. Hermes execution/integration remains unauthorized.
 
 BBD-RATE-001 remains complete and accepted at `c7d91c69`; its final evidence is
 [BBD-RATE-001-FINAL-ACCEPTANCE-01.md](../testing/BBD-RATE-001-FINAL-ACCEPTANCE-01.md).
