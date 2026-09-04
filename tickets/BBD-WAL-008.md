@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
+Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION RESUME 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -415,6 +415,17 @@ is governed by
 may correct the final-security evidence and current-task records without rerunning any
 gate. Source, tests, policy, other documentation, real-device work, and WAL-007/Monero
 remain frozen.
+
+## Reviewer execution decision 23
+
+Hermes stopped before mutation because Evidence Correction 01 froze the
+pre-authorization `CURRENT_TASK.md` identity instead of the identity created by its
+own protected governance commit. The reviewer-authored defect and exact clean stop are
+recorded in
+`docs/testing/BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md`.
+Hermes alone may resume the same two-path documentation correction under the corrected
+frozen record. No security gate may be rerun; all source, tests, policy, other
+documentation, real-device work, and WAL-007/Monero remain frozen.
 
 ## Acceptance boundary
 

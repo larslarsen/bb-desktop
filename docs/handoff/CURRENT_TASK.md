@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 01 AUTHORIZED — HERMES ONLY
+State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION RESUME 01 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,13 +18,16 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_01.md)
+[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md)
 
 Evidence under correction:
 [BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md)
 
 Governing review:
 [BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md)
+
+Valid stopped attempt:
+[BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md)
 
 Integrated evidence:
 [BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
@@ -36,6 +39,11 @@ provider/model. Transcript audit also found bounded read-only/process deviations
 Hermes alone may correct the two named evidence records without rerunning any gate.
 Source, tests, policy, manifests, locks, workflows, deny/ignore rules, ticket, review
 documents, real-device work, and WAL-007/Monero remain frozen.
+
+Hermes correctly stopped before mutation because Correction 01 froze the
+pre-authorization `CURRENT_TASK.md` identity rather than the file as committed in the
+protected parent. Resume 01 corrects that reviewer handoff defect. No security gate is
+rerun and the two-path edit boundary is unchanged.
 
 The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).
