@@ -2,57 +2,33 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
+State: WAL-008 ACCEPTED — NO ACTOR AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes
+Authorized integration actor: none
 
-Protected governance parent: the commit containing this task update
+Protected governance parent: none — ticket accepted
 
 Ticket: [BBD-WAL-008.md](../../tickets/BBD-WAL-008.md)
 
 Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Active handoff:
-[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_02.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_02.md)
+Acceptance:
+[BBD-WAL-008-ACCEPTANCE-01.md](../testing/BBD-WAL-008-ACCEPTANCE-01.md)
 
-Evidence under correction:
+Final security evidence:
 [BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md)
 
-Governing review:
-[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md)
-
-Valid stopped attempt:
-[BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md)
-
-Integrated evidence:
-[BBD-WAL-008-POLICY-EXPECTED-RED-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-01.md)
-[BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md)
-
-All five final security results are valid, but the integrated evidence has three
-material metadata errors: the Resume-01 protected parent, Hermes upstream hash, and
-provider/model. Transcript audit also found bounded read-only/process deviations.
-Hermes completed the documentation-only evidence correction in
-[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md).
-The corrected evidence is recorded in
-[BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md).
-The evidence review requiring these corrections is
-[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md).
-The documentation-only correction stopped with source and integration closed pending
-reviewer acceptance.
-
-Correction Resume 01 fixed the three metadata fields but omitted the required
-transcript-deviations section. Evidence Review 02 authorizes Hermes alone to insert the
-supplied section verbatim and correct this leading state block. No gate may be rerun.
-
-Hermes correctly stopped before mutation because Correction 01 froze the
-pre-authorization `CURRENT_TASK.md` identity rather than the file as committed in the
-protected parent. Resume 01 corrects that reviewer handoff defect. No security gate is
-rerun and the two-path edit boundary is unchanged.
+Implementation commit `369d811c` and final-security evidence commit `f9ab2b2d` are
+accepted. All required local Zcash gates and the five final security checks passed.
+GitHub's separate repository-wide Clippy failure remains confined to parked
+BBD-WAL-007/XMR, so global release CI is not green. WAL-008 proves no real-device
+transport/signing/broadcast capability. No actor is authorized until the reviewer
+opens the next Zcash ticket.
 
 The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).
@@ -68,10 +44,12 @@ reviewed in
 Hermes corrected the two named records without rerunning any gate. All source,
 tests, execution, other documentation, real-device work, and WAL-007 remain frozen.
 
-Evidence Correction 02 is complete and awaits reviewer acceptance. The governing
-review is
-[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md).
-The frozen Monero boundary is retained.
+Correction 01 is complete and awaits reviewer acceptance. The exact four
+post-integration commands are disclosed in
+[BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md).
+The governing review is
+[BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
+The authorized integration commit `369d811c` is unchanged.
 
 Evidence Correction 01 is accepted with the correction transcript's unnecessary
 read-only `git log --oneline -3` recorded in

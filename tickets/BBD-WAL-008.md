@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
+Status: ACCEPTED — REAL DEVICE AND SIGNING DEFERRED TO FOLLOW-ON TICKETS
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -435,6 +435,17 @@ omitted the required transcript-deviations section. The bounded miss is recorded
 may insert the supplied section verbatim and update current-task state. No security
 gate may be rerun; all source, tests, policy, other documentation, real-device work,
 and WAL-007/Monero remain frozen.
+
+## Reviewer acceptance decision 25
+
+The exact implementation at `369d811c`, complete final-security evidence at
+`f9ab2b2d`, required Rust/Node/policy gates, dependency controls, and both secret scans
+are accepted in `docs/testing/BBD-WAL-008-ACCEPTANCE-01.md`. Correction 02's mistaken
+current-task edit is repaired in the reviewer acceptance commit. BBD-WAL-008 is
+complete within its synthetic, fail-closed capability boundary. It establishes no
+real-device, signing, broadcast, UX, packaging, or mainnet support. No actor is
+authorized; BBD-WAL-007/Monero remains parked, and follow-on Zcash work requires a new
+reviewer ticket.
 
 ## Acceptance boundary
 
