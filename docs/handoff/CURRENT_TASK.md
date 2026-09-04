@@ -2,20 +2,20 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A2 EXPECTED RED RESUME AUTHORIZED — HERMES ONLY
+State: WAL-009 PHASE A2 EXPECTED RED DOCUMENTATION/INTEGRATION AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Jr Dev — Hermes, expected red only
+Authorized integration actor: Jr Dev — Hermes, documentation/integration only; no execution
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_RESUME_01.md](HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_RESUME_01.md)
+[HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_INTEGRATION_01.md](HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_INTEGRATION_01.md)
 
 Accepted test-source review:
 [BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md)
@@ -26,10 +26,11 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Spark's exact one-file formatting result is source-accepted. Hermes alone may restart
-the formatter check and focused expected-red command, then integrate only on the exact
-authorized outcomes. Semantic or production source changes and broader execution,
-broadcast/network, real hardware, Electron, mainnet, and Monero remain closed.
+The formatter passed and the focused target produced the accepted absent-contract red
+before any test executed. Hermes's conservative diagnostic stop is accepted. Hermes
+alone may now document that completed run and integrate the exact four paths without
+rerunning anything. Source edits and all broader execution, broadcast/network, real
+hardware, Electron, mainnet, and Monero remain closed.
 
 ## Historical record (superseded by the active state above)
 
