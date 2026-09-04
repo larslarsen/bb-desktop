@@ -1,6 +1,6 @@
 # BBD-WAL-008 — Zcash Hardware Capability Attestation and Device-Trust Gate
 
-Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION RESUME 01 AUTHORIZED — HERMES ONLY
+Status: FINAL SECURITY RESULTS VALID — EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -426,6 +426,15 @@ recorded in
 Hermes alone may resume the same two-path documentation correction under the corrected
 frozen record. No security gate may be rerun; all source, tests, policy, other
 documentation, real-device work, and WAL-007/Monero remain frozen.
+
+## Reviewer evidence decision 24
+
+Correction Resume 01 fixed the three final-security metadata fields at `8b8915b6` but
+omitted the required transcript-deviations section. The bounded miss is recorded in
+`docs/testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md`. Hermes alone
+may insert the supplied section verbatim and update current-task state. No security
+gate may be rerun; all source, tests, policy, other documentation, real-device work,
+and WAL-007/Monero remain frozen.
 
 ## Acceptance boundary
 

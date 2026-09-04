@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
+State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 02 AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -18,13 +18,13 @@ Parked predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
 Active handoff:
-[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md)
+[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_02.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_02.md)
 
 Evidence under correction:
 [BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md)
 
 Governing review:
-[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md)
+[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md)
 
 Valid stopped attempt:
 [BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-EVIDENCE-CORRECTION-01-STOP-REVIEW-01.md)
@@ -44,6 +44,10 @@ The evidence review requiring these corrections is
 [BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md).
 The documentation-only correction stopped with source and integration closed pending
 reviewer acceptance.
+
+Correction Resume 01 fixed the three metadata fields but omitted the required
+transcript-deviations section. Evidence Review 02 authorizes Hermes alone to insert the
+supplied section verbatim and correct this leading state block. No gate may be rerun.
 
 Hermes correctly stopped before mutation because Correction 01 froze the
 pre-authorization `CURRENT_TASK.md` identity rather than the file as committed in the
