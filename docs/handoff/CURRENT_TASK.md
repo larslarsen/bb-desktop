@@ -1,34 +1,35 @@
 # Current Task
 
-Ticket: BBD-WAL-008
+Ticket: BBD-WAL-009
 
-State: WAL-008 ACCEPTED — NO ACTOR AUTHORIZED
+State: WAL-009 PHASE A1 SIGN/VERIFY TEST SOURCE AUTHORIZED — SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
 Authorized integration actor: none
 
-Protected governance parent: none — ticket accepted
+Protected governance parent: the commit containing this task update
 
-Ticket: [BBD-WAL-008.md](../../tickets/BBD-WAL-008.md)
+Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Parked predecessor:
-[BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
+Active handoff:
+[CODEX_SOL_BBD_WAL_009_PHASE_A1_SIGN_VERIFY_TESTS_01.md](CODEX_SOL_BBD_WAL_009_PHASE_A1_SIGN_VERIFY_TESTS_01.md)
 
-Acceptance:
+Accepted Zcash predecessor:
 [BBD-WAL-008-ACCEPTANCE-01.md](../testing/BBD-WAL-008-ACCEPTANCE-01.md)
 
-Final security evidence:
-[BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md)
+Parked Monero predecessor:
+[BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Implementation commit `369d811c` and final-security evidence commit `f9ab2b2d` are
-accepted. All required local Zcash gates and the five final security checks passed.
-GitHub's separate repository-wide Clippy failure remains confined to parked
-BBD-WAL-007/XMR, so global release CI is not green. WAL-008 proves no real-device
-transport/signing/broadcast capability. No actor is authorized until the reviewer
-opens the next Zcash ticket.
+WAL-008 is accepted. WAL-009 begins with test source for local Zcash v6/Ironwood PCZT
+authorization and independent post-sign verification. Sol High may edit only the
+manifest test-target entry and new `zec_sign_verify` test file, run nothing, perform no
+Git operation, and stop for reviewer inspection. Production, execution, integration,
+broadcast/network, real hardware, Electron, mainnet, and all Monero work remain closed.
+
+## Historical record (superseded by the active state above)
 
 The exact 80/7 expected red and transcript are accepted in
 [BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-008-POLICY-EXPECTED-RED-ACCEPTANCE-01.md).
@@ -113,8 +114,6 @@ production-inventory assertion. The exact frozen source identities and an unchan
 lockfile are confirmed. Hermes may stage the exact two source paths plus the evidence and
 current-task records, commit, push, then stop for reviewer acceptance. Production source,
 broader gates, real-device work, and WAL-007 execution remain unauthorized.
-
-## Historical record (superseded by the active state above)
 
 Slice 5 is accepted at `64811dea`, with its evidence corrected at `04472f10`, in
 [BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md](../testing/BBD-WAL-007-SLICE-05-ACCEPTANCE-01.md).
