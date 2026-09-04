@@ -1,12 +1,15 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PHASE A1 TEST SOURCE ACCEPTED — PHASE A2 EXPECTED RED AUTHORIZED, HERMES ONLY
+Status: PHASE A1 FORMAT CORRECTION AUTHORIZED — SPARK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized test-source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High).
+Completed test-source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High).
 Grok Build remains the default senior route, but the owner reports its weekly usage
 exhausted; this is the documented fill-in condition.
+
+Authorized formatting actor: Implementation Dev — Codex Spark, High, under the exact
+one-path mechanical handoff.
 
 Planned integration actor: Jr Dev — Hermes
 
@@ -163,7 +166,7 @@ Source-text assertions are allowed only for production inventory/forbidden-autho
 checks. Behavioral outcomes cannot be proved by self-reported flags or a fake decoded
 transaction shaped by the implementation under test.
 
-## Phase A1 authorization
+## Phase A1 test-source authorization (completed)
 
 Codex Sol may edit only:
 
