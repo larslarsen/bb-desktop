@@ -2,20 +2,20 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A1 FORMAT CORRECTION AUTHORIZED — SPARK HIGH ONLY
+State: WAL-009 PHASE A2 EXPECTED RED RESUME AUTHORIZED — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Implementation Dev — Codex Spark, High, mechanical format only
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes, expected red only
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[CODEX_SPARK_BBD_WAL_009_PHASE_A1_FORMAT_CORRECTION_01.md](CODEX_SPARK_BBD_WAL_009_PHASE_A1_FORMAT_CORRECTION_01.md)
+[HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_RESUME_01.md](HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_RESUME_01.md)
 
 Accepted test-source review:
 [BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md)
@@ -26,11 +26,10 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Hermes stopped correctly when the first formatter check found only layout differences
-in the new test. Spark High alone may run the exact pinned one-file Rustfmt mutation.
-Hermes execution/integration, semantic source changes, production source, broader
-execution, broadcast/network, real hardware, Electron, mainnet, and Monero remain
-closed.
+Spark's exact one-file formatting result is source-accepted. Hermes alone may restart
+the formatter check and focused expected-red command, then integrate only on the exact
+authorized outcomes. Semantic or production source changes and broader execution,
+broadcast/network, real hardware, Electron, mainnet, and Monero remain closed.
 
 ## Historical record (superseded by the active state above)
 
