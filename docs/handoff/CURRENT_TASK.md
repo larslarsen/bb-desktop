@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A2 EXPECTED RED DOCUMENTATION/INTEGRATION AUTHORIZED — HERMES ONLY
+State: WAL-009 PHASE A2 EXPECTED RED DOCUMENTATION/INTEGRATION COMPLETE — CLOSED PENDING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -28,9 +28,10 @@ Parked Monero predecessor:
 
 The formatter passed and the focused target produced the accepted absent-contract red
 before any test executed. Hermes's conservative diagnostic stop is accepted. Hermes
-alone may now document that completed run and integrate the exact four paths without
-rerunning anything. Source edits and all broader execution, broadcast/network, real
-hardware, Electron, mainnet, and Monero remain closed.
+documented the completed run in
+[BBD-WAL-009-PHASE-A1-EXPECTED-RED-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-01.md)
+and integrated the exact four paths. Source edits and all broader execution,
+broadcast/network, real hardware, Electron, mainnet, and Monero remain closed.
 
 ## Historical record (superseded by the active state above)
 

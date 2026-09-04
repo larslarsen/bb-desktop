@@ -88,6 +88,10 @@ name = "zec_hardware"
 path = "tests/zec_hardware.rs"
 
 [[test]]
+name = "zec_sign_verify"
+path = "tests/zec_sign_verify.rs"
+
+[[test]]
 name = "xmr_distribution"
 path = "tests/xmr_distribution.rs"
 
