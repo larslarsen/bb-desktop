@@ -4,14 +4,14 @@ Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Implementation repo: `/home/lars/OpenBazaar/bb-desktop`
 
-Protected governance parent: `6503959d08332802f90f8832b5af2652035f46ed`
+Protected governance parent: `c3997ab63e109d2e6536ffe4b411b6a28e03a8b1`
 
 Result: **FINAL SECURITY GATE 01 PASSED — AWAITING REVIEWER ACCEPTANCE**
 
 ## Preflight
 
-- Hermes: Agent v0.18.2 (2026.7.7.2) · upstream 63239301 · local 10b6d1a9
-- Provider/model: openai/gpt-5.6-sol (Nous)
+- Hermes: Agent v0.18.2 (2026.7.7.2) · upstream 63279301 · local 10b6d1a9
+- Provider/model: nous/meituan/longcat-2.0:free
 - Branch: `master`
 - HEAD: `c3997ab63e109d2e6536ffe4b411b6a28e03a8b1`
 - `HEAD == origin/master`: confirmed

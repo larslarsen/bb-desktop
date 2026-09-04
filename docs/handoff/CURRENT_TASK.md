@@ -2,7 +2,7 @@
 
 Ticket: BBD-WAL-008
 
-State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION RESUME 01 AUTHORIZED — HERMES ONLY
+State: WAL-008 FINAL SECURITY EVIDENCE CORRECTION 01 COMPLETE — AWAITING REVIEWER ACCEPTANCE
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -36,9 +36,14 @@ Integrated evidence:
 All five final security results are valid, but the integrated evidence has three
 material metadata errors: the Resume-01 protected parent, Hermes upstream hash, and
 provider/model. Transcript audit also found bounded read-only/process deviations.
-Hermes alone may correct the two named evidence records without rerunning any gate.
-Source, tests, policy, manifests, locks, workflows, deny/ignore rules, ticket, review
-documents, real-device work, and WAL-007/Monero remain frozen.
+Hermes completed the documentation-only evidence correction in
+[HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md](HERMES_BBD_WAL_008_FINAL_SECURITY_EVIDENCE_CORRECTION_RESUME_01.md).
+The corrected evidence is recorded in
+[BBD-WAL-008-FINAL-SECURITY-GATE-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01.md).
+The evidence review requiring these corrections is
+[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-01.md).
+The documentation-only correction stopped with source and integration closed pending
+reviewer acceptance.
 
 Hermes correctly stopped before mutation because Correction 01 froze the
 pre-authorization `CURRENT_TASK.md` identity rather than the file as committed in the
