@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PHASE A1 SIGN/VERIFY TEST SOURCE AUTHORIZED — SOL HIGH ONLY
+Status: PHASE A1 TEST SOURCE ACCEPTED — PHASE A2 EXPECTED RED AUTHORIZED, HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 

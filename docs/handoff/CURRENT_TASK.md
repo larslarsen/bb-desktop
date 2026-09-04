@@ -2,20 +2,23 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A1 SIGN/VERIFY TEST SOURCE AUTHORIZED — SOL HIGH ONLY
+State: WAL-009 PHASE A1 TEST SOURCE ACCEPTED — PHASE A2 EXPECTED RED AUTHORIZED, HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Jr Dev — Hermes, expected red only
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_009_PHASE_A1_SIGN_VERIFY_TESTS_01.md](CODEX_SOL_BBD_WAL_009_PHASE_A1_SIGN_VERIFY_TESTS_01.md)
+[HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_01.md](HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_01.md)
+
+Accepted test-source review:
+[BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md)
 
 Accepted Zcash predecessor:
 [BBD-WAL-008-ACCEPTANCE-01.md](../testing/BBD-WAL-008-ACCEPTANCE-01.md)
@@ -23,11 +26,10 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-WAL-008 is accepted. WAL-009 begins with test source for local Zcash v6/Ironwood PCZT
-authorization and independent post-sign verification. Sol High may edit only the
-manifest test-target entry and new `zec_sign_verify` test file, run nothing, perform no
-Git operation, and stop for reviewer inspection. Production, execution, integration,
-broadcast/network, real hardware, Electron, mainnet, and all Monero work remain closed.
+The exact two-path Phase-A1 test drop is source-accepted. Hermes alone may run the
+formatter check and focused expected-red command, then integrate only on the exact
+authorized outcomes. Production source and all broader execution, broadcast/network,
+real hardware, Electron, mainnet, and Monero work remain closed.
 
 ## Historical record (superseded by the active state above)
 
