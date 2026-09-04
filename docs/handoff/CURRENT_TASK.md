@@ -2,20 +2,23 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A2 EXPECTED RED DOCUMENTATION/INTEGRATION COMPLETE — CLOSED PENDING REVIEWER ACCEPTANCE
+State: WAL-009 PHASE A3 SIGN/VERIFY PRODUCTION SOURCE AUTHORIZED — SOL HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
 
-Authorized integration actor: Jr Dev — Hermes, documentation/integration only; no execution
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_INTEGRATION_01.md](HERMES_BBD_WAL_009_PHASE_A2_EXPECTED_RED_INTEGRATION_01.md)
+[CODEX_SOL_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_PRODUCTION_01.md)
+
+Accepted expected-red gate:
+[BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
 
 Accepted test-source review:
 [BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md)
@@ -26,12 +29,10 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-The formatter passed and the focused target produced the accepted absent-contract red
-before any test executed. Hermes's conservative diagnostic stop is accepted. Hermes
-documented the completed run in
-[BBD-WAL-009-PHASE-A1-EXPECTED-RED-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-01.md)
-and integrated the exact four paths. Source edits and all broader execution,
-broadcast/network, real hardware, Electron, mainnet, and Monero remain closed.
+The exact 14-test sign/verify contract and its expected red are accepted at `d7819e0f`.
+Sol High alone may implement the bounded seven-path production core without execution
+or Git. Broadcast/network, real hardware, Electron methods, mainnet, dependencies, and
+all Monero work remain closed.
 
 ## Historical record (superseded by the active state above)
 
