@@ -68,12 +68,10 @@ reviewed in
 Hermes corrected the two named records without rerunning any gate. All source,
 tests, execution, other documentation, real-device work, and WAL-007 remain frozen.
 
-Correction 01 is complete and awaits reviewer acceptance. The exact four
-post-integration commands are disclosed in
-[BBD-WAL-008-SLICE-02-GREEN-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01.md).
-The governing review is
-[BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md](../testing/BBD-WAL-008-SLICE-02-GREEN-01-EVIDENCE-REVIEW-01.md).
-The authorized integration commit `369d811c` is unchanged.
+Evidence Correction 02 is complete and awaits reviewer acceptance. The governing
+review is
+[BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md](../testing/BBD-WAL-008-FINAL-SECURITY-GATE-01-EVIDENCE-REVIEW-02.md).
+The frozen Monero boundary is retained.
 
 Evidence Correction 01 is accepted with the correction transcript's unnecessary
 read-only `git log --oneline -3` recorded in

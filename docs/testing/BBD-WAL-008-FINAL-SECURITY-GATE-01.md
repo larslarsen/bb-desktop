@@ -98,6 +98,26 @@ the XMR-only `chunks_exact_to_as_chunks` lint in `tests/xmr_rpc.rs`) and grants
 no Monero edit authority. Source, tests, broader execution, real-device work,
 and WAL-007 remain frozen.
 
+## Transcript deviations
+
+Resume-01 session `20260903_162048_093801` first attempted three nonexistent shorthand
+paths: `docs/testing/FINAL-SECURITY-GATE-01.md`,
+`docs/testing/STOP-REVIEW-01.md`, and
+`docs/testing/SLICE-02-ACCEPTANCE-01.md`. It then used repeated bounded searches plus
+`ls -la /home/lars/OpenBazaar/bb-desktop/docs/handoff/ | grep -i wal-008` and a full
+handoff-directory listing to locate the exact records. It also ran the unrequested
+read-only command
+`git show 6503959d08332802f90f8832b5af2652035f46ed --stat | head -30`. The session did
+not issue separate reads for the two named role/routing policy documents; `AGENTS.md`
+was already injected as project context.
+
+After the three exact gate commands passed, tool identities were captured in one
+compound shell submission. The authorized evidence/current-task integration used one
+compound stage/commit/push submission, and the final Git proof added the unrequested
+`git log --oneline -1`. These operations were read-only or authorized documentation
+integration. They did not mutate source or immutable gate inputs, and no security gate
+was rerun.
+
 ## Repository state
 
 - `git status --porcelain`: clean
