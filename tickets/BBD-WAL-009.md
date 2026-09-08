@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE REVIEW PRODUCTION 01 — GROK BUILD
+Status: NATIVE REVIEW VALIDATION 01 — HERMES
 
-Active authorization: [native review production 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md).
-The [retained-spend acceptance and native review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-ACCEPTANCE-AND-NATIVE-REVIEW.md)
-accepts the corrected focused green, three intended falsification failures, and
-restored six-test library green. All temporary mutations are restored. Earlier
-11 prepare and 13 other sign/verify passes are retained without a whole-suite repeat.
-Hermes procedural/report deviations are recorded in that authoritative review;
-no new report-only correction cycle or repeat of passing checks is authorized.
+Active authorization: [native review validation 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md).
+The [native review production source review](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PRODUCTION-01-SOURCE-REVIEW.md)
+accepts Grok High's one-file immutable dialog/synchronous native runner for
+execution. The six pre-existing real-widget tests and native.rs are unchanged;
+all twenty-one other pending identities remain frozen.
 
-Grok Build 4.6 High alone may implement the existing six-test private dialog
-contract and synchronous native runner in native_ui.rs. Tests and native.rs stay
-frozen. The classified missing-contract/obsolete API compile red is understood;
-behavioral widget red is not claimed. Native test execution, falsifications,
-regressions, compilation, and later real-window/capability integration remain
-separate gates. No Grok execution, Git, evidence, or integration is authorized.
+Hermes alone may run widget green, the exact Confirm and close-priority
+falsifications with complete restoration, restored widget green, all seventeen
+native-surface regressions, and native compilation. Each command once, in
+background with full capture. Write the one named evidence record and stop;
+no compiler/source repair, extra commands, Git mutation, or integration.
 
-Full recovered effects, actual-secret cleanup, native integration, and remaining
+Retained-spend/clock/signature-context results remain accepted without expensive
+repetition. Actual native-window layout/lifecycle, owning-thread/capability
+integration, independently recovered effects, actual-secret cleanup, and remaining
 security stay unaccepted. Reviewer remains XHigh; launch once, no actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh

@@ -1,55 +1,53 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 NATIVE REVIEW PRODUCTION 01 — GROK BUILD
+State: WAL-009 NATIVE REVIEW VALIDATION 01 — HERMES
 Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actor: Grok Build 4.6 High only
-Authorized execution/evidence/integration actors: none
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md)
-Reviewer decision: [retained-spend acceptance and native review](../testing/BBD-WAL-009-RETAINED-SPEND-ACCEPTANCE-AND-NATIVE-REVIEW.md)
+Active handoff: [HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md)
+Reviewer decision: [native review production source review](../testing/BBD-WAL-009-NATIVE-REVIEW-PRODUCTION-01-SOURCE-REVIEW.md)
 Read this prefix and linked records; no historical handoff reload.
 
-Hermes outer 47193 was collected once after done, exit 0. Completed session:
-20260908_120219_fc08d7, Hermes 0.18.2, nous, poolside/laguna-s-2.1:free.
-All required retained-spend/clock stages are accepted: corrected focused test
-passed; exact expiry, retained-index, and witness-count mutations failed at the
-intended assertions; restored library passed all six tests. Temporary mutations
-are restored and all twenty frozen identities match. Preserve the earlier
-11 prepare and 13 other sign/verify passes; do not repeat the whole integration.
+Grok session 025c4563-cfb2-444f-8885-575bfdc4266a, outer 98275, was collected once
+after done, exit 0; runtime grok-4.6-build High. The one-file native confirmation
+dialog/runner drop is accepted for validation. native_ui.rs is 303 lines,
+c6d5fc3a4dee46f4700f2a3ae5866a5003746eab5aa6dd6bc20e5ba5c6d726b4.
+All twenty-one other pending source/package/lock/evidence identities are unchanged.
+The reviewer compared the exact saved 201-line baseline to the actual final file.
+Read-only inspection scope deviations are recorded without another source cycle.
 
-The actor ran four unauthorized extra Cargo commands and left report inaccuracies.
-The linked reviewer decision records authoritative errata and rejects procedural
-compliance. Those deviations do not invalidate the actual required saved results.
-No further report-only correction cycle or repeat of passing gates is authorized.
-Both completed Hermes sessions are closed; do not resume or recollect them.
+Hermes alone may run six ordered commands: six widget tests green; Confirm
+transition falsification; same-frame close precedence falsification; restored
+six widget tests green; seventeen native-surface regressions; native compilation.
+The two exact temporary native_ui.rs mutations have measured hashes and mandatory
+complete restoration on every outcome. Tests and all other source are frozen.
+Each Cargo command launches once in background; capture its full output and exit.
+No rerun, compiler repair, extra probes/tests, Git mutation, or integration.
+Write only docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01.md and stop.
+Launch status: authorization prepared; launch once after governance commit.
 
-Grok may now implement the private immutable review dialog and synchronous native
-runner ONLY in wallet-broker/src/native_ui.rs, starting 201 lines,
-600e2fb34134a276d31da9c5e746cc6478337bae73590fd742cf2d36ff785524.
-The six pre-existing widget tests and native.rs capability boundary are frozen.
-Their classified missing-contract/Context::run compile red is understood;
-no claim is made that behavioral widget assertions have run. The handoff fixes
-terminal confirmation/denial, full review identity, close precedence, per-call
-ownership, synchronous run_and_return, and fail-closed platform errors.
+The dialog owns the complete review, confirms once, makes close/Escape/Cancel
+win over a same-frame click, and uses a synchronous run_and_return native loop.
+Actual widget outcomes remain unverified until this execution is reviewed.
+Real-window layout/platform lifecycle, owning-thread use, and capability-bridge
+integration still need a separate native gate; no OS smoke claim from widgets.
 
-No test/compiler/formatter, native window launch, evidence, Git, integration,
-dependency change, or other source edit is authorized to Grok. After source review,
-Hermes will receive grouped widget green/falsifications, native regressions, and
-compilation. Real native-window/owning-thread/capability integration remains separate.
-Launch status: launched once from authorization 21cefbc4 with CLI grok-4.6,
-reasoning High, session 025c4563-cfb2-444f-8885-575bfdc4266a, outer terminal 98275.
-No completion collected. Do not launch again or poll; collect after owner done.
+Retained-spend/clock/signature-context validation remains accepted, including
+three intended falsification failures and restored six-test library green.
+No repeat of those expensive suites or prior evidence-only correction cycle.
+Full independent recovered effects, actual-secret cleanup, remaining security,
+integration, mainnet, network, broadcast, real hardware, and Monero remain
+unaccepted or parked. All pending developer source/package/locks and seven prior
+evidence records remain uncommitted; this does not open broader WAL-009 acceptance.
 
-Reviewer publication scope: CURRENT_TASK.md, ticket, active Grok handoff, and
-linked reviewer decision only. No actor polling; collect after done/explicit
+Reviewer publication scope: CURRENT_TASK.md, ticket, active Hermes handoff, and
+linked source review only. No actor polling; collect after done/explicit
 collection. XHigh remains appropriate; no reasoning change is needed.
-Pending developer source/package/locks and all seven evidence records remain
-uncommitted. Full recovered effects, actual-secret cleanup, remaining security,
-integration, mainnet, network, broadcast, hardware, and Monero remain unaccepted
-or parked. This is not broader WAL-009 acceptance.
 
 ## Historical record (superseded by the active state above)
 
