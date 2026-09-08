@@ -1,30 +1,29 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT VALIDATION 01 ONLY — HERMES
+Status: SIGNATURE-CONTEXT VALIDATION EVIDENCE CORRECTION 01 ONLY — HERMES
 
-Active actor authorization: [Hermes validation 01](../docs/handoff/HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md).
-At most six ordered test commands: focused green, transparent-rejection failure,
-two message-corruption failures, and restored-source integration/library tests.
-Only the exact temporary falsification replacements are permitted. Source/test
-design, permanent repairs, dependencies, native work, and integration stay closed.
+Active actor authorization: [Hermes evidence correction 01](../docs/handoff/HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md).
+Rebuild only the existing validation evidence from exact saved command/result and
+measurement IDs. No execution, source/test repair, dependency operation, or
+integration is authorized.
 
-Latest review: [falsification order 01 acceptance](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md).
-The one-assertion move matches its proposed full-file identity. Actual signature
-positive controls now precede the signature test's PCZT equality. All sixteen
-other pending identities are unchanged. Mechanical prerequisites, the private
-context/actual verifier wiring, and this test correction are source-accepted;
-compilation and behavior remain unproved.
+Latest review: [validation 01 review](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md).
+The five exact commands and source restorations are verified: four focused tests
+passed; transparent rejection and both message-corruption controls failed at
+their intended assertions; all 11 prepare tests passed; sign/verify had 6 passes
+and 8 failures. The full library command was correctly not reached.
 
-The handoff freezes seventeen starting identities, exact mutation/restoration
-hashes, required assertion sites, complete result capture, and stop conditions.
-Every stage requires the preceding expected result. After a stop, restore any
-active recognized mutation, record the actual limitation and remaining stages,
-and stop. No earlier actor or absent-interface red rerun is authorized.
+The submitted evidence is rejected because manual transcription altered diagnostic
+details, mislabeled target paths, and omitted the final integration error. Correct
+it from saved JSON, include full before/after identities and procedure errata,
+remove unsupported root-cause speculation, and leave the record uncommitted.
+No tests need repeating to correct this evidence.
 
-The new validation evidence remains uncommitted. Prior evidence errata and local
-prose-path normalization require later explicit Hermes integration. Independent
-transaction-effect recovery, actual-secret cleanup, and native confirmation
-remain A3 blockers; this adapter validation does not resolve them.
+All source identities remain restored. The software INTENT_MISMATCH and external
+SIGNATURE_INVALID failures need subsequent bounded reviewer triage. Focused
+context success does not establish the full payment pipeline, independent
+recovered effects, actual-secret cleanup, or native confirmation. Earlier
+evidence corrections and developer source/lock integration remain deferred.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

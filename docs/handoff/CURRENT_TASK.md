@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 SIGNATURE-CONTEXT VALIDATION 01 ONLY — HERMES
+State: WAL-009 SIGNATURE-CONTEXT VALIDATION EVIDENCE CORRECTION 01 ONLY — HERMES
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh (owner resumed)
 
-Authorized source actor: none; all Grok signature-context source tasks are complete
+Authorized source actor: none
 
-Authorized execution actor: Hermes Jr Dev, active handoff only
+Authorized execution actor: none; the validation run has stopped
 
-Authorized evidence actor: Hermes Jr Dev, one new uncommitted validation record only
+Authorized evidence actor: Hermes Jr Dev, correction of one existing record only
 
 Authorized integration actor: none
 
@@ -19,56 +19,54 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md](HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md)
+[HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md)
 
 Reviewer checkpoint:
-[BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md](../testing/BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md)
+[BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md](../testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md)
 
 Context-reset checkpoint: read only this leading section, the active handoff, and
-reviewer checkpoint. No historical log or prior execution permission is active.
+reviewer checkpoint. Earlier execution/source permissions are closed.
 
-The owner reported Grok done. Outer 96396 was collected once, exit 0. Session
-`b1a63fe8-d204-4f7e-9af0-201648a936be`, authorized at `94875511`, runtime
-grok-4.6-build, high, completed exactly the single assertion move. Its full test
-file matches the proposed identity; reversing that move reconstructs the preceding
-full hash. All sixteen other pending identities are unchanged. Source is accepted;
-no compiler or tests ran. Do not recollect this or any earlier completed actor.
+The owner reported Hermes done. Outer 48001 was collected once, exit 0. Original
+session 20260908_082758_10ad42, Hermes v0.18.2, nous,
+poolside/laguna-s-2.1:free, ran from c4fc4ec9 and observed 38aed7e8.
+The saved data verifies exactly five commands: focused context 4 passed; all three
+required falsification failures at their intended sites; prepare 11 passed;
+sign/verify 6 passed and 8 failed. Full library/restored focused green was not run.
+Both mutations were exactly restored and all seventeen starting identities match.
 
-Hermes may run at most six sequential commands: focused four-test green,
-transparent-rejection falsification, two message-corruption falsifications, then
-restored-source zec_prepare/zec_sign_verify and full library regressions. The exact
-two temporary replacements, mutated hashes, required assertion failures,
-restorations, and first-unexpected-result stop are frozen in the handoff.
-No permanent source/test change, formatting, dependency operation, or Git mutation.
+The execution/results/restoration are accepted as partial validation. The submitted
+538-line evidence is rejected: manually transcribed output changed diagnostic
+details and omitted the final integration error. It also lacks a full after table
+and contains incorrect path counts, unsupported cause speculation, and omitted
+procedure deviations. Hermes may rebuild ONLY that record from the exact saved
+message IDs in the new handoff. No test rerun, source repair, or fresh investigation.
 
+Writable evidence baseline: BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01.md,
+538 lines, SHA-256
+`593753f1011a385b763f3f3f7d9225f98f44f4dae587901ff74c7a4bcfd6d9ac`.
 Frozen spend.rs: 929 lines, SHA-256
 `bd51b3d0ee2f748fa31e483a2747c157ff20544aa62e3e00a7929c77060b7361`.
-Frozen verification_context_tests.rs: 528 lines, SHA-256
+Frozen context tests: 528 lines, SHA-256
 `45f3bdf2f1d08924d53c298517c631427ab052c2d4955b31e98aa555386d380a`.
-Frozen test_support.rs: 4371 lines, SHA-256
-`fea8f65ed6637033506902688c8f547952cea848af51d05a49969cae81f48920`.
-All seventeen full starting identities are in the handoff and must be restored.
 
-Launch status: Hermes launched from governance commit `c4fc4ec9` with
-`--pass-session-id`, outer terminal session 48001. No completion has been collected.
-Its actual session ID/version/provider/model must be recorded in the evidence.
-Leave this run alone until the owner reports done; do not poll or duplicate it.
+Launch status: authorized, not yet launched. Record the single correction session
+after committing this handoff. No duplicate actor.
 
-The owner forbids polling. Collect only after the owner reports done or requests
-collection. Pause if reviewer work needs a different reasoning level; XHigh remains
-appropriate. Record actual Hermes version/provider/model rather than adoption data.
+The owner forbids polling. Collect only after done or explicit collection request.
+XHigh remains appropriate; pause if a different reviewer reasoning level is needed.
 
-New evidence path: docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01.md.
-Generate it from actual saved tool data, with complete results, counts, mutations/
-restorations, full before/after identities, and unrun stages. Keep it uncommitted.
-Prior evidence errata and local prose-path normalization stay deferred to explicit
-later Hermes integration. All developer source/package/lock changes remain pending.
+All developer source/package/lock changes and five implementation evidence records
+remain uncommitted. Earlier evidence errata and normalization stay deferred to
+explicit integration. This correction must preserve all seventeen original paths.
+Do not recollect completed actors or resume the unrun library command.
 
-Independent recovered effects, actual-secret cleanup, and native confirmation
-remain A3 blockers. Metadata-copy comparisons and synthetic wipe counters remain
-unaccepted even if this validation passes. Native, security, mainnet, broadcast,
-Monero, network, and wider gates remain separately pending. No earlier actor or
-absent-interface red is to be resumed or repeated.
+After corrected evidence review, scope the software INTENT_MISMATCH and external
+SIGNATURE_INVALID failures separately. The cause is unresolved; a shared error
+code does not locate it in the context constructor. Independent recovered effects,
+actual-secret cleanup, and native confirmation remain A3 blockers. Metadata-copy
+comparisons and synthetic wipe counters stay unaccepted. Native, security,
+integration, mainnet, broadcast, Monero, network, and wider work remain pending.
 
 ## Historical record (superseded by the active state above)
 
