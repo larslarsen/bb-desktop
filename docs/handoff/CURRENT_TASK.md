@@ -2,20 +2,20 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 OFFLINE LOCK SYNCHRONIZATION — HERMES ONLY
+State: WAL-009 LOCK EVIDENCE CORRECTION — HERMES DOCUMENTATION ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Hermes; lock synchronization/evidence only, no Git integration
+Authorized integration actor: Hermes; one evidence file only, no execution or Git integration
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_LOCK_SYNC_01.md](HERMES_BBD_WAL_009_LOCK_SYNC_01.md)
+[HERMES_BBD_WAL_009_LOCK_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_LOCK_EVIDENCE_CORRECTION_01.md)
 
 Current review:
 [BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
@@ -34,9 +34,10 @@ Parked Monero predecessor:
 
 Correction 02's transaction buffer ownership repair is source-accepted in
 [BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md](../testing/BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md).
-Correction 03's exact Orchard manifest declaration is source-accepted. Hermes may
-synchronize only the lockfile root dependency list offline and record evidence.
-No package upgrades, tests/builds, policy runs, or integration are authorized.
+Hermes completed offline lock synchronization with exactly one root dependency added
+and no version changes. Reviewer inspection confirms the diff and resulting hash.
+Only its evidence needs correction: a package-lock hash typo and unsupported runtime
+model attribution. Hermes may correct that one document without repeating any gate.
 The remaining A3 blockers stay open; all other pending work is preserved.
 
 ## Historical record (superseded by the active state above)

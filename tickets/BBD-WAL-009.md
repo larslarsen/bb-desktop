@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: OFFLINE LOCK SYNCHRONIZATION — HERMES ONLY
+Status: LOCK EVIDENCE CORRECTION — HERMES DOCUMENTATION ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
