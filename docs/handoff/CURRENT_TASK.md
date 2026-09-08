@@ -49,8 +49,10 @@ Frozen test_support.rs: 4371 lines, SHA-256
 `fea8f65ed6637033506902688c8f547952cea848af51d05a49969cae81f48920`.
 All seventeen full starting identities are in the handoff and must be restored.
 
-Launch status: authorized, not yet launched. Record the single Hermes outer
-session after committing this handoff. No duplicate actor.
+Launch status: Hermes launched from governance commit `c4fc4ec9` with
+`--pass-session-id`, outer terminal session 48001. No completion has been collected.
+Its actual session ID/version/provider/model must be recorded in the evidence.
+Leave this run alone until the owner reports done; do not poll or duplicate it.
 
 The owner forbids polling. Collect only after the owner reports done or requests
 collection. Pause if reviewer work needs a different reasoning level; XHigh remains
