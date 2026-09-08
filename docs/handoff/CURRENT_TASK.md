@@ -69,8 +69,10 @@ The four-test verification_context_tests.rs stays frozen at 528 lines, SHA-256
 Both Grok test-source tasks are complete and source-accepted. Do not recollect
 outer sessions 27805 or 88665.
 
-Launch status: Grok prerequisites task authorized but not yet launched. Check the
-later launch checkpoint before starting an actor; never duplicate an active run.
+Launch status: Grok was launched from governance commit `e0bacf99`, CLI model
+`grok-4.6`, reasoning High, session `97461fa7-3a30-4efc-93be-7d3957c8a5b2`,
+outer terminal session 64572. No completion has been collected. Leave this run
+alone until the owner reports done; do not poll or launch a duplicate.
 
 The owner explicitly forbids polling. Collect an actor only after the owner
 reports completion or explicitly requests collection. The owner also asks for a
