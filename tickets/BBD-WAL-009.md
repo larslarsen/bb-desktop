@@ -1,26 +1,32 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT TEST SOURCE ONLY — GROK HIGH
+Status: SIGNATURE-CONTEXT TEST CORRECTION 01 ONLY — GROK HIGH
 
-Active actor authorization: [Grok signature-context tests 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md),
-one new private test module and two append-only test declarations/accessors.
-No existing production byte, execution, or integration is authorized to change.
+Active actor authorization: [Grok one-file test correction 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_CORRECTION_01.md).
+Only verification_context_tests.rs may change. The two append-only declarations/
+accessors are source-accepted and frozen. No production implementation, execution,
+evidence, or integration is open.
+
+Latest review: [signature-context test source 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-TEST-SOURCE-01-REVIEW.md).
+Grok preserved both production prefixes and authored the four real-fixture tests.
+The test module requires a NonEmpty API correction, a non-dumping bundle equality
+assertion, unchanged-message/untouched-signature controls for authorization
+mutations, and removal of an unused import. No compiler or tests ran.
+
 The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
-fixes the future typed signature_hash adapter. The active handoff freezes its
-private interface, real PCZT signing oracle, and four focused tests.
-The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
-still fixes the separate modal lifetime and later green/falsification requirements.
+and [original test handoff](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
+retain the future typed signature_hash adapter, private interface, independent
+PCZT oracle, and execution/falsification contract. The
+[native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+still governs the separate modal lifetime and later native checks.
 
-Latest review: [prerequisite-02 evidence correction](../docs/testing/BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md).
-Hermes's recovered command/runtime/outcome and fourteen hash rows are accepted
-with authoritative errata. Original check 02 remains a valid mixed compile stop:
-six errors, one warning, zero tests executed. The evidence remains uncommitted;
-its diagnostics require mechanical rendering and local-path normalization under
-a later Hermes integration handoff. Current evidence correction is closed.
-The six native tests and delimiter repair remain source-accepted. Known compile
-repairs need separate handoffs. Lockfile/evidence integration is deferred.
-Actual-secret cleanup, independent transaction-effect verification, and native
-confirmation remain unresolved; this signature-context slice does not accept them.
+Prerequisite-02 command/runtime/outcome and fourteen hash rows remain accepted
+with [authoritative evidence errata](../docs/testing/BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md).
+That check ran zero tests. Evidence requires mechanical diagnostic rendering and
+local-path normalization under a later Hermes integration handoff. Known compiler
+repairs and lockfile/evidence integration remain deferred. Actual-secret cleanup,
+independent transaction-effect verification, and native confirmation remain
+unresolved; this signature-context slice does not accept them.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
