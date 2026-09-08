@@ -12,6 +12,21 @@ Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md](GROK_BUILD_BBD_W
 Reviewer decision: [native widget validation acceptance](../testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
 Read this prefix and linked records; no historical handoff reload.
 
+Owner priority change: visible product progress now takes precedence over opening
+further internal slices. The owner challenged the prolonged review/test cycle and
+lack of a usable result. The already launched bounded Grok task may finish; do
+not poll it. After collection, make a runnable synthetic-data native confirmation
+demo the next milestone, with an actual screenshot, exact launch command, and a
+plain statement of implemented versus missing behavior. Prepare only the minimal
+source/execution handoffs needed for that demonstration. Do not automatically
+open another backend/test-only slice first. Existing security acceptance limits
+remain in force; a demo is not authorization of live signing or sending.
+
+The recent pushed checkpoint commits contain reviewer governance. The pending
+wallet implementation is uncommitted and is not integrated into a usable send
+flow. Future owner updates must state that distinction and report visible
+behavior, not present checkpoint hashes as product delivery.
+
 Hermes outer 29799 was collected once after done, exit 0. Completed session
 20260908_132224_391188, Hermes 0.18.2, nous, poolside/laguna-s-2.1:free.
 All six required outcomes are accepted: original six widget tests passed;

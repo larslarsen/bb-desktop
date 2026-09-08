@@ -2,6 +2,12 @@
 
 Status: NATIVE APP/LAYOUT TEST SOURCE 01 — GROK BUILD
 
+Owner priority: deliver a runnable synthetic-data native confirmation demo next,
+including an actual screenshot and launch command, before opening further internal
+slices. The current bounded source task may finish without polling. Pending wallet
+implementation is uncommitted; no usable send flow has been delivered. Existing
+security/real-send acceptance limits remain unchanged.
+
 Active authorization: [native App/layout tests 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md).
 The [native widget validation acceptance](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
 accepts six original/restored widget passes, both intended falsification failures,
