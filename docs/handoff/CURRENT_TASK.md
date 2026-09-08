@@ -35,7 +35,10 @@ appended exactly `}\n` under the `405c789b` source authorization. The result is
 Its entire original prefix is unchanged. Source task closed; do not relaunch Grok.
 The earlier outer session 31456 failed before editing because the reviewer supplied
 unsupported CLI model ID `grok-4.6-build`; use `grok-4.6` for future CLI launches.
-Only the linked fresh Hermes prerequisite check is open; it has not yet launched.
+Only the linked fresh Hermes prerequisite check is open. It was launched from
+`e5418536`, outer terminal session 25473, with the actual Hermes session ID made
+available to the actor for its evidence record. No completion has been collected.
+Leave the run alone until the owner reports done; do not poll or duplicate it.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
