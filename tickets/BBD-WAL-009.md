@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CORRECTION 03 ORCHARD DEPENDENCY DECLARATION — GROK HIGH ONLY
+Status: OFFLINE LOCK SYNCHRONIZATION — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 

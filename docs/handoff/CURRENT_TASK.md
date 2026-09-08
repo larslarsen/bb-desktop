@@ -2,20 +2,20 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 CORRECTION 03 ORCHARD DEPENDENCY DECLARATION — GROK HIGH ONLY
+State: WAL-009 OFFLINE LOCK SYNCHRONIZATION — HERMES ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Sr Dev — Grok Build, High; one Cargo.toml dependency entry only
+Authorized source actor: none
 
-Authorized integration actor: none
+Authorized integration actor: Hermes; lock synchronization/evidence only, no Git integration
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_009_ORCHARD_DECLARATION_03.md](GROK_BUILD_BBD_WAL_009_ORCHARD_DECLARATION_03.md)
+[HERMES_BBD_WAL_009_LOCK_SYNC_01.md](HERMES_BBD_WAL_009_LOCK_SYNC_01.md)
 
 Current review:
 [BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
@@ -34,9 +34,10 @@ Parked Monero predecessor:
 
 Correction 02's transaction buffer ownership repair is source-accepted in
 [BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md](../testing/BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md).
-Grok High may add only the exact already-pinned Orchard dependency declaration.
-All other source, tests, lockfiles, and unrelated package changes remain preserved.
-No execution or integration is authorized; the remaining A3 blockers stay open.
+Correction 03's exact Orchard manifest declaration is source-accepted. Hermes may
+synchronize only the lockfile root dependency list offline and record evidence.
+No package upgrades, tests/builds, policy runs, or integration are authorized.
+The remaining A3 blockers stay open; all other pending work is preserved.
 
 ## Historical record (superseded by the active state above)
 
