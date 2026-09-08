@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CORRECTION 02 TRANSACTION BUFFER CLEANUP — GROK HIGH ONLY
+Status: CORRECTION 03 ORCHARD DEPENDENCY DECLARATION — GROK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
