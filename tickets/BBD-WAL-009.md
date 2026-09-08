@@ -1,13 +1,13 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: INITIAL RED REJECTED — HERMES EVIDENCE CORRECTION ONLY
+Status: HARNESS DELIMITER CORRECTION — GROK SOURCE ONLY
 
-Active bounded authorization: [evidence correction 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_EVIDENCE_CORRECTION_01.md).
-Hermes alone may correct one documentation path; no source edit, execution, or
-integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+Active bounded authorization: [harness delimiter correction 05](../docs/handoff/GROK_BUILD_BBD_WAL_009_HARNESS_DELIMITER_05.md).
+Grok alone may append the missing closing delimiter in zec/test_support.rs. No
+other source edit, execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
 still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [initial-red rejection](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-EXPECTED-RED-01-REJECTION.md).
+Latest review: [evidence correction review and errata](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md).
 The six-test source remains accepted. The execution hit an unrelated unclosed
 delimiter before any test ran, and the actor altered/repeated the command.
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
