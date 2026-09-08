@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A3 SIGN/VERIFY CORRECTION AUTHORIZED — GROK BUILD HIGH ONLY
+State: WAL-009 PHASE A3 GROK CORRECTION 01 REJECTED — NO ACTOR AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Sr Dev — Grok Build, High
+Authorized source actor: none
 
 Authorized integration actor: none
 
@@ -14,8 +14,8 @@ Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Active handoff:
-[GROK_BUILD_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_CORRECTION_01.md](GROK_BUILD_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_CORRECTION_01.md)
+Current review:
+[BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -29,11 +29,11 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Sol hit its usage limit with an incomplete seven-path drop containing rejected
-test-shaped shortcuts. Grok Build High alone may correct or replace those seven paths
-without execution or Git. The unrelated package manifest/lock changes are protected
-concurrent work and remain outside WAL-009. Broadcast/network, real hardware, Electron
-methods, mainnet, dependencies, and all Monero work remain closed.
+Grok completed Correction 01. Static review rejects the drop for fabricated wipe
+observations, copied effect metadata, disconnected native confirmation, error-path
+cleanup gaps, and an undeclared dependency. All changes are preserved. No execution,
+integration, or further source actor is authorized. Unrelated package changes remain
+protected concurrent work. See the current review for bounded follow-up requirements.
 
 ## Historical record (superseded by the active state above)
 
