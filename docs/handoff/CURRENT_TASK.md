@@ -39,7 +39,9 @@ No test/compiler/formatter, native window launch, evidence, Git, integration,
 dependency change, or other source edit is authorized to Grok. After source review,
 Hermes will receive grouped widget green/falsifications, native regressions, and
 compilation. Real native-window/owning-thread/capability integration remains separate.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization 21cefbc4 with CLI grok-4.6,
+reasoning High, session 025c4563-cfb2-444f-8885-575bfdc4266a, outer terminal 98275.
+No completion collected. Do not launch again or poll; collect after owner done.
 
 Reviewer publication scope: CURRENT_TASK.md, ticket, active Grok handoff, and
 linked reviewer decision only. No actor polling; collect after done/explicit
