@@ -46,7 +46,10 @@ prerequisite stop: six compile errors and one warning, zero tests executed. The
 missing native dialog contract was observed alongside five unrelated errors.
 Its evidence misattributes runtime, invents test names, and truncates required
 hashes/diagnostics; correction is required before integration. Only the linked
-one-file evidence correction is authorized; it has not yet been launched.
+one-file evidence correction is authorized. It was launched from `09cc3d5b`, outer
+terminal session 6932, with the current Hermes session ID supplied to the actor.
+No completion has been collected. Leave this run alone until the owner reports
+done; do not poll or launch a duplicate.
 Do not collect or relaunch any completed run.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
