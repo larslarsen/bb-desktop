@@ -2,20 +2,22 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 LOCK EVIDENCE CORRECTION — HERMES DOCUMENTATION ONLY
+State: WAL-009 LOCK SYNC ACCEPTED — A3 BLOCKED; NO ACTOR AUTHORIZED
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none
 
-Authorized integration actor: Hermes; one evidence file only, no execution or Git integration
+Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Active handoff:
-[HERMES_BBD_WAL_009_LOCK_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_LOCK_EVIDENCE_CORRECTION_01.md)
+Active handoff: none. The lock evidence correction is complete and closed.
+
+Latest acceptance:
+[BBD-WAL-009-LOCK-SYNC-01-REVIEW.md](../testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md)
 
 Current review:
 [BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
@@ -35,10 +37,12 @@ Parked Monero predecessor:
 Correction 02's transaction buffer ownership repair is source-accepted in
 [BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md](../testing/BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md).
 Hermes completed offline lock synchronization with exactly one root dependency added
-and no version changes. Reviewer inspection confirms the diff and resulting hash.
-Only its evidence needs correction: a package-lock hash typo and unsupported runtime
-model attribution. Hermes may correct that one document without repeating any gate.
-The remaining A3 blockers stay open; all other pending work is preserved.
+and no version changes. The diff and corrected evidence are accepted; lockfile and
+evidence remain uncommitted for later Hermes integration. No further execution is
+authorized. Actual-secret cleanup observations, independent transaction-effect
+verification, and the native confirmation event path remain A3 blockers. The next
+UI slice requires a reviewer-fixed event/lifetime contract and real-input regression
+tests before production repair. All pending work is preserved.
 
 ## Historical record (superseded by the active state above)
 

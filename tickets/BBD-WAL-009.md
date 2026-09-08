@@ -1,6 +1,10 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: LOCK EVIDENCE CORRECTION — HERMES DOCUMENTATION ONLY
+Status: LOCK SYNC ACCEPTED — A3 BLOCKED; NO ACTOR AUTHORIZED
+
+Latest review: [lock synchronization acceptance](../docs/testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md).
+Lockfile/evidence integration remains deferred. Cleanup observations, independent
+transaction-effect verification, and native confirmation remain unresolved.
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
