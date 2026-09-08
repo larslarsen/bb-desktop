@@ -1,23 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE REVIEW VALIDATION 01 — HERMES
+Status: NATIVE APP/LAYOUT TEST SOURCE 01 — GROK BUILD
 
-Active authorization: [native review validation 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md).
-The [native review production source review](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PRODUCTION-01-SOURCE-REVIEW.md)
-accepts Grok High's one-file immutable dialog/synchronous native runner for
-execution. The six pre-existing real-widget tests and native.rs are unchanged;
-all twenty-one other pending identities remain frozen.
+Active authorization: [native App/layout tests 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md).
+The [native widget validation acceptance](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
+accepts six original/restored widget passes, both intended falsification failures,
+seventeen native-surface passes, and native compilation. All source is restored.
+Hermes report/procedural errata are recorded without repeating successful gates
+or opening a correction-only cycle; evidence remains unintegrated.
 
-Hermes alone may run widget green, the exact Confirm and close-priority
-falsifications with complete restoration, restored widget green, all seventeen
-native-surface regressions, and native compilation. Each command once, in
-background with full capture. Write the one named evidence record and stop;
-no compiler/source repair, extra commands, Git mutation, or integration.
+Grok Build 4.6 High alone may author four tests for longer review layout and the
+actual eframe App callback lifecycle in a new private module, plus its cfg(test)
+declaration. All existing production and tests are frozen. No test execution,
+production repair, evidence, Git, or integration is authorized to Grok.
 
-Retained-spend/clock/signature-context results remain accepted without expensive
-repetition. Actual native-window layout/lifecycle, owning-thread/capability
-integration, independently recovered effects, actual-secret cleanup, and remaining
-security stay unaccepted. Reviewer remains XHigh; launch once, no actor polling.
+Retained-spend/clock/signature-context results remain accepted. Actual OS/native
+window and capability integration, independently recovered effects, actual-secret
+cleanup, and remaining security remain unaccepted. Reviewer remains XHigh;
+launch once and collect after done, without actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

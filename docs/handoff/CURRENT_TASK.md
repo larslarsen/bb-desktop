@@ -1,54 +1,55 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 NATIVE REVIEW VALIDATION 01 — HERMES
+State: WAL-009 NATIVE APP/LAYOUT TEST SOURCE 01 — GROK BUILD
 Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
-Authorized integration actors: none
+Authorized source actor: Grok Build 4.6 High, tests only
+Authorized execution/evidence/integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_VALIDATION_01.md)
-Reviewer decision: [native review production source review](../testing/BBD-WAL-009-NATIVE-REVIEW-PRODUCTION-01-SOURCE-REVIEW.md)
+Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md)
+Reviewer decision: [native widget validation acceptance](../testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
 Read this prefix and linked records; no historical handoff reload.
 
-Grok session 025c4563-cfb2-444f-8885-575bfdc4266a, outer 98275, was collected once
-after done, exit 0; runtime grok-4.6-build High. The one-file native confirmation
-dialog/runner drop is accepted for validation. native_ui.rs is 303 lines,
-c6d5fc3a4dee46f4700f2a3ae5866a5003746eab5aa6dd6bc20e5ba5c6d726b4.
-All twenty-one other pending source/package/lock/evidence identities are unchanged.
-The reviewer compared the exact saved 201-line baseline to the actual final file.
-Read-only inspection scope deviations are recorded without another source cycle.
+Hermes outer 29799 was collected once after done, exit 0. Completed session
+20260908_132224_391188, Hermes 0.18.2, nous, poolside/laguna-s-2.1:free.
+All six required outcomes are accepted: original six widget tests passed;
+Confirm and close-priority mutations failed at the intended assertions; restored
+six widget tests passed; all seventeen native-surface tests passed; native
+compilation passed. Both mutations are restored and all 23 frozen identities match.
+No extra Cargo/npm command or Git mutation occurred.
 
-Hermes alone may run six ordered commands: six widget tests green; Confirm
-transition falsification; same-frame close precedence falsification; restored
-six widget tests green; seventeen native-surface regressions; native compilation.
-The two exact temporary native_ui.rs mutations have measured hashes and mandatory
-complete restoration on every outcome. Tests and all other source are frozen.
-Each Cargo command launches once in background; capture its full output and exit.
-No rerun, compiler repair, extra probes/tests, Git mutation, or integration.
-Write only docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01.md and stop.
-Launch status: launched once from authorization aada9adb via hermes -z with
---pass-session-id, outer terminal 29799. Runtime session ID will be recorded from
-that invocation on collection. No completion collected; do not relaunch or poll.
+The actor's report gives the wrong model/session/lineage and falsely claims full
+background/capture compliance. The linked review records exact saved result IDs,
+actual foreground execution for stages 2-6, and report errata. Required outcomes
+remain valid. No repeat of passing tests or correction-only actor cycle. The new
+503-line native validation evidence remains pending at SHA-256
+3a734781d0ad2c31989318373272f13ba89654ded2ab3a6b90f83ea322821de1;
+its local paths and errata must be corrected with later authorized integration.
 
-The dialog owns the complete review, confirms once, makes close/Escape/Cancel
-win over a same-frame click, and uses a synchronous run_and_return native loop.
-Actual widget outcomes remain unverified until this execution is reviewed.
-Real-window layout/platform lifecycle, owning-thread use, and capability-bridge
-integration still need a separate native gate; no OS smoke claim from widgets.
+Next, Grok authors four tests in new native_ui/zec_native_app_tests.rs and appends
+ONLY its cfg(test) module declaration to native_ui.rs. Existing production is
+303 lines, c6d5fc3a4dee46f4700f2a3ae5866a5003746eab5aa6dd6bc20e5ba5c6d726b4;
+all production bytes and the six existing tests are frozen. Cover longer review
+values at native/constrained sizes and the actual eframe App callback's one-shot
+close, confirmation preservation, and simultaneous-close denial. Use actual
+rendered widgets/events and pinned Frame::_new_kittest, not approval injection.
+No production repair, compiler/test/formatter, evidence, Git, or integration.
+Launch status: authorization prepared; launch once after governance commit.
 
-Retained-spend/clock/signature-context validation remains accepted, including
-three intended falsification failures and restored six-test library green.
-No repeat of those expensive suites or prior evidence-only correction cycle.
-Full independent recovered effects, actual-secret cleanup, remaining security,
-integration, mainnet, network, broadcast, real hardware, and Monero remain
-unaccepted or parked. All pending developer source/package/locks and seven prior
-evidence records remain uncommitted; this does not open broader WAL-009 acceptance.
+The six accepted dialog tests do not prove layout with longer fields or the
+App callback's programmatic-close behavior. The new tests address those gaps.
+Actual OS window/platform/owning-thread/capability integration still requires its
+separate gate. No OS acceptance is claimed from synthetic egui callback tests.
+Retained-spend/clock/signature-context gates remain accepted without expensive
+reruns. Full recovered effects, actual-secret cleanup, remaining security,
+integration, mainnet, network, broadcast, hardware, and Monero remain unaccepted
+or parked. Pending developer source/package/locks and eight evidence records
+remain uncommitted. No broader WAL-009 acceptance.
 
-Reviewer publication scope: CURRENT_TASK.md, ticket, active Hermes handoff, and
-linked source review only. No actor polling; collect after done/explicit
+Reviewer publication scope: CURRENT_TASK.md, ticket, active Grok handoff, and
+linked reviewer decision only. No actor polling; collect after done/explicit
 collection. XHigh remains appropriate; no reasoning change is needed.
 
 ## Historical record (superseded by the active state above)
