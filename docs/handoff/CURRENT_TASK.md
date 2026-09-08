@@ -52,8 +52,10 @@ module and append only the specified cfg(test) declaration and state-root access
 to spend.rs and test_support.rs. All existing production prefixes stay unchanged.
 No compiler repair, production implementation, execution, or integration is open.
 
-Launch status: authorized but not yet launched. Check the later launch checkpoint
-before starting an actor; never duplicate a recorded active run.
+Launch status: Grok was launched from governance commit `0e2125b7`, CLI model
+`grok-4.6`, reasoning High, session `489bf072-2e08-49ad-a3ac-aa6154f1925c`,
+outer terminal session 88665. No completion has been collected. Leave this run
+alone until the owner reports done; do not poll or launch a duplicate.
 
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection. The owner also asks
