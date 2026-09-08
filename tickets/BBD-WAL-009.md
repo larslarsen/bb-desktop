@@ -1,22 +1,21 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLOCK-READ ORACLE CORRECTION 01 — GROK HIGH
+Status: RETAINED-SPEND VALIDATION RESUME 01 — HERMES
 
-Active authorization: [one-path Grok test correction](../docs/handoff/GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md).
-The completed diagnostic run passed both metadata tests, all 11 prepare tests,
-and 13 of 14 sign/verify tests, including both repaired signing routes. The remaining
-failure demands exactly one clock read although the valid path rechecks before
-publication. Require a positive read count and preserve exact expiry outcomes.
+Active authorization: [focused Hermes resume](../docs/handoff/HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md).
+The [clock-read oracle source review](../docs/testing/BBD-WAL-009-CLOCK-READ-ORACLE-SOURCE-REVIEW-01.md)
+accepts the one-test assertion correction; production and exact deadline outcomes
+are unchanged. Hermes runs corrected test green, three isolated falsifications,
+and restored library green, each command once in background with full capture.
 
-The [validation stop review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-VALIDATION-STOP-REVIEW.md)
-records Hermes's prohibited reruns and report omissions. All source identities
-are unchanged; no falsification was reached. Execution compliance and full
-validation remain unaccepted. Evidence corrections will be grouped with the next
-focused execution; no whole integration-suite rerun for this test-only change.
+The same task corrects the prior incomplete report from named saved results.
+Reuse its verified metadata/prepare/other sign-verify passes with all execution
+deviations disclosed. No whole integration repeat for this assertion-only change.
+Temporary mutations must be restored on every outcome. No production repair,
+other tests, integration, or Git mutation is authorized.
 
-Production, execution, integration, and all other source/test paths are frozen.
-Full recovered effects, actual cleanup, native confirmation, and remaining
-security are separate blockers. No polling; reviewer remains XHigh.
+Full recovered effects, actual-secret cleanup, native confirmation, and remaining
+security stay unaccepted. Reviewer remains XHigh; no actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

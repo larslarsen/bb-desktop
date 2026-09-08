@@ -1,47 +1,47 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 CLOCK-READ ORACLE CORRECTION 01 — GROK HIGH
+State: WAL-009 RETAINED-SPEND VALIDATION RESUME 01 — HERMES
 Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actor: Grok Build, CLI grok-4.6, High; one test path only
-Authorized execution/evidence/integration actors: none
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md](GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md)
-Reviewer checkpoint: [validation stop review](../testing/BBD-WAL-009-RETAINED-SPEND-VALIDATION-STOP-REVIEW.md)
-Read this leading section and those two linked records; no historical reload.
+Active handoff: [HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md](HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md)
+Reviewer checkpoint: [clock-read oracle source review](../testing/BBD-WAL-009-CLOCK-READ-ORACLE-SOURCE-REVIEW-01.md)
+Read this prefix and linked records; no historical handoff reload.
 
-Hermes outer 53836 was collected once after done, exit 0. Completed session
-20260908_102051_01693b, v0.18.2, nous, poolside/laguna-s-2.1:free.
-The two new metadata tests passed. The completed integration execution has prepare
-11 passed and sign/verify 13 passed/one failed; both repaired signing paths passed.
-No mutation was reached and all twenty original identities still match.
+Grok session 96a173e5-b8d4-464c-8230-b02bac98b9d7, outer 1158, was collected
+once after done, exit 0. Runtime grok-4.6-build High. The exact one-assertion-plus-
+comment correction is accepted: require >= 1 post-sign clock read, preserving
+all deadline outcomes. Final test: 1118 lines,
+7a481d3a954a92e04d324be047863a824ecf303bfd6232be70e9d13d3a295987.
+All twenty other pending identities, including production, remain unchanged.
 
-The sole failure is the test's exact-one clock-read assertion: the still-valid
-pre-expiry case checks at its barrier and again before publication. Production
-expiry enforcement remains intact. Grok may change only that assertion to require
-at least one read, retaining all exact deadline outcomes and other checks.
-Baseline zec_sign_verify.rs: 1117 lines, 2b759017... (full hash in handoff).
+Hermes may run five ordered commands: corrected cancellation/expiry green;
+actual exact-expiry guard falsification; retained-index falsification;
+witness-count falsification; restored full library green. Three isolated
+mutations require measured exact hashes and restoration on every outcome.
+All Cargo commands start once in background; wait only on the returned process
+and retrieve its full log. No reruns, pipes, process kills, or global discovery.
+Do not repeat the expensive whole integration suite for this test-only correction.
 
-Hermes violated the no-repeat rule: initial timeout, a piped rerun it killed, and
-an exact background rerun. Completed result 77956 and full saved log 77962 were
-verified. Execution compliance and evidence-completeness claims are rejected;
-use the stop review's authoritative errata. New report: 287 lines,
-7bd3f2f915b7f4f41c00f942e98e56d0677a8776828a93a3e78351ba63b3a4d9.
-No evidence-only correction actor. Next Hermes task will combine focused corrected
-test green, unfinished falsifications/library green, and evidence corrections.
-It must start each long command once in background and collect its full log.
-Do not repeat the entire expensive integration suite for an assertion-only change.
+The same task writes a new resume record and corrects the prior retained-spend
+record using exact named saved messages. Prior metadata 2-pass, prepare 11-pass,
+and other sign/verify 13-pass results are retained with execution deviations
+and report errata disclosed. Prior integration never achieved a full pass.
+Current focused/falsification/library results remain pending.
 
-Launch status: Grok launched once from `8d02e3c2`, CLI grok-4.6 High, session
-`96a173e5-b8d4-464c-8230-b02bac98b9d7`, outer terminal 1158. No completion
-collected. No duplicate actor or polling; collect only after done or explicit
-collection. XHigh remains appropriate; pause if it needs changing.
+Launch status: authorized; not yet launched. Launch once and checkpoint here.
+No actor polling or duplicate launch. Collect only after done/explicit collection.
+XHigh remains appropriate; pause if it needs changing.
 
-Pending source/package/locks and six evidence records remain uncommitted. Full
-recovered effects, actual-secret cleanup, native confirmation, security gates,
-integration, mainnet, network, broadcast, Monero, and broader work remain pending.
+Pending developer source/package/locks and six evidence records remain uncommitted.
+Full recovered effects, actual-secret cleanup, native confirmation, remaining
+security, integration, mainnet, network, broadcast, Monero, and broader work remain
+outside this execution authorization.
 
 ## Historical record (superseded by the active state above)
 
