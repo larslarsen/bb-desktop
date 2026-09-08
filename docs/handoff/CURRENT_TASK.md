@@ -27,9 +27,19 @@ was collected once. Session `20260907_212200_134a07` is complete, and its comman
 result correction is accepted with the authoritative errata in the current review.
 The original run `20260907_211536_310238` remains rejected; zero tests ran.
 Do not collect or launch either completed Hermes run again. Only the linked Grok
-delimiter correction is open. Grok was launched from `405c789b`, outer terminal
-session 31456, Grok session `de833145-1f35-43e8-8574-c3f3b2aac178`. No completion
-has been collected. Leave this run alone until the owner reports done.
+delimiter correction is open. The owner reported the first Grok launch done;
+outer session 31456 was collected once and returned exit 1 before source editing:
+the reviewer-supplied CLI model ID `grok-4.6-build` was unknown. The source remains
+4358 lines at starting SHA-256
+`21489e5cda159d670fbdd3b96b196bb0e40f8227fa8770a80b6bd7a3e1c23d83`.
+This was a reviewer launch-configuration error, not an implementation failure or
+reason to escalate developers. The CLI catalog lists `grok-4.6` as the default
+supported ID (it also emitted settings-fetch warnings).
+
+Corrected launch: CLI model `grok-4.6`, reasoning High, launched from `cf812d54`
+under the unchanged `405c789b` source authorization; outer terminal session 76020,
+Grok session `4bd9f31f-a5c1-46aa-8434-083989349b06`. No completion has been
+collected for this corrected launch. Leave it alone until the owner reports done.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
