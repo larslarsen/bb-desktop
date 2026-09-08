@@ -12,15 +12,11 @@ Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md](GROK_BUILD_BBD_W
 Reviewer decision: [native widget validation acceptance](../testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
 Read this prefix and linked records; no historical handoff reload.
 
-Owner priority change: visible product progress now takes precedence over opening
-further internal slices. The owner challenged the prolonged review/test cycle and
-lack of a usable result. The already launched bounded Grok task may finish; do
-not poll it. After collection, make a runnable synthetic-data native confirmation
-demo the next milestone, with an actual screenshot, exact launch command, and a
-plain statement of implemented versus missing behavior. Prepare only the minimal
-source/execution handoffs needed for that demonstration. Do not automatically
-open another backend/test-only slice first. Existing security acceptance limits
-remain in force; a demo is not authorization of live signing or sending.
+Owner clarification: the owner asked for an honest assessment of churn and why
+wallet integration is taking so long, not a new demo milestone. The reviewer
+withdraws that inferred priority change. Existing bounded authorization remains
+in effect. Reduce avoidable handoffs/report-only cycles and explain the actual
+remaining integration work without changing product priorities by inference.
 
 The recent pushed checkpoint commits contain reviewer governance. The pending
 wallet implementation is uncommitted and is not integrated into a usable send
