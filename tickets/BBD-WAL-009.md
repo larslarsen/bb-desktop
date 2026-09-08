@@ -1,24 +1,24 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PREREQUISITE STOP REVIEWED — AWAITING REVIEWER XHIGH
+Status: XHIGH SCOPING COMPLETE — HERMES EVIDENCE CORRECTION ONLY
 
-Active actor authorization: none. The [prerequisite check 02 review](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
-records a valid single-command stop, mixed compile blockers, evidence defects, and
-the owner's requested reasoning-level checkpoint. No source edit, execution, or
-integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+Active actor authorization: [Hermes prerequisite evidence correction](../docs/handoff/HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md),
+one documentation path only. The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
+fixes the next signature-context design and required tests. No source edit,
+execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
 still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [prerequisite check 02](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md).
+Latest review: [XHigh scoping](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md).
 The six-test source remains accepted. The earlier rejected execution hit an unrelated
 unclosed delimiter before any test ran, and the actor altered/repeated the command.
 The exact delimiter repair is source-accepted. A fresh exact check observed the
 missing native dialog contract plus five unrelated errors and one warning; zero
-tests ran. The resulting evidence needs correction before integration. Reviewer
-repair scoping pauses for XHigh under the owner's reasoning-level preference.
+tests ran. The resulting evidence needs correction before integration. The owner
+resumed XHigh review; signature-context tests and source need separate later handoffs.
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
 transaction-effect verification, and native confirmation remain unresolved.
 
-Reviewer: Lead Engineer/Reviewer — Codex at High
+Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
 Completed test-source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High).
 That completed test phase used the then-reported Grok usage exhaustion as its fill-in

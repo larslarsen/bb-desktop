@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PREREQUISITE STOP REVIEWED — AWAITING REVIEWER XHIGH
+State: WAL-009 XHIGH SCOPING COMPLETE — HERMES EVIDENCE CORRECTION ONLY
 
-Reviewer: Lead Engineer/Reviewer — Codex at High
+Reviewer: Lead Engineer/Reviewer — Codex at XHigh (owner resumed)
 
 Authorized source actor: none; Grok's exact delimiter source drop is accepted
 
 Authorized execution actor: none; prerequisite check 02 is complete
 
-Authorized evidence actor: none; prerequisite evidence needs correction before integration
+Authorized evidence actor: Hermes Jr Dev; prerequisite-02 evidence correction, one path only
 
 Authorized integration actor: none
 
@@ -18,10 +18,11 @@ Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Active handoff: none.
+Active handoff:
+[HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md)
 
 Reviewer checkpoint:
-[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
+[BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md](../testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
 
 Context-reset checkpoint: read this leading section and the reviewer checkpoint, not
 the historical log. The owner reported Hermes correction done; outer session 98069
@@ -44,21 +45,24 @@ poolside/laguna-s-2.1:free. Its exact one-command execution is accepted as a val
 prerequisite stop: six compile errors and one warning, zero tests executed. The
 missing native dialog contract was observed alongside five unrelated errors.
 Its evidence misattributes runtime, invents test names, and truncates required
-hashes/diagnostics; correction is required before integration. No actor is active
-or authorized. Do not collect or relaunch any completed run.
+hashes/diagnostics; correction is required before integration. Only the linked
+one-file evidence correction is authorized; it has not yet been launched.
+Do not collect or relaunch any completed run.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
-level. High completed the bounded audit. Pause now for the owner to switch the
-reviewer to XHigh before scoping the signature-hash authorization-context and
-proof/recipient repairs under the native authority and test-oracle constraints.
-At resume, bound evidence correction separately; source and execution remain closed.
+level. The owner switched the reviewer to XHigh. Static scoping now fixes a private
+typed verification view that preserves the pinned signature_hash call and moves
+decoded data without cloning, while rejecting every present transparent bundle.
+The source review also bounds the remaining mechanical fixes and requires a
+separate test-first signature-context handoff. No source edit or execution is open.
+Evidence correction is separate and must recover original full data mechanically.
 
 Latest acceptance:
 [BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
 
 Current review:
-[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
+[BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md](../testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -86,7 +90,7 @@ evidence-correction review's errata at later integration. The missing impl delim
 is now source-accepted. Prerequisite check 02 observed the missing dialog contract,
 Context::run incompatibility, four other compile errors, and one warning. All source
 bytes are frozen. Native/signing production repair, further execution, and integration
-are unauthorized pending the XHigh reviewer checkpoint.
+are unauthorized. XHigh scoping is recorded; only the evidence correction is open.
 The fixed modal contract and later falsifications remain required. All pending work
 is preserved. Grok is available again; Sol remains usage-exhausted.
 
