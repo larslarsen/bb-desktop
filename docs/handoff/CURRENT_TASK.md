@@ -20,6 +20,9 @@ Active handoff:
 Context-reset checkpoint: read this leading section and the active handoff, not
 the historical log. Collect the current Grok run once only when the owner reports
 done; do not poll or cancel it. Review the test-only drop before any Hermes run.
+Grok launched from governance commit `33de1fb2`; outer terminal session `27099`.
+If a new context cannot attach to that terminal session, inspect the two authorized
+files and the saved actor completion report; do not launch a duplicate actor.
 
 Latest acceptance:
 [BBD-WAL-009-LOCK-SYNC-01-REVIEW.md](../testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md)
