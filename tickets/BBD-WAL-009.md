@@ -1,30 +1,30 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT FALSIFICATION ORDER 01 ONLY — GROK HIGH
+Status: SIGNATURE-CONTEXT VALIDATION 01 ONLY — HERMES
 
-Active actor authorization: [Grok falsification order 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_FALSIFICATION_ORDER_01.md).
-Only one existing assertion in verification_context_tests.rs may move. Place its
-message-to-PCZT equality after the real valid spend/binding checks so deliberate
-message corruption reaches the required signature-positive failure. All other
-source/test bytes, dependencies, native work, execution, evidence, and integration
-remain frozen.
+Active actor authorization: [Hermes validation 01](../docs/handoff/HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md).
+At most six ordered test commands: focused green, transparent-rejection failure,
+two message-corruption failures, and restored-source integration/library tests.
+Only the exact temporary falsification replacements are permitted. Source/test
+design, permanent repairs, dependencies, native work, and integration stay closed.
 
-Latest review: [signature-context production 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-PRODUCTION-01-REVIEW.md).
-The one-file private context and actual verifier wiring are source-accepted.
-Reversing the saved edits reconstructs the full starting hash; all sixteen other
-pending file identities are unchanged. No compiler or test result is claimed.
-The test-order finding narrows earlier test-source acceptance; required
-falsification readiness still needs the bounded correction and execution.
+Latest review: [falsification order 01 acceptance](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md).
+The one-assertion move matches its proposed full-file identity. Actual signature
+positive controls now precede the signature test's PCZT equality. All sixteen
+other pending identities are unchanged. Mechanical prerequisites, the private
+context/actual verifier wiring, and this test correction are source-accepted;
+compilation and behavior remain unproved.
 
-The [understood mixed red](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md)
-preceded the mechanical/context repairs. After this correction's source review,
-Hermes must prove focused green, falsify transparent rejection and the computed
-message with exact restoration, and run the reserved broader regressions.
-The original private interface and independent PCZT oracle remain unchanged.
+The handoff freezes seventeen starting identities, exact mutation/restoration
+hashes, required assertion sites, complete result capture, and stop conditions.
+Every stage requires the preceding expected result. After a stop, restore any
+active recognized mutation, record the actual limitation and remaining stages,
+and stop. No earlier actor or absent-interface red rerun is authorized.
 
-Actual-secret cleanup, independent transaction-effect recovery, and native
-confirmation remain A3 blockers. Evidence errata/normalization and developer
-source/lock integration stay deferred.
+The new validation evidence remains uncommitted. Prior evidence errata and local
+prose-path normalization require later explicit Hermes integration. Independent
+transaction-effect recovery, actual-secret cleanup, and native confirmation
+remain A3 blockers; this adapter validation does not resolve them.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 SIGNATURE-CONTEXT FALSIFICATION ORDER 01 ONLY — GROK HIGH
+State: WAL-009 SIGNATURE-CONTEXT VALIDATION 01 ONLY — HERMES
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh (owner resumed)
 
-Authorized source actor: Grok Build, CLI model `grok-4.6`, reasoning High
+Authorized source actor: none; all Grok signature-context source tasks are complete
 
-Authorized execution actor: none
+Authorized execution actor: Hermes Jr Dev, active handoff only
 
-Authorized evidence actor: none
+Authorized evidence actor: Hermes Jr Dev, one new uncommitted validation record only
 
 Authorized integration actor: none
 
@@ -19,60 +19,54 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_FALSIFICATION_ORDER_01.md](GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_FALSIFICATION_ORDER_01.md)
+[HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md](HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_01.md)
 
 Reviewer checkpoint:
-[BBD-WAL-009-SIGNATURE-CONTEXT-PRODUCTION-01-REVIEW.md](../testing/BBD-WAL-009-SIGNATURE-CONTEXT-PRODUCTION-01-REVIEW.md)
+[BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md](../testing/BBD-WAL-009-SIGNATURE-CONTEXT-FALSIFICATION-ORDER-01-REVIEW.md)
 
 Context-reset checkpoint: read only this leading section, the active handoff, and
-the reviewer checkpoint. Do not reload historical content.
+reviewer checkpoint. No historical log or prior execution permission is active.
 
-The owner reported Grok done. Outer 64906 was collected once, exit 0. Session
-`d80b2875-cb42-4d53-8b97-926fb3a1026e`, authorized at `99d7a437`, reports
-grok-4.6-build, high. Its exact one-file production drop is source-accepted.
-The private context preserves the decoded authorized shielded data, rejects every
-present transparent bundle, and computes the pinned message. The actual verifier
-uses that same context for signatures/proof and retains existing checks/errors.
-No compiler/tests ran. Do not recollect that completed actor.
+The owner reported Grok done. Outer 96396 was collected once, exit 0. Session
+`b1a63fe8-d204-4f7e-9af0-201648a936be`, authorized at `94875511`, runtime
+grok-4.6-build, high, completed exactly the single assertion move. Its full test
+file matches the proposed identity; reversing that move reconstructs the preceding
+full hash. All sixteen other pending identities are unchanged. Source is accepted;
+no compiler or tests ran. Do not recollect this or any earlier completed actor.
 
-One test-order finding must be corrected before Hermes validation: the signature
-test currently compares its message to the PCZT oracle before real signature
-checks. Deliberate message corruption would stop at that equality and miss the
-required valid-signature falsification. Grok may move only that existing equality
-after the actual valid spend/binding controls. All other bytes stay frozen.
-
-Writable baseline: verification_context_tests.rs, 528 lines, SHA-256
-`78e7fe50c3bd213f8d0067957bf1771bd42137d46b9e0e8e7adbcb50d8330dec`.
-Expected reordered identity: 528 lines, SHA-256
-`45f3bdf2f1d08924d53c298517c631427ab052c2d4955b31e98aa555386d380a`.
+Hermes may run at most six sequential commands: focused four-test green,
+transparent-rejection falsification, two message-corruption falsifications, then
+restored-source zec_prepare/zec_sign_verify and full library regressions. The exact
+two temporary replacements, mutated hashes, required assertion failures,
+restorations, and first-unexpected-result stop are frozen in the handoff.
+No permanent source/test change, formatting, dependency operation, or Git mutation.
 
 Frozen spend.rs: 929 lines, SHA-256
 `bd51b3d0ee2f748fa31e483a2747c157ff20544aa62e3e00a7929c77060b7361`.
+Frozen verification_context_tests.rs: 528 lines, SHA-256
+`45f3bdf2f1d08924d53c298517c631427ab052c2d4955b31e98aa555386d380a`.
 Frozen test_support.rs: 4371 lines, SHA-256
 `fea8f65ed6637033506902688c8f547952cea848af51d05a49969cae81f48920`.
+All seventeen full starting identities are in the handoff and must be restored.
 
-Launch status: Grok launched from governance commit `94875511`, CLI model
-`grok-4.6`, reasoning High, session `b1a63fe8-d204-4f7e-9af0-201648a936be`,
-outer terminal session 96396. No completion has been collected. Leave it alone
-until the owner reports done; do not poll or launch a duplicate.
+Launch status: authorized, not yet launched. Record the single Hermes outer
+session after committing this handoff. No duplicate actor.
 
 The owner forbids polling. Collect only after the owner reports done or requests
 collection. Pause if reviewer work needs a different reasoning level; XHigh remains
-appropriate for continuing review. Grok uses High.
+appropriate. Record actual Hermes version/provider/model rather than adoption data.
 
-The prior mixed expected-red stop is understood: five compile errors, one warning,
-zero executed tests. Mechanical prerequisites and the production context are now
-source-accepted. After this test correction's review, freeze Hermes focused green,
-transparent/message falsifications with restoration, and broader regressions.
-No earlier actor or absent-interface red is to be resumed or repeated.
+New evidence path: docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01.md.
+Generate it from actual saved tool data, with complete results, counts, mutations/
+restorations, full before/after identities, and unrun stages. Keep it uncommitted.
+Prior evidence errata and local prose-path normalization stay deferred to explicit
+later Hermes integration. All developer source/package/lock changes remain pending.
 
-All pending developer source/package/lock changes and four implementation evidence
-records remain uncommitted. Earlier evidence errata and local prose-path
-normalization remain required in a later explicit Hermes integration handoff.
-Independent recovered effects, actual-secret cleanup observations, and native
-modal/capability behavior remain A3 blockers. Metadata-copy comparisons and
-synthetic wipe counters remain unaccepted. Native work, Monero, mainnet, broadcast,
-network, and wider work stay parked. Grok is available; Sol remains usage-exhausted.
+Independent recovered effects, actual-secret cleanup, and native confirmation
+remain A3 blockers. Metadata-copy comparisons and synthetic wipe counters remain
+unaccepted even if this validation passes. Native, security, mainnet, broadcast,
+Monero, network, and wider gates remain separately pending. No earlier actor or
+absent-interface red is to be resumed or repeated.
 
 ## Historical record (superseded by the active state above)
 
