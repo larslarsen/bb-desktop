@@ -2,13 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 NATIVE REVIEW TEST SOURCE ACCEPTED — HERMES INITIAL RED ONLY
+State: WAL-009 INITIAL RED REJECTED — HERMES EVIDENCE CORRECTION ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none; Grok's two-path test-only drop is source-accepted
 
-Authorized execution actor: Hermes Jr Dev; one initial-red command and evidence only
+Authorized execution actor: none
+
+Authorized evidence actor: Hermes Jr Dev; one documentation path only
 
 Authorized integration actor: none
 
@@ -17,20 +19,23 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md)
+[HERMES_BBD_WAL_009_NATIVE_REVIEW_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_EVIDENCE_CORRECTION_01.md)
 
 Context-reset checkpoint: read this leading section and the active handoff, not
 the historical log. The owner confirmed Grok was already done. Its saved completion
 report and source were reviewed; do not collect or launch Grok again. Outer session
 27099 was unavailable; the saved Grok session was
-`01a07f2e-f45a-78e2-8f05-7526ce1f62dd`. Hermes has not yet been launched for this
-handoff. Source repair and integration are closed pending initial-red evidence review.
+`01a07f2e-f45a-78e2-8f05-7526ce1f62dd`. Hermes initial-red session
+`20260907_211536_310238` (outer 24886) is complete and rejected: it altered and
+repeated the command, then inaccurately reported exact compliance. Both invocations
+hit an unclosed SignVerifyHarness delimiter before any tests ran. Only the linked
+evidence correction is open. Source repair, execution, and integration are closed.
 
 Latest acceptance:
 [BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md)
 
 Current review:
-[BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
+[BBD-WAL-009-NATIVE-REVIEW-EXPECTED-RED-01-REJECTION.md](../testing/BBD-WAL-009-NATIVE-REVIEW-EXPECTED-RED-01-REJECTION.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -51,10 +56,11 @@ and no version changes. The diff and corrected evidence are accepted; lockfile a
 evidence remain uncommitted for later Hermes integration. Actual-secret cleanup
 observations, independent transaction-effect verification, and the native confirmation
 event path remain A3 blockers. Grok's six real-input regressions and private module
-declaration are source-accepted. Hermes alone may run the single initial-red command
-and record evidence under the active handoff. The existing Context::run API failure
-must be classified separately from the missing dialog contract; neither is proof of
-a failed input regression. Production repair and integration remain unauthorized.
+declaration are source-accepted. Hermes's initial-red run is rejected. Its unrelated
+unclosed-delimiter diagnostic is retained only for prerequisite triage; no UI test
+executed. Hermes alone may correct the inaccurate evidence under the active handoff.
+The existing Context::run API failure and missing dialog contract remain unobserved
+by that run. Production repair, further execution, and integration are unauthorized.
 The fixed modal contract and later falsifications remain required. All pending work
 is preserved. Grok is available again; Sol remains usage-exhausted.
 

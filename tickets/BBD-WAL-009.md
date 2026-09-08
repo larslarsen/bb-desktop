@@ -1,13 +1,15 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE REVIEW TEST SOURCE ACCEPTED — HERMES INITIAL RED ONLY
+Status: INITIAL RED REJECTED — HERMES EVIDENCE CORRECTION ONLY
 
-Active bounded authorization: [native review initial red 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md).
-Hermes alone may run its single command and record evidence; no source edit or
+Active bounded authorization: [evidence correction 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_EVIDENCE_CORRECTION_01.md).
+Hermes alone may correct one documentation path; no source edit, execution, or
 integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
 still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [native review test-source acceptance](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md).
+Latest review: [initial-red rejection](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-EXPECTED-RED-01-REJECTION.md).
+The six-test source remains accepted. The execution hit an unrelated unclosed
+delimiter before any test ran, and the actor altered/repeated the command.
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
 transaction-effect verification, and native confirmation remain unresolved.
 
