@@ -29,7 +29,9 @@ complete restoration on every outcome. Tests and all other source are frozen.
 Each Cargo command launches once in background; capture its full output and exit.
 No rerun, compiler repair, extra probes/tests, Git mutation, or integration.
 Write only docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01.md and stop.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization aada9adb via hermes -z with
+--pass-session-id, outer terminal 29799. Runtime session ID will be recorded from
+that invocation on collection. No completion collected; do not relaunch or poll.
 
 The dialog owns the complete review, confirms once, makes close/Escape/Cancel
 win over a same-frame click, and uses a synchronous run_and_return native loop.
