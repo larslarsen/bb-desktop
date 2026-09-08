@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: RETAINED-SPEND REPAIR 02 — GROK HIGH
+Status: RETAINED-SPEND VALIDATION 01 — HERMES
 
-Active authorization: [combined Grok repair 02](../docs/handoff/GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_02.md).
-Repair 01 stopped without edits on a private wire-value field. The reviewer
-verified the public Verifier::with_ironwood route to the parsed spend value;
-repair 02 keeps the original value predicates and four-path scope.
+Active authorization: [grouped Hermes validation](../docs/handoff/HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md).
+Grok repair 02 is accepted for execution in the
+[retained-spend source review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-SOURCE-REVIEW-02.md).
+The four-path tests-first drop retains actual spend identity/value through proving
+and verifies the actual external action index against the retained PCZT.
 
-Latest review: [retained-spend API review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-API-REVIEW.md).
-Author regression extensions first, then preserve actual real-spend identity/value
-through signing/proving and propagate actual shuffled external action indices.
-No dependency edits, test execution, or integration are authorized to Grok.
+Hermes alone may run focused/affected integration green, two exact isolated
+falsifications, and restored library green. Restore mutations on every outcome;
+stop on unexpected results. Record exact runtime and execution evidence.
+No source edits, integration, or Git mutation beyond those temporary controls.
 
-Existing software/external failures provide understood red. Later Hermes must
-run grouped affected tests and falsify witness classification and slot-one binding.
-Prior accepted results remain: context 4 passed and three falsifications failed;
-prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun.
-Full recovered effects, actual cleanup, native confirmation, remaining security,
-and developer integration are pending. No polling; reviewer remains XHigh.
+The accepted decoded context/verifier and its four tests remain unchanged.
+New repair execution is pending. Full recovered effects, actual cleanup, native
+confirmation, remaining security, and integration are separate requirements.
+No polling; reviewer remains XHigh.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

@@ -1,48 +1,46 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-
-State: WAL-009 RETAINED-SPEND REPAIR 02 — GROK HIGH
-
-Reviewer: Codex at XHigh; owner requested fewer handoffs and shorter reports
-Authorized source actor: Grok Build, CLI grok-4.6, High; combined tests-first repair
-Authorized execution/evidence/integration actors: none
+State: WAL-009 RETAINED-SPEND VALIDATION 01 — HERMES
+Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
+Authorized source actors: none; Grok repair 02 is complete
+Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_02.md](GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_02.md)
-Reviewer checkpoint: [retained-spend API review](../testing/BBD-WAL-009-RETAINED-SPEND-API-REVIEW.md)
-Read only this leading section and those two records; no historical reload.
+Active handoff: [HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md](HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md)
+Reviewer checkpoint: [retained-spend source review 02](../testing/BBD-WAL-009-RETAINED-SPEND-SOURCE-REVIEW-02.md)
+Read this leading section and those two linked records; no historical reload.
 
-Repair-01 Grok session 3026df1d-8a5c-4f63-b2a8-0cf1d279e5f4, outer 71820,
-was collected once after done, exit 0. No edits. Its stop exposed an omitted
-reviewer API route: the wire Spend has no value getter. The existing public
-Verifier::with_ironwood role exposes the parsed Spend's actual value. Repair 02
-uses that role by ownership while retaining all positive-real/zero-padding checks.
-No dependency change or model escalation is needed. Repair 01 is closed.
+Grok session d91bf773-249e-4701-9da4-620856c899be, outer 8471, was collected
+once after done, exit 0. Runtime grok-4.6-build High; source drop accepted for
+execution. Tests led production. Four authorized paths changed; all twenty
+pending file identities and the frozen context implementation/tests were verified.
 
-Batch the existing witness-classification and shuffled external-index repairs
-with their test extensions. Writable baselines remain spend.rs (929, bd51b3d0...),
-test_support.rs (4371, fea8f65e...), zec_sign_verify.rs (1115, 80a3a342...),
-plus absent spend/external_binding_tests.rs; verify full hashes in the handoff.
-The accepted context helper/verifier and four context tests stay frozen.
+The repair retains the unsigned real spend's index/key/nullifier/actual value,
+uses the public parsed-PCZT Verifier role by ownership, and rechecks that identity
+and positive-real/zero-padding values after proving. External signing propagates
+and verifies the actual retained action index. The real crypto pipeline remains.
 
-Verified prior execution remains: context 4 passed; three required falsification
-failures; prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun.
-All mutations are restored. No Grok execution or repeat of the old red is allowed.
-Corrected evidence data is accepted with minor report/procedure errata deferred
-as recorded in the prior validation-acceptance review.
+Hermes may run five ordered commands: focused metadata green; prepare/sign-verify
+integration green; isolated slot-zero falsification; isolated witness-count
+falsification; restored full library green. Each mutation must be restored and
+hash-verified on every outcome. Stop on any unexpected result. Only the new
+retained-spend validation evidence record may persist; no source repair or Git
+mutation is authorized. Actual runtime/version and exact outputs must be recorded.
 
-Launch status: Grok launched once from `ab81e291`, CLI grok-4.6 High, session
-`d91bf773-249e-4701-9da4-620856c899be`, outer terminal 8471. No completion
-collected. No duplicate actor or polling; collect only after done or an explicit
-collection request. XHigh remains appropriate; pause if that must change.
+Launch status: authorized; not yet launched. Launch once and checkpoint the
+session here. No duplicate actor or polling. Collect only after done or explicit
+collection. XHigh remains appropriate; pause if it needs changing.
 
-All pending developer source/package/lock work and five evidence records remain
-uncommitted. Hermes later owns separately authorized grouped execution,
-falsification, and integration. Full recovered effects, actual-secret cleanup,
-native confirmation, and remaining security gates stay unaccepted. Mainnet,
-network, broadcast, Monero, and broader work remain parked.
+Previous validation remains context 4 passed and three falsifications failed;
+prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun. New repair
+results are pending. Prior evidence-data acceptance and deferred minor errata
+remain unchanged. Pending source/package/locks and five evidence records remain
+uncommitted. Full recovered effects, actual-secret cleanup, native confirmation,
+remaining security, integration, mainnet, network, broadcast, Monero, and broader
+work are outside this execution task.
 
 ## Historical record (superseded by the active state above)
 
