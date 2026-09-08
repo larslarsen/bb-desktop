@@ -2,11 +2,13 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 NATIVE REVIEW REGRESSION TEST SOURCE — GROK ONLY
+State: WAL-009 NATIVE REVIEW TEST SOURCE ACCEPTED — HERMES INITIAL RED ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Grok Build 4.6 High; two-path test-only drop
+Authorized source actor: none; Grok's two-path test-only drop is source-accepted
+
+Authorized execution actor: Hermes Jr Dev; one initial-red command and evidence only
 
 Authorized integration actor: none
 
@@ -15,17 +17,17 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md](GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+[HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md)
 
 Context-reset checkpoint: read this leading section and the active handoff, not
-the historical log. Collect the current Grok run once only when the owner reports
-done; do not poll or cancel it. Review the test-only drop before any Hermes run.
-Grok launched from governance commit `33de1fb2`; outer terminal session `27099`.
-If a new context cannot attach to that terminal session, inspect the two authorized
-files and the saved actor completion report; do not launch a duplicate actor.
+the historical log. The owner confirmed Grok was already done. Its saved completion
+report and source were reviewed; do not collect or launch Grok again. Outer session
+27099 was unavailable; the saved Grok session was
+`01a07f2e-f45a-78e2-8f05-7526ce1f62dd`. Hermes has not yet been launched for this
+handoff. Source repair and integration are closed pending initial-red evidence review.
 
 Latest acceptance:
-[BBD-WAL-009-LOCK-SYNC-01-REVIEW.md](../testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md)
+[BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md)
 
 Current review:
 [BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
@@ -46,13 +48,15 @@ Correction 02's transaction buffer ownership repair is source-accepted in
 [BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md](../testing/BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md).
 Hermes completed offline lock synchronization with exactly one root dependency added
 and no version changes. The diff and corrected evidence are accepted; lockfile and
-evidence remain uncommitted for later Hermes integration. No further execution is
-authorized. Actual-secret cleanup observations, independent transaction-effect
-verification, and the native confirmation event path remain A3 blockers. The next
-UI slice now has a fixed modal event/lifetime contract in the active handoff. Grok
-may author only six real-input regressions and their private test-module declaration.
-Production repair and Hermes execution/integration remain unauthorized. All pending
-work is preserved. Grok is available again; Sol remains usage-exhausted.
+evidence remain uncommitted for later Hermes integration. Actual-secret cleanup
+observations, independent transaction-effect verification, and the native confirmation
+event path remain A3 blockers. Grok's six real-input regressions and private module
+declaration are source-accepted. Hermes alone may run the single initial-red command
+and record evidence under the active handoff. The existing Context::run API failure
+must be classified separately from the missing dialog contract; neither is proof of
+a failed input regression. Production repair and integration remain unauthorized.
+The fixed modal contract and later falsifications remain required. All pending work
+is preserved. Grok is available again; Sol remains usage-exhausted.
 
 ## Historical record (superseded by the active state above)
 

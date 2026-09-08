@@ -1,12 +1,13 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE REVIEW REGRESSION TEST SOURCE — GROK ONLY
+Status: NATIVE REVIEW TEST SOURCE ACCEPTED — HERMES INITIAL RED ONLY
 
-Active bounded authorization: [native review tests 04](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md).
-Its two test-only paths, modal lifetime contract, red/green commands, and
-falsifications supplement this ticket. No production edit or execution is authorized.
+Active bounded authorization: [native review initial red 01](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_EXPECTED_RED_01.md).
+Hermes alone may run its single command and record evidence; no source edit or
+integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [lock synchronization acceptance](../docs/testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md).
+Latest review: [native review test-source acceptance](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md).
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
 transaction-effect verification, and native confirmation remain unresolved.
 
@@ -14,7 +15,7 @@ Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Completed test-source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High).
 That completed test phase used the then-reported Grok usage exhaustion as its fill-in
-condition. Grok is now available again and owns the active native-review test slice.
+condition. Grok is available again and completed the accepted native-review test slice.
 
 Completed formatting actor: Implementation Dev — Codex Spark, High.
 
