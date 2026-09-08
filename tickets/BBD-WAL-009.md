@@ -1,23 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE APP/LAYOUT TEST SOURCE 01 — GROK BUILD
+Status: NATIVE APP/LAYOUT FOCUSED EXECUTION 01 — HERMES
 
-Active authorization: [native App/layout tests 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md).
-The [native widget validation acceptance](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
-accepts six original/restored widget passes, both intended falsification failures,
-seventeen native-surface passes, and native compilation. All source is restored.
-Hermes report/procedural errata are recorded without repeating successful gates
-or opening a correction-only cycle; evidence remains unintegrated.
+Active authorization: [one-command focused execution](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md).
+The [test-source review](../docs/testing/BBD-WAL-009-NATIVE-APP-TEST-SOURCE-01-REVIEW.md)
+accepts four layout/actual-App callback regressions. All existing production bytes
+are unchanged. Hermes runs the one focused command, classifies all four outcomes,
+writes one record, and stops. No source repair, repeat of prior suites, or integration.
 
-Grok Build 4.6 High alone may author four tests for longer review layout and the
-actual eframe App callback lifecycle in a new private module, plus its cfg(test)
-declaration. All existing production and tests are frozen. No test execution,
-production repair, evidence, Git, or integration is authorized to Grok.
-
-Retained-spend/clock/signature-context results remain accepted. Actual OS/native
-window and capability integration, independently recovered effects, actual-secret
-cleanup, and remaining security remain unaccepted. Reviewer remains XHigh;
-launch once and collect after done, without actor polling.
+Owner direction is to reduce churn while continuing the existing wallet scope;
+no new demo milestone. High is recommended for the next bounded result review,
+with XHigh flagged before cryptographic/custody architecture work. Implementation
+remains uncommitted and no usable send flow is delivered. Existing accepted
+validation remains valid; remaining security and native integration gates stay
+open. Launch once, no actor polling or additional speculative coverage slices.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

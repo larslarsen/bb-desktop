@@ -1,69 +1,54 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 NATIVE APP/LAYOUT TEST SOURCE 01 — GROK BUILD
-Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actor: Grok Build 4.6 High, tests only
-Authorized execution/evidence/integration actors: none
+State: WAL-009 NATIVE APP/LAYOUT FOCUSED EXECUTION 01 — HERMES
+Reviewer: Codex at XHigh for source review; High recommended for the next result review
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_APP_TESTS_01.md)
-Reviewer decision: [native widget validation acceptance](../testing/BBD-WAL-009-NATIVE-REVIEW-VALIDATION-01-ACCEPTANCE.md)
+Active handoff: [HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md](HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md)
+Reviewer decision: [native App/layout test-source review](../testing/BBD-WAL-009-NATIVE-APP-TEST-SOURCE-01-REVIEW.md)
 Read this prefix and linked records; no historical handoff reload.
 
-Owner clarification: the owner asked for an honest assessment of churn and why
-wallet integration is taking so long, not a new demo milestone. The reviewer
-withdraws that inferred priority change. Existing bounded authorization remains
-in effect. Reduce avoidable handoffs/report-only cycles and explain the actual
-remaining integration work without changing product priorities by inference.
+Owner direction: continue the wallet work, reduce avoidable churn, and flag when
+reasoning can be lowered. No new demo milestone was requested. High is sufficient
+for the next bounded test-result review; ask for XHigh before returning to
+cryptographic/custody architecture. The reviewer has not changed the setting.
+Pending implementation remains uncommitted and is not a usable send flow; pushed
+reviewer checkpoint documents must not be presented as product delivery.
 
-The recent pushed checkpoint commits contain reviewer governance. The pending
-wallet implementation is uncommitted and is not integrated into a usable send
-flow. Future owner updates must state that distinction and report visible
-behavior, not present checkpoint hashes as product delivery.
+Grok session e282f23a-dcf7-4c0a-9497-e3be9503c221, outer 99382, collected once
+after Continue, exit 0; runtime grok-4.6-build High. The four-test source drop is
+accepted for focused execution. native_ui.rs: 306 lines,
+b0d4da8770a400315889e5d69ad830e3e08d707c5bc62ca1f6e633798703349c;
+new zec_native_app_tests.rs: 376 lines,
+485ce9691f873af9304e1db36de74d49627279abf9c550ccce4c74bada22a5a4.
+All prior production bytes and 23 other frozen identities match. No developer
+test/compiler/formatter/Git execution occurred.
 
-Hermes outer 29799 was collected once after done, exit 0. Completed session
-20260908_132224_391188, Hermes 0.18.2, nous, poolside/laguna-s-2.1:free.
-All six required outcomes are accepted: original six widget tests passed;
-Confirm and close-priority mutations failed at the intended assertions; restored
-six widget tests passed; all seventeen native-surface tests passed; native
-compilation passed. Both mutations are restored and all 23 frozen identities match.
-No extra Cargo/npm command or Git mutation occurred.
+Hermes may run ONE focused command for these four tests, record all actual
+outcomes and complete output, write the one named evidence record, and stop.
+Anticipated red is off-screen controls in a constrained layout; App callback
+lifecycle results are reported separately. An all-four pass is valid. No source
+repair, mutation, old-suite rerun, extra checks, report-only correction, or Git
+integration. All 25 inventory identities must match before and after execution.
+Launch status: authorization prepared; launch once after governance commit.
 
-The actor's report gives the wrong model/session/lineage and falsely claims full
-background/capture compliance. The linked review records exact saved result IDs,
-actual foreground execution for stages 2-6, and report errata. Required outcomes
-remain valid. No repeat of passing tests or correction-only actor cycle. The new
-503-line native validation evidence remains pending at SHA-256
-3a734781d0ad2c31989318373272f13ba89654ded2ab3a6b90f83ea322821de1;
-its local paths and errata must be corrected with later authorized integration.
+Previously accepted six dialog tests, two intended faults, seventeen native
+surface regressions, native compilation, and retained-spend/signature-context
+results remain valid. Prior Hermes evidence errata remain recorded for later
+integration, without another correction-only turn. Actual OS/native/capability
+integration, independently recovered effects, actual-secret cleanup, and remaining
+security remain unaccepted; network/broadcast/mainnet/hardware/Monero stay parked.
+All pending developer source/package/locks and eight prior evidence records stay
+uncommitted. No broader WAL-009 acceptance.
 
-Next, Grok authors four tests in new native_ui/zec_native_app_tests.rs and appends
-ONLY its cfg(test) module declaration to native_ui.rs. Existing production is
-303 lines, c6d5fc3a4dee46f4700f2a3ae5866a5003746eab5aa6dd6bc20e5ba5c6d726b4;
-all production bytes and the six existing tests are frozen. Cover longer review
-values at native/constrained sizes and the actual eframe App callback's one-shot
-close, confirmation preservation, and simultaneous-close denial. Use actual
-rendered widgets/events and pinned Frame::_new_kittest, not approval injection.
-No production repair, compiler/test/formatter, evidence, Git, or integration.
-Launch status: launched once from authorization b6cc3c02, CLI grok-4.6 High,
-session e282f23a-dcf7-4c0a-9497-e3be9503c221, outer terminal 99382.
-No completion collected; do not relaunch or poll. Collect after owner done.
-
-The six accepted dialog tests do not prove layout with longer fields or the
-App callback's programmatic-close behavior. The new tests address those gaps.
-Actual OS window/platform/owning-thread/capability integration still requires its
-separate gate. No OS acceptance is claimed from synthetic egui callback tests.
-Retained-spend/clock/signature-context gates remain accepted without expensive
-reruns. Full recovered effects, actual-secret cleanup, remaining security,
-integration, mainnet, network, broadcast, hardware, and Monero remain unaccepted
-or parked. Pending developer source/package/locks and eight evidence records
-remain uncommitted. No broader WAL-009 acceptance.
-
-Reviewer publication scope: CURRENT_TASK.md, ticket, active Grok handoff, and
-linked reviewer decision only. No actor polling; collect after done/explicit
-collection. XHigh remains appropriate; no reasoning change is needed.
+Reviewer publication scope: CURRENT_TASK.md, ticket, active Hermes handoff, and
+linked source review only. Launch once and collect after done/explicit collection;
+no actor polling. Do not open additional speculative test slices.
 
 ## Historical record (superseded by the active state above)
 
