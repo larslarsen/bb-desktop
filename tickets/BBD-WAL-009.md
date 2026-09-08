@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PHASE A3 SIGN/VERIFY PRODUCTION SOURCE AUTHORIZED — SOL HIGH ONLY
+Status: PHASE A3 SIGN/VERIFY CORRECTION AUTHORIZED — GROK BUILD HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
@@ -9,6 +9,8 @@ Grok Build remains the default senior route, but the owner reports its weekly us
 exhausted; this is the documented fill-in condition.
 
 Completed formatting actor: Implementation Dev — Codex Spark, High.
+
+Authorized production correction actor: Sr Dev — Grok Build, High.
 
 Planned integration actor: Jr Dev — Hermes
 

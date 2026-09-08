@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A3 SIGN/VERIFY PRODUCTION SOURCE AUTHORIZED — SOL HIGH ONLY
+State: WAL-009 PHASE A3 SIGN/VERIFY CORRECTION AUTHORIZED — GROK BUILD HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Principal Dev — Codex Sol (`gpt-5.6-sol`, High)
+Authorized source actor: Sr Dev — Grok Build, High
 
 Authorized integration actor: none
 
@@ -15,7 +15,7 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[CODEX_SOL_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_PRODUCTION_01.md](CODEX_SOL_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_PRODUCTION_01.md)
+[GROK_BUILD_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_CORRECTION_01.md](GROK_BUILD_BBD_WAL_009_PHASE_A3_SIGN_VERIFY_CORRECTION_01.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -29,10 +29,11 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-The exact 14-test sign/verify contract and its expected red are accepted at `d7819e0f`.
-Sol High alone may implement the bounded seven-path production core without execution
-or Git. Broadcast/network, real hardware, Electron methods, mainnet, dependencies, and
-all Monero work remain closed.
+Sol hit its usage limit with an incomplete seven-path drop containing rejected
+test-shaped shortcuts. Grok Build High alone may correct or replace those seven paths
+without execution or Git. The unrelated package manifest/lock changes are protected
+concurrent work and remain outside WAL-009. Broadcast/network, real hardware, Electron
+methods, mainnet, dependencies, and all Monero work remain closed.
 
 ## Historical record (superseded by the active state above)
 
