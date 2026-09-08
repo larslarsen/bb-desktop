@@ -2,17 +2,20 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 PHASE A3 GROK CORRECTION 01 REJECTED — NO ACTOR AUTHORIZED
+State: WAL-009 CORRECTION 02 TRANSACTION BUFFER CLEANUP — GROK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Sr Dev — Grok Build, High; spend.rs cleanup only
 
 Authorized integration actor: none
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
+
+Active handoff:
+[GROK_BUILD_BBD_WAL_009_TRANSACTION_CLEANUP_02.md](GROK_BUILD_BBD_WAL_009_TRANSACTION_CLEANUP_02.md)
 
 Current review:
 [BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PHASE-A3-GROK-CORRECTION-01-REVIEW.md)
@@ -29,11 +32,10 @@ Accepted Zcash predecessor:
 Parked Monero predecessor:
 [BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
 
-Grok completed Correction 01. Static review rejects the drop for fabricated wipe
-observations, copied effect metadata, disconnected native confirmation, error-path
-cleanup gaps, and an undeclared dependency. All changes are preserved. No execution,
-integration, or further source actor is authorized. Unrelated package changes remain
-protected concurrent work. See the current review for bounded follow-up requirements.
+Correction 01 remains rejected. Grok High may fix only ownership and cleanup of the
+serialized transaction buffer in spend.rs under Correction 02. The other review
+findings remain unresolved. No execution or integration is authorized. Other pending
+Rust changes and unrelated package changes are preserved.
 
 ## Historical record (superseded by the active state above)
 

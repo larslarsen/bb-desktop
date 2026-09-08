@@ -1,6 +1,6 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PHASE A3 GROK CORRECTION 01 REJECTED — NO ACTOR AUTHORIZED
+Status: CORRECTION 02 TRANSACTION BUFFER CLEANUP — GROK HIGH ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
