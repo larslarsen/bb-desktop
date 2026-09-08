@@ -57,8 +57,10 @@ Missing context is intended; existing spend/test-support compile errors may
 produce a mixed prerequisite stop. No behavior is accepted and no repair/rerun
 or integration is authorized after any result.
 
-Launch status: Hermes authorized but not yet launched. Check the later launch
-checkpoint before starting an actor; never duplicate a recorded active run.
+Launch status: Hermes was launched from governance commit `bf39113b`, outer
+terminal session 24941, with its current actor session ID supplied through
+--pass-session-id. No completion has been collected. Leave this run alone until
+the owner reports done; do not poll or launch a duplicate.
 
 The owner explicitly forbids polling. Collect a launched actor only after the
 owner reports completion or explicitly requests collection. The owner also asks
