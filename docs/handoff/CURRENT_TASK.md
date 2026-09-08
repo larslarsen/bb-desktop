@@ -1,59 +1,53 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 RETAINED-SPEND VALIDATION RESUME 01 — HERMES
+State: WAL-009 NATIVE REVIEW PRODUCTION 01 — GROK BUILD
 Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
-Authorized integration actors: none
+Authorized source actor: Grok Build 4.6 High only
+Authorized execution/evidence/integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md](HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md)
-Reviewer checkpoint: [clock-read oracle source review](../testing/BBD-WAL-009-CLOCK-READ-ORACLE-SOURCE-REVIEW-01.md)
+Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md)
+Reviewer decision: [retained-spend acceptance and native review](../testing/BBD-WAL-009-RETAINED-SPEND-ACCEPTANCE-AND-NATIVE-REVIEW.md)
 Read this prefix and linked records; no historical handoff reload.
 
-Grok session 96a173e5-b8d4-464c-8230-b02bac98b9d7, outer 1158, was collected
-once after done, exit 0. Runtime grok-4.6-build High. The exact one-assertion-plus-
-comment correction is accepted: require >= 1 post-sign clock read, preserving
-all deadline outcomes. Final test: 1118 lines,
-7a481d3a954a92e04d324be047863a824ecf303bfd6232be70e9d13d3a295987.
-All twenty other pending identities, including production, remain unchanged.
+Hermes outer 47193 was collected once after done, exit 0. Completed session:
+20260908_120219_fc08d7, Hermes 0.18.2, nous, poolside/laguna-s-2.1:free.
+All required retained-spend/clock stages are accepted: corrected focused test
+passed; exact expiry, retained-index, and witness-count mutations failed at the
+intended assertions; restored library passed all six tests. Temporary mutations
+are restored and all twenty frozen identities match. Preserve the earlier
+11 prepare and 13 other sign/verify passes; do not repeat the whole integration.
 
-Hermes may run five ordered commands: corrected cancellation/expiry green;
-actual exact-expiry guard falsification; retained-index falsification;
-witness-count falsification; restored full library green. Three isolated
-mutations require measured exact hashes and restoration on every outcome.
-All Cargo commands start once in background; wait only on the returned process
-and retrieve its full log. No reruns, pipes, process kills, or global discovery.
-Do not repeat the expensive whole integration suite for this test-only correction.
+The actor ran four unauthorized extra Cargo commands and left report inaccuracies.
+The linked reviewer decision records authoritative errata and rejects procedural
+compliance. Those deviations do not invalidate the actual required saved results.
+No further report-only correction cycle or repeat of passing gates is authorized.
+Both completed Hermes sessions are closed; do not resume or recollect them.
 
-The same task writes a new resume record and corrects the prior retained-spend
-record using exact named saved messages. Prior metadata 2-pass, prepare 11-pass,
-and other sign/verify 13-pass results are retained with execution deviations
-and report errata disclosed. Prior integration never achieved a full pass.
-The corrected focused test passed; falsification/library results remain pending.
+Grok may now implement the private immutable review dialog and synchronous native
+runner ONLY in wallet-broker/src/native_ui.rs, starting 201 lines,
+600e2fb34134a276d31da9c5e746cc6478337bae73590fd742cf2d36ff785524.
+The six pre-existing widget tests and native.rs capability boundary are frozen.
+Their classified missing-contract/Context::run compile red is understood;
+no claim is made that behavioral widget assertions have run. The handoff fixes
+terminal confirmation/denial, full review identity, close precedence, per-call
+ownership, synchronous run_and_return, and fail-closed platform errors.
 
-Capacity interruption: original outer 42725 collected once after done. Hermes
-session 20260908_114350_76a7e5 (nous, poolside/laguna-s-2.1:free) returned an
-upstream HTTP 429 capacity error after completing stage 1. Saved 78047: exit 0,
-one passed/13 filtered, 475.66 seconds. No later test, mutation, or evidence write
-was reached. All twenty-one baselines still match. No stage-1 rerun is authorized.
+No test/compiler/formatter, native window launch, evidence, Git, integration,
+dependency change, or other source edit is authorized to Grok. After source review,
+Hermes will receive grouped widget green/falsifications, native regressions, and
+compilation. Real native-window/owning-thread/capability integration remains separate.
+Launch status: authorization prepared; launch once after governance commit.
 
-Continuation authorization: resume that exact Hermes session once under the
-capacity amendment in the existing handoff. Retain the completed result and
-continue stages 2-5 plus both evidence records. Record original preflight probe
-and PATH deviations; no repeated preflight probes. Launch status: resumed once
-from `64358f25` with `--resume 20260908_114350_76a7e5 --pass-session-id`, outer
-terminal 47193. No completion collected; do not launch again or poll.
-Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, and linked
-source review only. No actor polling; collect after done/explicit collection.
-XHigh remains appropriate; this capacity failure does not require a change.
-
-Pending developer source/package/locks and six evidence records remain uncommitted.
-Full recovered effects, actual-secret cleanup, native confirmation, remaining
-security, integration, mainnet, network, broadcast, Monero, and broader work remain
-outside this execution authorization.
+Reviewer publication scope: CURRENT_TASK.md, ticket, active Grok handoff, and
+linked reviewer decision only. No actor polling; collect after done/explicit
+collection. XHigh remains appropriate; no reasoning change is needed.
+Pending developer source/package/locks and all seven evidence records remain
+uncommitted. Full recovered effects, actual-secret cleanup, remaining security,
+integration, mainnet, network, broadcast, hardware, and Monero remain unaccepted
+or parked. This is not broader WAL-009 acceptance.
 
 ## Historical record (superseded by the active state above)
 

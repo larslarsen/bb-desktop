@@ -1,26 +1,24 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: RETAINED-SPEND VALIDATION RESUME 01 — HERMES
+Status: NATIVE REVIEW PRODUCTION 01 — GROK BUILD
 
-Active authorization: [focused Hermes resume](../docs/handoff/HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_RESUME_01.md).
-The [clock-read oracle source review](../docs/testing/BBD-WAL-009-CLOCK-READ-ORACLE-SOURCE-REVIEW-01.md)
-accepts the one-test assertion correction; production and exact deadline outcomes
-are unchanged. Hermes runs corrected test green, three isolated falsifications,
-and restored library green, each command once in background with full capture.
+Active authorization: [native review production 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_PRODUCTION_01.md).
+The [retained-spend acceptance and native review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-ACCEPTANCE-AND-NATIVE-REVIEW.md)
+accepts the corrected focused green, three intended falsification failures, and
+restored six-test library green. All temporary mutations are restored. Earlier
+11 prepare and 13 other sign/verify passes are retained without a whole-suite repeat.
+Hermes procedural/report deviations are recorded in that authoritative review;
+no new report-only correction cycle or repeat of passing checks is authorized.
 
-The same task corrects the prior incomplete report from named saved results.
-Reuse its verified metadata/prepare/other sign-verify passes with all execution
-deviations disclosed. No whole integration repeat for this assertion-only change.
-Temporary mutations must be restored on every outcome. No production repair,
-other tests, integration, or Git mutation is authorized.
+Grok Build 4.6 High alone may implement the existing six-test private dialog
+contract and synchronous native runner in native_ui.rs. Tests and native.rs stay
+frozen. The classified missing-contract/obsolete API compile red is understood;
+behavioral widget red is not claimed. Native test execution, falsifications,
+regressions, compilation, and later real-window/capability integration remain
+separate gates. No Grok execution, Git, evidence, or integration is authorized.
 
-The corrected focused cancellation/expiry test passed (one passed, exit 0).
-Hermes then hit upstream model capacity. Resume the same session once for the
-remaining stages and evidence; do not rerun that completed test. No mutation
-was reached and all twenty-one starting identities still match.
-
-Full recovered effects, actual-secret cleanup, native confirmation, and remaining
-security stay unaccepted. Reviewer remains XHigh; no actor polling.
+Full recovered effects, actual-secret cleanup, native integration, and remaining
+security stay unaccepted. Reviewer remains XHigh; launch once, no actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
