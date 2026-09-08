@@ -36,7 +36,9 @@ values at native/constrained sizes and the actual eframe App callback's one-shot
 close, confirmation preservation, and simultaneous-close denial. Use actual
 rendered widgets/events and pinned Frame::_new_kittest, not approval injection.
 No production repair, compiler/test/formatter, evidence, Git, or integration.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization b6cc3c02, CLI grok-4.6 High,
+session e282f23a-dcf7-4c0a-9497-e3be9503c221, outer terminal 99382.
+No completion collected; do not relaunch or poll. Collect after owner done.
 
 The six accepted dialog tests do not prove layout with longer fields or the
 App callback's programmatic-close behavior. The new tests address those gaps.
