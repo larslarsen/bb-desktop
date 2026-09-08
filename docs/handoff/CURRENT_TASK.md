@@ -1,56 +1,45 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 NATIVE APP/LAYOUT FOCUSED EXECUTION 01 — HERMES
-Reviewer: Codex at XHigh for source review; High recommended for the next result review
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
-Authorized integration actors: none
+State: WAL-009 NATIVE LAYOUT REPAIR 01 — GROK BUILD
+Reviewer: Codex; High sufficient for this bounded UI repair/review
+Authorized source actor: Grok Build 4.6 High only
+Authorized execution/evidence/integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md](HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md)
-Reviewer decision: [native App/layout test-source review](../testing/BBD-WAL-009-NATIVE-APP-TEST-SOURCE-01-REVIEW.md)
-Read this prefix and linked records; no historical handoff reload.
+Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_LAYOUT_REPAIR_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_LAYOUT_REPAIR_01.md)
+Reviewer decision: [native App/layout red review](../testing/BBD-WAL-009-NATIVE-APP-RED-01-REVIEW.md)
+Read this prefix and linked records only; no historical handoff reload.
 
-Owner direction: continue the wallet work, reduce avoidable churn, and flag when
-reasoning can be lowered. No new demo milestone was requested. High is sufficient
-for the next bounded test-result review; ask for XHigh before returning to
-cryptographic/custody architecture. The reviewer has not changed the setting.
-Pending implementation remains uncommitted and is not a usable send flow; pushed
-reviewer checkpoint documents must not be presented as product delivery.
+Hermes outer 86077 collected once after Continue, exit 0. Completed session
+20260908_141026_ac52d5, Hermes 0.18.2, nous/poolside/laguna-s-2.1:free.
+The single test execution exited 101: 3 passed, 1 failed, 12 filtered. Only the
+360x480 long-review case failed, at viewport.contains_rect; normal-size layout
+and both actual App lifecycle tests passed. Full 43-line saved log accepted.
+All 25 frozen identities match. Report/procedural errata are recorded in the
+review without another correction-only turn or repeat of successful results.
 
-Grok session e282f23a-dcf7-4c0a-9497-e3be9503c221, outer 99382, collected once
-after Continue, exit 0; runtime grok-4.6-build High. The four-test source drop is
-accepted for focused execution. native_ui.rs: 306 lines,
-b0d4da8770a400315889e5d69ad830e3e08d707c5bc62ca1f6e633798703349c;
-new zec_native_app_tests.rs: 376 lines,
-485ce9691f873af9304e1db36de74d49627279abf9c550ccce4c74bada22a5a4.
-All prior production bytes and 23 other frozen identities match. No developer
-test/compiler/formatter/Git execution occurred.
+Grok may now change ONLY native_ui.rs's review-body layout to reserve room for
+Confirm/Cancel and scroll all immutable review fields within remaining space.
+Starting 306 lines, b0d4da8770a400315889e5d69ad830e3e08d707c5bc62ca1f6e633798703349c.
+The ten existing tests, confirmation state transitions, App wrapper/runner,
+window size, authority, dependencies, and all other source remain frozen.
+No new tests, compiler/formatter/test execution, evidence, Git, or integration.
+Launch status: authorization prepared; launch once after governance commit.
 
-Hermes may run ONE focused command for these four tests, record all actual
-outcomes and complete output, write the one named evidence record, and stop.
-Anticipated red is off-screen controls in a constrained layout; App callback
-lifecycle results are reported separately. An all-four pass is valid. No source
-repair, mutation, old-suite rerun, extra checks, report-only correction, or Git
-integration. All 25 inventory identities must match before and after execution.
-Launch status: launched once from authorization 148ef213 via hermes -z with
---pass-session-id, outer terminal 86077. Runtime session ID will be recorded on
-collection. No completion collected; do not relaunch or poll.
+After source review, group ten-test green, the two already specified layout/App
+falsifications, and native compilation. No additional speculative coverage slice.
+High remains appropriate; flag XHigh before cryptographic/custody architecture.
+Owner asks for less churn within existing wallet scope, not a new demo milestone.
+Implementation remains uncommitted and is not a usable send flow; reviewer
+checkpoint commits are governance, not product delivery. Nine evidence records
+remain pending. OS/capability integration, independent recovered effects,
+actual-secret cleanup, and remaining security stay unaccepted; network/broadcast/
+mainnet/hardware/Monero stay parked. Prior accepted gates remain valid.
 
-Previously accepted six dialog tests, two intended faults, seventeen native
-surface regressions, native compilation, and retained-spend/signature-context
-results remain valid. Prior Hermes evidence errata remain recorded for later
-integration, without another correction-only turn. Actual OS/native/capability
-integration, independently recovered effects, actual-secret cleanup, and remaining
-security remain unaccepted; network/broadcast/mainnet/hardware/Monero stay parked.
-All pending developer source/package/locks and eight prior evidence records stay
-uncommitted. No broader WAL-009 acceptance.
-
-Reviewer publication scope: CURRENT_TASK.md, ticket, active Hermes handoff, and
-linked source review only. Launch once and collect after done/explicit collection;
-no actor polling. Do not open additional speculative test slices.
+Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, linked review.
+Launch once; collect after done/explicit collection. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

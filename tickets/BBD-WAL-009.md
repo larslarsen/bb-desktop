@@ -1,19 +1,18 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE APP/LAYOUT FOCUSED EXECUTION 01 — HERMES
+Status: NATIVE LAYOUT REPAIR 01 — GROK BUILD
 
-Active authorization: [one-command focused execution](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_APP_EXPECTED_RED_01.md).
-The [test-source review](../docs/testing/BBD-WAL-009-NATIVE-APP-TEST-SOURCE-01-REVIEW.md)
-accepts four layout/actual-App callback regressions. All existing production bytes
-are unchanged. Hermes runs the one focused command, classifies all four outcomes,
-writes one record, and stops. No source repair, repeat of prior suites, or integration.
+Active authorization: [bounded layout repair](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_LAYOUT_REPAIR_01.md).
+The [red review](../docs/testing/BBD-WAL-009-NATIVE-APP-RED-01-REVIEW.md) accepts
+3 passes and the small-window containment failure. Grok High may change only the
+review body layout in native_ui.rs to keep both controls visible. All ten existing
+tests and confirmation/authority/lifecycle semantics stay frozen. No source-actor
+execution, new tests, evidence, Git, or integration.
 
-Owner direction is to reduce churn while continuing the existing wallet scope;
-no new demo milestone. High is recommended for the next bounded result review,
-with XHigh flagged before cryptographic/custody architecture work. Implementation
-remains uncommitted and no usable send flow is delivered. Existing accepted
-validation remains valid; remaining security and native integration gates stay
-open. Launch once, no actor polling or additional speculative coverage slices.
+High is sufficient for this repair. Owner asks for less churn within existing
+wallet scope; no new demo milestone. Pending implementation is uncommitted and no
+usable send flow is delivered. Prior gates stay accepted; native integration and
+remaining security stay open. Launch once, no actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
