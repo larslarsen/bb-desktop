@@ -7,6 +7,29 @@ active prefix, this handoff, and the linked
 [source review](../testing/BBD-WAL-009-NATIVE-LAYOUT-REPAIR-01-SOURCE-REVIEW.md).
 Read only native_ui.rs and its two test modules as needed. No historical sessions.
 
+## Capacity continuation — do not repeat stage 1
+
+Resume completed Hermes session 20260908_145855_f82684 once after upstream HTTP
+429 capacity failure. Outer 10169 was collected; actual runtime was Hermes 0.18.2,
+nous/poolside/laguna-s-2.1:free. Original authorization 504b4953, checkpoint 0e60e76e.
+Stage 1 already passed ONCE: command 78608, process proc_2b93b268f394 (78610),
+completion 78612 exit 0; all 10 passed, 6 filtered, 0.15 seconds. Reviewer accepts
+that complete saved completion output. Do not rerun this command.
+
+No mutation, stage 2-5 execution, or evidence write was reached. All 26 starting
+identities match reviewer measurement. Continue ONLY stages 2-5 and the evidence
+record. Retrieve stage 1's final process.log if its existing handle is available;
+otherwise use the accepted saved 78612 output without rerunning. Preserve original
+runtime/preflight results and record the continuation's session/commit separately.
+No repeated Git/version/source-read preflight. Verify the current native_ui.rs
+hash immediately before mutation and retain the required final full inventory.
+
+Record original deviations: preflight wc used .rs instead of .md for the retained-
+spend resume evidence, giving exit 1 despite all hashes matching; the reviewer has
+verified its actual 560-line count. The wait requested 600 seconds and was clamped
+to 60. These do not invalidate the actual ten-test pass; do not repeat either probe.
+The remaining exact mutation/restoration/capture/stop rules below still apply.
+
 ## Boundaries
 
 Only native_ui.rs may be temporarily mutated, exactly below. Keep its original

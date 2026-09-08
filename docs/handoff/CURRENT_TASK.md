@@ -26,9 +26,13 @@ compilation. Both exact mutations require complete restoration on every outcome.
 All tests/source are otherwise frozen. Write only the new named evidence record
 and stop. No source repair, extra tests/probes, prior evidence correction, Git
 mutation, or integration. Capture each command once in background with full log.
-Launch status: launched once from authorization 504b4953 via hermes -z with
---pass-session-id, outer terminal 10169. Runtime session ID will be recorded on
-collection. No completion collected; do not relaunch or poll.
+Capacity checkpoint: outer 10169 collected once after done. Hermes session
+20260908_145855_f82684 (nous/poolside/laguna-s-2.1:free) hit upstream HTTP 429 after
+stage 1 PASSED: saved 78612, exit 0, ten passed/6 filtered, 0.15 seconds. No mutation
+or later command/evidence was reached. All 26 frozen identities still match.
+Resume the same session ONCE under the active handoff's capacity amendment for
+stages 2-5 and evidence only; do not rerun stage 1 or preflight. No actor polling.
+Continuation launch: prepared; launch once after governance commit.
 
 High remains appropriate; flag XHigh before cryptographic/custody architecture.
 Owner asks for less churn within existing wallet scope, not a new demo milestone.

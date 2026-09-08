@@ -33,3 +33,14 @@ independently recovered effects, actual-secret cleanup, or remaining security.
 The owner requested continued wallet work with less churn, not a new demo scope.
 Reviewer publication scope: this review, linked handoff, CURRENT_TASK.md, ticket.
 Launch once; collect after done, with no actor polling.
+
+## Capacity checkpoint
+
+Hermes outer 10169 collected once after done: upstream HTTP 429 after stage 1.
+Completed session 20260908_145855_f82684, nous/poolside/laguna-s-2.1:free. Saved
+78608/78610 launched the exact first command once; 78612 exited 0 with all ten
+tests passed, 6 filtered, 0.15 seconds. Complete saved output is accepted. No
+mutation or later command was reached; all 26 identities match and evidence is
+absent. Resume the same task once for stages 2-5/evidence, without stage-1 repeat.
+The existing handoff records the preflight path typo and clamped wait. High remains
+sufficient; provider capacity does not call for a reasoning change.

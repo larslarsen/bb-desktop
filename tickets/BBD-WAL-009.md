@@ -2,6 +2,10 @@
 
 Status: GROUPED NATIVE LAYOUT VALIDATION 01 — HERMES
 
+Capacity continuation: all ten UI tests passed, then the provider returned HTTP
+429 before mutations. Resume the same Hermes session once for the remaining four
+stages and evidence. Preserve stage 1; no rerun. All source identities still match.
+
 Active authorization: [grouped layout validation](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md).
 The [source review](../docs/testing/BBD-WAL-009-NATIVE-LAYOUT-REPAIR-01-SOURCE-REVIEW.md)
 accepts the one-file scrolling-body fix with confirmation/lifecycle logic unchanged.
