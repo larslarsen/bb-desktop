@@ -50,8 +50,10 @@ Frozen spend.rs: 929 lines, SHA-256
 Frozen context tests: 528 lines, SHA-256
 `45f3bdf2f1d08924d53c298517c631427ab052c2d4955b31e98aa555386d380a`.
 
-Launch status: authorized, not yet launched. Record the single correction session
-after committing this handoff. No duplicate actor.
+Launch status: Hermes correction launched from governance commit `8e6923a4` with
+`--pass-session-id`, outer terminal session 60108. No completion has been collected.
+Record its actual correction session ID/runtime in the corrected evidence.
+Leave it alone until the owner reports done; do not poll or launch a duplicate.
 
 The owner forbids polling. Collect only after done or explicit collection request.
 XHigh remains appropriate; pause if a different reviewer reasoning level is needed.
