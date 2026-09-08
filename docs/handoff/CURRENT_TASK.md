@@ -34,9 +34,10 @@ test green, unfinished falsifications/library green, and evidence corrections.
 It must start each long command once in background and collect its full log.
 Do not repeat the entire expensive integration suite for an assertion-only change.
 
-Launch status: authorized; not yet launched. Launch once and checkpoint here.
-No duplicate actor or polling. Collect only after done or explicit collection.
-XHigh remains appropriate; pause if it needs changing.
+Launch status: Grok launched once from `8d02e3c2`, CLI grok-4.6 High, session
+`96a173e5-b8d4-464c-8230-b02bac98b9d7`, outer terminal 1158. No completion
+collected. No duplicate actor or polling; collect only after done or explicit
+collection. XHigh remains appropriate; pause if it needs changing.
 
 Pending source/package/locks and six evidence records remain uncommitted. Full
 recovered effects, actual-secret cleanup, native confirmation, security gates,
