@@ -1,32 +1,32 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT EXPECTED RED 01 ONLY — HERMES
+Status: COMPILE PREREQUISITES 01 ONLY — GROK HIGH
 
-Active actor authorization: [Hermes expected red 01](../docs/handoff/HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_EXPECTED_RED_01.md).
-One exact no-default-features library command targets the four signature-context
-tests. Hermes may write only its new result record. Source edits, reruns,
-falsification, and integration remain closed.
+Active actor authorization: [Grok compile prerequisites 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_COMPILE_PREREQUISITES_01.md).
+Four mechanical edits in spend.rs and test_support.rs: recipient borrowing, proof
+Option cloning, exhaustive fault conversion, and unused-mut removal. Test source,
+signature-context implementation, native work, execution, evidence, and integration
+remain closed.
 
-Latest review: [signature-context test correction 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-TEST-CORRECTION-01-REVIEW.md).
-Grok's one-file correction is accepted. The four-test source and two append-only
-declarations/accessors are now source-accepted with original production prefixes
-preserved. No compiler or tests ran during authoring or review. The future private
-context is still absent, and known production compile errors may block execution;
-a mixed compile stop is not behavioral red.
+Latest review: [signature-context expected red 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md).
+Hermes submitted the exact command once, exit 101, five errors and one warning,
+zero tests executed. The missing private context appeared with four known source
+prerequisites. Its diagnostics and sixteen before/after file measurements are
+verified, with documented attribution/procedure errata and a deferred evidence
+integration limitation. This is not isolated behavioral red or test acceptance.
 
+The four-test source and two test declarations/accessors remain source-accepted.
 The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
-and [original test handoff](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
-retain the future typed signature_hash adapter, private interface, independent
-PCZT oracle, and falsification contract. The
-[native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
-still governs the separate modal lifetime and later native checks.
+and [original signature test handoff](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
+retain the future typed signature_hash adapter, private interface, PCZT oracle,
+and falsification contract. Keep its production repair separate from the current
+mechanical slice. No intermediate rerun is automatically authorized.
 
-Native prerequisite-02 command/runtime/outcome and fourteen hash rows remain
-accepted with [authoritative evidence errata](../docs/testing/BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md).
-That check ran zero tests. Prior evidence repair and source/lock integration
-remain deferred. Actual-secret cleanup, independent transaction-effect recovery,
-and native confirmation remain unresolved; this signature-context slice does
-not accept them.
+The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+still governs the separate modal lifetime and native checks. Prior evidence
+corrections and source/lock integration remain deferred. Actual-secret cleanup,
+independent transaction-effect recovery, and native confirmation remain unresolved;
+this compile-prerequisite slice does not accept them.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
