@@ -26,7 +26,9 @@ Starting 306 lines, b0d4da8770a400315889e5d69ad830e3e08d707c5bc62ca1f6e633798703
 The ten existing tests, confirmation state transitions, App wrapper/runner,
 window size, authority, dependencies, and all other source remain frozen.
 No new tests, compiler/formatter/test execution, evidence, Git, or integration.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization f2c942b8, CLI grok-4.6 High,
+session 1e93d0db-3e54-4d88-a7e3-ce1c35a7bd9a, outer terminal 38040.
+No completion collected; do not relaunch or poll.
 
 After source review, group ten-test green, the two already specified layout/App
 falsifications, and native compilation. No additional speculative coverage slice.
