@@ -1,32 +1,31 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: COMPILE PREREQUISITES 01 ONLY — GROK HIGH
+Status: SIGNATURE-CONTEXT PRODUCTION 01 ONLY — GROK HIGH
 
-Active actor authorization: [Grok compile prerequisites 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_COMPILE_PREREQUISITES_01.md).
-Four mechanical edits in spend.rs and test_support.rs: recipient borrowing, proof
-Option cloning, exhaustive fault conversion, and unused-mut removal. Test source,
-signature-context implementation, native work, execution, evidence, and integration
-remain closed.
+Active actor authorization: [Grok signature-context production 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_PRODUCTION_01.md).
+Only spend.rs may change: add the fixed private context/authorization marker and
+wire its retained decoded data and computed message into the actual verifier.
+Every present transparent bundle must be rejected before cryptographic checking.
+Preserve existing preflight, validation, errors, and cleanup. Tests, dependencies,
+native work, execution, evidence, and integration remain closed.
 
-Latest review: [signature-context expected red 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md).
-Hermes submitted the exact command once, exit 101, five errors and one warning,
-zero tests executed. The missing private context appeared with four known source
-prerequisites. Its diagnostics and sixteen before/after file measurements are
-verified, with documented attribution/procedure errata and a deferred evidence
-integration limitation. This is not isolated behavioral red or test acceptance.
+Latest review: [compile prerequisites 01 source review](../docs/testing/BBD-WAL-009-COMPILE-PREREQUISITES-01-REVIEW.md).
+Grok's four mechanical edits are source-accepted. Reversing the exact replacements
+reconstructs both full starting hashes; all fifteen other pending file identities
+are unchanged. No compiler/test result or broader behavior acceptance is claimed.
 
-The four-test source and two test declarations/accessors remain source-accepted.
+The four-test source remains frozen. The understood [mixed expected-red stop](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md)
+preceded this production task: five errors, one warning, zero tests executed.
+No intermediate rerun is open. Later Hermes execution must prove focused green,
+falsify transparent rejection and the computed message, and run the reserved
+broader regressions after source review.
+
 The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
 and [original signature test handoff](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
-retain the future typed signature_hash adapter, private interface, PCZT oracle,
-and falsification contract. Keep its production repair separate from the current
-mechanical slice. No intermediate rerun is automatically authorized.
-
-The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
-still governs the separate modal lifetime and native checks. Prior evidence
-corrections and source/lock integration remain deferred. Actual-secret cleanup,
-independent transaction-effect recovery, and native confirmation remain unresolved;
-this compile-prerequisite slice does not accept them.
+retain the private interface and independent PCZT oracle. The [native test contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+still governs the separate modal lifetime and native checks. Actual-secret
+cleanup, independent transaction-effect recovery, and native confirmation remain
+A3 blockers. Evidence errata/normalization and source/lock integration stay deferred.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
