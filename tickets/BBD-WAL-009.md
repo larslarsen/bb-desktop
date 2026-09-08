@@ -1,31 +1,30 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT PRODUCTION 01 ONLY — GROK HIGH
+Status: SIGNATURE-CONTEXT FALSIFICATION ORDER 01 ONLY — GROK HIGH
 
-Active actor authorization: [Grok signature-context production 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_PRODUCTION_01.md).
-Only spend.rs may change: add the fixed private context/authorization marker and
-wire its retained decoded data and computed message into the actual verifier.
-Every present transparent bundle must be rejected before cryptographic checking.
-Preserve existing preflight, validation, errors, and cleanup. Tests, dependencies,
-native work, execution, evidence, and integration remain closed.
+Active actor authorization: [Grok falsification order 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_FALSIFICATION_ORDER_01.md).
+Only one existing assertion in verification_context_tests.rs may move. Place its
+message-to-PCZT equality after the real valid spend/binding checks so deliberate
+message corruption reaches the required signature-positive failure. All other
+source/test bytes, dependencies, native work, execution, evidence, and integration
+remain frozen.
 
-Latest review: [compile prerequisites 01 source review](../docs/testing/BBD-WAL-009-COMPILE-PREREQUISITES-01-REVIEW.md).
-Grok's four mechanical edits are source-accepted. Reversing the exact replacements
-reconstructs both full starting hashes; all fifteen other pending file identities
-are unchanged. No compiler/test result or broader behavior acceptance is claimed.
+Latest review: [signature-context production 01](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-PRODUCTION-01-REVIEW.md).
+The one-file private context and actual verifier wiring are source-accepted.
+Reversing the saved edits reconstructs the full starting hash; all sixteen other
+pending file identities are unchanged. No compiler or test result is claimed.
+The test-order finding narrows earlier test-source acceptance; required
+falsification readiness still needs the bounded correction and execution.
 
-The four-test source remains frozen. The understood [mixed expected-red stop](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md)
-preceded this production task: five errors, one warning, zero tests executed.
-No intermediate rerun is open. Later Hermes execution must prove focused green,
-falsify transparent rejection and the computed message, and run the reserved
-broader regressions after source review.
+The [understood mixed red](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-EXPECTED-RED-01-REVIEW.md)
+preceded the mechanical/context repairs. After this correction's source review,
+Hermes must prove focused green, falsify transparent rejection and the computed
+message with exact restoration, and run the reserved broader regressions.
+The original private interface and independent PCZT oracle remain unchanged.
 
-The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
-and [original signature test handoff](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
-retain the private interface and independent PCZT oracle. The [native test contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
-still governs the separate modal lifetime and native checks. Actual-secret
-cleanup, independent transaction-effect recovery, and native confirmation remain
-A3 blockers. Evidence errata/normalization and source/lock integration stay deferred.
+Actual-secret cleanup, independent transaction-effect recovery, and native
+confirmation remain A3 blockers. Evidence errata/normalization and developer
+source/lock integration stay deferred.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
