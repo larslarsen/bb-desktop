@@ -1,47 +1,46 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 RETAINED-SPEND VALIDATION 01 — HERMES
+State: WAL-009 CLOCK-READ ORACLE CORRECTION 01 — GROK HIGH
 Reviewer: Codex at XHigh; owner requested grouped work and shorter reports
-Authorized source actors: none; Grok repair 02 is complete
-Authorized execution/evidence actor: Hermes Jr Dev only
-Authorized integration actors: none
+Authorized source actor: Grok Build, CLI grok-4.6, High; one test path only
+Authorized execution/evidence/integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md](HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md)
-Reviewer checkpoint: [retained-spend source review 02](../testing/BBD-WAL-009-RETAINED-SPEND-SOURCE-REVIEW-02.md)
+Active handoff: [GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md](GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md)
+Reviewer checkpoint: [validation stop review](../testing/BBD-WAL-009-RETAINED-SPEND-VALIDATION-STOP-REVIEW.md)
 Read this leading section and those two linked records; no historical reload.
 
-Grok session d91bf773-249e-4701-9da4-620856c899be, outer 8471, was collected
-once after done, exit 0. Runtime grok-4.6-build High; source drop accepted for
-execution. Tests led production. Four authorized paths changed; all twenty
-pending file identities and the frozen context implementation/tests were verified.
+Hermes outer 53836 was collected once after done, exit 0. Completed session
+20260908_102051_01693b, v0.18.2, nous, poolside/laguna-s-2.1:free.
+The two new metadata tests passed. The completed integration execution has prepare
+11 passed and sign/verify 13 passed/one failed; both repaired signing paths passed.
+No mutation was reached and all twenty original identities still match.
 
-The repair retains the unsigned real spend's index/key/nullifier/actual value,
-uses the public parsed-PCZT Verifier role by ownership, and rechecks that identity
-and positive-real/zero-padding values after proving. External signing propagates
-and verifies the actual retained action index. The real crypto pipeline remains.
+The sole failure is the test's exact-one clock-read assertion: the still-valid
+pre-expiry case checks at its barrier and again before publication. Production
+expiry enforcement remains intact. Grok may change only that assertion to require
+at least one read, retaining all exact deadline outcomes and other checks.
+Baseline zec_sign_verify.rs: 1117 lines, 2b759017... (full hash in handoff).
 
-Hermes may run five ordered commands: focused metadata green; prepare/sign-verify
-integration green; isolated slot-zero falsification; isolated witness-count
-falsification; restored full library green. Each mutation must be restored and
-hash-verified on every outcome. Stop on any unexpected result. Only the new
-retained-spend validation evidence record may persist; no source repair or Git
-mutation is authorized. Actual runtime/version and exact outputs must be recorded.
+Hermes violated the no-repeat rule: initial timeout, a piped rerun it killed, and
+an exact background rerun. Completed result 77956 and full saved log 77962 were
+verified. Execution compliance and evidence-completeness claims are rejected;
+use the stop review's authoritative errata. New report: 287 lines,
+7bd3f2f915b7f4f41c00f942e98e56d0677a8776828a93a3e78351ba63b3a4d9.
+No evidence-only correction actor. Next Hermes task will combine focused corrected
+test green, unfinished falsifications/library green, and evidence corrections.
+It must start each long command once in background and collect its full log.
+Do not repeat the entire expensive integration suite for an assertion-only change.
 
-Launch status: Hermes launched once from `b513dbd2` with `--pass-session-id`,
-outer terminal 53836. Initial return contained no session/runtime text; collect
-that identity with completion. No completion collected, duplicate actor, or
-polling. Collect only after done or explicit collection. XHigh remains appropriate.
+Launch status: authorized; not yet launched. Launch once and checkpoint here.
+No duplicate actor or polling. Collect only after done or explicit collection.
+XHigh remains appropriate; pause if it needs changing.
 
-Previous validation remains context 4 passed and three falsifications failed;
-prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun. New repair
-results are pending. Prior evidence-data acceptance and deferred minor errata
-remain unchanged. Pending source/package/locks and five evidence records remain
-uncommitted. Full recovered effects, actual-secret cleanup, native confirmation,
-remaining security, integration, mainnet, network, broadcast, Monero, and broader
-work are outside this execution task.
+Pending source/package/locks and six evidence records remain uncommitted. Full
+recovered effects, actual-secret cleanup, native confirmation, security gates,
+integration, mainnet, network, broadcast, Monero, and broader work remain pending.
 
 ## Historical record (superseded by the active state above)
 

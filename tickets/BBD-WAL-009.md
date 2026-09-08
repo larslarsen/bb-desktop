@@ -1,22 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: RETAINED-SPEND VALIDATION 01 — HERMES
+Status: CLOCK-READ ORACLE CORRECTION 01 — GROK HIGH
 
-Active authorization: [grouped Hermes validation](../docs/handoff/HERMES_BBD_WAL_009_RETAINED_SPEND_VALIDATION_01.md).
-Grok repair 02 is accepted for execution in the
-[retained-spend source review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-SOURCE-REVIEW-02.md).
-The four-path tests-first drop retains actual spend identity/value through proving
-and verifies the actual external action index against the retained PCZT.
+Active authorization: [one-path Grok test correction](../docs/handoff/GROK_BUILD_BBD_WAL_009_CLOCK_READ_ORACLE_01.md).
+The completed diagnostic run passed both metadata tests, all 11 prepare tests,
+and 13 of 14 sign/verify tests, including both repaired signing routes. The remaining
+failure demands exactly one clock read although the valid path rechecks before
+publication. Require a positive read count and preserve exact expiry outcomes.
 
-Hermes alone may run focused/affected integration green, two exact isolated
-falsifications, and restored library green. Restore mutations on every outcome;
-stop on unexpected results. Record exact runtime and execution evidence.
-No source edits, integration, or Git mutation beyond those temporary controls.
+The [validation stop review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-VALIDATION-STOP-REVIEW.md)
+records Hermes's prohibited reruns and report omissions. All source identities
+are unchanged; no falsification was reached. Execution compliance and full
+validation remain unaccepted. Evidence corrections will be grouped with the next
+focused execution; no whole integration-suite rerun for this test-only change.
 
-The accepted decoded context/verifier and its four tests remain unchanged.
-New repair execution is pending. Full recovered effects, actual cleanup, native
-confirmation, remaining security, and integration are separate requirements.
-No polling; reviewer remains XHigh.
+Production, execution, integration, and all other source/test paths are frozen.
+Full recovered effects, actual cleanup, native confirmation, and remaining
+security are separate blockers. No polling; reviewer remains XHigh.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
