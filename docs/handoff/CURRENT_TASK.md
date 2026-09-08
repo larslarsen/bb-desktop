@@ -53,8 +53,10 @@ Frozen anchors:
 - verification_context_tests.rs: 528 lines, SHA-256
   `78e7fe50c3bd213f8d0067957bf1771bd42137d46b9e0e8e7adbcb50d8330dec`.
 
-Launch status: authorized, not yet launched. Record the single Grok session and
-outer terminal identifier after publishing this handoff. No duplicate actor.
+Launch status: Grok was launched from governance commit `99d7a437`, CLI model
+`grok-4.6`, reasoning High, session `d80b2875-cb42-4d53-8b97-926fb3a1026e`,
+outer terminal session 64906. No completion has been collected. Leave this run
+alone until the owner reports done; do not poll or launch a duplicate.
 
 The owner explicitly forbids polling. Collect an actor only after the owner
 reports completion or explicitly requests collection. The owner also asks for a
