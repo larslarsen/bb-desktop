@@ -33,9 +33,10 @@ All mutations are restored. No Grok execution or repeat of the old red is allowe
 Corrected evidence data is accepted with minor report/procedure errata deferred
 as recorded in the prior validation-acceptance review.
 
-Launch status: authorized; not yet launched. Launch exactly once, then checkpoint
-its session here. No duplicate actor or polling; collect only after done or an
-explicit collection request. XHigh remains appropriate; pause if that must change.
+Launch status: Grok launched once from `ab81e291`, CLI grok-4.6 High, session
+`d91bf773-249e-4701-9da4-620856c899be`, outer terminal 8471. No completion
+collected. No duplicate actor or polling; collect only after done or an explicit
+collection request. XHigh remains appropriate; pause if that must change.
 
 All pending developer source/package/lock work and five evidence records remain
 uncommitted. Hermes later owns separately authorized grouped execution,
