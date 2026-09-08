@@ -2,73 +2,55 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 SIGNATURE-CONTEXT VALIDATION EVIDENCE CORRECTION 01 ONLY — HERMES
+State: WAL-009 RETAINED-SPEND REPAIR 01 — GROK HIGH
 
-Reviewer: Lead Engineer/Reviewer — Codex at XHigh (owner resumed)
+Reviewer: Codex at XHigh; owner requested fewer handoffs and shorter reports
 
-Authorized source actor: none
-
-Authorized execution actor: none; the validation run has stopped
-
-Authorized evidence actor: Hermes Jr Dev, correction of one existing record only
-
-Authorized integration actor: none
+Authorized source actor: Grok Build, CLI grok-4.6, High; combined tests-first repair
+Authorized execution/evidence/integration actors: none
 
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
+Active handoff: [GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_01.md](GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_01.md)
+Reviewer checkpoint: [validation acceptance and retained-spend review](../testing/BBD-WAL-009-VALIDATION-ACCEPTANCE-AND-RETAINED-SPEND-REVIEW.md)
 
-Active handoff:
-[HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md)
+Read only this leading section and those two linked records; no historical reload.
 
-Reviewer checkpoint:
-[BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md](../testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md)
+Hermes correction outer 60108 was collected once on Continue, exit 0. Session
+20260908_090052_c07851, v0.18.2, nous, poolside/laguna-s-2.1:free is complete.
+Corrected evidence: 677 lines, SHA-256
+6a23bcb2943df54953d1acddf85a2ec9cfc41b92e84c12856a48b7d07be53c58.
+All five outputs/commands and seventeen before/after identities are verified.
+Remaining report/procedure errata are recorded in the review and deferred to
+integration, without another evidence correction cycle. No prior actor is active.
 
-Context-reset checkpoint: read only this leading section, the active handoff, and
-reviewer checkpoint. Earlier execution/source permissions are closed.
+Verified validation remains: context 4 passed; three required falsification
+failures; prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun.
+All mutations are restored. No tests are to be rerun by Grok.
 
-The owner reported Hermes done. Outer 48001 was collected once, exit 0. Original
-session 20260908_082758_10ad42, Hermes v0.18.2, nous,
-poolside/laguna-s-2.1:free, ran from c4fc4ec9 and observed 38aed7e8.
-The saved data verifies exactly five commands: focused context 4 passed; all three
-required falsification failures at their intended sites; prepare 11 passed;
-sign/verify 6 passed and 8 failed. Full library/restored focused green was not run.
-Both mutations were exactly restored and all seventeen starting identities match.
+The reviewer found two concrete source defects: witnesses on padding are counted
+as real spends, and external signing assumes action index zero despite shuffled
+placement. Grok may batch the regression extension and fixed production corrections
+in one four-path drop. Capture the unique unsigned spend's identity before signing,
+preserve it through final inspection, and propagate/verify the actual external
+action index against the retained PCZT. Preserve actual cryptographic verification.
 
-The execution/results/restoration are accepted as partial validation. The submitted
-538-line evidence is rejected: manually transcribed output changed diagnostic
-details and omitted the final integration error. It also lacks a full after table
-and contains incorrect path counts, unsupported cause speculation, and omitted
-procedure deviations. Hermes may rebuild ONLY that record from the exact saved
-message IDs in the new handoff. No test rerun, source repair, or fresh investigation.
+Writable baselines are in the handoff: spend.rs (929 lines, bd51b3d0...),
+test_support.rs (4371, fea8f65e...), zec_sign_verify.rs (1115, 80a3a342...),
+plus new private spend/external_binding_tests.rs. Verify full hashes there.
+The accepted context helper/verifier and four context tests stay frozen.
 
-Writable evidence baseline: BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01.md,
-538 lines, SHA-256
-`593753f1011a385b763f3f3f7d9225f98f44f4dae587901ff74c7a4bcfd6d9ac`.
-Frozen spend.rs: 929 lines, SHA-256
-`bd51b3d0ee2f748fa31e483a2747c157ff20544aa62e3e00a7929c77060b7361`.
-Frozen context tests: 528 lines, SHA-256
-`45f3bdf2f1d08924d53c298517c631427ab052c2d4955b31e98aa555386d380a`.
+Launch status: authorized, not yet launched. Record the single Grok session.
+No duplicate actor. Owner forbids polling; collect only after done or explicit
+collection request. XHigh remains appropriate; pause if that needs changing.
 
-Launch status: Hermes correction launched from governance commit `8e6923a4` with
-`--pass-session-id`, outer terminal session 60108. No completion has been collected.
-Record its actual correction session ID/runtime in the corrected evidence.
-Leave it alone until the owner reports done; do not poll or launch a duplicate.
-
-The owner forbids polling. Collect only after done or explicit collection request.
-XHigh remains appropriate; pause if a different reviewer reasoning level is needed.
-
-All developer source/package/lock changes and five implementation evidence records
-remain uncommitted. Earlier evidence errata and normalization stay deferred to
-explicit integration. This correction must preserve all seventeen original paths.
-Do not recollect completed actors or resume the unrun library command.
-
-After corrected evidence review, scope the software INTENT_MISMATCH and external
-SIGNATURE_INVALID failures separately. The cause is unresolved; a shared error
-code does not locate it in the context constructor. Independent recovered effects,
-actual-secret cleanup, and native confirmation remain A3 blockers. Metadata-copy
-comparisons and synthetic wipe counters stay unaccepted. Native, security,
-integration, mainnet, broadcast, Monero, network, and wider work remain pending.
+All developer source/package/lock work and five evidence records stay uncommitted.
+Hermes later owns grouped execution, falsification, and integration when separately
+authorized. No source/test authority extends beyond the active handoff.
+Independent recovered effects, actual-secret cleanup, native confirmation, and
+remaining security gates stay unaccepted. Mainnet, network, broadcast, Monero,
+and broader work remain parked.
 
 ## Historical record (superseded by the active state above)
 

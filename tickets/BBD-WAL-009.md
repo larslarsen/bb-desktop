@@ -1,29 +1,24 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIGNATURE-CONTEXT VALIDATION EVIDENCE CORRECTION 01 ONLY — HERMES
+Status: RETAINED-SPEND REPAIR 01 — GROK HIGH
 
-Active actor authorization: [Hermes evidence correction 01](../docs/handoff/HERMES_BBD_WAL_009_SIGNATURE_CONTEXT_VALIDATION_EVIDENCE_CORRECTION_01.md).
-Rebuild only the existing validation evidence from exact saved command/result and
-measurement IDs. No execution, source/test repair, dependency operation, or
-integration is authorized.
+Active authorization: [combined Grok repair](../docs/handoff/GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_01.md).
+Author regression extensions first, then preserve real-spend identity through
+signing/proving and carry actual action indices through external contributions.
+Four source/test paths only; execution and integration remain closed.
 
-Latest review: [validation 01 review](../docs/testing/BBD-WAL-009-SIGNATURE-CONTEXT-VALIDATION-01-REVIEW.md).
-The five exact commands and source restorations are verified: four focused tests
-passed; transparent rejection and both message-corruption controls failed at
-their intended assertions; all 11 prepare tests passed; sign/verify had 6 passes
-and 8 failures. The full library command was correctly not reached.
+Latest review: [validation acceptance and retained-spend findings](../docs/testing/BBD-WAL-009-VALIDATION-ACCEPTANCE-AND-RETAINED-SPEND-REVIEW.md).
+Corrected diagnostic blocks, commands, and source identities are verified;
+remaining attribution/procedure errata are deferred without another record retry.
+Context tests/falsifications passed; prepare passed 11 tests; sign/verify failed
+8 of 14; full library remains unrun.
 
-The submitted evidence is rejected because manual transcription altered diagnostic
-details, mislabeled target paths, and omitted the final integration error. Correct
-it from saved JSON, include full before/after identities and procedure errata,
-remove unsupported root-cause speculation, and leave the record uncommitted.
-No tests need repeating to correct this evidence.
-
-All source identities remain restored. The software INTENT_MISMATCH and external
-SIGNATURE_INVALID failures need subsequent bounded reviewer triage. Focused
-context success does not establish the full payment pipeline, independent
-recovered effects, actual-secret cleanup, or native confirmation. Earlier
-evidence corrections and developer source/lock integration remain deferred.
+The existing real software/external success failures provide understood red
+regressions. New deterministic metadata coverage must accept retained slots zero
+and one and reject wrong pool/index/key/signature metadata. Later Hermes must
+run the grouped affected tests and falsify the repaired guards.
+Full recovered effects, actual cleanup, native confirmation, security, and
+developer integration remain separate pending requirements.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
