@@ -49,8 +49,10 @@ and remove an unused Write import. Only that one test file may change under the
 active correction handoff. Keep all four test names and the future private
 interface unchanged. The production context/marker must remain absent.
 
-Launch status: correction authorized but not yet launched. Check the later launch
-checkpoint before starting an actor; never duplicate a recorded active run.
+Launch status: correction launched from governance commit `2280f01e`, CLI model
+`grok-4.6`, reasoning High, session `89408f90-bfc2-4d50-a3a2-9895844f7c37`,
+outer terminal session 27805. No completion has been collected. Leave it alone
+until the owner reports done; do not poll or launch a duplicate.
 
 The owner explicitly forbids polling. Collect a launched actor only after the
 owner reports completion or explicitly requests collection. The owner also asks
