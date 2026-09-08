@@ -1,44 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 NATIVE LAYOUT REPAIR 01 — GROK BUILD
-Reviewer: Codex; High sufficient for this bounded UI repair/review
-Authorized source actor: Grok Build 4.6 High only
-Authorized execution/evidence/integration actors: none
+State: WAL-009 GROUPED NATIVE LAYOUT VALIDATION 01 — HERMES
+Reviewer: Codex; High sufficient for this bounded validation/review
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [GROK_BUILD_BBD_WAL_009_NATIVE_LAYOUT_REPAIR_01.md](GROK_BUILD_BBD_WAL_009_NATIVE_LAYOUT_REPAIR_01.md)
-Reviewer decision: [native App/layout red review](../testing/BBD-WAL-009-NATIVE-APP-RED-01-REVIEW.md)
+Active handoff: [HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md](HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md)
+Reviewer decision: [layout repair source review](../testing/BBD-WAL-009-NATIVE-LAYOUT-REPAIR-01-SOURCE-REVIEW.md)
 Read this prefix and linked records only; no historical handoff reload.
 
-Hermes outer 86077 collected once after Continue, exit 0. Completed session
-20260908_141026_ac52d5, Hermes 0.18.2, nous/poolside/laguna-s-2.1:free.
-The single test execution exited 101: 3 passed, 1 failed, 12 filtered. Only the
-360x480 long-review case failed, at viewport.contains_rect; normal-size layout
-and both actual App lifecycle tests passed. Full 43-line saved log accepted.
-All 25 frozen identities match. Report/procedural errata are recorded in the
-review without another correction-only turn or repeat of successful results.
+Grok session 1e93d0db-3e54-4d88-a7e3-ce1c35a7bd9a, outer 38040, collected once
+after done, exit 0; runtime grok-4.6-build High. The one-file layout repair is
+accepted for validation. native_ui.rs: 321 lines,
+d132a164a6413165291abd0582abf3eca4cacd3f33ce6eb4ac2b467e8774d960.
+Only the bounded scrolling review body and button-space calculation changed.
+All state/authority/lifecycle semantics, ten tests, and 25 other identities match.
 
-Grok may now change ONLY native_ui.rs's review-body layout to reserve room for
-Confirm/Cancel and scroll all immutable review fields within remaining space.
-Starting 306 lines, b0d4da8770a400315889e5d69ad830e3e08d707c5bc62ca1f6e633798703349c.
-The ten existing tests, confirmation state transitions, App wrapper/runner,
-window size, authority, dependencies, and all other source remain frozen.
-No new tests, compiler/formatter/test execution, evidence, Git, or integration.
-Launch status: launched once from authorization f2c942b8, CLI grok-4.6 High,
-session 1e93d0db-3e54-4d88-a7e3-ce1c35a7bd9a, outer terminal 38040.
-No completion collected; do not relaunch or poll.
+Hermes may run five commands: ten UI tests green; unbounded-body falsification;
+programmatic-close re-entry falsification; restored ten-test green; native
+compilation. Both exact mutations require complete restoration on every outcome.
+All tests/source are otherwise frozen. Write only the new named evidence record
+and stop. No source repair, extra tests/probes, prior evidence correction, Git
+mutation, or integration. Capture each command once in background with full log.
+Launch status: authorization prepared; launch once after governance commit.
 
-After source review, group ten-test green, the two already specified layout/App
-falsifications, and native compilation. No additional speculative coverage slice.
 High remains appropriate; flag XHigh before cryptographic/custody architecture.
 Owner asks for less churn within existing wallet scope, not a new demo milestone.
-Implementation remains uncommitted and is not a usable send flow; reviewer
-checkpoint commits are governance, not product delivery. Nine evidence records
-remain pending. OS/capability integration, independent recovered effects,
-actual-secret cleanup, and remaining security stay unaccepted; network/broadcast/
-mainnet/hardware/Monero stay parked. Prior accepted gates remain valid.
+No additional speculative coverage slice. Previously accepted results remain
+valid. Pending implementation and nine evidence records remain uncommitted;
+reviewer checkpoint commits are governance, not a delivered wallet flow.
+OS/capability integration, independent recovered effects, actual-secret cleanup,
+and remaining security stay unaccepted; network/broadcast/mainnet/hardware/Monero
+stay parked. No broader WAL-009 acceptance.
 
 Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, linked review.
 Launch once; collect after done/explicit collection. No actor polling.
