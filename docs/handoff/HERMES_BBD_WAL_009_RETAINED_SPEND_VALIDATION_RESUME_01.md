@@ -5,6 +5,36 @@ Run from bb-desktop root. All Grok source tasks are closed.
 Five ordered test commands, three exact temporary falsifications, one new evidence
 record, and correction of the named prior evidence record. No integration/repair.
 
+## Capacity interruption continuation
+
+This amendment overrides the unstarted-stage wording below. Resume completed
+Hermes invocation/session 20260908_114350_76a7e5 after its upstream HTTP 429
+capacity error. Stage 1 already ran ONCE and PASSED: command 78030, background
+proc_31fb6516c988 (78031), final completion 78047, exit 0, one passed/13 filtered,
+475.66 seconds. There is no running test to restart. Do NOT rerun stage 1.
+
+The reviewer accepts that saved completion result and its captured warning/build/
+test output as the stage-1 result. Include it directly from saved JSON in evidence.
+Retrieve the original full process log only if the existing handle remains
+available; an unavailable old handle does not authorize a test rerun. If necessary,
+read preflight and stage-1 records from that exact predecessor session even if
+this resumed invocation receives a new session ID. Record both runtime identities.
+
+All twenty-one file baselines still match; no mutation/evidence write was reached.
+Retain the prior runtime/version and preflight data. Do not repeat Git, version,
+filesystem, or toolchain probes. The reviewer separately confirmed that all known
+cwd/ancestor Cargo config/config.toml paths are absent. Recheck file hashes before
+the next mutation as already required, then continue ONLY stages 2-5 and the two
+specified evidence records. Preserve mandatory restoration and single launches.
+
+Disclose the capacity interruption and preflight deviations: original invocation
+attempted bare rustup/rustc, then used a shell-local PATH export and rustc version
+probe despite the prohibition. It also requested full config reads/directory
+listings; no config content was returned. Do not repeat those actions. The absolute
+HOME rustup Cargo command for stage 1 itself was submitted exactly as authorized.
+Original execution authorization is cced19c8 and observed checkpoint is 650a4a98;
+record this continuation amendment's commit separately.
+
 Read AGENTS.md, TESTING.md, docs/engineering/HERMES_JR_DEV_ROUTING.md, this handoff,
 the active CURRENT_TASK.md prefix, and the two bounded reviews:
 

@@ -32,12 +32,21 @@ The same task writes a new resume record and corrects the prior retained-spend
 record using exact named saved messages. Prior metadata 2-pass, prepare 11-pass,
 and other sign/verify 13-pass results are retained with execution deviations
 and report errata disclosed. Prior integration never achieved a full pass.
-Current focused/falsification/library results remain pending.
+The corrected focused test passed; falsification/library results remain pending.
 
-Launch status: Hermes launched once from `cced19c8` with `--pass-session-id`,
-outer terminal 42725. Initial return contained no session/runtime text; collect
-that identity with completion. No completion collected or actor polling. Collect
-only after done/explicit collection. XHigh remains appropriate.
+Capacity interruption: original outer 42725 collected once after done. Hermes
+session 20260908_114350_76a7e5 (nous, poolside/laguna-s-2.1:free) returned an
+upstream HTTP 429 capacity error after completing stage 1. Saved 78047: exit 0,
+one passed/13 filtered, 475.66 seconds. No later test, mutation, or evidence write
+was reached. All twenty-one baselines still match. No stage-1 rerun is authorized.
+
+Continuation authorization: resume that exact Hermes session once under the
+capacity amendment in the existing handoff. Retain the completed result and
+continue stages 2-5 plus both evidence records. Record original preflight probe
+and PATH deviations; no repeated preflight probes. Launch status: not yet resumed.
+Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, and linked
+source review only. No actor polling; collect after done/explicit collection.
+XHigh remains appropriate; this capacity failure does not require a change.
 
 Pending developer source/package/locks and six evidence records remain uncommitted.
 Full recovered effects, actual-secret cleanup, native confirmation, remaining

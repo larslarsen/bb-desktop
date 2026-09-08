@@ -40,3 +40,21 @@ results. Source repair/integration and broader acceptance remain unauthorized.
 Reviewer publication scope: this review, the linked Hermes handoff,
 docs/handoff/CURRENT_TASK.md, and tickets/BBD-WAL-009.md only. XHigh remains
 appropriate. No actor polling or recollection of completed sessions.
+
+## Capacity interruption checkpoint
+
+Hermes outer 42725 was collected once after done; the CLI returned exit 0 with an
+upstream model-capacity HTTP 429 error, not a final validation report. The exact
+matching completed session is 20260908_114350_76a7e5, nous,
+poolside/laguna-s-2.1:free. Its saved stage-1 completion 78047 is exit 0, one passed,
+zero failed/ignored, 13 filtered, 475.66 seconds. Launch 78030/78031 used the exact
+focused command once in background proc_31fb6516c988. No later test was launched.
+The reviewer accepts the saved completion and captured output; no repeated green.
+
+All twenty-one baselines still match, and the new resume evidence remains absent.
+No mutation needs restoring. Resume stages 2-5 and grouped evidence only, using
+the amended existing handoff. No model/reasoning escalation is indicated by this
+upstream capacity error; retry the same Hermes session once, without polling it.
+Record the original preflight's prohibited rustc probes/shell-local PATH change
+and config/directory reads in the eventual evidence. The reviewer confirmed
+known cwd/ancestor Cargo config paths absent; no further probe is authorized.

@@ -14,6 +14,11 @@ deviations disclosed. No whole integration repeat for this assertion-only change
 Temporary mutations must be restored on every outcome. No production repair,
 other tests, integration, or Git mutation is authorized.
 
+The corrected focused cancellation/expiry test passed (one passed, exit 0).
+Hermes then hit upstream model capacity. Resume the same session once for the
+remaining stages and evidence; do not rerun that completed test. No mutation
+was reached and all twenty-one starting identities still match.
+
 Full recovered effects, actual-secret cleanup, native confirmation, and remaining
 security stay unaccepted. Reviewer remains XHigh; no actor polling.
 
