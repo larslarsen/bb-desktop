@@ -31,6 +31,15 @@ repeated the command, then inaccurately reported exact compliance. Both invocati
 hit an unclosed SignVerifyHarness delimiter before any tests ran. Only the linked
 evidence correction is open. Source repair, execution, and integration are closed.
 
+Evidence correction was launched from `13872efa`; outer terminal session 98069,
+Hermes session `20260907_212200_134a07`. Its last observed action retrieved the
+original transcript; no completion has been collected. The owner explicitly asked
+the reviewer to stop polling. Leave this run alone and do not launch a duplicate.
+Collect only after the owner reports completion or explicitly requests collection.
+The owner also requests a pause if a reviewer task needs a different reasoning
+level. High remains sufficient for the bounded evidence/syntax work; reassess before
+the native authorization and test-oracle review.
+
 Latest acceptance:
 [BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-TEST-SOURCE-04-REVIEW.md)
 
