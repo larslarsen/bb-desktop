@@ -1,15 +1,16 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: HARNESS DELIMITER CORRECTION — GROK SOURCE ONLY
+Status: DELIMITER SOURCE ACCEPTED — HERMES PREREQUISITE CHECK 02 ONLY
 
-Active bounded authorization: [harness delimiter correction 05](../docs/handoff/GROK_BUILD_BBD_WAL_009_HARNESS_DELIMITER_05.md).
-Grok alone may append the missing closing delimiter in zec/test_support.rs. No
-other source edit, execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+Active bounded authorization: [native prerequisite check 02](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md).
+Hermes alone may execute one fresh compile-prerequisite check and record evidence.
+No source edit, broader execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
 still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [evidence correction review and errata](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md).
-The six-test source remains accepted. The execution hit an unrelated unclosed
-delimiter before any test ran, and the actor altered/repeated the command.
+Latest review: [delimiter source acceptance](../docs/testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md).
+The six-test source remains accepted. The earlier rejected execution hit an unrelated
+unclosed delimiter before any test ran, and the actor altered/repeated the command.
+The exact delimiter repair is now source-accepted; no compilation result is assumed.
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
 transaction-effect verification, and native confirmation remain unresolved.
 

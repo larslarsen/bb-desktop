@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 HARNESS DELIMITER CORRECTION — GROK SOURCE ONLY
+State: WAL-009 DELIMITER SOURCE ACCEPTED — HERMES PREREQUISITE CHECK 02 ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: Grok Build 4.6 High; append one closing delimiter only
+Authorized source actor: none; Grok's exact delimiter source drop is accepted
 
-Authorized execution actor: none
+Authorized execution actor: Hermes Jr Dev; single prerequisite check 02 only
 
-Authorized evidence actor: none; correction closed with reviewer errata
+Authorized evidence actor: Hermes Jr Dev; one new prerequisite record only
 
 Authorized integration actor: none
 
@@ -19,27 +19,23 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[GROK_BUILD_BBD_WAL_009_HARNESS_DELIMITER_05.md](GROK_BUILD_BBD_WAL_009_HARNESS_DELIMITER_05.md)
+[HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md)
 
 Context-reset checkpoint: read this leading section and the active handoff, not
 the historical log. The owner reported Hermes correction done; outer session 98069
 was collected once. Session `20260907_212200_134a07` is complete, and its command/
 result correction is accepted with the authoritative errata in the current review.
 The original run `20260907_211536_310238` remains rejected; zero tests ran.
-Do not collect or launch either completed Hermes run again. Only the linked Grok
-delimiter correction is open. The owner reported the first Grok launch done;
-outer session 31456 was collected once and returned exit 1 before source editing:
-the reviewer-supplied CLI model ID `grok-4.6-build` was unknown. The source remains
-4358 lines at starting SHA-256
-`21489e5cda159d670fbdd3b96b196bb0e40f8227fa8770a80b6bd7a3e1c23d83`.
-This was a reviewer launch-configuration error, not an implementation failure or
-reason to escalate developers. The CLI catalog lists `grok-4.6` as the default
-supported ID (it also emitted settings-fetch warnings).
-
-Corrected launch: CLI model `grok-4.6`, reasoning High, launched from `cf812d54`
-under the unchanged `405c789b` source authorization; outer terminal session 76020,
-Grok session `4bd9f31f-a5c1-46aa-8434-083989349b06`. No completion has been
-collected for this corrected launch. Leave it alone until the owner reports done.
+Do not collect or launch either completed Hermes run again. The owner reported
+Grok's corrected launch done; outer session 76020 was collected once with exit 0.
+Session `4bd9f31f-a5c1-46aa-8434-083989349b06`, CLI model `grok-4.6`, High,
+appended exactly `}\n` under the `405c789b` source authorization. The result is
+4359 lines, SHA-256
+`461fdd070318cc5f31a29af2cdceaab1d0b63dc23473641b61ea9aafc145cd1b`.
+Its entire original prefix is unchanged. Source task closed; do not relaunch Grok.
+The earlier outer session 31456 failed before editing because the reviewer supplied
+unsupported CLI model ID `grok-4.6-build`; use `grok-4.6` for future CLI launches.
+Only the linked fresh Hermes prerequisite check is open; it has not yet launched.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
@@ -47,10 +43,10 @@ level. High remains sufficient for the bounded evidence/syntax work; reassess be
 the native authorization and test-oracle review.
 
 Latest acceptance:
-[BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md)
+[BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md](../testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md)
 
 Current review:
-[BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-EVIDENCE-CORRECTION-01-REVIEW.md)
+[BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md](../testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -74,10 +70,11 @@ event path remain A3 blockers. Grok's six real-input regressions and private mod
 declaration are source-accepted. Hermes's initial-red run is rejected. Its unrelated
 unclosed-delimiter diagnostic is retained only for prerequisite triage; no UI test
 executed. The corrected evidence remains uncommitted and must accompany the current
-review's errata at later integration. Grok alone may append the missing impl delimiter
-in zec/test_support.rs; every other source byte is frozen. The existing Context::run
-API failure and missing dialog contract remain unobserved by that run. Native
-production repair, further execution, and integration are unauthorized.
+evidence-correction review's errata at later integration. The missing impl delimiter
+is now source-accepted; every source byte is frozen pending the one fresh Hermes
+prerequisite check. The existing Context::run API failure and missing dialog contract
+remain unobserved by the earlier run. Native production repair, broader execution,
+and integration are unauthorized.
 The fixed modal contract and later falsifications remain required. All pending work
 is preserved. Grok is available again; Sol remains usage-exhausted.
 
