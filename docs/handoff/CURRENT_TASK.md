@@ -32,7 +32,9 @@ stage 1 PASSED: saved 78612, exit 0, ten passed/6 filtered, 0.15 seconds. No mut
 or later command/evidence was reached. All 26 frozen identities still match.
 Resume the same session ONCE under the active handoff's capacity amendment for
 stages 2-5 and evidence only; do not rerun stage 1 or preflight. No actor polling.
-Continuation launch: prepared; launch once after governance commit.
+Continuation launched once from ad6c325b with --resume 20260908_145855_f82684
+and --pass-session-id, outer terminal 14430. No completion collected; do not
+relaunch or poll. Collect after done/explicit collection.
 
 High remains appropriate; flag XHigh before cryptographic/custody architecture.
 Owner asks for less churn within existing wallet scope, not a new demo milestone.
