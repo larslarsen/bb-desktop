@@ -27,7 +27,9 @@ was collected once. Session `20260907_212200_134a07` is complete, and its comman
 result correction is accepted with the authoritative errata in the current review.
 The original run `20260907_211536_310238` remains rejected; zero tests ran.
 Do not collect or launch either completed Hermes run again. Only the linked Grok
-delimiter correction is open. No new Grok run has yet been launched for this handoff.
+delimiter correction is open. Grok was launched from `405c789b`, outer terminal
+session 31456, Grok session `de833145-1f35-43e8-8574-c3f3b2aac178`. No completion
+has been collected. Leave this run alone until the owner reports done.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
