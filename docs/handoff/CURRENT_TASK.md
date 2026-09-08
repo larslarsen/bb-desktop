@@ -34,9 +34,10 @@ and other sign/verify 13-pass results are retained with execution deviations
 and report errata disclosed. Prior integration never achieved a full pass.
 Current focused/falsification/library results remain pending.
 
-Launch status: authorized; not yet launched. Launch once and checkpoint here.
-No actor polling or duplicate launch. Collect only after done/explicit collection.
-XHigh remains appropriate; pause if it needs changing.
+Launch status: Hermes launched once from `cced19c8` with `--pass-session-id`,
+outer terminal 42725. Initial return contained no session/runtime text; collect
+that identity with completion. No completion collected or actor polling. Collect
+only after done/explicit collection. XHigh remains appropriate.
 
 Pending developer source/package/locks and six evidence records remain uncommitted.
 Full recovered effects, actual-secret cleanup, native confirmation, remaining
