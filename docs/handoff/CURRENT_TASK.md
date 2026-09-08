@@ -41,7 +41,9 @@ test_support.rs (4371, fea8f65e...), zec_sign_verify.rs (1115, 80a3a342...),
 plus new private spend/external_binding_tests.rs. Verify full hashes there.
 The accepted context helper/verifier and four context tests stay frozen.
 
-Launch status: authorized, not yet launched. Record the single Grok session.
+Launch status: Grok launched from `4a337997`, grok-4.6 High, session
+`3026df1d-8a5c-4f63-b2a8-0cf1d279e5f4`, outer terminal 71820.
+No completion collected; leave it alone until done or explicit collection.
 No duplicate actor. Owner forbids polling; collect only after done or explicit
 collection request. XHigh remains appropriate; pause if that needs changing.
 
