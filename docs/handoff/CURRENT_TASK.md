@@ -26,7 +26,9 @@ compilation. Both exact mutations require complete restoration on every outcome.
 All tests/source are otherwise frozen. Write only the new named evidence record
 and stop. No source repair, extra tests/probes, prior evidence correction, Git
 mutation, or integration. Capture each command once in background with full log.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization 504b4953 via hermes -z with
+--pass-session-id, outer terminal 10169. Runtime session ID will be recorded on
+collection. No completion collected; do not relaunch or poll.
 
 High remains appropriate; flag XHigh before cryptographic/custody architecture.
 Owner asks for less churn within existing wallet scope, not a new demo milestone.
