@@ -30,9 +30,10 @@ hash-verified on every outcome. Stop on any unexpected result. Only the new
 retained-spend validation evidence record may persist; no source repair or Git
 mutation is authorized. Actual runtime/version and exact outputs must be recorded.
 
-Launch status: authorized; not yet launched. Launch once and checkpoint the
-session here. No duplicate actor or polling. Collect only after done or explicit
-collection. XHigh remains appropriate; pause if it needs changing.
+Launch status: Hermes launched once from `b513dbd2` with `--pass-session-id`,
+outer terminal 53836. Initial return contained no session/runtime text; collect
+that identity with completion. No completion collected, duplicate actor, or
+polling. Collect only after done or explicit collection. XHigh remains appropriate.
 
 Previous validation remains context 4 passed and three falsifications failed;
 prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun. New repair
