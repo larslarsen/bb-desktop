@@ -2,11 +2,11 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 LOCK SYNC ACCEPTED — A3 BLOCKED; NO ACTOR AUTHORIZED
+State: WAL-009 NATIVE REVIEW REGRESSION TEST SOURCE — GROK ONLY
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
-Authorized source actor: none
+Authorized source actor: Grok Build 4.6 High; two-path test-only drop
 
 Authorized integration actor: none
 
@@ -14,7 +14,12 @@ Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Active handoff: none. The lock evidence correction is complete and closed.
+Active handoff:
+[GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md](GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+
+Context-reset checkpoint: read this leading section and the active handoff, not
+the historical log. Collect the current Grok run once only when the owner reports
+done; do not poll or cancel it. Review the test-only drop before any Hermes run.
 
 Latest acceptance:
 [BBD-WAL-009-LOCK-SYNC-01-REVIEW.md](../testing/BBD-WAL-009-LOCK-SYNC-01-REVIEW.md)
@@ -41,8 +46,10 @@ and no version changes. The diff and corrected evidence are accepted; lockfile a
 evidence remain uncommitted for later Hermes integration. No further execution is
 authorized. Actual-secret cleanup observations, independent transaction-effect
 verification, and the native confirmation event path remain A3 blockers. The next
-UI slice requires a reviewer-fixed event/lifetime contract and real-input regression
-tests before production repair. All pending work is preserved.
+UI slice now has a fixed modal event/lifetime contract in the active handoff. Grok
+may author only six real-input regressions and their private test-module declaration.
+Production repair and Hermes execution/integration remain unauthorized. All pending
+work is preserved. Grok is available again; Sol remains usage-exhausted.
 
 ## Historical record (superseded by the active state above)
 
