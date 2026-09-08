@@ -35,7 +35,9 @@ Anticipated red is off-screen controls in a constrained layout; App callback
 lifecycle results are reported separately. An all-four pass is valid. No source
 repair, mutation, old-suite rerun, extra checks, report-only correction, or Git
 integration. All 25 inventory identities must match before and after execution.
-Launch status: authorization prepared; launch once after governance commit.
+Launch status: launched once from authorization 148ef213 via hermes -z with
+--pass-session-id, outer terminal 86077. Runtime session ID will be recorded on
+collection. No completion collected; do not relaunch or poll.
 
 Previously accepted six dialog tests, two intended faults, seventeen native
 surface regressions, native compilation, and retained-spend/signature-context
