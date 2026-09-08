@@ -1,22 +1,26 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: XHIGH SCOPING COMPLETE — HERMES EVIDENCE CORRECTION ONLY
+Status: SIGNATURE-CONTEXT TEST SOURCE ONLY — GROK HIGH
 
-Active actor authorization: [Hermes prerequisite evidence correction](../docs/handoff/HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md),
-one documentation path only. The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
-fixes the next signature-context design and required tests. No source edit,
-execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
-still fixes the modal lifetime and later green/falsification requirements.
+Active actor authorization: [Grok signature-context tests 01](../docs/handoff/GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md),
+one new private test module and two append-only test declarations/accessors.
+No existing production byte, execution, or integration is authorized to change.
+The [XHigh scoping review](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
+fixes the future typed signature_hash adapter. The active handoff freezes its
+private interface, real PCZT signing oracle, and four focused tests.
+The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+still fixes the separate modal lifetime and later green/falsification requirements.
 
-Latest review: [XHigh scoping](../docs/testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md).
-The six-test source remains accepted. The earlier rejected execution hit an unrelated
-unclosed delimiter before any test ran, and the actor altered/repeated the command.
-The exact delimiter repair is source-accepted. A fresh exact check observed the
-missing native dialog contract plus five unrelated errors and one warning; zero
-tests ran. The resulting evidence needs correction before integration. The owner
-resumed XHigh review; signature-context tests and source need separate later handoffs.
-Lockfile/evidence integration remains deferred. Cleanup observations, independent
-transaction-effect verification, and native confirmation remain unresolved.
+Latest review: [prerequisite-02 evidence correction](../docs/testing/BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md).
+Hermes's recovered command/runtime/outcome and fourteen hash rows are accepted
+with authoritative errata. Original check 02 remains a valid mixed compile stop:
+six errors, one warning, zero tests executed. The evidence remains uncommitted;
+its diagnostics require mechanical rendering and local-path normalization under
+a later Hermes integration handoff. Current evidence correction is closed.
+The six native tests and delimiter repair remain source-accepted. Known compile
+repairs need separate handoffs. Lockfile/evidence integration is deferred.
+Actual-secret cleanup, independent transaction-effect verification, and native
+confirmation remain unresolved; this signature-context slice does not accept them.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

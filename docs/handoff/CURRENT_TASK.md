@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 XHIGH SCOPING COMPLETE — HERMES EVIDENCE CORRECTION ONLY
+State: WAL-009 SIGNATURE-CONTEXT TEST SOURCE ONLY — GROK HIGH
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh (owner resumed)
 
-Authorized source actor: none; Grok's exact delimiter source drop is accepted
+Authorized source actor: Grok Build, CLI model `grok-4.6`, reasoning High
 
-Authorized execution actor: none; prerequisite check 02 is complete
+Authorized execution actor: none
 
-Authorized evidence actor: Hermes Jr Dev; prerequisite-02 evidence correction, one path only
+Authorized evidence actor: none; prerequisite-02 correction is closed with errata
 
 Authorized integration actor: none
 
@@ -19,83 +19,59 @@ Protected governance parent: the commit containing this task update
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
 Active handoff:
-[HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md](HERMES_BBD_WAL_009_PREREQUISITE_02_EVIDENCE_CORRECTION_01.md)
+[GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md](GROK_BUILD_BBD_WAL_009_SIGNATURE_CONTEXT_TESTS_01.md)
 
 Reviewer checkpoint:
-[BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md](../testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
+[BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md](../testing/BBD-WAL-009-PREREQUISITE-02-EVIDENCE-CORRECTION-01-REVIEW.md)
 
-Context-reset checkpoint: read this leading section and the reviewer checkpoint, not
-the historical log. The owner reported Hermes correction done; outer session 98069
-was collected once. Session `20260907_212200_134a07` is complete, and its command/
-result correction is accepted with the authoritative errata in the current review.
-The original run `20260907_211536_310238` remains rejected; zero tests ran.
-Do not collect or launch either completed Hermes run again. The owner reported
-Grok's corrected launch done; outer session 76020 was collected once with exit 0.
-Session `4bd9f31f-a5c1-46aa-8434-083989349b06`, CLI model `grok-4.6`, High,
-appended exactly `}\n` under the `405c789b` source authorization. The result is
-4359 lines, SHA-256
-`461fdd070318cc5f31a29af2cdceaab1d0b63dc23473641b61ea9aafc145cd1b`.
-Its entire original prefix is unchanged. Source task closed; do not relaunch Grok.
-The earlier outer session 31456 failed before editing because the reviewer supplied
-unsupported CLI model ID `grok-4.6-build`; use `grok-4.6` for future CLI launches.
-Hermes prerequisite check 02, launched from `e5418536`, is complete. The owner
-reported done and outer terminal session 25473 was collected once. Actual actor
-session `20260907_220511_907287` used Hermes v0.18.2, provider nous, model
-poolside/laguna-s-2.1:free. Its exact one-command execution is accepted as a valid
-prerequisite stop: six compile errors and one warning, zero tests executed. The
-missing native dialog contract was observed alongside five unrelated errors.
-Its evidence misattributes runtime, invents test names, and truncates required
-hashes/diagnostics; correction is required before integration. Only the linked
-one-file evidence correction is authorized. It was launched from `09cc3d5b`, outer
-terminal session 6932, with the current Hermes session ID supplied to the actor.
-No completion has been collected. Leave this run alone until the owner reports
-done; do not poll or launch a duplicate.
-Do not collect or relaunch any completed run.
+Context-reset checkpoint: read this leading section, the active handoff, and the
+reviewer checkpoint; do not reload the historical log.
+
+The owner reported Hermes correction done. Outer session 6932 was collected once
+with exit 0. Correction session `20260907_222229_2bc84d`, Hermes v0.18.2, provider
+nous, model poolside/laguna-s-2.1:free, is complete. The corrected record is 181
+lines, SHA-256
+`33d488dfcc88eb684d316bcffc547c051be412984d5633c54da76c1cef19dbe2`.
+Its command/runtime/outcome and all fourteen complete hash rows are accepted with
+authoritative errata in the checkpoint. The diagnostics are not verbatim, local
+paths remain, and exact retrieval-procedure compliance is not accepted. The record
+remains uncommitted; a later explicit Hermes integration handoff must mechanically
+render/fence the original diagnostics and normalize local prefixes before publishing.
+
+Original prerequisite check 02 remains a valid single exact command, exit 101,
+six errors/one warning, six declared native tests/zero executed. Original session
+`20260907_220511_907287`, outer 25473, is complete. The missing native dialog
+contract appeared alongside five unrelated compile errors. No behavior passed.
+Do not collect or relaunch either completed Hermes run.
+
+The [XHigh scoping review](../testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
+fixes the private move-only signature_hash type adapter. The active handoff now
+freezes its private interface and four tests using actual local fixture PCZT
+signing, decoding, signatures, and proof checks. Grok may create one private test
+module and append only the specified cfg(test) declaration and state-root accessor
+to spend.rs and test_support.rs. All existing production prefixes stay unchanged.
+No compiler repair, production implementation, execution, or integration is open.
+
+Launch status: authorized but not yet launched. Check the later launch checkpoint
+before starting an actor; never duplicate a recorded active run.
+
 The owner explicitly forbids polling. Collect any launched actor only after the
-owner reports completion or explicitly requests collection; do not duplicate it.
-The owner also requests a pause if a reviewer task needs a different reasoning
-level. The owner switched the reviewer to XHigh. Static scoping now fixes a private
-typed verification view that preserves the pinned signature_hash call and moves
-decoded data without cloning, while rejecting every present transparent bundle.
-The source review also bounds the remaining mechanical fixes and requires a
-separate test-first signature-context handoff. No source edit or execution is open.
-Evidence correction is separate and must recover original full data mechanically.
+owner reports completion or explicitly requests collection. The owner also asks
+for a pause when a task needs a different reviewer reasoning level. XHigh remains
+appropriate for the current security/test-oracle review; Grok's fixed source task
+uses High. CLI model `grok-4.6-build` is invalid; use `grok-4.6`.
 
-Latest acceptance:
-[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
-
-Current review:
-[BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md](../testing/BBD-WAL-009-PREREQUISITE-02-XHIGH-SCOPING-REVIEW.md)
-
-Accepted expected-red gate:
-[BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
-
-Accepted test-source review:
-[BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md](../testing/BBD-WAL-009-PHASE-A1-TEST-SOURCE-REVIEW-01.md)
-
-Accepted Zcash predecessor:
-[BBD-WAL-008-ACCEPTANCE-01.md](../testing/BBD-WAL-008-ACCEPTANCE-01.md)
-
-Parked Monero predecessor:
-[BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md](../testing/BBD-WAL-007-PHASE-D-ROOT-REVIEW-01.md)
-
-Correction 02's transaction buffer ownership repair is source-accepted in
-[BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md](../testing/BBD-WAL-009-TRANSACTION-CLEANUP-02-REVIEW.md).
-Hermes completed offline lock synchronization with exactly one root dependency added
-and no version changes. The diff and corrected evidence are accepted; lockfile and
-evidence remain uncommitted for later Hermes integration. Actual-secret cleanup
-observations, independent transaction-effect verification, and the native confirmation
-event path remain A3 blockers. Grok's six real-input regressions and private module
-declaration are source-accepted. Hermes's initial-red run is rejected. Its unrelated
-unclosed-delimiter diagnostic is retained only for prerequisite triage; no UI test
-executed. The corrected evidence remains uncommitted and must accompany the current
-evidence-correction review's errata at later integration. The missing impl delimiter
-is now source-accepted. Prerequisite check 02 observed the missing dialog contract,
-Context::run incompatibility, four other compile errors, and one warning. All source
-bytes are frozen. Native/signing production repair, further execution, and integration
-are unauthorized. XHigh scoping is recorded; only the evidence correction is open.
-The fixed modal contract and later falsifications remain required. All pending work
-is preserved. Grok is available again; Sol remains usage-exhausted.
+The six native widget tests and exact two-byte delimiter repair remain
+source-accepted. test_support.rs starts this task at 4359 lines, SHA-256
+`461fdd070318cc5f31a29af2cdceaab1d0b63dc23473641b61ea9aafc145cd1b`.
+The previous Grok session `4bd9f31f-a5c1-46aa-8434-083989349b06`, outer76020,
+is complete and must not be recollected. All pending source/package/lock changes
+and three implementation evidence records remain preserved and uncommitted.
+Actual-secret cleanup observations, independent recovered-effect comparison,
+and the native modal/capability path remain A3 blockers. The metadata-copying
+verifier and canary-only wipe counters are not accepted. The signature tests
+will not resolve those broader blockers. Grok is available; Sol remains
+usage-exhausted. Monero, mainnet, broadcast, network, and wider work stay parked.
 
 ## Historical record (superseded by the active state above)
 
