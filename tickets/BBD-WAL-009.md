@@ -1,24 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: RETAINED-SPEND REPAIR 01 — GROK HIGH
+Status: RETAINED-SPEND REPAIR 02 — GROK HIGH
 
-Active authorization: [combined Grok repair](../docs/handoff/GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_01.md).
-Author regression extensions first, then preserve real-spend identity through
-signing/proving and carry actual action indices through external contributions.
-Four source/test paths only; execution and integration remain closed.
+Active authorization: [combined Grok repair 02](../docs/handoff/GROK_BUILD_BBD_WAL_009_RETAINED_SPEND_REPAIR_02.md).
+Repair 01 stopped without edits on a private wire-value field. The reviewer
+verified the public Verifier::with_ironwood route to the parsed spend value;
+repair 02 keeps the original value predicates and four-path scope.
 
-Latest review: [validation acceptance and retained-spend findings](../docs/testing/BBD-WAL-009-VALIDATION-ACCEPTANCE-AND-RETAINED-SPEND-REVIEW.md).
-Corrected diagnostic blocks, commands, and source identities are verified;
-remaining attribution/procedure errata are deferred without another record retry.
-Context tests/falsifications passed; prepare passed 11 tests; sign/verify failed
-8 of 14; full library remains unrun.
+Latest review: [retained-spend API review](../docs/testing/BBD-WAL-009-RETAINED-SPEND-API-REVIEW.md).
+Author regression extensions first, then preserve actual real-spend identity/value
+through signing/proving and propagate actual shuffled external action indices.
+No dependency edits, test execution, or integration are authorized to Grok.
 
-The existing real software/external success failures provide understood red
-regressions. New deterministic metadata coverage must accept retained slots zero
-and one and reject wrong pool/index/key/signature metadata. Later Hermes must
-run the grouped affected tests and falsify the repaired guards.
-Full recovered effects, actual cleanup, native confirmation, security, and
-developer integration remain separate pending requirements.
+Existing software/external failures provide understood red. Later Hermes must
+run grouped affected tests and falsify witness classification and slot-one binding.
+Prior accepted results remain: context 4 passed and three falsifications failed;
+prepare 11 passed; sign/verify 6 passed/8 failed; full library unrun.
+Full recovered effects, actual cleanup, native confirmation, remaining security,
+and developer integration are pending. No polling; reviewer remains XHigh.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
