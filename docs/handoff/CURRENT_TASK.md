@@ -43,7 +43,9 @@ was reached. All twenty-one baselines still match. No stage-1 rerun is authorize
 Continuation authorization: resume that exact Hermes session once under the
 capacity amendment in the existing handoff. Retain the completed result and
 continue stages 2-5 plus both evidence records. Record original preflight probe
-and PATH deviations; no repeated preflight probes. Launch status: not yet resumed.
+and PATH deviations; no repeated preflight probes. Launch status: resumed once
+from `64358f25` with `--resume 20260908_114350_76a7e5 --pass-session-id`, outer
+terminal 47193. No completion collected; do not launch again or poll.
 Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, and linked
 source review only. No actor polling; collect after done/explicit collection.
 XHigh remains appropriate; this capacity failure does not require a change.
