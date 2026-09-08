@@ -1,16 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DELIMITER SOURCE ACCEPTED — HERMES PREREQUISITE CHECK 02 ONLY
+Status: PREREQUISITE STOP REVIEWED — AWAITING REVIEWER XHIGH
 
-Active bounded authorization: [native prerequisite check 02](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md).
-Hermes alone may execute one fresh compile-prerequisite check and record evidence.
-No source edit, broader execution, or integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
+Active actor authorization: none. The [prerequisite check 02 review](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
+records a valid single-command stop, mixed compile blockers, evidence defects, and
+the owner's requested reasoning-level checkpoint. No source edit, execution, or
+integration is authorized. The [native review tests 04 contract](../docs/handoff/GROK_BUILD_BBD_WAL_009_NATIVE_REVIEW_TESTS_04.md)
 still fixes the modal lifetime and later green/falsification requirements.
 
-Latest review: [delimiter source acceptance](../docs/testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md).
+Latest review: [prerequisite check 02](../docs/testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md).
 The six-test source remains accepted. The earlier rejected execution hit an unrelated
 unclosed delimiter before any test ran, and the actor altered/repeated the command.
-The exact delimiter repair is now source-accepted; no compilation result is assumed.
+The exact delimiter repair is source-accepted. A fresh exact check observed the
+missing native dialog contract plus five unrelated errors and one warning; zero
+tests ran. The resulting evidence needs correction before integration. Reviewer
+repair scoping pauses for XHigh under the owner's reasoning-level preference.
 Lockfile/evidence integration remains deferred. Cleanup observations, independent
 transaction-effect verification, and native confirmation remain unresolved.
 

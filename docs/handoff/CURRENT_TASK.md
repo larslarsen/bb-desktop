@@ -2,15 +2,15 @@
 
 Ticket: BBD-WAL-009
 
-State: WAL-009 DELIMITER SOURCE ACCEPTED — HERMES PREREQUISITE CHECK 02 ONLY
+State: WAL-009 PREREQUISITE STOP REVIEWED — AWAITING REVIEWER XHIGH
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
 Authorized source actor: none; Grok's exact delimiter source drop is accepted
 
-Authorized execution actor: Hermes Jr Dev; single prerequisite check 02 only
+Authorized execution actor: none; prerequisite check 02 is complete
 
-Authorized evidence actor: Hermes Jr Dev; one new prerequisite record only
+Authorized evidence actor: none; prerequisite evidence needs correction before integration
 
 Authorized integration actor: none
 
@@ -18,10 +18,12 @@ Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
 
-Active handoff:
-[HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md](HERMES_BBD_WAL_009_NATIVE_REVIEW_PREREQUISITE_02.md)
+Active handoff: none.
 
-Context-reset checkpoint: read this leading section and the active handoff, not
+Reviewer checkpoint:
+[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
+
+Context-reset checkpoint: read this leading section and the reviewer checkpoint, not
 the historical log. The owner reported Hermes correction done; outer session 98069
 was collected once. Session `20260907_212200_134a07` is complete, and its command/
 result correction is accepted with the authoritative errata in the current review.
@@ -35,21 +37,28 @@ appended exactly `}\n` under the `405c789b` source authorization. The result is
 Its entire original prefix is unchanged. Source task closed; do not relaunch Grok.
 The earlier outer session 31456 failed before editing because the reviewer supplied
 unsupported CLI model ID `grok-4.6-build`; use `grok-4.6` for future CLI launches.
-Only the linked fresh Hermes prerequisite check is open. It was launched from
-`e5418536`, outer terminal session 25473, with the actual Hermes session ID made
-available to the actor for its evidence record. No completion has been collected.
-Leave the run alone until the owner reports done; do not poll or duplicate it.
+Hermes prerequisite check 02, launched from `e5418536`, is complete. The owner
+reported done and outer terminal session 25473 was collected once. Actual actor
+session `20260907_220511_907287` used Hermes v0.18.2, provider nous, model
+poolside/laguna-s-2.1:free. Its exact one-command execution is accepted as a valid
+prerequisite stop: six compile errors and one warning, zero tests executed. The
+missing native dialog contract was observed alongside five unrelated errors.
+Its evidence misattributes runtime, invents test names, and truncates required
+hashes/diagnostics; correction is required before integration. No actor is active
+or authorized. Do not collect or relaunch any completed run.
 The owner explicitly forbids polling. Collect any launched actor only after the
 owner reports completion or explicitly requests collection; do not duplicate it.
 The owner also requests a pause if a reviewer task needs a different reasoning
-level. High remains sufficient for the bounded evidence/syntax work; reassess before
-the native authorization and test-oracle review.
+level. High completed the bounded audit. Pause now for the owner to switch the
+reviewer to XHigh before scoping the signature-hash authorization-context and
+proof/recipient repairs under the native authority and test-oracle constraints.
+At resume, bound evidence correction separately; source and execution remain closed.
 
 Latest acceptance:
-[BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md](../testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md)
+[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
 
 Current review:
-[BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md](../testing/BBD-WAL-009-HARNESS-DELIMITER-05-REVIEW.md)
+[BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md](../testing/BBD-WAL-009-NATIVE-REVIEW-PREREQUISITE-02-REVIEW.md)
 
 Accepted expected-red gate:
 [BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md](../testing/BBD-WAL-009-PHASE-A1-EXPECTED-RED-ACCEPTANCE-01.md)
@@ -74,10 +83,10 @@ declaration are source-accepted. Hermes's initial-red run is rejected. Its unrel
 unclosed-delimiter diagnostic is retained only for prerequisite triage; no UI test
 executed. The corrected evidence remains uncommitted and must accompany the current
 evidence-correction review's errata at later integration. The missing impl delimiter
-is now source-accepted; every source byte is frozen pending the one fresh Hermes
-prerequisite check. The existing Context::run API failure and missing dialog contract
-remain unobserved by the earlier run. Native production repair, broader execution,
-and integration are unauthorized.
+is now source-accepted. Prerequisite check 02 observed the missing dialog contract,
+Context::run incompatibility, four other compile errors, and one warning. All source
+bytes are frozen. Native/signing production repair, further execution, and integration
+are unauthorized pending the XHigh reviewer checkpoint.
 The fixed modal contract and later falsifications remain required. All pending work
 is preserved. Grok is available again; Sol remains usage-exhausted.
 
