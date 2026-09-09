@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: INITIAL TRANSPORT RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
+State: INITIAL TRANSPORT RED ACCEPTED — PRODUCTION SOURCE RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, exact four-path task
 Authorized execution/integration actors: none; Hermes red authorization closed
@@ -30,6 +30,8 @@ Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md,
 docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
+Grok launched once from 2213beff; outer 28116,
+session 64e98d89-1d15-4598-893f-f7309376243d. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
