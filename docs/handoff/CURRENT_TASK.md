@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED AUTHORIZED
+State: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source/integration actors: none
 Authorized execution/evidence actor: Hermes; exact five-command task
@@ -17,7 +17,8 @@ one-file test drop is accepted: 3810 lines, a58d85e5322f0cb01a78b636454f92547bd9
 Hermes may synchronize the reviewed npm graph offline, collect policy suite/CLI
 expected red and run Electron security/npm audit. Only lock/node_modules and one
 new evidence record may change. No production source extension or integration.
-No actor yet launched. Collect only on owner done/Continue; no polling or relaunch.
+Hermes launched once from d754f8dc; active outer 90392. Actual runtime session
+will be verified on collection. Collect only on owner done/Continue; no polling or relaunch.
 
 The current policy still expects eight Zcash source files and rejects the two
 reviewed extractor statements; the tests now cover the exact fourteen-file layout
