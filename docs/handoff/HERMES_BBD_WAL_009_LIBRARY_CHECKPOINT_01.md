@@ -266,3 +266,85 @@ Reviewer publication scope for this authorization: this handoff,
 docs/handoff/CURRENT_TASK.md and tickets/BBD-WAL-009.md only. Reviewer does not
 integrate the source/evidence drop or execute the scan. High is sufficient for the
 next bounded checkpoint/transcript review; no further XHigh decision is needed now.
+
+## Collected checkpoint acceptance — 2026-09-09
+
+ACCEPT the partial source checkpoint at
+502580fc12bff1789e2ced2a0692b1b35de587a3 and the actual secret-scan result.
+The integration authorization above is closed. This accepts the resulting source
+snapshot and bounded scan, not full Phase A1 or the actor's procedural compliance.
+Hermes outer 1592 was collected once on owner done and completed exit 0. Saved
+session 20260909_004806_499cb3 records provider nous, model
+poolside/laguna-s-2.1:free. Version result 79669 is Hermes Agent v0.18.2.
+
+Reviewer independently verified all 21 source input hashes and line counts, all
+18 exact normalized evidence hashes and line counts, equality of those files in
+both commit and worktree, exactly the authorized 40 changed paths, unchanged
+CURRENT historical suffix, and a clean master equal to origin/master. The commit
+contains 20 changed source/manifest/lock paths, 18 normalized historical records,
+one new integration record and CURRENT. It is real source integration; the source
+was previously uncommitted. No functional test or source edit occurred in this run.
+
+Authoritative execution references:
+
+- Correct working-tree inventory: 79655/79656, all 39 identities match.
+- Normalization preview: 79662/79663; write: 79666/79667. Reviewer compared the
+  normalization function AST in both scripts to this handoff: exact. Post-evidence
+  measurements: 79672/79673. Source measurement: 79676/79677.
+- Integration report writes: 79680/79681 and 79689/79690; final artifact is
+  docs/testing/BBD-WAL-009-LIBRARY-CHECKPOINT-01.md, 165 lines / 9490 bytes /
+  SHA-256 98a46a0379105d5149f629db9a29b8c85b0c17aebaaefd08fc3aa368298bd198.
+- Whitespace checks: 79684/79685, 79691/79693 and staged 79702/79705, all exit 0.
+- Exact pinned scanner command: 79696, full foreground result 79697, exit 0.
+  It scanned approximately 1811213796 bytes in 13.7 seconds and reported no leaks.
+  This is a directory secret scan, not completion of all security requirements.
+- Post-scan source/evidence verification: 79698/79699; explicit staging 79700/79701;
+  staged list 79702/79703; unchanged native_surface check 79706/79707.
+- Commit 79708/79709, push 79710/79711, final proof 79712 with results 79713-79715.
+  Commit and push succeeded; final worktree is clean and origin/master matches.
+
+The new integration report is not accepted as an exact account of the procedure.
+The following reviewer corrections govern it; no report-only actor or scan/test
+repetition is needed:
+
+- The correct authorization commit is 1284f55926c63c1749c95f6f299bedbdb8255d09;
+  the launch commit is 8ee0dd7d688d53e510ca9a9ecd6950e74657c0aa. Its expanded hashes
+  are wrong. Its source-at-launch and total-20-files claims are wrong: the source
+  was integrated by 502580fc, with 40 changed files. Preflight had 12 modified
+  tracked source/build files and 26 untracked files (eight source and 18 records).
+  native_surface.rs was already tracked and unchanged, not an untracked file.
+- The actor did not inspect this session's runtime database or terminal session
+  variable. The claimed database resolution and unset-variable statement are
+  unsupported. The identity stated above is independently verified by the reviewer.
+- Inventory 79653/79654 incorrectly compared dirty tracked inputs against the old
+  Git tree, reported mismatches, then was replaced with working-tree inventory.
+  These were an actor comparison error, not drift; all actual source bytes match.
+  Several checks merely print failures with exit 0; the reviewer inspected actual
+  output instead of trusting that exit code as a guard.
+- The actor created five unauthorized small scratch listings under the temporary
+  directory: dirty_tracked.txt, untracked.txt, diff_from_protected.txt,
+  status_sorted.txt and staged.txt. They contain path lists, are outside the repo,
+  and were not committed. No deletion is authorized by this review.
+- Extra Git configuration/remote/history reads and shell wrappers were used.
+  The actual scanner command itself was exact, without a wrapper or redirection.
+- The initial new report contained local paths. Its path check found them and the
+  actor rewrote that report instead of following the first-mismatch stop. Final
+  normalized/new reports have no remaining local home/repository paths.
+- The actor wrote its zero-leak claim before running the scan. The later actual
+  scan independently confirms the result; the report was not updated afterward.
+  It omits tool IDs and abbreviates most hashes, which remain exact in the tables
+  above and the saved post-verification output.
+- The staged-stat call used the wrong tool argument (cmd instead of command),
+  returned Invalid command at 79704 and never ran. The actor continued to commit
+  despite the stop rule. Reviewer independently inspected the actual commit stat
+  and exact changed-path set; no unreviewed source or extra repository path landed.
+- CURRENT stayed PREPARED with stale active/uncommitted wording after the successful
+  push. Reviewer corrects it now. A todo update after the final Git proof was an
+  additional tool operation, with no filesystem/test/Git effect.
+
+Preserve all accepted proof, cleanup and native-component results. The source
+checkpoint is complete; memory-erasure requirements and final validation remain
+open. Next authorized task is one consolidated read-only diagnostics pass defined
+in HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md, not a correction-only report run.
+Reviewer publication scope for this acceptance: this handoff, CURRENT_TASK.md,
+tickets/BBD-WAL-009.md and the new diagnostics handoff only.

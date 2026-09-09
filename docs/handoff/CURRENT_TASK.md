@@ -1,43 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CHECKPOINT PREPARED — SECRET SCAN/COMMIT/PUSH PENDING
-Reviewer: Codex; owner selected XHigh for the completed architecture decision
+State: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS AUTHORIZED
+Reviewer: Codex; High suffices for the fixed diagnostics/review task
 Authorized source actors: none
-Authorized execution/evidence/integration actor: Hermes, checkpoint 01 only
-Protected parent: the commit publishing this authorization; one CURRENT-only reviewer launch checkpoint is allowed
+Authorized execution/evidence actor: Hermes, diagnostics 01 only
+Authorized integration actors: none
+Protected parent: commit publishing diagnostics authorization; one CURRENT-only launch commit is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Decision and exact task: [library checkpoint 01](HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md)
-Read this prefix and that handoff only, plus its explicitly named workflow inputs.
+Active task: [consolidated diagnostics 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md)
+Acceptance: [library checkpoint](HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md#collected-checkpoint-acceptance--2026-09-09)
+Read this prefix and the active task only, plus its named workflow inputs.
 
-The runtime scope decision is complete. Keep the native review component: pinned
-eframe already reuses its loop. The eventual broker process main thread owns UI;
-private request/cancel lifetime and capability rules are fixed in the handoff.
-Actual executable/framing/Electron startup and OS evidence belong to later WAL-011
-integration; WAL-010 owns usable native/Pay flows. No native rewrite/extra GUI-test
-slice is authorized for the current fixture signing checkpoint.
+Partial source integration at 502580fc12bff1789e2ced2a0692b1b35de587a3 is accepted.
+The actual 40-file source/evidence commit is pushed; 21 source input identities and
+18 normalized records match exactly. The worktree was clean at acceptance. The
+single pinned Gitleaks directory scan passed, zero leaks. No functional tests or
+proofs were repeated. Implementation and historical evidence are now committed.
+Hermes outer 1592 / runtime 20260909_004806_499cb3 is completed and closed.
+Its new report/procedure deviations are corrected in the reviewer acceptance;
+no report-only correction or repeated scan is authorized.
 
-Pinned upstream typed keys/PCZT/prover memory do not have the erasure guarantees
-our buffer observers can prove. Full typed-secret erasure remains a Phase-A1/final-
-release blocker, requiring a separate dependency-level decision before real custody.
-No requirement is waived and no full Phase-A1/ticket/release acceptance is claimed.
+Hermes may now collect exactly four read-only diagnostics: formatter check,
+no-default library Clippy, native-ui library Clippy, and security-policy CLI.
+Ordinary diagnostic failures are collected together, not repaired/retried. No
+source change, functional test/proof, source integration or broader work authorized.
+Reviewer will launch once; do not independently launch another actor or poll.
 
-All 39 frozen input identities match. Hermes may normalize 18 evidence records,
-carry forward the two accepted reviewer corrections, scan for secrets, and commit/
-push the 20 changed source/manifest/lock paths plus evidence as a partial checkpoint.
-Source bytes and all accepted signing/native-component/cleanup/panic results remain
-unchanged. No functional tests, proof reruns, source edits or broader work authorized.
-
-Implementation and 18 evidence records remain uncommitted until Hermes completes.
-Final validation/security and later send/runtime work remain open. Broadcast/mainnet/
-hardware/Monero/Electron send remain parked. High suffices for the next fixed review.
-Hermes launched once from 1284f559; outer session 1592 is active.
-Collect that outer once only on owner done/Continue. Do not poll or relaunch.
-Actual Hermes session/provider/model will be verified from saved runtime on collection.
+Full Phase-A1/ticket/release acceptance remains open. Pinned upstream typed-secret
+erasure requires a separate dependency-level design; consolidated final validation
+and security remain outstanding. Runtime/Electron wiring and OS tests belong to
+WAL-011; usable native/Pay flows belong to WAL-010. Broadcast/mainnet/hardware/
+Monero/Electron send remain parked. No security requirement is waived.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md only.
+docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md and
+docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md only.
 
 ## Historical record (superseded by the active state above)
 

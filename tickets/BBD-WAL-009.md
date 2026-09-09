@@ -1,21 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PARTIAL LIBRARY CHECKPOINT INTEGRATION AUTHORIZED
+Status: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS AUTHORIZED
 
-The XHigh architecture decision is recorded in
-[library checkpoint 01](../docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md).
-Retain the native component; pinned eframe reuses the event loop. The eventual
-main-thread runtime, protocol/framing, Electron startup and OS tests belong to
-WAL-011; usable native/Pay flows belong to WAL-010. Current local fixture tests do
-not establish production process integration.
+The reviewed library source and 18 normalized records are integrated and pushed
+at 502580fc12bff1789e2ced2a0692b1b35de587a3. Exact source/evidence identities and
+zero-leak directory scan are accepted in
+[library checkpoint review](../docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md#collected-checkpoint-acceptance--2026-09-09).
+The review corrects the actor's stale status and inaccurate integration summary.
+No functional test or proof was repeated; no report-only repair is needed.
 
-Hermes alone may normalize 18 evidence records, preserve accepted corrections,
-scan for secrets and integrate the frozen library source as a partial checkpoint.
-No source change, functional test/proof rerun or full Phase-A1 acceptance is authorized.
-Pinned upstream typed-secret erasure remains a Phase-A1/final-release blocker;
-final validation/security and later send/UX/runtime work remain open. This checkpoint
-makes reviewed code durable and does not enable a usable wallet or release.
-High is sufficient for the next fixed review. CURRENT_TASK.md governs active scope.
+Hermes alone may collect the four read-only formatter/lint/security-policy
+[diagnostics](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md)
+together. No source edits, functional tests, integration or broader work authorized.
+High is sufficient for this fixed task. CURRENT_TASK.md governs active scope.
+
+This partial checkpoint is not full Phase-A1, wallet or release acceptance.
+Upstream typed-secret erasure and final validation/security remain open. The native
+runtime decision is unchanged: actual broker/Electron/OS integration belongs to
+WAL-011 and usable native/Pay flows to WAL-010. No money-moving feature is enabled.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
