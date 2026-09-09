@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION AUTHORIZED
+State: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actors: none; Grok drop accepted and source authorization closed
 Authorized execution/evidence/integration actor: Hermes, task below only
@@ -16,8 +16,8 @@ Grok outer 75023 / session 9aa3e29e-8c84-4cad-9d28-333ab7038ec8 is closed.
 The five-file source cleanup is accepted for validation. Hermes may mechanically
 format the 17 frozen Rust paths, run the two library lint gates and two focused
 existing tests, normalize the old diagnostic report alongside new evidence, scan
-for secrets, and integrate only on success. No full proof rerun. No actor is yet
-launched for this new task. Launch once; collect only on owner done/Continue; no polling.
+for secrets, and integrate only on success. No full proof rerun. Hermes launched once from 7a714857; active outer 14578. Runtime session will
+be verified at collection. Collect only on owner done/Continue; no polling or relaunch.
 
 Owner decision 2026-09-09: use MapLibre and remove Leaflet. This resolves the pending
 mapping question. Dependency and exact policy corrections are next; this Rust task
