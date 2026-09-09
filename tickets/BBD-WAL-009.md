@@ -1,20 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: REAL PIPELINE PANIC EXPECTED RED — HERMES ONE TEST
+Status: REAL PIPELINE PANIC CORRECTION — GROK TWO SOURCE PATHS
 
-The [active handoff](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md)
-accepts Grok's focused regression source and authorizes Hermes alone for its single
-expected-red test. The specific INTERNAL payload must pass before absent real
-seed activity fails 0 versus 1. All 37 identities are frozen at the reviewed drop;
-no production/test mutation, broader execution or integration is authorized.
+The [active handoff](../docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md)
+accepts the exact missing-pipeline-activity red (1 failed, 15 filtered) and authorizes
+Grok High for the two-source-path correction. The existing panic helper must run
+actual signing/proving/extraction/verification, then unwind before publication.
+Real counters must survive unwind, actual owners/lease must Drop, and authorization
+must be invalidated. Tests, dependencies, other source and execution remain frozen.
 
-Exact reversal proves the other test content unchanged; the one extra newline in
-the old subsection deletion is accepted as harmless formatting. Sixteen tests now
-exist in the integration target. No test execution has yet been collected.
-Prior cleanup/signing/decoded-effects acceptance remains valid. Source and sixteen
-prior evidence records remain uncommitted; other integration/security gaps stay open.
-The owner confirmed the reviewer was already on High; prior XHigh labeling in this
-panic task was incorrect. High suffices for fixed collection. Never poll an actor.
+The 1338-line/16-test regression target is unchanged. All prior acceptance remains
+valid; no accepted baseline or report-only correction actor is needed. Source and
+seventeen evidence records remain uncommitted. Native integration, full typed-secret
+erasure and final security remain open. High remains sufficient for this bounded
+correction/review. CURRENT_TASK.md governs scope; never poll an actor.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

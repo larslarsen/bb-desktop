@@ -1,41 +1,38 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: REAL PIPELINE PANIC EXPECTED RED — HERMES ONE TEST
-Reviewer: Codex, High (owner confirmed; prior XHigh label was incorrect)
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact expected-red handoff only
+State: REAL PIPELINE PANIC CORRECTION — GROK TWO SOURCE PATHS
+Reviewer: Codex, High; no reasoning-setting change requested
+Authorized source actor: Grok Build, grok-4.6 High, exact two-path correction only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [real pipeline panic expected red](HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md)
+Active handoff and red acceptance: [real pipeline panic correction](GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Grok outer 3531, session c839c8c4-45a3-4db9-aed2-1d8a97a6f723, completed
-with exit 0, saved model grok-4.6 / High. Its test-source task is closed. The
-new regression is accepted for one focused expected-red invocation. Source review
-verified all 37 identities (only the intended test file changed) and exact reversal
-of the two replacements. The 818-byte deletion includes one extra newline beyond
-the 817-byte region; this harmless formatting deviation is accepted and recorded.
+Hermes outer 34696 completed exit 0; session 20260908_232331_f34d0d,
+nous / poolside/laguna-s-2.1:free, v0.18.2. Its single test exited 101,
+1 failed / 15 filtered, at seed_accesses=0 expected=1 after the INTERNAL guard.
+The regression red is accepted; all 37 prior identities remain exact. Command/
+report deviations are recorded in the active handoff, without a rerun or repair actor.
 
-The test requires a specific INTERNAL panic followed by real pipeline stage counts,
-three actual buffer-owner wipe observations, no publication, released/reacquirable
-lock and invalidated authorization. Expected red is seed_accesses=0 expected=1;
-no production correction or broader execution is authorized. One new evidence record
-only. Preserve completed cleanup/signing/decoded-effects results; no baseline reruns.
+Grok may change only the named regions of wallet-broker/src/zec/spend.rs and
+wallet-broker/src/zec/test_support.rs: an explicit panic-after-verification fault,
+unwind-safe observation retention and invalidation, and the existing panic helper
+routed through actual execution. All tests are frozen, including the accepted
+1338-line/16-test integration target. No source/test execution or Git is authorized.
 
-Implementation and sixteen prior actor evidence records remain uncommitted. Full
-typed-secret erasure, real pipeline panic, native OS/owning-thread/capability
-integration and final security remain open. Network/broadcast/mainnet/hardware/
-Monero/Electron send stay parked. No full-wallet or usable send-flow acceptance.
+Implementation and seventeen actor evidence records remain uncommitted. Preserve
+all prior cleanup/signing/decoded-effects acceptance. Full typed-secret erasure,
+real pipeline panic validation, native OS/owning-thread/capability integration and
+final security remain open. Network/broadcast/mainnet/hardware/Monero/Electron send
+stay parked. No full-wallet or usable send-flow acceptance is claimed.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md only.
-High is sufficient for fixed source/result review; do not claim a setting change.
-Launched once from ea5017ae: Hermes outer terminal 34696, --pass-session-id.
-Runtime session/provider/model and completion remain unverified until collection.
-Collect once after owner done; do not poll or relaunch.
+and docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md only.
+Launch once, collect on owner done, never poll. Not launched yet.
 
 ## Historical record (superseded by the active state above)
 
