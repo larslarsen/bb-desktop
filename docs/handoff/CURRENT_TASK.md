@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE BROKER TRANSPORT — TEST SOURCE AUTHORIZED
+State: LIVE BROKER TRANSPORT — TEST SOURCE RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, test source only
 Authorized execution/integration actors: none
@@ -30,6 +30,8 @@ tickets/BBD-WAL-009.md, tickets/BBD-WAL-011.md,
 docs/handoff/GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md,
 docs/engineering/WALLET_ROADMAP_ROUTING.md.
 Launch once; collect once when the owner reports completion. No actor polling.
+Grok launched once from 846b3371; outer 68774,
+session b09f971a-4d37-438a-b117-0c9a6463ee7b. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
