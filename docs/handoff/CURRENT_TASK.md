@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CONSOLIDATED DIAGNOSTICS RESUME 01 AUTHORIZED
+State: CONSOLIDATED DIAGNOSTICS RESUME 01 RUNNING
 Reviewer: Codex; High suffices for this fixed task
 Authorized source actors: none
 Authorized execution/evidence actor: Hermes, one Resume-01 diagnostics launch only
@@ -19,7 +19,9 @@ Reviewer may launch Hermes once for formatter check, no-default library Clippy,
 native-ui library Clippy and security-policy CLI, exactly as the handoff specifies.
 Collect ordinary findings together; do not repair or rerun commands. No functional
 tests/proofs, source changes, source integration or provider/model changes authorized.
-Reviewer will launch once; do not independently launch another actor or poll.
+Hermes launched once from 80a5e8ef; outer session 8844 is active.
+Collect that outer once only on owner done/Continue. Do not poll or relaunch.
+Actual runtime session/provider/model will be verified from saved records on collection.
 
 Source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 remains accepted and
 pushed. Preserve CI run 34327240542: build/social/20 Electron security checks passed,
