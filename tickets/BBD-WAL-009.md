@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DECODED EFFECTS VALIDATION 01 — HERMES
+Status: EFFECTS COMPILE CORRECTION 01 — GROK, ONE LINE
 
-The [source acceptance and grouped validation](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md)
-accepts Grok's four-file decoded recovery/retained-context drop for execution.
-The financial oracle now comes from decoded outputs; all ten regression assertions
-remain intact. Other source/evidence identities match. Grok is completed/closed.
+The [compile-stop review and exact correction](../docs/handoff/GROK_BBD_WAL_009_EFFECTS_COMPILE_CORRECTION_01.md)
+records stage 1 failing before test execution: E0277 at effects.rs:279, caused by
+missing () on intent_mismatch. The reviewer missed the typo. All frozen identities
+match; no mutation/backup or stages 2-6 were reached. Hermes is completed/closed.
 
-Hermes runs the exact six-stage sequence: regression green, isolated receiver
-falsification with restoration, restored library green, software and synthetic
-pipeline checks, native compile. Stop on first unexpected outcome; no fixes or
-retries. Only the named temporary effects.rs mutation and one new evidence record
-are authorized. No Git or source integration; no broader WAL-009 acceptance.
+Grok High may make the exact two-byte insertion in effects.rs only. No other
+source/test change, execution, evidence or integration. After source acceptance,
+Hermes will restart the existing validation against updated identities. No green
+acceptance or new test scope is claimed. High is sufficient for this mechanical
+step; XHigh is needed again before further security acceptance.
 
-Keep reviewer XHigh. The accepted ten-case red and prior results remain valid.
-Implementation and eleven prior actor evidence records remain uncommitted; no
-usable send flow is delivered. Full cleanup, native integration and remaining
-security stay open. Launch once, collect after done, no actor polling. Active
-CURRENT_TASK.md and handoff override historical phase authorizations.
+Previously accepted results remain valid. Implementation and twelve actor
+evidence records remain uncommitted; no usable send flow is delivered. Full
+effects/cleanup/native/security acceptance stays open. Launch once, collect after
+done, no polling. Active CURRENT_TASK.md and handoff override historical scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

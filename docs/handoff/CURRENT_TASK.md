@@ -1,45 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS VALIDATION 01 — HERMES
-Reviewer: Codex, XHigh
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
+State: EFFECTS COMPILE CORRECTION 01 — GROK, ONE LINE
+Reviewer: Codex; High sufficient for this mechanical correction/collection
+Authorized source actor: Grok Build, grok-4.6 High, one exact replacement only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and source acceptance: [decoded effects validation](HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md)
+Active handoff and compile-stop review: [effects compile correction](GROK_BBD_WAL_009_EFFECTS_COMPILE_CORRECTION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Grok session 378e7dc3-8f4e-4afe-989f-468a73a4a9a5, outer 87196, collected once
-after done, exit 0; runtime grok-4.6-build High. The four-file production drop is
-accepted for grouped validation. Saved edits reproduce exact starting identities;
-all 25 other source/evidence identities match. No source-actor tests or Git.
-The new authority has no copied financial oracle, recovered effects drive payment/
-fee/count results, and all ten regression assertions remain unchanged.
+Hermes outer 19677 collected once after done, exit 0; runtime session
+20260908_192320_041a4d, nous/poolside/laguna-s-2.1:free. Exact stage 1 failed
+compilation with E0277 at effects.rs:279: missing () on intent_mismatch. No test
+or later stage ran; no temporary source mutation/backup was entered. All 29 frozen
+identities match. The reviewer missed this typo. Hermes is completed and closed.
+Its extra config/Git/helper work is recorded without a report-only correction.
 
-Hermes may run the exact six-stage sequence: regression green; isolated receiver-
-comparison falsification; restored seven-test library green; software integration;
-synthetic integration; native compile. Only the exact temporary effects.rs mutation
-is authorized, with complete restoration on every outcome. All 29 identities are
-frozen in the active handoff. Stop at the first unexpected result, no repair/retry.
-Write one new evidence record with complete logs and accurate deviations. No Git,
-source integration, prior evidence correction or broader execution. Grok is closed.
+Grok may insert exactly () in the single named map_err expression in effects.rs.
+Original 379-line SHA-256:
+bd62a867ba8c135517df6858aff9eb97aaa4e4c30c76e22c93a27b622412fd56.
+Required 379-line final SHA-256:
+cfa6a86f35d6772053025ca1c9bbb3154d604f79c90d031af261787938576035.
+No other change, source-actor execution or integration. Then stop for collection.
+The six-stage validation remains closed pending source acceptance and new hashes.
 
-Previously accepted results remain valid, including the ten-case expected red.
-No UI test repeat or new demo milestone. Implementation and eleven prior actor
-evidence records remain uncommitted. Full actual-secret cleanup, OS/capability
-integration and remaining security stay open. Network/broadcast/mainnet/hardware/
-Monero parked. Keep reviewer XHigh for effects acceptance.
+Previously accepted results remain valid. Implementation and twelve actor
+evidence records remain uncommitted. Full effects/cleanup/native/security
+acceptance remains open. Network/broadcast/mainnet/hardware/Monero parked.
+High is sufficient now; flag XHigh before further security acceptance.
 
 Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
-HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md only.
-Launch once and record outer/runtime identity here. Collect after done/explicit
+GROK_BBD_WAL_009_EFFECTS_COMPILE_CORRECTION_01.md only.
+Launch once and record session/outer identity here. Collect after done/explicit
 collection; never poll an actor.
-Hermes launched once from 4d7cfe2d with --pass-session-id, outer terminal 19677.
-Runtime session ID will be collected with completion. No completion collected;
-do not relaunch or poll. Wait for owner done/explicit collection.
 
 ## Historical record (superseded by the active state above)
 
