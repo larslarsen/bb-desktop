@@ -1,43 +1,37 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: NATIVE WIDGET/LAYOUT VALIDATION ACCEPTED — XHIGH SCOPING NEXT
-Reviewer: Codex; High review complete; pause for owner to switch to XHigh
-Authorized source actors: none
+State: DECODED EFFECTS REGRESSION 01 — GROK TEST SOURCE
+Reviewer: Codex, XHigh; owner switched to XHigh on 2026-09-08
+Authorized source actor: Grok Build, grok-4.6 High, one test file only
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Reviewer decision: [native layout validation acceptance](../testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md)
-Closed handoff: [grouped layout validation](HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md)
-Read this prefix and linked review only; no historical handoff reload.
+Active handoff and XHigh decision: [decoded effects regression](GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md)
+Read this prefix and the active handoff; no historical handoff reload.
 
-Hermes outer 14430 collected once after owner done, exit 0. Resumed runtime
-session 20260908_150421_ce19a4, nous/poolside/laguna-s-2.1:free. Original session
-20260908_145855_f82684 / outer 10169 was already collected after HTTP 429.
-Both executions are closed. No relaunch, resume, actor polling, or new actor.
+The verifier checks real proof/signatures but accepts two agreeing inspection
+copies even when their payment claims disagree with decoded signed bytes. The
+handoff fixes the recovery/binding architecture and authorizes one regression
+using one real signed fixture, independent output recovery, a positive control,
+and ten agreeing-metadata negative cases. Production remains frozen until an
+understood behavioral red. No source-only actor runs tests or Git.
 
-Accepted: initial ten-test UI green; two deliberate faults failed at their
-intended layout/re-entry assertions; restored ten-test green; native compile.
-All 26 frozen identities match, including both restored mutations. The review
-records the malformed command/retry, truncated log, and report inaccuracies.
-These do not require another test run or a report-only correction task.
+All 26 prior frozen identities and the new native layout evidence match. The
+native layout validation is accepted at 00b0ca29; its actor executions are closed.
+No UI follow-up, report-only correction, prior proof-suite repeat, or new demo
+milestone. Implementation and ten actor evidence records remain uncommitted.
+Independent effects, actual-secret cleanup, OS/owning-thread/capability integration
+and remaining security stay open. Network/broadcast/mainnet/hardware/Monero parked.
 
-Next: switch reviewer reasoning to XHigh, then define the independent transaction-
-effects verification repair. Current code compares prepared inspection metadata
-with a clone instead of recovering all authoritative effects from decoded signed
-bytes. Actual-secret cleanup, OS/owning-thread/capability integration, and remaining
-security stay open. No broader WAL-009 acceptance or speculative UI test slice.
+Keep reviewer XHigh through the effects architecture/source acceptance. Grok's
+bounded test authoring uses its required High setting. Launch once and record the
+session here. Collect only after done/explicit collection; no actor polling.
 
-The owner asks for less churn within existing wallet scope, not a new demo
-milestone. Previously accepted gates remain valid. Pending implementation and ten
-actor evidence records remain uncommitted; reviewer commits publish governance,
-not a delivered wallet send flow. Network/broadcast/mainnet/hardware/Monero stay
-parked. Stop here for the requested reasoning-setting handoff.
-
-Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md only.
+Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
+GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md only.
 
 ## Historical record (superseded by the active state above)
 

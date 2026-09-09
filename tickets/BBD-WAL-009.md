@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE WIDGET/LAYOUT VALIDATION ACCEPTED — XHIGH SCOPING NEXT
+Status: DECODED EFFECTS REGRESSION 01 — GROK TEST SOURCE
 
-The [reviewer acceptance](../docs/testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md)
-accepts ten UI tests, both intended layout/close-re-entry falsifications, restored
-ten-test green, and native compilation. All 26 frozen identities match. Both
-Hermes executions are collected and closed; no actor remains authorized.
-Execution/report exceptions are recorded without another correction-only task.
+The owner switched the reviewer to XHigh. The
+[active handoff](../docs/handoff/GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md)
+fixes the independent recovery/retained-binding architecture and authorizes Grok
+High to edit only verification_context_tests.rs: one signed fixture, independent
+decoded oracle, positive verification and ten agreeing-metadata mismatch cases.
+The current verifier incorrectly accepts matching metadata copies without
+recovering the payment effects from signed bytes. Production, test execution and
+integration remain unauthorized until reviewer acceptance of each next step.
 
-High review is complete. Pause for the owner's requested switch to XHigh before
-scoping independent transaction-effects verification: recover actual effects
-from the decoded signed artifact instead of comparing prepared metadata clones.
-Actual-secret cleanup, native OS/capability integration, and remaining security
-remain open. No additional speculative UI coverage or old-suite reruns.
-
-Implementation and ten actor evidence records remain uncommitted; no usable send
-flow is delivered. Keep the existing wallet scope and previously accepted results.
-The linked acceptance and CURRENT_TASK.md define the active state; historical
-phase authorizations below do not reopen execution. No actor polling.
+Native widget/layout validation remains accepted at 00b0ca29. No additional UI
+coverage, report-only correction or old expensive suite repetition. Implementation
+and ten actor evidence records remain uncommitted; no usable send flow is delivered.
+Actual-secret cleanup, native integration and remaining security stay open. Keep
+reviewer XHigh for this effects work; launch once, collect after done, never poll.
+The linked handoff and CURRENT_TASK.md override historical phase authorizations.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
