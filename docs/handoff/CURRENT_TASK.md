@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: POLICY TEST SOURCE REVIEWED — BOUNDED CORRECTION 01 AUTHORIZED
+State: POLICY TEST SOURCE REVIEWED — BOUNDED CORRECTION 01 RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; one test file, correction only
 Authorized execution/evidence/integration actors: none
@@ -16,8 +16,9 @@ Grok outer 66797 / session b0c5ac17-b70d-4f51-a5f4-392a48012d63 is closed.
 The one-file policy test drop has a fixture assertion that would reject the correct
 future package. Grok alone may remove that assertion and update four stale Pay/RATE
 package/lock-root assertions to the literal MapLibre-only 6.8.0 map. Keep all three
-new policy groups and other negative tests. No actor yet launched for the correction.
-Launch once; collect only on owner done/Continue; no polling or automatic relaunch.
+new policy groups and other negative tests. Grok launched once from 057538f7; active outer 86850.
+Session: 1e85f230-a5d3-4e13-bcbd-6840c6dc40ab. Collect only on owner done/Continue;
+no polling or automatic relaunch.
 
 Owner decision: keep MapLibre, remove Leaflet. Packages/locks/production policy/Rust
 remain frozen until corrected test-source review and expected red. The next Hermes
