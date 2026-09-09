@@ -1,20 +1,21 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DECODED EFFECTS ACCEPTED — CLEANUP OBSERVATION REGRESSION SOURCE
+Status: CLEANUP OBSERVATIONS EXPECTED RED 01 — HERMES, ONE TEST
 
-XHigh [accepts the decoded-effects repair](../docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md)
-and all six collected validation outcomes, with saved-log deviations retained.
-The copied-financial-metadata finding is closed. No repeat of the expensive checks
-or report-only correction is needed; the completed Hermes actor remains closed.
+The [test-source acceptance and expected-red handoff](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
+accepts Grok's one appended regression. The original test prefix and all other
+frozen identities match. Grok is closed. Hermes may execute the exact regression
+once and write its evidence; no source repair, broader testing or integration.
+Expected red is the final assertion identifying fabricated cleanup observations
+for unreached proof/transaction classes after real-signer and positive-Seed guards.
+The path stops before proof generation. No execution result is claimed yet.
 
-The [next bounded source task](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md)
-authorizes Grok High to append one real-signer-error regression exposing fabricated
-cleanup events for unreached proof/transaction classes. Production, execution and
-integration remain frozen. Full actual-secret cleanup and native/security acceptance
-remain open. Implementation and thirteen actor evidence records remain uncommitted;
-no usable send flow is delivered. High is sufficient for next source collection;
-return to XHigh before cleanup production architecture/acceptance. Active handoff
-and CURRENT_TASK.md govern scope. Launch once; collect after done; never poll.
+Decoded-effects acceptance and prior valid checks remain in force. Full actual-secret
+cleanup, native integration and security acceptance stay open. Implementation and
+thirteen prior actor evidence records remain uncommitted; no usable send flow is
+delivered. High is sufficient for this collection; return to XHigh before cleanup
+production architecture/acceptance. Active handoff and CURRENT_TASK.md govern scope.
+Launch once, collect after done, never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

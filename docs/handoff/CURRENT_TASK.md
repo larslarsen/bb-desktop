@@ -1,44 +1,40 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS ACCEPTED — CLEANUP OBSERVATION REGRESSION SOURCE
-Reviewer: Codex, XHigh; High sufficient for the next bounded source collection
-Authorized source actor: Grok Build, grok-4.6 High, append one integration test only
-Authorized execution/evidence actors: none
+State: CLEANUP OBSERVATIONS EXPECTED RED 01 — HERMES, ONE TEST
+Reviewer: Codex, High for bounded source acceptance and execution collection
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes, exact expected-red handoff only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Acceptance: [decoded effects](../testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md)
-Active handoff: [cleanup observations regression](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md)
+Active handoff and source acceptance: [cleanup expected red](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-XHigh accepts the decoded-effects repair and six collected validation outcomes,
-including receiver-only falsification and exact source restoration. The copied
-financial-metadata finding is closed. Hermes session 20260908_194210_e47f69,
-outer 35920, is completed and closed. All 31 source/evidence baselines match.
-Saved-log exceptions remain recorded; no report-only correction or rerun needed.
+Grok session 9942d648-4b13-43f6-b241-eab7e337a0c8, outer 49550, collected once
+following owner done, exit 0. One 97-line test appended; original 1118-line prefix
+unchanged, final 1215-line SHA-256
+c95fa9ae836ca7151f35ef92e664dbc569f24b54b1ff4fb8ad78c1fce997a787.
+All other 30 frozen identities match. Source accepted for expected-red execution.
+Grok is completed and closed; its corrected measurement-script error is recorded.
 
-The next established defect: on a real signer failure before proof/extraction,
-the harness fabricates cleanup observations for uncreated proof and transaction
-objects. Grok may append one regression in tests/zec_sign_verify.rs using the
-existing real signer-failure route. No production edit, test execution, old proof
-rerun or dependency change. The expected red will be authorized after source review.
-This does not claim full cleanup; later production work must observe actual owners.
+Hermes may run the one exact real signer-failure regression and create its named
+evidence. Expected exit 101, one failed, 14 filtered; final assertion must identify
+four spurious ProofWorkspace/ExtractedTransaction touch/wipe events after all
+signer/positive-Seed guards passed. No source mutation, rerun, other test, Git or
+integration. This path stops before expensive proof generation. No result yet.
 
-Implementation and thirteen actor evidence records remain uncommitted; no usable
-send flow is delivered. Full cleanup/native/security acceptance stays open.
-Network/broadcast/mainnet/hardware/Monero parked. High is sufficient for the next
-source collection; flag XHigh before cleanup production architecture/acceptance.
+Decoded-effects acceptance and earlier valid checks remain in force. Implementation
+and thirteen prior actor evidence records remain uncommitted. No usable send flow
+is delivered. Full cleanup/native/security acceptance remains open; network,
+broadcast/mainnet/hardware/Monero parked. High is sufficient for next collection;
+flag XHigh before cleanup production architecture/acceptance.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md and
-docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md only.
-Launch once and record session/outer identity here. Collect after owner done or
-explicit collection; never poll an actor.
-Launched once from 8ca77e71: Grok session
-9942d648-4b13-43f6-b241-eab7e337a0c8, outer terminal 49550, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
+and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md only.
+Launch once and record outer identity here. Collect after owner done or explicit
+collection; never poll an actor. No cleanup execution actor launched yet.
 
 ## Historical record (superseded by the active state above)
 
