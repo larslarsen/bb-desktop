@@ -29,6 +29,9 @@ and remaining security stay open. Network/broadcast/mainnet/hardware/Monero park
 Keep reviewer XHigh through the effects architecture/source acceptance. Grok's
 bounded test authoring uses its required High setting. Launch once and record the
 session here. Collect only after done/explicit collection; no actor polling.
+Launched once from 2a098115: Grok session
+7ddfcee6-c773-4d03-af90-51da48895a33, outer terminal 32613, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
 GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md only.
