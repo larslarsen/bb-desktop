@@ -149,3 +149,29 @@ The reviewer will collect once on owner done/Continue, then authorize the policy
 expected-red plus missing native-ui Clippy together. No accepted gate is replayed.
 High is sufficient. Reviewer publication scope: this handoff, CURRENT_TASK.md and
 tickets/BBD-WAL-009.md only.
+
+## Corrected test-source acceptance — 2026-09-09
+
+ACCEPT Correction 01 for the bounded expected-red execution. Outer 86850 was
+collected once on owner done, exit 0, and is closed. Grok session is
+1e85f230-a5d3-4e13-bcbd-6840c6dc40ab. Final test/securityPolicy.node.js is
+3643 logical lines, SHA-256
+fe31a4cbab5c3c179a02812dd892542dcc5bbe9d604435b3609242fa6b7f58c7.
+This matches the reviewer's pre-launch predicted exact correction byte-for-byte.
+The transcript contains exactly the three authorized replacements: fixture helper,
+Pay assertions, RATE assertions. No other path changed; production policy/package/
+lock hashes are unchanged. All three policy groups and negative cases are retained.
+Literal maps avoid the Pay test's later-const initialization hazard.
+
+Transcript inventory: 11 reads, eight searches, three replacement calls, one directory
+listing and three terminal batches. Two batches measured file identities; one ran
+read-only Git HEAD/log/show despite the explicit no-Git instruction. No Git mutation,
+execution gate, production/evidence edit, network or delegation occurred. The final
+claim of no Git is inaccurate; the read-only deviation does not invalidate the
+exact corrected source. No extra correction is needed for that report statement.
+
+Grok source authorization is closed. Hermes alone may run the two commands and write
+the one evidence record in HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md.
+Native-ui Clippy runs first, then the policy expected-red, so the prior omitted gate
+has an explicit command/result. No integration or production source change yet.
+High is sufficient. No previous successful gate will be replayed.
