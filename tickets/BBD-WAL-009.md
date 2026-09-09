@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS VALIDATION 01 — HERMES, SIX TEST INVOCATIONS
+Status: CLEANUP OBSERVATIONS VALIDATION ACCEPTED — NEXT XHIGH LIFECYCLE CONTRACT
 
-The grouped adapter correction passes XHigh source review: events finalize only
-at owner drop with unwind override, actual early-error labels are preserved, and
-success is selected after publication work. The
-[validation handoff](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md)
-authorizes Hermes alone to run focused green, two deliberate-fault failures with
-restoration, restored green and the two affected software/synthetic pipeline tests.
-Only exact temporary adapter mutations, one new backup and one evidence record are
-allowed. No permanent source/test edits, broader execution or integration.
+The [collected validation review](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md#collected-validation--accepted)
+accepts four green runs and the two intended falsification failures. Both temporary
+faults were restored exactly; all 33 source/evidence baselines match. The real
+software and synthetic external signing pipelines remain working. Saved tool
+records govern acceptance; report inaccuracies are recorded without a correction
+run or repeated test. Hermes is closed; no actor or integration is authorized.
 
-Prior accepted regression red, decoded-effects acceptance and other valid checks
-remain in force. The old synthetic all-classes cleanup test stays unchanged and
-unaccepted; real lifecycle and typed-secret/native/security acceptance remain open.
-Implementation and fourteen prior evidence records remain uncommitted; no usable
-send flow is delivered by this validation. High suffices for bounded collection;
-return to XHigh for lifecycle design/acceptance. Launch once, collect after done,
-never poll. Active handoff and CURRENT_TASK.md govern scope.
+The next reviewer task requires XHigh: a bounded real cleanup lifecycle test contract
+covering actual owned buffers, early errors and unwind classification. The old
+synthetic all-classes test stays unchanged and unaccepted until that authorization.
+Full typed-secret/native/security acceptance remains open. Decoded-effects acceptance
+and earlier valid checks remain in force. Implementation and fifteen evidence
+records remain uncommitted; this validation does not deliver a usable send flow.
+Stop at the owner's requested reasoning-change boundary. No actor is running;
+nothing should be polled. Active review and CURRENT_TASK.md govern scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

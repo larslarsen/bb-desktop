@@ -1,44 +1,48 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS VALIDATION 01 — HERMES, SIX TEST INVOCATIONS
-Reviewer: Codex; corrected source accepted at XHigh, High sufficient for collection
+State: CLEANUP OBSERVATIONS VALIDATION ACCEPTED — NEXT XHIGH LIFECYCLE CONTRACT
+Reviewer: Codex; use XHigh before the next lifecycle design/acceptance
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact validation handoff only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [cleanup observations validation](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md)
-Read this prefix and active handoff; no historical handoff reload.
+Active review: [collected cleanup validation](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md#collected-validation--accepted)
+Read this prefix and the collected review; no historical handoff reload.
 
-Grok correction session f2231b84-4294-48e8-95cb-87f495940173, outer 7343,
-was collected once after owner done, exit 0, grok-4.6-build High, and is closed.
-The bounded correction passes source review: both mutable bindings, finalization
-only at owner drop with unwind override, success selected after publication work,
-and actual early-error labels. Exact reversal reproduces the starting adapter hash;
-the corrected 4463-line hash and all other 32 inventory rows match.
+Hermes outer 38061 was collected once after owner done, exit 0, and is closed.
+Runtime session 20260908_213504_01112b, nous / poolside/laguna-s-2.1:free,
+version v0.18.2, verified against saved records.
 
-Hermes alone may run the focused green, two exact deliberate-fault failures with
-restoration, restored green and the affected software/synthetic pipeline tests.
-Only the prescribed temporary test_support.rs mutations, one new disk-backed
-backup and one new evidence record are allowed. No permanent source/test changes,
-full-target/library reruns, formatter, other execution, Git or integration.
+ACCEPT all six prescribed outcomes: focused green; the exact false-event and
+suppressed-seed-notification failures; restored focused green; working software
+and synthetic external pipelines. Four passing runs and two intended failures,
+each selecting one test with 14 filtered. The two signing tests took 143.73s
+and 140.59s. No repeats are needed.
 
-The accepted 1.87s regression red, decoded-effects acceptance and earlier valid
-checks remain in force. The old synthetic all-classes cleanup test stays unchanged
-and unaccepted; real lifecycle coverage and typed-secret/native/security acceptance
-remain open. Network/broadcast/mainnet/hardware/Monero/Electron send are parked.
-Implementation and fourteen prior actor evidence records remain uncommitted.
-No usable send flow is delivered by this validation.
+Both faults were restored exactly. Saved and independently reviewed inventories
+match all 33 baselines; the retained backup equals the restored source.
+The new 564-line evidence hash is
+5bfed1076b4668f2df03cc2766983989323a8c0332ada7b4f43db34f2c8868a1.
+The actor report has command-scope and transcription inaccuracies; the collected
+review records them and the governing raw result IDs. No report-only correction.
+
+Implementation and fifteen actor evidence records remain uncommitted. This accepts
+truthful focused observations and preserves both pipelines, not full cleanup.
+The old synthetic all-classes test stays unchanged and unaccepted pending a real
+ownership/lifecycle test contract. Full typed-secret/native/security acceptance
+remains open. Network/broadcast/mainnet/hardware/Monero/Electron send are parked.
+Decoded-effects acceptance and earlier valid checks remain in force.
+
+Next: XHigh reviewer designs the bounded real cleanup lifecycle tests, including
+actual owned buffers, early failures and unwind classification, before authorizing
+a source actor. Stop here for the owner's requested reasoning-change boundary.
+No actor is running. Do not relaunch or poll a completed actor.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md only.
-High is sufficient for bounded result collection; use XHigh for subsequent lifecycle
-design/acceptance. Launch once, collect after owner done, never poll an actor.
-Launched once from efc5ac89: Hermes outer terminal 38061, with --pass-session-id.
-Runtime session/provider/model will be verified from completion and saved records.
-No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 

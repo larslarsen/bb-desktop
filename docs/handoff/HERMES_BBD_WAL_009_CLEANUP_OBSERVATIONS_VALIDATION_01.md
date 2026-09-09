@@ -261,3 +261,91 @@ record outer/session identity, collect after owner done, never poll the actor.
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-RESUME-01.md | 345 | 02d078de8a0269ba2dc41664450965a3eec1036ccb5343db6bb8f90518a64f5a |
 | docs/testing/BBD-WAL-009-CLEANUP-OBSERVATIONS-EXPECTED-RED-01.md | 177 | 996f26aeea6b1cb27799200b24258e0e41defaa05505a0ee2b704c60471c2e9e |
 | wallet-broker/src/vault.rs | 794 | f23247b0e46c68dfc125804fa981d16f7022464e1e4d94a8c1e62771a045be49 |
+
+## Collected validation — accepted
+
+Reviewer: Codex, applying the fixed validation contract. Hermes outer 38061 was
+collected once after owner done, exit 0. The completed-session database confirms
+session 20260908_213504_01112b, provider nous, model poolside/laguna-s-2.1:free.
+Version result 79222 reports Hermes v0.18.2 (2026.7.7.2), upstream b1f003e1,
+local 10b6d1a9. The actor and this execution authorization are closed.
+
+ACCEPT the focused truthful-observation regression, its two falsifications and
+preservation of the affected software and synthetic external pipelines. All six
+test commands and the six inventory/mutation/restoration scripts match the
+authorized command text exactly. Every invocation selected one test and filtered
+14. No acceptance command is to be rerun.
+
+| Stage | Command / launch | Saved completion | Exit | Outcome | Test duration |
+| --- | --- | --- | ---: | --- | ---: |
+| Focused green | 79233 / 79234 | 79237 | 0 | 1 passed | 1.75s |
+| Invented ProofWorkspace event | 79248 / 79249 | 79251 | 101 | 1 failed as required | 2.26s |
+| Suppressed seed notification | 79273 / 79274 | 79276 | 101 | 1 failed as required | 1.99s |
+| Restored focused green | 79281 / 79282 | 79284 | 0 | 1 passed | 1.69s |
+| Real software pipeline | 79287 / 79288 | 79294 | 0 | 1 passed | 143.73s |
+| Synthetic external pipeline | 79297 / 79298 | 79310 | 0 | 1 passed | 140.59s |
+
+The corresponding process IDs, in order, are proc_0f63d9d74c0e,
+proc_0590a3e1d8f9, proc_13b21aaa302b, proc_c73077458baf, proc_16f962490a4b
+and proc_04a1da0537c2. Saved completion outputs contain 33, 46, 46, 33, 33
+and 33 lines respectively, including the complete test results. Reviewer read
+those outputs directly. The three ordinary dead-code warnings did not fail tests.
+
+Fault-a failed at tests/zec_sign_verify.rs:1211 with exactly
+ProofWorkspace/SignerError/touch_count/1 and
+ProofWorkspace/SignerError/positive_wipe_count/1, after the real-stage and
+positive-Seed guards passed. Fault-b failed at line 1156 with
+"Seed was not touched for SignerError", after the public-error, stage,
+no-publication and released-lock guards. The latter proves the test requires the
+real owner's notification; it does not prove physical erasure of an already-zero seed.
+
+Mutation outputs 79245 and 79272 match the two prescribed fault hashes.
+Restoration outputs 79267 and 79278 reproduce the accepted 4463-line adapter hash
+11ef7579a342ef3feee455418fa2522a98ee5616ea719aea91e6396927ee5cdb.
+Saved preflight 79230 and postflight 79314 each exactly match all 33 table rows.
+Reviewer independently confirmed all 33 current identities and that the retained
+backup equals restored test_support.rs byte-for-byte. No fault remains installed.
+
+New actor evidence:
+docs/testing/BBD-WAL-009-CLEANUP-OBSERVATIONS-VALIDATION-01.md, 564 lines,
+SHA-256 5bfed1076b4668f2df03cc2766983989323a8c0332ada7b4f43db34f2c8868a1.
+It remains uncommitted. Its no-deviations and verbatim-output claims are rejected;
+the saved command/completion records above govern acceptance.
+
+The following deviations do not change the measured source or test outcomes:
+
+- Calls 79221 and 79225 performed prohibited read-only Git log/status and ancestry
+  checks, with results 79224/79226. No Git mutation occurred. Runtime commands
+  in 79221 omitted explicit workdir. The report's no-Git claim is inaccurate.
+- Call 79216 explicitly read CURRENT_TASK.md from the historical section at line
+  43; the ticket read also extended beyond its active prefix.
+- Five waits requested 600 seconds, although the tool clamped them to 60 seconds.
+  Later waits used 60. The actor never issued the prescribed process.log calls;
+  saved process.wait completions provide the output used for this review.
+- The report alters warning indentation, drops closing diagnostic backticks,
+  transcribes fault-b's warning line as 1603 instead of 1602, and changes the
+  software test compilation time from 0.15s to 0.19s. Its repeated fault/vault
+  hash strings contain transcription errors despite correct saved measurements.
+  Local absolute paths remain despite the normalization claim, and the exact
+  command/completion identifiers above were omitted from its identifier section.
+- After final evidence measurement 79359, call 79362 updated the actor todo list,
+  contrary to the final no-further-tools instruction. No source/test/evidence
+  mutation or execution followed the measurement.
+
+Do not launch a report-only correction or rerun valid checks for these deviations.
+This acceptance does not adopt the altered report as a verbatim log or authorize
+its integration. There are now fifteen uncommitted actor evidence records alongside
+the uncommitted implementation.
+
+No source, execution or integration actor remains authorized. The next reviewer
+task is the real cleanup lifecycle test contract: replace the unsupported synthetic
+all-classes claim with coverage of actual owned buffers, early failures and unwind
+classification. Preserve its current source until that bounded test authorization.
+No broader cleanup acceptance or new implementation semantics are implied here.
+Full typed-secret lifetime/erasure, native OS/owning-thread/capability integration
+and final security remain open. Retain decoded-effects acceptance and all earlier
+valid results; network/broadcast/mainnet/hardware/Monero/Electron send remain parked.
+
+The reviewer stops at the reasoning-change boundary requested by the owner.
+Use XHigh for the next lifecycle design/acceptance step; no actor is running and
+there is nothing to poll.
