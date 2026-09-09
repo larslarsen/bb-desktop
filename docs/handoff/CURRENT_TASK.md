@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — RUST EXECUTABLE TEST SOURCE AUTHORIZED
+State: LIVE TRANSPORT ACCEPTED — RUST EXECUTABLE TEST SOURCE RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, executable test source only
 Authorized execution/integration actors: none; Hermes green task closed
@@ -30,6 +30,8 @@ Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md,
 docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
+Grok launched once from 1b194248; outer 40380,
+session c0b065f2-55aa-422e-b96c-7ab09a016840. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
