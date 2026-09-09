@@ -1,23 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP LIFECYCLE VALIDATION 01 — HERMES, NINE TEST INVOCATIONS
+Status: CLEANUP LIFECYCLE VALIDATION 01 ACCEPTED — REVIEWER NEXT DESIGN
 
-The five-path lifecycle test source passes XHigh review. Both production prefixes
-are unchanged and all other 14 integration tests are preserved. The
-[validation handoff](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md)
-authorizes Hermes alone to run initial library green, six exact deliberate-fault
-failures with restoration, final library green and the replacement wrong-seed
-integration test. There are 13 library and 15 integration tests; no proof-heavy
-target or accepted signing check is to be rerun.
+The [collected acceptance](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md#collected-validation-acceptance--2026-09-08)
+accepts initial/restored six-test library greens, all six intended fault failures,
+and replacement wrong-seed integration green. All 36 frozen identities and three
+restored backups match. The source and execution actors are closed; no actor,
+execution or integration is currently authorized. No accepted tests need rerunning.
 
-Only prescribed temporary source edits, three new backups and one evidence record
-are writable. No permanent source/test change, formatter, broader execution, Git
-or integration. Prior cleanup/signing/decoded-effects acceptance remains in force.
-Implementation and fifteen prior evidence records remain uncommitted; full typed-
-secret/native/security and proof-to-publication panic acceptance remain open.
-High suffices for collecting fixed outcomes; use XHigh for new design or broader
-acceptance. Active handoff and CURRENT_TASK.md govern scope. Launch once, collect
-after done, never poll.
+Report and command deviations are recorded in that acceptance. Correct report
+portability/facts during future bounded integration, without a report-only actor.
+Implementation and sixteen actor evidence records remain uncommitted. Prior
+cleanup/signing/decoded-effects results remain accepted. Full typed-secret erasure,
+proof-to-publication panic integration, native integration and final security remain
+open. Next reviewer work is to bound those gaps at XHigh; High sufficed for this
+fixed collection. CURRENT_TASK.md governs scope; never poll an actor.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

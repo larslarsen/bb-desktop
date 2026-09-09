@@ -420,3 +420,91 @@ never poll the actor.
 | docs/testing/BBD-WAL-009-CLEANUP-OBSERVATIONS-VALIDATION-01.md | 564 | 5bfed1076b4668f2df03cc2766983989323a8c0332ada7b4f43db34f2c8868a1 |
 | wallet-broker/src/zec/test_support/cleanup_lifecycle_tests.rs | 452 | b280e7dfa0eb3f65360b33d6f2f5e7debb3fe53c1d4ea4ea8ba1fcfd54500c06 |
 | wallet-broker/src/zec/spend/cleanup_lifecycle_tests.rs | 174 | ca7a373f8d009e9fc66e65ecfb9d63b4b1483fb924ab9f66dcba511a3f904ccc |
+
+## Collected validation acceptance — 2026-09-08
+
+ACCEPT the nine bounded test outcomes and exact restoration. This authorization
+is closed. Hermes outer 54437 completed with exit 0 after owner-triggered
+collection. Earlier collections returned still-running; no automatic actor polling
+or relaunch was performed. Runtime database session 20260908_224941_8c6500 records
+provider `nous`, model `poolside/laguna-s-2.1:free`; version output 79377 records
+Hermes Agent v0.18.2. The report incorrectly names laguna-s-1.2.
+
+Reviewer independently read all nine saved completion outputs, compared all nine
+Cargo command strings with this handoff, checked the temporary mutation scripts,
+and verified the 36 frozen file identities and three backups against current bytes.
+Every fault was restored before the next test. No production/test change remains
+from execution. The final evidence identity is 400 lines, 17836 bytes, SHA-256
+`46415af46bd4313598c9c30caea3c07b06cb2fdb5d0d6c2ce479919a7c58a869`.
+
+The table identifies saved transcript messages: command, launch response, wait
+command and completion response. Each wait requested 60 seconds. No process.log
+call was made; the saved completion responses contain the complete short outputs
+(32/42/45/42/42/42/40/32/33 lines), which the reviewer inspected directly.
+
+| Run | Command / launch / wait / completion | Exit | Passed / failed / filtered | Compile / test seconds |
+| --- | --- | --- | --- | --- |
+| Initial library | 79384 / 79385 / 79386 / 79387 | 0 | 6 / 0 / 7 | 8.81 / 6.07 |
+| A | 79392 / 79393 / 79394 / 79395 | 101 | 0 / 1 / 12 | 2.49 / 0.00 |
+| B | 79402 / 79403 / 79404 / 79405 | 101 | 0 / 1 / 12 | 2.63 / 0.00 |
+| C | 79412 / 79413 / 79414 / 79415 | 101 | 0 / 1 / 12 | 3.26 / 1.76 |
+| D | 79422 / 79423 / 79424 / 79425 | 101 | 0 / 1 / 12 | 2.51 / 0.00 |
+| E | 79432 / 79433 / 79434 / 79435 | 101 | 0 / 1 / 12 | 3.45 / 1.61 |
+| F | 79442 / 79443 / 79444 / 79445 | 101 | 0 / 1 / 12 | 2.77 / 0.00 |
+| Restored library | 79454 / 79455 / 79456 / 79457 | 0 | 6 / 0 / 7 | 2.63 / 6.55 |
+| Wrong-seed integration | 79460 / 79461 / 79462 / 79463 | 0 | 1 / 0 / 14 | 3.20 / 1.62 |
+
+All six reds are the intended assertions, not compile/setup failures: A detects
+Seed/Success touch=1 before owner Drop; B reaches the marked panic, checks its
+payload and detects Seed/Success touch=2; C passes actual cancellation/stage guards
+and detects Seed/Error touch=1; D retains touch=2 but detects positive=0 expected=2;
+E detects zero PCZT notifications where one is required (actual length 3619);
+F reaches the all_zero assertion after label/length=64 and error guards pass.
+D/F prove the observer detects nonzero bytes before ordinary later destruction;
+E proves notification sensitivity, not failure of contained SecretBytes Drop.
+
+Preflight command/result 79380/79381 and post 79466/79467 report 36 matches;
+post also reports all three backups equal restored source. Apply command/result
+pairs are 79390/79391, 79400/79401, 79410/79411, 79420/79421, 79430/79431,
+79440/79441. Restore pairs are 79396/79397, 79406/79407, 79416/79417,
+79426/79427, 79436/79437, 79450/79451. Each resulting fault/base hash and line
+count matches the plan. Evidence write is 79473/79474; its measurement
+79479/79480 is the last tool operation.
+
+The report's claim of no deviations is rejected. Record these once here without
+an evidence-only repair actor or validation rerun:
+
+- Initial reads included historical CURRENT/task content, with another CURRENT
+  read at offset 501 (79375), contrary to the active-prefix restriction.
+- Identity command 79375 added an unrequested cargo --version query and shell
+  separators/redirection. It made no source or Git change.
+- Both inventory commands prepended an unauthorized cd to the repository root;
+  their actual inventory bodies are otherwise exact, as are all Cargo commands.
+- Restore A added `assert mode in ('restore', 'apply') or True`. This is an
+  unauthorized no-op, but the following genuine mode assertion and every original
+  hash/backup/write guard remained intact. All other mutation scripts are exact.
+- Required process.log calls were omitted. Full saved completions supply the
+  missing output evidence; the report itself contains summaries and abbreviated
+  scripts, not verbatim complete logs, and omits message identifiers.
+- After final inventory, 79468 ran unrequested backup listing and filesystem
+  rediscovery commands. These were read-only; no further source/test work occurred.
+- The report contains a local absolute working-directory path despite claiming
+  normalization; it must not be integrated unchanged under AGENTS.md. The model
+  is misreported, and warnings are not literally unchanged: the timestamp helper
+  is at lines 1603/1598/1601 for A/B/C, versus baseline 1602.
+
+These execution/reporting deviations do not invalidate the observed test failures,
+restoration or green results. No Git, formatter, broader test or proof-heavy rerun
+occurred. Preserve this acceptance and the prior cleanup/signing/decoded-effects
+results. Correct report portability and the enumerated facts during a future
+explicitly bounded integration task, without rerunning accepted tests.
+
+The lifecycle coverage and replacement wrong-seed test are accepted within the
+actual-owner boundary. Implementation and sixteen actor evidence records remain
+uncommitted. Full typed-secret erasure, proof-to-publication panic integration,
+native OS/owning-thread/capability integration and final security remain open.
+No full wallet, usable send flow or broader acceptance is claimed. No actor is
+active or authorized. Next reviewer work is to bound the remaining integration
+and security gaps; High sufficed for this fixed review, XHigh is appropriate for
+that design decision. Reviewer publication scope remains this handoff, CURRENT
+and BBD-WAL-009 only.

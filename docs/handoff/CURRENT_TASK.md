@@ -1,46 +1,40 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP LIFECYCLE VALIDATION 01 — HERMES, NINE TEST INVOCATIONS
-Reviewer: Codex; source/mutation contract accepted at XHigh, High sufficient for collection
+State: CLEANUP LIFECYCLE VALIDATION 01 ACCEPTED — REVIEWER NEXT DESIGN
+Reviewer: Codex; High sufficient for completed collection, XHigh for next design
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact validation handoff only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [cleanup lifecycle validation](HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md)
-Read this prefix and active handoff; no historical handoff reload.
+Closed handoff and acceptance: [cleanup lifecycle validation](HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md#collected-validation-acceptance--2026-09-08)
+Read this prefix and the collected acceptance; no historical handoff reload.
 
-Grok session c7b99290-f754-4e0e-838c-7950ecaf7840, outer 49083, was collected
-once after owner done, exit 0, grok-4.6-build High, and is closed. The five-path
-test drop passes source review. Both production prefixes and all other 31
-inventory rows match; exact reversal proves the other 14 integration tests unchanged.
-The final inventory has 36 rows, 13 library tests and 15 integration tests.
+Hermes outer 54437 is complete, exit 0; session 20260908_224941_8c6500,
+nous / poolside/laguna-s-2.1:free, Hermes v0.18.2. Nine invocations are accepted:
+initial six-test library green, six intended fault assertions, restored six-test
+library green, and replacement wrong-seed integration green. All 36 source/prior-
+evidence identities match and all three backups equal restored source. No further
+test run or report-only correction actor is needed. Grok source actor 49083 is closed.
 
-Hermes may run initial six-test library green; six exact deliberate-fault failures,
-restoring each; restored library green; and the replacement wrong-seed integration
-test. Only prescribed temporary edits in test_support.rs/spend.rs/vault.rs, three
-new disk-backed backups and one evidence record are allowed. Tests remain frozen.
-No permanent source change, formatter, broader test, proof-heavy rerun, Git or
-integration. Stop on any unexpected result after restoring the known active fault.
+The acceptance records command/report deviations from the saved transcript,
+including the report's incorrect model, missing full logs and absolute path.
+Valid outcomes are retained; report portability/facts require correction during
+future explicitly authorized integration. No source or evidence integration occurred.
 
-The old synthetic all-classes assertion has been replaced with actual-owner tests.
-Current runtime/compile results for those new tests are still pending. Prior cleanup
-validation, signing-pipeline and decoded-effects acceptance remain in force.
-
-Implementation and fifteen actor evidence records remain uncommitted. Full
-typed-secret erasure, proof-to-publication panic integration, native integration
-and final security remain open; network/broadcast/mainnet/hardware/Monero/Electron
-send stay parked. No full wallet or usable send-flow acceptance is claimed.
+Implementation and sixteen actor evidence records remain uncommitted. Prior
+cleanup/signing/decoded-effects acceptance remains in force. The synthetic all-
+classes assertion has been replaced and the actual-owner lifecycle coverage passes.
+Full typed-secret erasure, proof-to-publication panic integration, native OS/
+owning-thread/capability integration and final security remain open. Next reviewer
+work is to bound those remaining integration/security gaps. Network/broadcast/
+mainnet/hardware/Monero/Electron send remain parked; no usable send-flow acceptance.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md only.
-High suffices for fixed result collection; XHigh for new design/broader acceptance.
-Launch once, collect after owner done, never poll an actor.
-Launched once from d15de379: Hermes outer terminal 54437, with --pass-session-id.
-Runtime session/provider/model will be verified from completion and saved records.
-No completion collected. Do not relaunch or poll; collect after owner done.
+No actor is active. Never poll or relaunch a completed actor.
 
 ## Historical record (superseded by the active state above)
 
