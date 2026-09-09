@@ -197,3 +197,56 @@ record outer identity, collect after owner done/explicit collection, never poll.
 | docs/testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01.md | 354 | ffcfc14837ff02aba33a5a24fa6a58d610055b18b4efd150787c6b8acba7dc43 |
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-EXPECTED-RED-01.md | 196 | a7def01abd54eae10e663e341ce8b253992d883863a1410c93278fa698d78431 |
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01.md | 165 | fe82cce82ebba2595747a411a5ffd2258d86abed36dc9b3de60517193d4babad |
+
+## Collected execution — pending XHigh acceptance
+
+Reviewer collected outer 35920 once following owner done, exit 0. Hermes runtime
+session 20260908_194210_e47f69; completed-session database confirms provider nous,
+model poolside/laguna-s-2.1:free. Version output 78839 confirms v0.18.2
+(2026.7.7.2), upstream b1f003e1, local 10b6d1a9. Actor is completed and closed.
+No rerun, report-only correction, new actor or integration is authorized.
+
+All six commands match the handoff and ran once each in order. Saved results:
+
+| Stage | Command / launch / completion | Process | Full log / lines | Observed result |
+| --- | --- | --- | --- | --- |
+| Regression | 78854 / 78856 / 78917 | proc_cf84b532037e | 78919 / 28 | exit 0; 1 passed, 6 filtered; 428.45s |
+| Receiver fault | 78941 / 78942 / 78980 | proc_63397f15a945 | 79099 / 41 | exit 101; 1 failed, 6 filtered; receiver:ok only; 436.58s |
+| Restored library | 78984 / 78986 / 79025 | proc_be4a831ee040 | 79091 / 38 | exit 0; 7 passed, 0 filtered; 459.67s |
+| Software pipeline | 79027 / 79029 / 79051 | proc_b3c979ac41d6 | 79105 / 34 | exit 0; 1 passed, 13 filtered; 155.66s |
+| Synthetic pipeline | 79054 / 79056 / 79073 | proc_7eae72650c54 | 79106 / 33 | exit 0; 1 passed, 13 filtered; 153.53s |
+| Native compile | 79076 / 79078 / 79080 | proc_74eb6947a13b | 79092 / 36 | exit 0; 4 warnings; 2.06s |
+
+The exact temporary 377-line fault hash was measured at 78940. Immediately after
+the expected failure, command 78981 restored full original bytes; result 78983
+confirms the corrected 379-line baseline hash, before stage 3. Reviewer independently
+measured all 30 frozen identities with no mismatch and the matching retained backup.
+The five test executions consumed 1633.89s (about 27.2 minutes), excluding compile
+and actor overhead; the receiver fault was the one intentionally failing execution.
+
+New uncommitted evidence: docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-RESUME-01.md,
+345 lines, SHA-256 02d078de8a0269ba2dc41664450965a3eec1036ccb5343db6bb8f90518a64f5a.
+The record is not accepted as a verbatim transcript. Its stage-2 output incorrectly
+says zero failed; raw log 79099 correctly says one failed. Warning formatting was
+changed, local absolute paths remain despite the normalization claim, and actual
+inventory rows and command/completion IDs were omitted. Saved logs above govern.
+
+Execution deviations are retained here without sending another correction actor:
+- A filesystem command changed persistent cwd to wallet-broker. Initial inventory
+  78849 failed before measuring files; after a pwd/ls probe, corrected-root inventory
+  78853 matched all 30 rows. The report omits that failed attempt.
+- Actor created then deleted unauthorized target/bbd-wal009-stage1-process.log;
+  reviewer confirms it is absent. A nonexistent shell tool was attempted before
+  terminal deletion. The report's exactly-two-files claim omits this temporary file.
+- Full logs for stages 2-6 were collected after stage 6 instead of at each stage's
+  completion. Complete logs are retained; no test was rerun.
+- Extra backup measurement followed the final evidence hash, and a further source
+  hash/diff command 79117 ran after the required stop. No further source mutation,
+  Git, configuration discovery or broader tests appears in the saved calls.
+
+The actor's final response mentions a completion gate requesting Node tests/build.
+It did not run those commands. That is not an unresolved Rust test failure and does
+not justify repeating the completed proof-heavy checks. The reviewer has collected
+and verified execution facts at High; effects/security acceptance and the next
+implementation scope remain pending XHigh review. Implementation and thirteen
+actor evidence records remain uncommitted. No usable send flow is delivered.

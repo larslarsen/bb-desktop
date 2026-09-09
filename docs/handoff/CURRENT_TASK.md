@@ -1,41 +1,37 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS VALIDATION RESUME 01 — HERMES, SIX FIXED STAGES
-Reviewer: Codex; High for mechanical handoff/collection, XHigh before security acceptance
+State: SIX VALIDATION OUTCOMES COLLECTED — XHIGH REVIEW NEXT
+Reviewer: Codex; collection completed at High, XHigh before security acceptance
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact resume handoff only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [validation resume 01](HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md)
-Read this prefix and active handoff; no historical handoff reload.
+Active handoff and collection: [validation resume 01](HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md)
+Read this prefix and the handoff's collected-execution section first.
 
-Grok session 9172296c-e3f5-466d-84f9-cf0bc95928f8, outer 76898, collected once,
-exit 0. Exactly two parentheses inserted at effects.rs:279; final 379-line hash
-cfa6a86f35d6772053025ca1c9bbb3154d604f79c90d031af261787938576035 accepted.
-All other frozen identities and prior compile-stop evidence match. Grok is closed.
-The previous Hermes run failed compilation before any test; it remains closed.
+Hermes outer 35920 collected once after owner done, exit 0. Runtime session
+20260908_194210_e47f69, nous/poolside/laguna-s-2.1:free, v0.18.2. Actor is closed.
+All six exact commands reached expected outcomes: regression green (1/6), receiver
+fault red (1 failed/6 filtered, receiver:ok only), restored library green (7/0),
+software and synthetic pipelines green (each 1/13), native compile exit 0.
+The temporary fault was immediately restored before stage 3; all 30 frozen
+identities and the full corrected backup match. No rerun is needed for collection.
 
-Hermes may execute the existing six stages from stage 1 under the updated 30-row
-inventory and corrected receiver-fault hash. Restore the full corrected source
-immediately after falsification on every outcome. Stop at the first unexpected
-result. Create only the new resume evidence and named small backup; no Git,
-source repair, broader execution or report-only correction. No green is claimed.
+Report inaccuracies and execution deviations are recorded against the saved logs
+in the active handoff. No report-only correction actor or broader tests authorized.
+Collection verifies execution facts; security/effects acceptance and next scope
+await XHigh review. Ask the owner to return to XHigh before proceeding with those.
 
-Previously accepted results remain valid. Implementation and twelve prior actor
+Previously accepted results remain valid. Implementation and thirteen actor
 evidence records remain uncommitted; no usable send flow is delivered. Full
 cleanup/native/security acceptance stays open. Network/broadcast/mainnet/hardware/
-Monero parked. High is sufficient now; flag XHigh before security acceptance.
+Monero parked. No actor is running or awaiting collection; never poll or relaunch.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md only.
-Launch once and record outer identity here. Collect after owner done or explicit
-collection; never poll an actor.
-Launched once from 2638de4a via hermes -z with --pass-session-id; outer terminal
-35920. Runtime session/provider/model will be collected with the completed run.
-No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 

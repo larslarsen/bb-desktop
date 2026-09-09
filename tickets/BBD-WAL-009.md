@@ -1,20 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DECODED EFFECTS VALIDATION RESUME 01 — HERMES, SIX FIXED STAGES
+Status: SIX VALIDATION OUTCOMES COLLECTED — XHIGH REVIEW NEXT
 
-The exact two-character compile correction is accepted in the
-[validation resume handoff](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md).
-No test ran in the previous compile-stopped execution. Hermes may run the existing
-six stages from stage 1 against the corrected 30-row inventory, recording a new
-resume evidence file. Restore the exact source immediately after the prescribed
-receiver falsification; stop at the first unexpected result. No integration or
-source repair is authorized. Grok and the previous Hermes execution are closed.
+The [resume collection](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md)
+records all six exact commands reaching expected outcomes: regression and restored
+library green, intended receiver-only falsification red, both pipeline tests green,
+and native compilation successful with warnings. Full source restoration and all
+30 frozen identities match. Hermes is completed and closed. Report inaccuracies
+and execution deviations are recorded against saved logs; no rerun or report-only
+correction actor is authorized.
 
-Previously accepted results remain valid. Implementation and twelve prior actor
-evidence records remain uncommitted; no usable send flow is delivered. Full
-cleanup/native/security acceptance stays open. High is sufficient for launch and
-collection; return to XHigh before further security acceptance. Launch once,
-collect after done, no polling. Active CURRENT_TASK.md and handoff govern scope.
+Collection is complete at High. Effects/security acceptance and next implementation
+scope require XHigh review. No source actor, execution or integration is authorized.
+Previously accepted results remain valid. Implementation and thirteen actor evidence
+records remain uncommitted; no usable send flow is delivered. Full cleanup/native/
+security acceptance stays open. Active CURRENT_TASK.md and handoff govern scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
