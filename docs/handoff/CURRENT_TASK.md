@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE TEST SOURCE ACCEPTED — INITIAL EXPECTED RED AUTHORIZED
+State: EXECUTABLE TEST SOURCE ACCEPTED — INITIAL EXPECTED RED RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok source task closed
 Authorized execution actor: Hermes, one executable expected-red run and one evidence record
@@ -36,6 +36,9 @@ Accepted test: a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e,
 947 lines, nine groups. The default executable is absent. Hermes may run only the
 linked expected-red handoff. No builds, production edits or integration.
 Launch once; collect on owner done/Continue. No actor polling.
+Hermes launched once from 438c4fb1; outer 42355, requested provider nous /
+poolside/laguna-s-2.1:free. Actual session/provider/model must come from the exact
+metadata query in the handoff and its completion report. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
