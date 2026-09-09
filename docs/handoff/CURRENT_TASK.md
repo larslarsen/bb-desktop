@@ -1,37 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: REAL PIPELINE PANIC VALIDATION ACCEPTED — REVIEWER NEXT INTEGRATION DESIGN
-Reviewer: Codex, High; no reasoning-setting change requested
+State: NATIVE RUNTIME INTEGRATION DESIGN — OWNER REQUESTED REASONING CHECKPOINT
+Reviewer: Codex, currently High; recommend XHigh for next architecture decision
 Authorized source actors: none
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Closed handoff and acceptance: [real pipeline panic validation](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#collected-validation-acceptance--2026-09-09)
-Read this prefix and the collected acceptance; no historical handoff reload.
+Acceptance and new findings: [pipeline validation / native integration findings](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#next-step-native-integration-findings--2026-09-09)
+Read this prefix and the appended findings; no historical handoff reload.
 
-Hermes outer 5671 completed exit 0; session 20260909_000439_f17d68,
-nous / poolside/laguna-s-2.1:free, v0.18.2. Five bounded outcomes are accepted:
-real pipeline panic green; intended lock-release fault failure; restored six-test
-cleanup library, signer-error and account-lock greens. All 38 identities and the
-retained backup match restored source. Grok outer 43249 is also closed.
+Real pipeline panic validation is accepted at 2d63b4ef. All five outcomes and
+source restoration are verified. Grok outer 43249 and Hermes outer 5671 are closed.
+Preserve all prior pipeline/cleanup/signing/decoded-effects results; no reruns.
 
-The test proves actual signing/proving/extraction/verification before panic, three
-actual buffer-owner observations, no publication, released/reacquirable account
-lock and invalidated authorization. The fault detects the broken real lock-release
-mechanism. This bounded software pipeline panic gap is closed. Preserve all prior
-cleanup/signing/decoded-effects results. No accepted test needs rerunning.
+Read-only native tracing found no Rust broker executable target/entry point.
+EframeSurface starts a synchronous native event loop from a library method.
+social-main.js creates an unconfigured supervisor and never starts it; supervisor
+spawn requires binary path/hash/data directory. Existing native frame tests and
+injected supervisor tests do not establish the real production process/UI boundary.
+The architecture reserves sidecar packaging for WAL-011 (ticket file not yet present).
 
-Execution/report limitations are recorded in the acceptance. The full red compiler
-prefix was not retrieved, but all intended failure/outcome diagnostics are present.
-Correct report portability/facts during future bounded integration; no report-only
-actor or proof rerun. Implementation and eighteen actor evidence records remain
-uncommitted. Full typed-secret erasure, native OS/owning-thread/capability integration
-and final security remain open. Next reviewer work is to bound native confirmation
-integration and remaining security requirements. Network/broadcast/mainnet/hardware/
-Monero/Electron send remain parked; no usable send-flow or full-wallet acceptance.
+Next design must fix scope between WAL-009 native confirmation evidence and actual
+runtime/packaging, UI event-loop ownership, request/cancel/close lifetime and native-
+only capability minting. No implementation or test contract is authorized yet.
+Pause for the owner's XHigh setting change, as requested by the owner for harder
+tasks. No setting change has been observed or claimed; this is not a permission
+requirement from repository instructions. Continue architecture work on owner signal.
+
+Implementation and eighteen actor evidence records remain uncommitted. Full typed-
+secret erasure, native integration and final security remain open. Report portability/
+facts need correction during future bounded integration; no report-only actor.
+Network/broadcast/mainnet/hardware/Monero/Electron send remain parked.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md only.

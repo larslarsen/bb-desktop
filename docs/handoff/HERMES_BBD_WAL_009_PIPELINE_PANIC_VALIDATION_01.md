@@ -346,3 +346,35 @@ actor evidence records remain uncommitted. No actor is active or authorized;
 next reviewer work is to bound native confirmation integration and the remaining
 security requirements. High is sufficient for this completed fixed review.
 Reviewer publication scope remains this handoff, CURRENT_TASK.md and BBD-WAL-009.md.
+
+## Next-step native integration findings — 2026-09-09
+
+Read-only tracing after acceptance found a runtime integration gap, not another
+cleanup regression. wallet-broker/Cargo.toml and src/lib.rs currently define a
+library, with no src/main.rs/src/bin executable or explicit binary target.
+Native confirmation is a crate-private library adapter; EframeSurface invokes
+run_synchronous_zec_review, which creates its own eframe::run_native event loop.
+Current native tests exercise egui/dialog/App frames but do not establish a real
+broker process or OS event-loop thread as the production authority owner.
+
+social-main.js constructs createWalletSupervisor() with no broker options and has
+no walletSupervisor.start call. supervisor.start requires a binary path, hash pin
+and data directory before it will spawn. The supervisor's write/receive seam is
+exercised through injected objects in tests; production stream framing and ownership
+must be reviewed before treating that seam as a working native process connection.
+The accepted architecture reserves sidecar packaging/binary pins for WAL-011;
+there is no tickets/BBD-WAL-011.md yet. Do not silently call a test-only executable
+or another egui simulation the completed product integration.
+
+Next reviewer decision must explicitly separate the remaining WAL-009 native
+confirmation evidence from executable/runtime/packaging scope, fix the UI event-loop
+owner and request/cancel/close lifetime, and preserve native-only capability minting
+and the existing no-Electron-confirm/no-broadcast boundary. Read pinned local framework
+code before fixing event-loop/thread behavior. No implementation contract is yet
+accepted for this change; no source/tests, runtime launch or actor is authorized.
+
+The reviewer recommends XHigh for this architecture decision and is pausing per
+the owner's explicit request to flag reasoning-level changes. The reviewer was on
+High for the completed read-only trace; no setting change is claimed. This is an
+owner-requested workflow pause, not an AGENTS.md approval requirement. All accepted
+pipeline/cleanup results remain valid and must not be rerun.

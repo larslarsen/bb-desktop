@@ -1,19 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: REAL PIPELINE PANIC VALIDATION ACCEPTED — REVIEWER NEXT INTEGRATION DESIGN
+Status: NATIVE RUNTIME INTEGRATION DESIGN — OWNER REQUESTED REASONING CHECKPOINT
 
-The [collected acceptance](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#collected-validation-acceptance--2026-09-09)
-accepts real software-pipeline panic green, the intended lock-release fault failure,
-and three restored regression runs. All 38 frozen identities and the retained
-backup match restored source. The bounded real panic/owner/account-lock coverage
-gap is closed. No actor or execution/integration task is active or authorized.
+Real pipeline panic validation is accepted at 2d63b4ef; all previous acceptance
+remains valid. [Native integration findings](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#next-step-native-integration-findings--2026-09-09)
+identify the absent Rust executable/runtime connection, library-owned synchronous
+UI loop and unstarted/unconfigured Electron supervisor. Next design must bound
+WAL-009 native confirmation evidence versus later runtime/packaging work and fix
+UI ownership/capability lifetime before authorizing source or tests.
 
-Prior cleanup/signing/decoded-effects acceptance remains valid. Report/capture
-limitations are recorded; no accepted proof/test needs repeating. Implementation
-and eighteen actor evidence records remain uncommitted. Next reviewer work is to
-bound native confirmation integration and remaining security requirements. Full
-typed-secret erasure, native integration and final security remain open. High was
-sufficient for this fixed review. CURRENT_TASK.md governs scope; never poll.
+Reviewer completed the trace at High and recommends XHigh for that architecture
+decision, pausing per the owner's reasoning-level instruction. No actor is active
+or authorized. Source and eighteen evidence records remain uncommitted; full typed-
+secret erasure, native integration and final security remain open. CURRENT_TASK.md
+governs scope. No accepted proof/test repetition or report-only correction actor.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
