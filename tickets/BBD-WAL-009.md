@@ -1,22 +1,14 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED AUTHORIZED
+Status: PAUSED — DIRECT APP/BROKER CONNECTION TAKES PRIORITY
 
-The exact inventory/extractor test drop is [accepted](../docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md#collected-test-source-acceptance--2026-09-09):
-92 tests retain all prior cases and add actual-source extraction checks with narrow
-statement/path binding. Fourteen current Zcash paths and every omission are covered.
-Grok is closed; production source-policy extension still awaits expected red.
-
-Hermes alone may perform [npm synchronization and expected red](../docs/handoff/HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md):
-offline MapLibre-only graph sync, policy suite/CLI, Electron security and npm audit,
-then one evidence record and stop. No integration or source edits. Retain successful
-package security results for later integration if inputs stay identical. High suffices.
-
-MapLibre 6.8.0/Leaflet removal and Orchard/signing-target source edits remain accepted.
-Prior Rust formatter/library lint and focused tests remain retained without replay.
-Full Phase-A1, wallet/release acceptance, upstream typed-secret erasure and final
-security remain open. Broker/Electron/OS is WAL-011; native/Pay flows are WAL-010.
-No money-moving feature is enabled. CURRENT_TASK.md governs active scope.
+The owner stopped the package-policy detour. Hermes outer 90392 was interrupted
+and exited 130. Its former npm/source-policy task is closed. Preserve pending
+source, lock and evidence edits without further package-policy work. Prior reviewed
+Rust source and successful focused checks remain retained. Full typed-secret erasure,
+Phase A1 and release/security acceptance remain open; this is not wallet completion.
+[BBD-WAL-011](BBD-WAL-011.md) now owns the active connection task. CURRENT_TASK.md
+alone authorizes actors. No WAL-009 source, execution or integration is authorized.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

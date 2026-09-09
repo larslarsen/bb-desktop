@@ -1,38 +1,35 @@
 # Current Task
 
-Ticket: BBD-WAL-009
-State: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED RUNNING
+Ticket: BBD-WAL-011
+State: LIVE BROKER TRANSPORT — TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source/integration actors: none
-Authorized execution/evidence actor: Hermes; exact five-command task
-Protected parent: publishing commit; one CURRENT-only launch allowed
+Authorized source actor: Grok Build, grok-4.6 High, test source only
+Authorized execution/integration actors: none
+Protected parent: publishing reviewer commit; one CURRENT-only launch allowed
 
-Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [Npm sync and source-policy red](HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md)
-Source acceptance: [Inventory/extractor test review](GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md#collected-test-source-acceptance--2026-09-09)
-Read this prefix and active task; no historical reload.
+Read [ticket](../../tickets/BBD-WAL-011.md),
+[active source task](GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md), AGENTS.md and TESTING.md.
+Do not reload historical handoffs. The owner authorized returning to direct wallet
+integration after challenging the package-policy detour. That detour is closed.
+Hermes outer 90392 was interrupted once and exited 130; do not resume or poll it.
 
-Grok outer 10179 / session 67b04d89-3cb5-42d7-8a43-59e8d30be4e9 is closed. Its exact
-one-file test drop is accepted: 3810 lines, a58d85e5322f0cb01a78b636454f92547bd98e556013cc07712dc0cf64ea565c.
-Hermes may synchronize the reviewed npm graph offline, collect policy suite/CLI
-expected red and run Electron security/npm audit. Only lock/node_modules and one
-new evidence record may change. No production source extension or integration.
-Hermes launched once from d754f8dc; active outer 90392. Actual runtime session
-will be verified on collection. Collect only on owner done/Continue; no polling or relaunch.
+The app never starts its wallet supervisor. The supervisor has no child stream
+listeners, writes objects to stdin and returns acknowledgments instead of replies.
+Rust has a library but no executable entry point. This task repairs the first real
+connection layer. Rust executable and Electron startup follow; transport acceptance
+alone must not be described as a usable or fully connected wallet.
 
-The current policy still expects eight Zcash source files and rejects the two
-reviewed extractor statements; the tests now cover the exact fourteen-file layout
-and narrowly bound statements. Preserve all existing authority restrictions. The
-accepted MapLibre 6.8.0/Leaflet removal and manifest policy edits remain frozen.
-Prior Rust formatter/library lint and focused results remain accepted, with no replay.
+Preserve pending package.json, package-lock.json, scripts/security-policy.js,
+test/securityPolicy.node.js and the untracked prior WAL-009 evidence. Do not revert,
+integrate, audit, or expand that package work in this task. Prior Rust results stay
+retained. Money-moving release, typed-secret erasure, native flows and packaging
+acceptance remain open. No endpoint selection, Monero or MapLibre work is authorized.
 
-Full typed-secret erasure, Phase A1/final validation/security and wallet completion
-remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
-features, hardware and Monero remain parked. High is sufficient.
-
-Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md and
-docs/handoff/HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md only.
+Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
+tickets/BBD-WAL-009.md, tickets/BBD-WAL-011.md,
+docs/handoff/GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md,
+docs/engineering/WALLET_ROADMAP_ROUTING.md.
+Launch once; collect once when the owner reports completion. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

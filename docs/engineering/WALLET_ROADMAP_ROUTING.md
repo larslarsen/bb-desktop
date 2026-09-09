@@ -6,6 +6,15 @@ repository handoff remains `docs/handoff/CURRENT_TASK.md`.
 
 Reviewer: Lead Engineer/Reviewer — Codex at High
 
+## Current priority — 2026-09-09
+
+The owner authorized direct app-to-wallet integration and stopped the package-policy
+detour. WAL-011 now starts with the missing live process transport, followed by the
+Rust executable and Electron startup. These read-only connection stages can proceed
+before money-moving release gates. Earlier WAL-003 acceptance covered boundary seams;
+it did not establish a running app-to-Rust connection. WAL-009 remains incomplete and
+paused. No MapLibre feature or additional package-policy project is authorized.
+
 ## Priority and dependency order
 
 | Priority | Ticket | Source actor | Why that actor | Start condition |
@@ -18,9 +27,9 @@ Reviewer: Lead Engineer/Reviewer — Codex at High
 | P2 complete | BBD-WAL-006 | Codex Sol, High | ZEC consensus, PCZT, Ironwood, SQLite viewing state, and librustzcash adapter | Reviewer-accepted at `996444e9`; final evidence at `14a68187` |
 | P3 parked | BBD-WAL-007 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | XMR wallet/node process isolation, RPC authentication, viewing/recovery, and durable subaddresses | Phase C accepted; reviewed local root available; owner deferred the real offline gate |
 | P3 complete | BBD-WAL-008 | Codex Sol, High, as documented fill-in while Grok weekly usage is exhausted | Zcash hardware capability attestation and device trust | Reviewer-accepted at `97d407e6`; no real-device positive pin |
-| P3 active, Zcash-first | BBD-WAL-009 | Codex Sol, High, as documented fill-in while Grok weekly usage is exhausted | ZEC PCZT sign/verify, then durable internal broadcast, concurrency, cancellation races, and crash recovery; XMR half deferred while WAL-007 is parked | WAL-008 accepted; Phase A1 ZEC test source authorized |
+| Paused, Zcash-first | BBD-WAL-009 | Codex Sol, High, as documented fill-in while Grok weekly usage is exhausted | ZEC PCZT sign/verify, then durable internal broadcast, concurrency, cancellation races, and crash recovery; XMR half deferred while WAL-007 is parked | WAL-008 accepted; Phase A1 ZEC test source authorized |
 | P4 | BBD-WAL-010 | Codex Spark, High for explicitly delegated DOM/CSS/state boilerplate; Grok for senior/authority-bearing source; Sol only by documented escalation | User-facing composition after authority and state-machine behavior are executable | WAL-005, RATE-001, and payment flow accepted |
-| P4 | BBD-WAL-011 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
+| Active: live connection first | BBD-WAL-011 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Native sidecar packaging, binary pins, SBOM, scanners, and sandbox preservation | Native components accepted |
 | P5 | BBD-WAL-012 | Sr Dev — Grok Build, High; Sol fill-in only by documented escalation | Mainnet release gate and money-safety evidence | Every preceding wallet gate accepted |
 
 ## Routing guardrails
