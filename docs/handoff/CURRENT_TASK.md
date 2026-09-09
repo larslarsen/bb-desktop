@@ -33,7 +33,9 @@ broadcast/mainnet/hardware/Monero/Electron send remain parked; no usable send fl
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md only.
-Launch once, collect on owner done, never poll. Not launched yet.
+Launched once from 4f529036: Hermes outer terminal 5671, --pass-session-id.
+Runtime session/provider/model and completion remain unverified until collection.
+Collect once after owner done; do not poll or relaunch.
 
 ## Historical record (superseded by the active state above)
 
