@@ -5,11 +5,19 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const { sanitizeWalletSnapshot } = require('../wallet-pay/model');
 const {
+  CONTROL_FRAME_LIMIT,
   computeSessionId,
+  createBrokerFrameDecoder,
   createProtocolSession,
+  encodeBrokerFrame,
+  normalizeBrokerError,
   validateHello,
   validateHelloAck,
 } = require('./protocol');
+
+const PUBLIC_REQUEST_LIMIT = 32;
+const DEADLINE_MS = 2000;
+const KILL_ESCALATE_MS = 250;
 
 const BROKER_METHODS = Object.freeze([
   'status.get',
@@ -167,13 +175,22 @@ function createWalletSupervisor(options = {}) {
   const system = Object.assign(defaultSystem(), options.system || {});
   const subscribers = new Set();
   const intents = new Set();
+  const pendingPublic = new Map();
   let child = null;
-  let timer = null;
+  let decoder = null;
+  let handshakeTimer = null;
+  let killTimer = null;
   let protocolSession = null;
   let sessionId = null;
+  let bootstrapId = null;
   let nextId = 1;
+  let parentSeq = 1;
   let snapshot = sanitizeSnapshot({ v: 1, broker: 'down', accounts: [] });
   let failed = false;
+  let bootstrapped = false;
+  let downPublished = false;
+  let terminating = false;
+  let childExited = false;
 
   function publish(value) {
     snapshot = sanitizeSnapshot(value);
@@ -183,36 +200,148 @@ function createWalletSupervisor(options = {}) {
     return sanitizeSnapshot(snapshot);
   }
 
-  function terminate() {
+  function parentPid() {
+    return String(options.parentPid == null ? process.pid : options.parentPid);
+  }
+
+  function parentNonce() {
+    if (typeof options.nonce === 'function') return options.nonce();
+    return crypto.randomBytes(16).toString('hex');
+  }
+
+  function makeError(code, wire) {
+    const normalized = normalizeBrokerError(wire && typeof wire === 'object' ? wire : { code });
+    const error = new SupervisorError(normalized.code, normalized.message);
+    error.retryable = normalized.retryable;
+    return error;
+  }
+
+  function publicResult(method, result) {
+    if (method === 'status.get' || method === 'sync.subscribe') return sanitizeSnapshot(result);
+    return cloneSafe(result);
+  }
+
+  function settle(entry, error, result) {
+    if (!entry || entry.settled) return;
+    entry.settled = true;
+    if (entry.timer) {
+      system.clearTimeout(entry.timer);
+      entry.timer = null;
+    }
+    if (error) entry.reject(error);
+    else entry.resolve(result);
+  }
+
+  function childIsGone() {
+    return childExited || (child != null && (child.exitCode != null || child.signalCode != null));
+  }
+
+  function signalChild(signal) {
     if (!child) return;
-    if (typeof child.terminate === 'function') child.terminate();
-    else if (typeof child.kill === 'function') child.kill('SIGTERM');
+    try {
+      if (typeof child.kill === 'function') child.kill(signal);
+      else if (signal === 'SIGTERM' && typeof child.terminate === 'function') child.terminate();
+    } catch (_) { /* already gone */ }
+  }
+
+  function detachDataListeners() {
+    if (!child) return;
+    if (child.stdout) {
+      child.stdout.removeListener('data', onStdoutData);
+      child.stdout.removeListener('end', onStdoutEnd);
+    }
+    if (child.stderr) child.stderr.removeListener('data', onStderrData);
+  }
+
+  function terminate() {
+    if (!child || terminating || childIsGone()) return;
+    terminating = true;
+    signalChild('SIGTERM');
+    killTimer = system.setTimeout(() => {
+      killTimer = null;
+      if (!childIsGone()) signalChild('SIGKILL');
+    }, KILL_ESCALATE_MS);
   }
 
   function close() {
     failed = true;
+    bootstrapped = false;
+    if (handshakeTimer) {
+      system.clearTimeout(handshakeTimer);
+      handshakeTimer = null;
+    }
+    const entries = [...pendingPublic.values()];
+    pendingPublic.clear();
+    bootstrapId = null;
     protocolSession = null;
     sessionId = null;
-    if (timer) system.clearTimeout(timer);
-    timer = null;
+    decoder = null;
+    detachDataListeners();
+    for (const entry of entries) settle(entry, makeError('UNAVAILABLE'));
+    let published = sanitizeSnapshot(snapshot);
+    if (!downPublished) {
+      downPublished = true;
+      published = publish({ v: 1, broker: 'down', accounts: [] });
+    }
     terminate();
-    return publish({ v: 1, broker: 'down', accounts: [] });
+    return published;
   }
 
-  function send(method, params) {
-    const id = (nextId++).toString(16).padStart(32, '0');
+  function writeRaw(value) {
+    const frame = encodeBrokerFrame(value);
+    if (frame.readUInt32BE(0) > CONTROL_FRAME_LIMIT) reject('LIMIT', 'frame too large');
+    if (!child || !child.stdin || failed) reject('UNAVAILABLE', 'broker unavailable');
+    try {
+      child.stdin.write(frame);
+    } catch (_) {
+      close();
+      reject('UNAVAILABLE', 'broker unavailable');
+    }
+    if (failed) reject('UNAVAILABLE', 'broker unavailable');
+  }
+
+  function writeRequest(method, params, trackPublic) {
+    if (!protocolSession || failed || !child || !child.stdin) reject('UNAVAILABLE', 'broker unavailable');
+    if (trackPublic && pendingPublic.size >= PUBLIC_REQUEST_LIMIT) reject('LIMIT', 'limit exceeded');
+    const id = nextId.toString(16).padStart(32, '0');
     const envelope = {
-      v: 1, id, seq: nextId - 1, kind: 'req', method, params,
-      session: sessionId, expires_ms: system.now() + 2000,
+      v: 1, id, seq: parentSeq, kind: 'req', method, params,
+      session: sessionId, expires_ms: system.now() + DEADLINE_MS,
     };
+    const frame = encodeBrokerFrame(envelope);
+    if (frame.readUInt32BE(0) > CONTROL_FRAME_LIMIT) reject('LIMIT', 'frame too large');
     protocolSession.accept('parent', envelope);
-    child.stdin.write(envelope);
-    return { ok: true };
+    nextId += 1;
+    parentSeq += 1;
+    try {
+      child.stdin.write(frame);
+    } catch (_) {
+      close();
+      reject('UNAVAILABLE', 'broker unavailable');
+    }
+    if (failed) reject('UNAVAILABLE', 'broker unavailable');
+    if (!trackPublic) {
+      bootstrapId = id;
+      return undefined;
+    }
+    const entry = { method, settled: false, timer: null, resolve: null, reject: null };
+    const promise = new Promise((resolve, rejectFn) => {
+      entry.resolve = resolve;
+      entry.reject = rejectFn;
+    });
+    entry.timer = system.setTimeout(() => {
+      if (entry.settled) return;
+      pendingPublic.delete(id);
+      settle(entry, makeError('TIMEOUT'));
+      close();
+    }, DEADLINE_MS);
+    pendingPublic.set(id, entry);
+    return promise;
   }
 
   const dispatch = createBrokerDispatcher({
-    bound: () => Boolean(protocolSession && protocolSession.bound.child && !failed),
-    send,
+    bound: () => Boolean(bootstrapped && !failed),
+    send: (method, params) => writeRequest(method, params, true),
   });
 
   function dispatchFromMain(method, params) {
@@ -222,13 +351,143 @@ function createWalletSupervisor(options = {}) {
     return dispatch(method, params);
   }
 
+  function finishBootstrap(value) {
+    bootstrapId = null;
+    if (value.kind === 'error') {
+      normalizeBrokerError(value.error);
+      return { ok: false, snapshot: close() };
+    }
+    if (handshakeTimer) {
+      system.clearTimeout(handshakeTimer);
+      handshakeTimer = null;
+    }
+    bootstrapped = true;
+    publish(value.result);
+    return { ok: true };
+  }
+
+  function acceptHello(value) {
+    const hello = validateHello(value).value;
+    if (hello.child_pid !== String(child.pid)) reject('UNAUTH', 'child PID mismatch');
+    const ack = {
+      protocol: 'bitbook-wallet-broker',
+      version: 1,
+      parent_nonce: parentNonce(),
+      parent_pid: parentPid(),
+    };
+    validateHelloAck(ack);
+    sessionId = computeSessionId({
+      parent_pid: ack.parent_pid,
+      child_pid: hello.child_pid,
+      parent_nonce: ack.parent_nonce,
+      child_nonce: hello.child_nonce,
+    });
+    protocolSession = createProtocolSession({ sessionId, now: system.now });
+    writeRaw(ack);
+    writeRequest('status.get', {}, false);
+    return { ok: true };
+  }
+
+  function acceptChild(value) {
+    protocolSession.accept('child', value);
+    if (value.kind === 'evt') {
+      if (bootstrapped) {
+        const receivedSnapshot = eventSnapshot(value);
+        if (receivedSnapshot !== undefined) publish(receivedSnapshot);
+      }
+      return { ok: true };
+    }
+    if (value.kind !== 'res' && value.kind !== 'error') return { ok: true };
+    if (!bootstrapped && bootstrapId && value.id === bootstrapId) return finishBootstrap(value);
+    const entry = pendingPublic.get(value.id);
+    if (!entry) return { ok: false, snapshot: close() };
+    pendingPublic.delete(value.id);
+    if (value.kind === 'error') {
+      settle(entry, makeError(value.error && value.error.code, value.error));
+      return { ok: true };
+    }
+    settle(entry, null, publicResult(entry.method, value.result));
+    return { ok: true };
+  }
+
+  function handleIncoming(value) {
+    if (!child || failed) return { ok: false, snapshot: sanitizeSnapshot(snapshot) };
+    try {
+      if (!sessionId) return acceptHello(value);
+      return acceptChild(value);
+    } catch (_) {
+      return { ok: false, snapshot: close() };
+    }
+  }
+
+  function onStdoutData(chunk) {
+    if (failed || !decoder) return;
+    try {
+      if (!Buffer.isBuffer(chunk)) {
+        close();
+        return;
+      }
+      const values = decoder.push(chunk);
+      for (let index = 0; index < values.length; index += 1) {
+        if (failed) return;
+        handleIncoming(values[index]);
+      }
+    } catch (_) {
+      close();
+    }
+  }
+
+  function onStdoutEnd() {
+    close();
+  }
+
+  function onStderrData() {
+    // Drain diagnostics without retaining or forwarding them.
+  }
+
+  function onTransportError() {
+    close();
+  }
+
+  function onChildExit() {
+    childExited = true;
+    if (killTimer) {
+      system.clearTimeout(killTimer);
+      killTimer = null;
+    }
+    close();
+  }
+
+  function onChildClose() {
+    childExited = true;
+    if (killTimer) {
+      system.clearTimeout(killTimer);
+      killTimer = null;
+    }
+    close();
+  }
+
+  function attachTransport(target) {
+    decoder = createBrokerFrameDecoder({ limitBytes: CONTROL_FRAME_LIMIT, stream: 'protocol' });
+    target.stdout.on('data', onStdoutData);
+    target.stdout.on('end', onStdoutEnd);
+    target.stdout.on('error', onTransportError);
+    target.stdin.on('error', onTransportError);
+    target.stderr.on('data', onStderrData);
+    target.stderr.on('error', onTransportError);
+    target.on('error', onTransportError);
+    target.on('exit', onChildExit);
+    target.on('close', onChildClose);
+  }
+
   const supervisor = {
     get bound() {
-      return Boolean(protocolSession && protocolSession.bound.parent && protocolSession.bound.child && !failed);
+      return Boolean(bootstrapped && protocolSession && !failed);
     },
     get sessionId() { return sessionId; },
 
     start() {
+      if (child || failed) return { ok: false, snapshot: sanitizeSnapshot(snapshot) };
       if (!options.brokerPath || typeof options.expectedSha256 !== 'string' ||
           !options.expectedSha256 || !options.dataDir || !PIN.test(options.expectedSha256)) {
         return { ok: false, snapshot: publish({ v: 1, broker: 'down', accounts: [] }) };
@@ -244,26 +503,27 @@ function createWalletSupervisor(options = {}) {
         system.access(options.brokerPath, fs.constants.R_OK);
         if (system.sha256(options.brokerPath) !== options.expectedSha256) reject('UNAUTH', 'broker hash mismatch');
         const cleanEnv = cleanEnvironment(options.env || {});
-        if (typeof system.spawn === 'function') {
-          child = system.spawn(options.brokerPath, [], {
-            cwd: options.dataDir,
-            env: cleanEnv,
-            shell: false,
-            stdio: ['pipe', 'pipe', 'pipe'],
-          });
-        } else {
-          child = childProcess.spawn(options.brokerPath, [], {
-            cwd: options.dataDir,
-            env: cleanEnv,
-            shell: false,
-            stdio: ['pipe', 'pipe', 'pipe'],
-          });
-        }
+        const spawn = typeof system.spawn === 'function' ? system.spawn : childProcess.spawn;
+        child = spawn(options.brokerPath, [], {
+          cwd: options.dataDir,
+          env: cleanEnv,
+          shell: false,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+        decoder = null;
         protocolSession = null;
         sessionId = null;
+        bootstrapId = null;
         nextId = 1;
+        parentSeq = 1;
         failed = false;
-        timer = system.setTimeout(() => close(), 2000);
+        bootstrapped = false;
+        downPublished = false;
+        terminating = false;
+        childExited = false;
+        pendingPublic.clear();
+        attachTransport(child);
+        handshakeTimer = system.setTimeout(() => close(), DEADLINE_MS);
         return { ok: true, snapshot: sanitizeSnapshot(snapshot) };
       } catch (_) {
         return { ok: false, snapshot: close() };
@@ -276,33 +536,7 @@ function createWalletSupervisor(options = {}) {
     },
 
     receiveProtocol(value) {
-      if (!child || failed) return { ok: false, snapshot: sanitizeSnapshot(snapshot) };
-      try {
-        if (!sessionId) {
-          const hello = validateHello(value).value;
-          if (hello.child_pid !== String(child.pid)) reject('UNAUTH', 'child PID mismatch');
-          const ack = {
-            protocol: 'bitbook-wallet-broker', version: 1,
-            parent_nonce: options.nonce(), parent_pid: String(options.parentPid),
-          };
-          validateHelloAck(ack);
-          sessionId = computeSessionId({
-            parent_pid: ack.parent_pid, child_pid: hello.child_pid,
-            parent_nonce: ack.parent_nonce, child_nonce: hello.child_nonce,
-          });
-          protocolSession = createProtocolSession({ sessionId, now: system.now });
-          child.stdin.write(ack);
-          return { ok: true };
-        }
-        protocolSession.accept('child', value);
-        if (timer) system.clearTimeout(timer);
-        timer = null;
-        const receivedSnapshot = eventSnapshot(value);
-        if (receivedSnapshot !== undefined && supervisor.bound) publish(receivedSnapshot);
-        return { ok: true };
-      } catch (_) {
-        return { ok: false, snapshot: close() };
-      }
+      return handleIncoming(value);
     },
 
     dispatch: dispatchFromMain,
@@ -310,7 +544,7 @@ function createWalletSupervisor(options = {}) {
       if (typeof intentId !== 'string' || !ID.test(intentId)) reject('SCHEMA', 'invalid intent id');
       intents.add(intentId);
     },
-    pendingRequests() { return []; },
+    pendingRequests() { return Array.from(pendingPublic.keys()); },
     restartDelays(count) {
       return Array.from({ length: Math.max(0, count) }, (_, index) => Math.min(250 * (2 ** index), 5000));
     },
@@ -327,11 +561,16 @@ function createWalletSupervisor(options = {}) {
       };
     },
     quit() {
-      if (supervisor.bound) {
-        for (const intentId of intents) dispatch('intent.cancel', { intent_id: intentId });
+      if (bootstrapped && !failed) {
+        for (const intentId of [...intents]) {
+          try {
+            const result = dispatch('intent.cancel', { intent_id: intentId });
+            if (result && typeof result.then === 'function') result.catch(() => {});
+          } catch (_) { /* still terminate */ }
+        }
       }
-      terminate();
       intents.clear();
+      close();
     },
   };
   return supervisor;

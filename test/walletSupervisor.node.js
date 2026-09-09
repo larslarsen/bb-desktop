@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const { EventEmitter } = require('events');
 const fixture = require('./fixtures/wallet-broker/transcript-v1.json');
 const payFixture = require('./fixtures/wallet-pay/snapshots-v1.json');
 const { sanitizeWalletSnapshot } = require('../wallet-pay/model');
@@ -14,17 +15,46 @@ const {
 const PIN = 'a'.repeat(64);
 const BROKER_PATH = '/app/resources/bitbook-wallet-broker';
 const DATA_DIR = '/user-data/wallet-broker';
+const BOOTSTRAP_ID = '00000000000000000000000000000001';
+const BOOTSTRAP_SNAPSHOT = { v: 1, broker: 'ready', accounts: [] };
+const SETTLE_MS = 1500;
 const tests = [];
 function test(name, fn) { tests.push({ name, fn }); }
+
+function withDeadline(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+}
+
+function decodeFrame(buffer) {
+  assert.ok(Buffer.isBuffer(buffer), 'stdin write must be a Buffer');
+  const length = buffer.readUInt32BE(0);
+  assert.strictEqual(buffer.length, 4 + length);
+  return JSON.parse(buffer.subarray(4, 4 + length).toString('utf8'));
+}
+
+function decodeWrites(writes) {
+  return writes.map((write) => decodeFrame(write));
+}
 
 function harness(overrides = {}) {
   const calls = [];
   const protocolWrites = [];
-  const child = {
-    pid: 41002,
-    stdin: { kind: 'protocol-in', write(value) { protocolWrites.push(value); calls.push(['protocol', value]); } },
-    stdout: { kind: 'protocol-out' }, stderr: { kind: 'diagnostics' },
-    terminate() { calls.push(['terminate']); },
+  const child = new EventEmitter();
+  child.pid = 41002;
+  child.stdin = new EventEmitter();
+  child.stdin.write = function write(value) {
+    protocolWrites.push(value);
+    calls.push(['protocol', value]);
+    return true;
+  };
+  child.stdout = new EventEmitter();
+  child.stderr = new EventEmitter();
+  child.kill = function kill(signal) {
+    calls.push(['kill', signal || 'SIGTERM']);
   };
   const system = Object.assign({
     mkdir(path, options) { calls.push(['mkdir', path, options]); },
@@ -36,8 +66,11 @@ function harness(overrides = {}) {
     access(path, mode) { calls.push(['access', path, mode]); },
     sha256(path) { calls.push(['sha256', path]); return PIN; },
     spawn(path, argv, options) { calls.push(['spawn', path, argv, options]); return child; },
-    setTimeout(fn, ms) { const timer = { fn, ms }; calls.push(['timer', ms, timer]); return timer; },
-    clearTimeout() {},
+    setTimeout(fn, ms) { const timer = { fn, ms, cleared: false }; calls.push(['timer', ms, timer]); return timer; },
+    clearTimeout(timer) {
+      calls.push(['clearTimeout', timer]);
+      if (timer) timer.cleared = true;
+    },
     now() { return 1000; },
   }, overrides.system);
   return {
@@ -51,15 +84,45 @@ function harness(overrides = {}) {
   };
 }
 
-function bindSupervisor(ctx) {
+function bindSupervisor(ctx, result) {
   ctx.supervisor.start();
   assert.strictEqual(ctx.supervisor.receiveProtocol(fixture.hello).ok, true);
+  const frames = decodeWrites(ctx.protocolWrites);
+  assert.deepStrictEqual(frames[0], fixture.hello_ack);
+  assert.strictEqual(frames[1].id, BOOTSTRAP_ID);
+  assert.strictEqual(frames[1].seq, 1);
+  assert.strictEqual(frames[1].kind, 'req');
+  assert.strictEqual(frames[1].method, 'status.get');
+  assert.deepStrictEqual(frames[1].params, {});
+  assert.strictEqual(frames[1].session, fixture.session_id);
+  assert.strictEqual(frames[1].expires_ms, 3000);
   assert.strictEqual(ctx.supervisor.receiveProtocol({
-    v: 1, id: '11112222333344445555666677778888', seq: 1, kind: 'evt',
-    method: 'sync.subscribe', params: {}, session: fixture.session_id,
+    v: 1,
+    id: BOOTSTRAP_ID,
+    seq: 1,
+    kind: 'res',
+    result: result || BOOTSTRAP_SNAPSHOT,
+    session: fixture.session_id,
   }).ok, true);
-  assert.strictEqual(ctx.supervisor.dispatch('status.get', {}).ok, true);
   assert.strictEqual(ctx.supervisor.bound, true);
+  return frames[1];
+}
+
+function publicFrames(ctx) {
+  return decodeWrites(ctx.protocolWrites).filter((message) => message.kind === 'req' && message.id !== BOOTSTRAP_ID);
+}
+
+async function expectCode(fn, code) {
+  try {
+    const result = fn();
+    if (result && typeof result.then === 'function') {
+      await result;
+      assert.fail(`expected ${code}`);
+    }
+    assert.fail(`expected ${code}`);
+  } catch (error) {
+    assert.strictEqual(error.code, code);
+  }
 }
 
 test('launch: private data directory and regular readable pinned binary precede one inert spawn', () => {
@@ -79,6 +142,18 @@ test('launch: private data directory and regular readable pinned binary precede 
   assert.strictEqual(spawn[3].shell, false);
   assert.deepStrictEqual(spawn[3].env, { LANG: 'C.UTF-8', PATH: '/usr/bin' });
   assert.ok(!JSON.stringify(spawn).includes('CANARY'));
+  assert.ok(ctx.child.stdout.listeners('data').length >= 1);
+  assert.ok(ctx.child.stdout.listeners('end').length >= 1);
+  assert.ok(ctx.child.stdout.listeners('error').length >= 1);
+  assert.ok(ctx.child.stdin.listeners('error').length >= 1);
+  assert.ok(ctx.child.stderr.listeners('data').length >= 1);
+  assert.ok(ctx.child.stderr.listeners('error').length >= 1);
+  assert.ok(ctx.child.listeners('error').length >= 1);
+  assert.ok(ctx.child.listeners('exit').length >= 1);
+  assert.ok(ctx.child.listeners('close').length >= 1);
+  assert.strictEqual(ctx.calls.filter((call) => call[0] === 'spawn').length, 1);
+  ctx.supervisor.start();
+  assert.strictEqual(ctx.calls.filter((call) => call[0] === 'spawn').length, 1);
 });
 
 test('launch: missing, non-file, symlink, unreadable, and hash mismatch never spawn', () => {
@@ -115,9 +190,13 @@ test('launch: missing, symlinked, non-directory, or non-0700 data directories ne
   }
 });
 
-test('handshake: real child-first fixture transcript binds both directions within two seconds', () => {
+test('handshake: real child-first fixture transcript binds both directions within two seconds', async () => {
   const ctx = harness();
-  ctx.supervisor.start();
+  const snapshots = [];
+  ctx.supervisor.subscribeSnapshot((value) => snapshots.push(value));
+  const started = ctx.supervisor.start();
+  assert.strictEqual(started.ok, true);
+  assert.strictEqual(started.snapshot.broker, 'down');
   assert.strictEqual(ctx.supervisor.bound, false);
   assert.strictEqual(ctx.calls.find((call) => call[0] === 'timer')[1], 2000);
   assert.strictEqual(ctx.supervisor.receiveDiagnostic(JSON.stringify(fixture.hello)), undefined);
@@ -125,46 +204,84 @@ test('handshake: real child-first fixture transcript binds both directions withi
   assert.strictEqual(ctx.supervisor.bound, false);
   assert.strictEqual(ctx.protocolWrites.length, 0);
   assert.strictEqual(ctx.supervisor.receiveProtocol(fixture.hello).ok, true);
-  assert.deepStrictEqual(ctx.protocolWrites[0], fixture.hello_ack);
+  const afterHello = decodeWrites(ctx.protocolWrites);
+  assert.deepStrictEqual(afterHello[0], fixture.hello_ack);
+  assert.strictEqual(afterHello[1].id, BOOTSTRAP_ID);
+  assert.strictEqual(afterHello[1].seq, 1);
+  assert.strictEqual(afterHello[1].method, 'status.get');
+  assert.deepStrictEqual(afterHello[1].params, {});
   assert.strictEqual(ctx.supervisor.sessionId, fixture.session_id);
-  assert.throws(() => ctx.supervisor.dispatch('status.get', {}), (error) => error.code === 'UNAUTH');
+  await expectCode(() => ctx.supervisor.dispatch('status.get', {}), 'UNAUTH');
+  const handshakeTimer = ctx.calls.find((call) => call[0] === 'timer' && call[1] === 2000)[2];
+  assert.strictEqual(handshakeTimer.cleared, false);
   assert.strictEqual(ctx.supervisor.receiveProtocol({
     v: 1, id: '11112222333344445555666677778888', seq: 1, kind: 'evt',
-    method: 'sync.subscribe', params: {}, session: fixture.session_id,
+    method: 'sync.subscribe',
+    params: { snapshot: { v: 1, broker: 'syncing', accounts: [], seed: 'CANARY' } },
+    session: fixture.session_id,
   }).ok, true);
-  assert.strictEqual(ctx.supervisor.dispatch('status.get', {}).ok, true);
-  assert.strictEqual(ctx.protocolWrites[1].session, fixture.session_id);
+  assert.strictEqual(ctx.supervisor.bound, false);
+  assert.strictEqual(handshakeTimer.cleared, false);
+  assert.ok(!snapshots.some((value) => value.broker === 'ready' || value.broker === 'syncing'));
+  await expectCode(() => ctx.supervisor.dispatch('status.get', {}), 'UNAUTH');
+  assert.strictEqual(ctx.supervisor.receiveProtocol({
+    v: 1,
+    id: BOOTSTRAP_ID,
+    seq: 2,
+    kind: 'res',
+    result: BOOTSTRAP_SNAPSHOT,
+    session: fixture.session_id,
+  }).ok, true);
   assert.strictEqual(ctx.supervisor.bound, true);
+  assert.strictEqual(handshakeTimer.cleared, true);
+  assert.deepStrictEqual(snapshots[snapshots.length - 1], sanitizeSnapshot(BOOTSTRAP_SNAPSHOT));
+  const pending = ctx.supervisor.dispatch('status.get', {});
+  assert.ok(pending && typeof pending.then === 'function');
+  const publicReq = publicFrames(ctx)[0];
+  assert.strictEqual(publicReq.session, fixture.session_id);
+  assert.strictEqual(publicReq.id, '00000000000000000000000000000002');
+  assert.strictEqual(publicReq.seq, 2);
+  assert.strictEqual(ctx.supervisor.receiveProtocol({
+    v: 1, id: publicReq.id, seq: 3, kind: 'res',
+    result: { v: 1, broker: 'ready', accounts: [] },
+    session: fixture.session_id,
+  }).ok, true);
+  const result = await withDeadline(pending, SETTLE_MS, 'matching status reply did not settle');
+  assert.deepStrictEqual(result, sanitizeSnapshot({ v: 1, broker: 'ready', accounts: [] }));
+  assert.notDeepStrictEqual(result, { ok: true });
 });
 
-test('handshake: PID, session, diagnostics, timeout, and early exit failures never dispatch', () => {
+test('handshake: PID, session, diagnostics, timeout, and early exit failures never dispatch', async () => {
   const wrongPid = harness();
   wrongPid.supervisor.start();
   assert.strictEqual(wrongPid.supervisor.receiveProtocol(Object.assign({}, fixture.hello, { child_pid: '41003' })).ok, false);
   const wrongSession = harness();
   wrongSession.supervisor.start();
   wrongSession.supervisor.receiveProtocol(Object.assign({}, fixture.hello, { child_nonce: '0'.repeat(32) }));
+  const wrongSessionWrites = wrongSession.protocolWrites.length;
   assert.strictEqual(wrongSession.supervisor.receiveProtocol({
     v: 1, id: '11112222333344445555666677778888', seq: 1, kind: 'evt',
     method: 'sync.subscribe', params: {}, session: fixture.session_id,
   }).ok, false);
   for (const ctx of [wrongPid, wrongSession]) {
-    assert.throws(() => ctx.supervisor.dispatch('status.get', {}));
-    assert.strictEqual(ctx.protocolWrites.some((message) => message.method === 'status.get'), false);
+    const before = ctx.protocolWrites.length;
+    await expectCode(() => ctx.supervisor.dispatch('status.get', {}), 'UNAUTH');
+    assert.strictEqual(ctx.protocolWrites.length, before);
   }
+  assert.strictEqual(wrongSession.protocolWrites.length, wrongSessionWrites);
   const timed = harness();
   timed.supervisor.start();
   timed.calls.find((call) => call[0] === 'timer')[2].fn();
-  assert.throws(() => timed.supervisor.dispatch('status.get', {}));
+  await expectCode(() => timed.supervisor.dispatch('status.get', {}), 'UNAUTH');
   const exited = harness();
   exited.supervisor.start();
   exited.supervisor.unexpectedExit({});
-  assert.throws(() => exited.supervisor.dispatch('status.get', {}));
+  await expectCode(() => exited.supervisor.dispatch('status.get', {}), 'UNAUTH');
   const mixed = harness();
   mixed.supervisor.start();
   assert.strictEqual(mixed.supervisor.receiveDiagnostic(fixture.hello).ok, false);
-  assert.throws(() => mixed.supervisor.dispatch('status.get', {}));
-  assert.strictEqual(mixed.protocolWrites.some((message) => message.method === 'status.get'), false);
+  await expectCode(() => mixed.supervisor.dispatch('status.get', {}), 'UNAUTH');
+  assert.strictEqual(mixed.protocolWrites.length, 0);
 });
 
 test('dispatch: exact supervisor methods and closed parameter schemas are enforced after binding', () => {
@@ -256,6 +373,43 @@ test('dispatch: pre-bind and oversize calls fail before broker send', () => {
   assert.strictEqual(sends, 0);
 });
 
+test('dispatch: matching replies settle promises out of order with cloned sanitized results', async () => {
+  const ctx = harness();
+  bindSupervisor(ctx);
+  const firstPayload = { fixture_result: 'first', nested: { n: 1 } };
+  const secondPayload = JSON.parse(JSON.stringify(payFixture.valid_full_input));
+  const first = ctx.supervisor.dispatch('account.list', {});
+  const second = ctx.supervisor.dispatch('status.get', {});
+  assert.ok(first && typeof first.then === 'function');
+  assert.ok(second && typeof second.then === 'function');
+  const reqs = publicFrames(ctx);
+  assert.strictEqual(reqs.length, 2);
+  assert.strictEqual(reqs[0].seq, 2);
+  assert.strictEqual(reqs[1].seq, 3);
+  assert.deepStrictEqual(ctx.supervisor.pendingRequests(), [reqs[0].id, reqs[1].id]);
+  const pendingCopy = ctx.supervisor.pendingRequests();
+  pendingCopy.push('ffff');
+  assert.deepStrictEqual(ctx.supervisor.pendingRequests(), [reqs[0].id, reqs[1].id]);
+  assert.ok(!ctx.supervisor.pendingRequests().includes(BOOTSTRAP_ID));
+  assert.strictEqual(ctx.supervisor.receiveProtocol({
+    v: 1, id: reqs[1].id, seq: 2, kind: 'res', result: secondPayload, session: fixture.session_id,
+  }).ok, true);
+  assert.strictEqual(ctx.supervisor.receiveProtocol({
+    v: 1, id: reqs[0].id, seq: 3, kind: 'res', result: firstPayload, session: fixture.session_id,
+  }).ok, true);
+  const [firstResult, secondResult] = await withDeadline(
+    Promise.all([first, second]),
+    SETTLE_MS,
+    'out-of-order replies did not settle'
+  );
+  assert.deepStrictEqual(firstResult, firstPayload);
+  firstResult.nested.n = 9;
+  assert.strictEqual(firstPayload.nested.n, 1);
+  assert.deepStrictEqual(secondResult, payFixture.valid_full_expected);
+  assert.ok(!JSON.stringify(secondResult).includes('SNAPSHOT_SECRET_CANARY'));
+  assert.deepStrictEqual(ctx.supervisor.pendingRequests(), []);
+});
+
 test('lifecycle: exit publishes only sanitized down state and restart never buffers spend requests', () => {
   const ctx = harness();
   ctx.supervisor.start();
@@ -264,25 +418,41 @@ test('lifecycle: exit publishes only sanitized down state and restart never buff
   assert.ok(!JSON.stringify(down).includes('CANARY'));
   assert.deepStrictEqual(ctx.supervisor.pendingRequests(), []);
   assert.deepStrictEqual(ctx.supervisor.restartDelays(6), [250, 500, 1000, 2000, 4000, 5000]);
+  assert.ok(ctx.calls.some((call) => call[0] === 'kill' && call[1] === 'SIGTERM'));
+  assert.strictEqual(ctx.child.stdout.listenerCount('data'), 0);
+  assert.strictEqual(ctx.child.stderr.listenerCount('data'), 0);
+  const spawns = ctx.calls.filter((call) => call[0] === 'spawn').length;
+  ctx.supervisor.start();
+  assert.strictEqual(ctx.calls.filter((call) => call[0] === 'spawn').length, spawns);
 });
 
-test('quit: every in-flight intent is cancelled before child termination', () => {
+test('quit: every in-flight intent is cancelled before child termination', async () => {
   const ctx = harness();
   bindSupervisor(ctx);
-  const beforeQuit = ctx.calls.length;
-  ctx.supervisor.trackIntent('00112233445566778899aabbccddeeff');
-  ctx.supervisor.trackIntent('ffeeddccbbaa99887766554433221100');
-  ctx.supervisor.quit();
-  assert.deepStrictEqual(ctx.protocolWrites.slice(-2).map((message) => [message.method, message.params]), [
-    ['intent.cancel', { intent_id: '00112233445566778899aabbccddeeff' }],
-    ['intent.cancel', { intent_id: 'ffeeddccbbaa99887766554433221100' }],
-  ]);
-  assert.deepStrictEqual(
-    ctx.calls.slice(beforeQuit).filter((call) => call[0] === 'protocol' || call[0] === 'terminate').map((call) => call[0]),
-    ['protocol', 'protocol', 'terminate']
-  );
-  for (const message of ctx.protocolWrites.slice(-2)) {
-    assert.strictEqual(message.session, fixture.session_id);
+  const unhandled = [];
+  const onUnhandled = (error) => unhandled.push(error);
+  process.on('unhandledRejection', onUnhandled);
+  try {
+    ctx.supervisor.trackIntent('00112233445566778899aabbccddeeff');
+    ctx.supervisor.trackIntent('ffeeddccbbaa99887766554433221100');
+    ctx.supervisor.quit();
+    await withDeadline(new Promise((resolve) => setTimeout(resolve, 0)), SETTLE_MS, 'quit microtask did not run');
+    const frames = decodeWrites(ctx.protocolWrites);
+    assert.deepStrictEqual(frames.filter((message) => message.method === 'intent.cancel').map((message) => [message.method, message.params]), [
+      ['intent.cancel', { intent_id: '00112233445566778899aabbccddeeff' }],
+      ['intent.cancel', { intent_id: 'ffeeddccbbaa99887766554433221100' }],
+    ]);
+    assert.deepStrictEqual(
+      ctx.calls.filter((call) => call[0] === 'protocol' || call[0] === 'kill').slice(-3).map((call) => call[0] === 'kill' ? ['kill', call[1]] : call[0]),
+      ['protocol', 'protocol', ['kill', 'SIGTERM']]
+    );
+    for (const message of frames.filter((entry) => entry.method === 'intent.cancel')) {
+      assert.strictEqual(message.session, fixture.session_id);
+    }
+    assert.deepStrictEqual(unhandled, []);
+    assert.deepStrictEqual(ctx.supervisor.pendingRequests(), []);
+  } finally {
+    process.removeListener('unhandledRejection', onUnhandled);
   }
 });
 
@@ -291,10 +461,10 @@ test('quit: an unbound child terminates without any application frame', () => {
   ctx.supervisor.start();
   ctx.supervisor.trackIntent('00112233445566778899aabbccddeeff');
   ctx.supervisor.quit();
-  assert.strictEqual(ctx.protocolWrites.some((message) => message.method), false);
+  assert.strictEqual(ctx.protocolWrites.length, 0);
   assert.deepStrictEqual(
-    ctx.calls.filter((call) => call[0] === 'protocol' || call[0] === 'terminate').map((call) => call[0]),
-    ['terminate']
+    ctx.calls.filter((call) => call[0] === 'protocol' || call[0] === 'kill').map((call) => call[0] === 'kill' ? ['kill', call[1]] : call[0]),
+    [['kill', 'SIGTERM']]
   );
 });
 
@@ -337,10 +507,10 @@ test('snapshot: sync publication traverses the shared sanitizer before every sub
   assert.strictEqual(unsubscribe(), false);
 });
 
-function run() {
+async function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
-    try { fn(); process.stdout.write(`ok ${name}\n`); }
+    try { await fn(); process.stdout.write(`ok ${name}\n`); }
     catch (error) { failed += 1; process.stderr.write(`not ok ${name}\n${error.stack || error}\n`); }
   }
   if (failed) process.exit(1);
