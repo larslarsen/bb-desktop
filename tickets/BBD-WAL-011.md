@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Transport implementation reviewed; focused validation/integration authorized.
+Status: Live supervisor transport accepted at 5aada7ef; Rust executable tests authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -45,7 +45,8 @@ Its collected review accepts the observed missing-transport failures. Grok compl
 [production implementation](../docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md),
 including bounded harness corrections. The collected source review permits
 [focused validation/integration](../docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md).
-Only Hermes is active; its exact handoff governs commands, failure stops and paths.
+That completed task is closed; its collected acceptance retains 77 passing checks.
+Grok now owns the executable test task named by CURRENT_TASK.md.
 The source review records the remaining emergency-cleanup limitation.
 
 Existing package-policy failures and pending npm edits are recorded separate work;

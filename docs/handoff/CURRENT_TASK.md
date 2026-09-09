@@ -1,33 +1,35 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: TRANSPORT SOURCE REVIEWED — FOCUSED GREEN RUNNING
+State: LIVE TRANSPORT ACCEPTED — RUST EXECUTABLE TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actors: none; Grok production authorization closed
-Authorized execution/integration actor: Hermes, exact green handoff only
+Authorized source actor: Grok Build, grok-4.6 High, executable test source only
+Authorized execution/integration actors: none; Hermes green task closed
 Protected parent: publishing reviewer commit; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[green task](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md), AGENTS.md and TESTING.md.
-Source acceptance: [collected review](GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md#collected-source-review--2026-09-09).
-Grok outer 28116 / session 64e98d89-1d15-4598-893f-f7309376243d was collected once,
-exit 0. Four-path transport source drop is reviewed for focused validation.
-Hermes may falsify response settlement with guaranteed restoration, run the six
-named suites once, correct the red evidence alongside green evidence, and integrate
-only on full success. No repairs/retries; first unexpected failure stops integration.
+[active task](GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md), AGENTS.md and TESTING.md.
+Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
+Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
+passed and response-settlement falsification worked. Preserve these results; no rerun.
+Hermes outer 70919 returned exit 2 after the durable transcript confirmed commit/push.
+Its runtime is 20260909_145144_c96e05, nous / poolside/laguna-s-2.1:free.
 
-Real transport is implemented but not yet validated. Rust executable and Electron
-startup remain missing; no usable-wallet claim. The source review records a remaining
-emergency-fallback cleanup limitation. The real quit case explicitly asserts child
-exit before fallback. Preserve unrelated npm/policy files and WAL-009 evidence;
-MapLibre work remains stopped. No Rust proof replay or release security acceptance.
+Hermes printed authentication-file content while exceeding runtime-discovery scope.
+Owner informed; credential rotation advised. No values copied here. The review
+records the incident; no credential/config discovery is authorized for any actor.
+Future Hermes metadata must use an exact narrow database query, no fallback search.
+
+Next is a real Rust executable providing truthful broker availability over the
+accepted transport. Electron startup and actual account/native-flow binding follow.
+This first executable reports degraded service; it must not pretend accounts are
+loaded or enable custody/send operations. Preserve pending npm/policy changes and
+WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md,
-docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md,
+docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
-Hermes launched once from 6d57efcb; outer 70919. Verify actual runtime session on
-collection; no polling or relaunch.
 
 ## Historical record (superseded by the active state above)
 
