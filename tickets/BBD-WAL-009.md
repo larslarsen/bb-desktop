@@ -1,22 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: EFFECTS COMPILE CORRECTION 01 — GROK, ONE LINE
+Status: DECODED EFFECTS VALIDATION RESUME 01 — HERMES, SIX FIXED STAGES
 
-The [compile-stop review and exact correction](../docs/handoff/GROK_BBD_WAL_009_EFFECTS_COMPILE_CORRECTION_01.md)
-records stage 1 failing before test execution: E0277 at effects.rs:279, caused by
-missing () on intent_mismatch. The reviewer missed the typo. All frozen identities
-match; no mutation/backup or stages 2-6 were reached. Hermes is completed/closed.
+The exact two-character compile correction is accepted in the
+[validation resume handoff](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md).
+No test ran in the previous compile-stopped execution. Hermes may run the existing
+six stages from stage 1 against the corrected 30-row inventory, recording a new
+resume evidence file. Restore the exact source immediately after the prescribed
+receiver falsification; stop at the first unexpected result. No integration or
+source repair is authorized. Grok and the previous Hermes execution are closed.
 
-Grok High may make the exact two-byte insertion in effects.rs only. No other
-source/test change, execution, evidence or integration. After source acceptance,
-Hermes will restart the existing validation against updated identities. No green
-acceptance or new test scope is claimed. High is sufficient for this mechanical
-step; XHigh is needed again before further security acceptance.
-
-Previously accepted results remain valid. Implementation and twelve actor
+Previously accepted results remain valid. Implementation and twelve prior actor
 evidence records remain uncommitted; no usable send flow is delivered. Full
-effects/cleanup/native/security acceptance stays open. Launch once, collect after
-done, no polling. Active CURRENT_TASK.md and handoff override historical scope.
+cleanup/native/security acceptance stays open. High is sufficient for launch and
+collection; return to XHigh before further security acceptance. Launch once,
+collect after done, no polling. Active CURRENT_TASK.md and handoff govern scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
