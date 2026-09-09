@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE AUTHORIZED
+State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, main.rs/runtime.rs only
 Authorized execution actor: none; Hermes expected-red task closed
@@ -40,6 +40,8 @@ Grok may author only wallet-broker/src/main.rs and wallet-broker/src/runtime.rs
 under the fixed executable contract. Accepted test/source identities stay frozen.
 No tests, builds or integration authorized. Launch once; collect on owner done/Continue.
 No actor polling.
+Grok launched once from 1ae19d2f; outer 4288,
+session a6f2c27a-175b-4f44-a414-6698acefa08b. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
