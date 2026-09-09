@@ -34,7 +34,10 @@ flag XHigh before cleanup production architecture/acceptance.
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md only.
 Launch once and record outer identity here. Collect after owner done or explicit
-collection; never poll an actor. No cleanup execution actor launched yet.
+collection; never poll an actor.
+Launched once from e612c5cc via hermes -z with --pass-session-id; outer terminal
+29552. Runtime session/provider/model will be collected with the completed run.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
