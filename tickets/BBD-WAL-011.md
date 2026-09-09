@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Live supervisor transport accepted at 5aada7ef; executable test Correction 01 authorized.
+Status: Live supervisor transport accepted at 5aada7ef; executable test Correction 02 authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -46,7 +46,7 @@ Its collected review accepts the observed missing-transport failures. Grok compl
 including bounded harness corrections. The collected source review permits
 [focused validation/integration](../docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md).
 That completed task is closed; its collected acceptance retains 77 passing checks.
-Grok now owns executable test Correction 01 in
+Grok now owns executable test Correction 02 in
 [the executable handoff](../docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md#collected-source-review-and-correction-01--2026-09-09).
 The original test drop is not accepted; execution and production remain closed.
 The source review records the remaining emergency-cleanup limitation.

@@ -1,11 +1,11 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 RESUME RUNNING
+State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 02 AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, executable test Correction 01 only
+Authorized source actor: Grok Build, grok-4.6 High, seven test-call argument replacements only
 Authorized execution/integration actors: none; Hermes green task closed
-Protected parent: resume reviewer publication after 7950ba55; one CURRENT-only launch allowed
+Protected parent: reviewer publication after 08fa1941; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
 [active task](GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md), AGENTS.md and TESTING.md.
@@ -28,19 +28,14 @@ WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release c
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
-The original nine-group, 711-line test drop is rejected for oracle and cleanup gaps
-in the active handoff's collected review. Only test/walletBrokerRuntime.node.js may
-be corrected. Production, execution and integration remain closed.
-Original session c0b065f2-55aa-422e-b96c-7ab09a016840 was collected by exact-ID
-transcript export on owner done; outer 40380 is unavailable in this tool session.
-Launch Correction 01 once; collect on owner done/Continue. No actor polling.
-Correction 01 outer 9893 collected on owner done, exit 0 but no source edit or
-completion report. Exact-ID transcript ends at a baseline-check tool request;
-the rejected test hash is unchanged. See the active handoff's resume record.
-Resume the same session f53cb3ef-f7c1-4598-a892-f3c6e7871611 once with automatic
-tool approval and the same bounded authority. Collect on owner done/Continue.
-Resume launched once from 8998fbc3; outer 61377, same session
-f53cb3ef-f7c1-4598-a892-f3c6e7871611. No actor polling.
+Correction 01 resume outer 61377 collected on owner done, exit 0 with a 947-line,
+nine-group drop. The five requested repairs are present, but source review found
+seven existing waitNewFrames calls passing stdout instead of the context object.
+The complete drop is rejected pending exactly those seven argument replacements
+under Correction 02 in the active handoff. Only test/walletBrokerRuntime.node.js
+may change. Production, execution and integration remain closed.
+Launch Correction 02 once in session f53cb3ef-f7c1-4598-a892-f3c6e7871611 with
+automatic tool approval. Collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

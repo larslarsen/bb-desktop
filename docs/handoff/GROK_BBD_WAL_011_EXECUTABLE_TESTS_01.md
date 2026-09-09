@@ -213,3 +213,42 @@ named files, wc -l of the test file, and bounded reads/searches of the already n
 files. No chained shell commands or extra identity/history commands. Read and edit
 only within the existing Correction 01 contract. Complete the correction, report
 its hash/lines/groups, then stop. No tests, builds, Git mutation or integration.
+
+### Correction 01 source review and Correction 02 — 2026-09-09
+
+Outer 61377 collected on owner done, exit 0, with a completed one-file drop:
+test/walletBrokerRuntime.node.js, 947 lines, nine top-level groups, SHA-256
+74469b561b8a82155a2dec9a30f129a0f94badd9556d7f00e8921f062cff3da3.
+Supervisor/protocol still match their frozen hashes. The exact-ID transcript export
+for f53cb3ef-f7c1-4598-a892-f3c6e7871611 shows the resumed run performing named reads,
+separate identity/status commands, one test-file edit and its final report. It shows
+no tests, builds or Git mutations. Its phrase "no Git operations" means no Git
+mutations; read-only Git commands are present. No raw tool-result audit is claimed.
+
+The five Correction 01 repairs and bounded method coverage are present in source:
+explicit UNAVAILABLE rejection, empty-only cwd removal, final drained output checks,
+non-vacuous malformed UTF-8 input, numeric failure exits, partial-body deadline/EOF
+cases and the remaining method-error cases. These improvements are retained.
+
+Decision: reject the complete drop for one remaining call-contract defect.
+waitNewFrames at lines 526–528 expects a context with stdout and child properties,
+but all seven callers pass ctx.stdout. That array has no stdout property, so the
+decoder reaches undefined.map instead of testing real replies. The defect also
+existed in the original drop and was missed by the first reviewer pass. An absent
+binary red would hide it; source correction is required before executing that red.
+
+Correction 02 actor: Grok 4.6 High, same session, source only, no subagents.
+Protected parent: reviewer publication after 08fa1941; one CURRENT-only launch
+commit may follow. Verify the 74469b56 test hash and frozen production hashes.
+Only write test/walletBrokerRuntime.node.js. Make exactly seven literal changes:
+replace `waitNewFrames(ctx.stdout,` with `waitNewFrames(ctx,` at the current lines
+642, 698, 750, 833, 846, 890 and 898. Preserve the helper, all other bytes, 947-line
+count and nine-group count. Do not redesign, format, execute or add coverage.
+
+Read only active CURRENT prefix, this final section, AGENTS.md/TESTING.md if needed,
+and the affected test source. Separate read-only HEAD/status, named source hashes,
+line count and call-site searches are allowed; no command chains, history/logs,
+runtime/config/credential/home discovery, tests, syntax checks, builds, dependencies,
+network tools, evidence edits or Git mutation. Preserve unrelated pending files.
+Report the seven replacements, resulting SHA-256/lines/groups, then stop. Hermes
+execution and integration and all production edits remain unauthorized.
