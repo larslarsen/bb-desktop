@@ -36,7 +36,9 @@ Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md
 and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md only.
 High is sufficient for bounded result collection; use XHigh for subsequent lifecycle
 design/acceptance. Launch once, collect after owner done, never poll an actor.
-Validation actor not yet launched.
+Launched once from efc5ac89: Hermes outer terminal 38061, with --pass-session-id.
+Runtime session/provider/model will be verified from completion and saved records.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
