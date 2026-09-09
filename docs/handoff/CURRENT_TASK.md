@@ -38,7 +38,9 @@ broadcast/mainnet/hardware/Monero/Electron send stay parked.
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md only.
 Keep XHigh for source review. Launch once, collect after owner done, never poll.
-Lifecycle test actor not yet launched.
+Launched once from f89d830d: Grok session
+c7b99290-f754-4e0e-838c-7950ecaf7840, outer terminal 49083, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
