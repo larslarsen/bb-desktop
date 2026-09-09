@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: POLICY EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
+State: POLICY EXPECTED RED ACCEPTED — PRODUCTION CORRECTION RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; exact two-file policy/package drop
 Authorized execution/evidence/integration actors: none
@@ -22,8 +22,9 @@ Grok may edit only scripts/security-policy.js and package.json: exact MapLibre 6
 runtime allowance, Leaflet removal, reviewed Orchard dependency and signing target
 in the exact manifest inventories. Corrected tests, red evidence and Rust are frozen.
 Package-lock synchronization, policy green/falsification and npm security validation
-follow source review under Hermes. No actor yet launched. Collect only on owner
-done/Continue; no polling or automatic relaunch. High is sufficient.
+follow source review under Hermes. Grok launched once from 34c217dd; outer 38156.
+Session: 750e76ad-b9be-4aa8-a67a-7dc9b8ee03ed. Collect only on owner done/Continue;
+no polling or automatic relaunch. High is sufficient.
 
 Full typed-secret erasure, Phase A1/final validation/security and wallet completion
 remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
