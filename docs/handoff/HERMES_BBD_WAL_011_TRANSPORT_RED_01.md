@@ -43,3 +43,33 @@ in the source review are not permission to edit tests or assert green readiness.
 
 No Git stage/commit/push, CURRENT edit, source changes or other evidence edits.
 Stop after the one evidence record and report it to the reviewer.
+
+## Collected review — 2026-09-09
+
+ACCEPT the initial expected-red execution; no repeat is needed. Outer 44012 was
+collected once on owner done, exit 0. Runtime session 20260909_135906_d3d5a1 has
+provider nous, model poolside/laguna-s-2.1:free; both session metadata and the actual
+status output support that model. The unintegrated evidence incorrectly copied
+meituan/longcat-2.0:free from historical material. Correct it during the next Hermes
+integration, not through a separate report-only actor.
+
+Actual command wrapper: `timeout 45 node test/walletSupervisorTransport.node.js
+2>&1; echo "EXIT_CODE=$?"`. The wrapper returned 0; its captured EXIT_CODE=1 is the
+test exit. Six not-ok groups, no ok groups. Groups 1–3 report missing real framed
+hello/ack/bootstrap connection. Group 4 reports no down publication after the child
+exits. Groups 5–6 report object writes where framed Buffers are required. These are
+expected missing-production failures, NOT the separate harness cleanup gaps noted
+in source review. In particular the fake correctly captures what production writes.
+The evidence's contrary explanation must be corrected during later integration.
+
+All five hashes still match. No production/test edits or Git mutation occurred.
+Transcript shows extra read-only Git log/show, directory listing, historical evidence
+read and final status. Status output included a masked credential indicator and is
+not suitable for future runtime metadata collection; use narrow session metadata.
+No independent process/directory inspection supports the evidence's clean-process
+claim; final cleanup acceptance still awaits the strengthened tests. These reporting
+issues do not invalidate the observed missing-transport red. Preserve the raw record
+uncommitted until Hermes corrects it alongside source integration.
+
+Hermes execution authorization is closed. Grok may implement the fixed transport
+contract and bounded harness corrections under the production handoff.
