@@ -190,3 +190,26 @@ syntax checks, builds, dependencies, docs/evidence edits or Git mutations.
 Only write: test/walletBrokerRuntime.node.js. Preserve every unrelated pending file.
 Report the resulting hash, lines, groups and corrections, then stop. Hermes red
 remains future work after reviewer acceptance; do not run it.
+
+### Correction 01 incomplete run and resume — 2026-09-09
+
+Outer 9893 returned exit 0 when collected on owner done, but supplied only two
+progress messages and no corrected drop. Exact-ID export of session
+f53cb3ef-f7c1-4598-a892-f3c6e7871611 ends at a combined baseline-check Execute request.
+The export does not establish whether that request ran or why the session stopped.
+That request included an unnecessary git-log command despite the narrow read scope.
+The test remains exactly f29dcecdd34453fc7413741b3a07534c7b88e10be201679217041c0b3ae9b15e;
+supervisor/protocol identities and pending path inventory are unchanged. No result
+is accepted and no execution is authorized. This is an incomplete run, not a
+completed correction or evidence of a source-design inability.
+
+Resume the same Grok 4.6 High session once from the reviewer publication following
+7950ba55; one CURRENT-only launch commit may follow. Use automatic tool approval
+instead of acceptEdits for this noninteractive invocation. This is a launcher
+adjustment, not a claim that a particular permission denial was observed, and does
+not widen authorized commands or paths. Do not repeat history/log discovery.
+Allowed shell commands are separate read-only HEAD/status, sha256sum of the three
+named files, wc -l of the test file, and bounded reads/searches of the already named
+files. No chained shell commands or extra identity/history commands. Read and edit
+only within the existing Correction 01 contract. Complete the correction, report
+its hash/lines/groups, then stop. No tests, builds, Git mutation or integration.
