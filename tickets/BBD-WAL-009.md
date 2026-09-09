@@ -1,22 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS VALIDATION ACCEPTED — NEXT XHIGH LIFECYCLE CONTRACT
+Status: CLEANUP LIFECYCLE TESTS 01 — GROK, TEST SOURCE ONLY
 
-The [collected validation review](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md#collected-validation--accepted)
-accepts four green runs and the two intended falsification failures. Both temporary
-faults were restored exactly; all 33 source/evidence baselines match. The real
-software and synthetic external signing pipelines remain working. Saved tool
-records govern acceptance; report inaccuracies are recorded without a correction
-run or repeated test. Hermes is closed; no actor or integration is authorized.
+The owner selected XHigh and the reviewer fixed the
+[real buffer lifecycle test contract](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md).
+Grok High alone may author six library tests, one replacement integration test and
+their cfg(test) module declarations in five exact paths. Production behavior stays
+unchanged. Coverage uses real nonzero owners, deferred classification, marked
+unwind, actual early operation errors and wrong-seed rejection after raw-PCZT
+ownership. The old synthetic all-classes claim is replaced by this bounded evidence;
+other tests remain frozen.
 
-The next reviewer task requires XHigh: a bounded real cleanup lifecycle test contract
-covering actual owned buffers, early errors and unwind classification. The old
-synthetic all-classes test stays unchanged and unaccepted until that authorization.
-Full typed-secret/native/security acceptance remains open. Decoded-effects acceptance
-and earlier valid checks remain in force. Implementation and fifteen evidence
-records remain uncommitted; this validation does not deliver a usable send flow.
-Stop at the owner's requested reasoning-change boundary. No actor is running;
-nothing should be polled. Active review and CURRENT_TASK.md govern scope.
+No execution, integration or evidence change is authorized. Prior cleanup validation,
+decoded-effects acceptance and earlier valid checks remain in force; no expensive
+proof reruns. Implementation and fifteen evidence records remain uncommitted.
+Full typed-secret erasure, proof-to-publication panic integration, native integration
+and security acceptance remain open. Keep reviewer XHigh for the test-source review.
+Active handoff and CURRENT_TASK.md govern scope. Launch once, collect after done,
+never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

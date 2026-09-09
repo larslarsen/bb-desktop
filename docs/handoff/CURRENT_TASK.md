@@ -1,48 +1,44 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS VALIDATION ACCEPTED — NEXT XHIGH LIFECYCLE CONTRACT
-Reviewer: Codex; use XHigh before the next lifecycle design/acceptance
-Authorized source actors: none
+State: CLEANUP LIFECYCLE TESTS 01 — GROK, TEST SOURCE ONLY
+Reviewer: Codex, XHigh; retain XHigh for the test-source review
+Authorized source actor: Grok Build, grok-4.6 High, five exact test/declaration paths
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active review: [collected cleanup validation](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md#collected-validation--accepted)
-Read this prefix and the collected review; no historical handoff reload.
+Active handoff: [real buffer lifecycle tests](GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md)
+Read this prefix and active handoff; no historical handoff reload.
 
-Hermes outer 38061 was collected once after owner done, exit 0, and is closed.
-Runtime session 20260908_213504_01112b, nous / poolside/laguna-s-2.1:free,
-version v0.18.2, verified against saved records.
+The owner selected XHigh. The lifecycle test contract is fixed: four test_support
+child-module tests, two spend child-module tests, and one replacement for the old
+unsupported synthetic all-classes integration test. Parent source changes are
+limited to cfg(test) module declarations; production behavior stays unchanged.
+The handoff names all five paths, exact test oracles and later falsifications.
 
-ACCEPT all six prescribed outcomes: focused green; the exact false-event and
-suppressed-seed-notification failures; restored focused green; working software
-and synthetic external pipelines. Four passing runs and two intended failures,
-each selecting one test with 14 filtered. The two signing tests took 143.73s
-and 140.59s. No repeats are needed.
+Coverage includes actual nonzero seed/PCZT/transaction owner Drop, deferred outcome
+selection, marked unwind, real pre-consume cancellation/expiry/missing-handle/schema
+failures, and wrong-seed rejection after PCZT ownership but before counted access.
+Tests must not manufacture events or use synthetic lifecycle helpers as wipe proof.
+Expected counts: 13 library tests (six new), 15 integration tests (one replaced).
+All 34 existing source/evidence identities were verified before authorization.
 
-Both faults were restored exactly. Saved and independently reviewed inventories
-match all 33 baselines; the retained backup equals the restored source.
-The new 564-line evidence hash is
-5bfed1076b4668f2df03cc2766983989323a8c0332ada7b4f43db34f2c8868a1.
-The actor report has command-scope and transcription inaccuracies; the collected
-review records them and the governing raw result IDs. No report-only correction.
+The prior six cleanup validation outcomes, exact restorations, decoded-effects
+acceptance and earlier valid results remain in force. No proof-heavy reruns or
+report-only correction. Production source, all other tests, dependencies, evidence,
+execution and integration remain frozen. Source actor stops after its test drop.
 
-Implementation and fifteen actor evidence records remain uncommitted. This accepts
-truthful focused observations and preserves both pipelines, not full cleanup.
-The old synthetic all-classes test stays unchanged and unaccepted pending a real
-ownership/lifecycle test contract. Full typed-secret/native/security acceptance
-remains open. Network/broadcast/mainnet/hardware/Monero/Electron send are parked.
-Decoded-effects acceptance and earlier valid checks remain in force.
-
-Next: XHigh reviewer designs the bounded real cleanup lifecycle tests, including
-actual owned buffers, early failures and unwind classification, before authorizing
-a source actor. Stop here for the owner's requested reasoning-change boundary.
-No actor is running. Do not relaunch or poll a completed actor.
+Implementation and fifteen actor evidence records remain uncommitted. Full
+third-party typed-secret erasure, proof-to-publication panic integration, native
+OS/owning-thread/capability and final security acceptance remain open. Network/
+broadcast/mainnet/hardware/Monero/Electron send stay parked.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md only.
+and docs/handoff/GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md only.
+Keep XHigh for source review. Launch once, collect after owner done, never poll.
+Lifecycle test actor not yet launched.
 
 ## Historical record (superseded by the active state above)
 
