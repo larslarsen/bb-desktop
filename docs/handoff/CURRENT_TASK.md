@@ -37,7 +37,9 @@ Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md
 and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md only.
 Launch once and record session/outer identity. Collect after owner done or explicit
 collection; never poll an actor.
-Correction actor not yet launched.
+Launched once from 5cc36787: Grok session
+f2231b84-4294-48e8-95cb-87f495940173, outer terminal 7343, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
