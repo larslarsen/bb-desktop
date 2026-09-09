@@ -1,40 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS REGRESSION 01 — GROK TEST SOURCE
-Reviewer: Codex, XHigh; owner switched to XHigh on 2026-09-08
-Authorized source actor: Grok Build, grok-4.6 High, one test file only
-Authorized execution/evidence actors: none
+State: DECODED EFFECTS EXPECTED RED 01 — HERMES
+Reviewer: Codex, XHigh
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and XHigh decision: [decoded effects regression](GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md)
-Read this prefix and the active handoff; no historical handoff reload.
+Active handoff and source acceptance: [decoded effects expected red](HERMES_BBD_WAL_009_DECODED_EFFECTS_EXPECTED_RED_01.md)
+Read this prefix and active handoff; no historical handoff reload.
 
-The verifier checks real proof/signatures but accepts two agreeing inspection
-copies even when their payment claims disagree with decoded signed bytes. The
-handoff fixes the recovery/binding architecture and authorizes one regression
-using one real signed fixture, independent output recovery, a positive control,
-and ten agreeing-metadata negative cases. Production remains frozen until an
-understood behavioral red. No source-only actor runs tests or Git.
+Grok session 7ddfcee6-c773-4d03-af90-51da48895a33, outer 32613, collected once
+after owner done, exit 0; runtime grok-4.6-build High. The one-file test source is
+accepted: verification_context_tests.rs, 757 lines,
+791e8cbb77d556ab05e35946e23cddbc3b5a27659c3ce7b5e2464a665210fda4.
+Reversing all source patches reproduces the exact baseline. The other 26 source/
+evidence identities match. No source-actor test/compiler/Git execution occurred.
 
-All 26 prior frozen identities and the new native layout evidence match. The
-native layout validation is accepted at 00b0ca29; its actor executions are closed.
-No UI follow-up, report-only correction, prior proof-suite repeat, or new demo
-milestone. Implementation and ten actor evidence records remain uncommitted.
-Independent effects, actual-secret cleanup, OS/owning-thread/capability integration
-and remaining security stay open. Network/broadcast/mainnet/hardware/Monero parked.
+Hermes may execute the one exact regression command once. Expected red is the
+final ten-case assertion after real decoded recovery and positive verification,
+showing that the current verifier accepts agreeing but false metadata. Compile,
+fixture/recovery/crypto failure or unexpected green requires a stop, no repair or
+retry. Capture complete process output and write the one named evidence record.
+Source, other tests, existing evidence, integration and Git mutation are frozen.
 
-Keep reviewer XHigh through the effects architecture/source acceptance. Grok's
-bounded test authoring uses its required High setting. Launch once and record the
-session here. Collect only after done/explicit collection; no actor polling.
-Launched once from 2a098115: Grok session
-7ddfcee6-c773-4d03-af90-51da48895a33, outer terminal 32613, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
+No UI follow-up, report-only correction, old proof-suite repeat or new demo
+milestone. Previously accepted outcomes remain valid. Implementation and ten prior
+actor evidence records remain uncommitted. Independent effects, actual-secret
+cleanup, native integration and remaining security stay open. Network/broadcast/
+mainnet/hardware/Monero parked. Keep reviewer XHigh for this effects work.
 
 Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
-GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md only.
+HERMES_BBD_WAL_009_DECODED_EFFECTS_EXPECTED_RED_01.md only.
+Launch once and record the outer/session identity here. Collect after done or
+explicit collection; never poll an actor.
 
 ## Historical record (superseded by the active state above)
 

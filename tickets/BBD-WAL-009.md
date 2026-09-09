@@ -1,22 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DECODED EFFECTS REGRESSION 01 — GROK TEST SOURCE
+Status: DECODED EFFECTS EXPECTED RED 01 — HERMES
 
-The owner switched the reviewer to XHigh. The
-[active handoff](../docs/handoff/GROK_BBD_WAL_009_DECODED_EFFECTS_TESTS_01.md)
-fixes the independent recovery/retained-binding architecture and authorizes Grok
-High to edit only verification_context_tests.rs: one signed fixture, independent
-decoded oracle, positive verification and ten agreeing-metadata mismatch cases.
-The current verifier incorrectly accepts matching metadata copies without
-recovering the payment effects from signed bytes. Production, test execution and
-integration remain unauthorized until reviewer acceptance of each next step.
+The [source acceptance and execution handoff](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_EXPECTED_RED_01.md)
+accepts Grok's one-file regression: independent recovery from one real signed
+fixture, a positive verifier control, and ten agreeing-metadata mismatch cases.
+All other source/evidence identities match. Grok is completed and closed.
 
-Native widget/layout validation remains accepted at 00b0ca29. No additional UI
-coverage, report-only correction or old expensive suite repetition. Implementation
-and ten actor evidence records remain uncommitted; no usable send flow is delivered.
-Actual-secret cleanup, native integration and remaining security stay open. Keep
-reviewer XHigh for this effects work; launch once, collect after done, never poll.
-The linked handoff and CURRENT_TASK.md override historical phase authorizations.
+Hermes may run the one exact regression command once and write its expected-red
+record. Failure must reach the final ten-case assertion; compile/recovery/crypto
+errors are not accepted red. No repair, retry, source change, additional tests or
+integration. The production recovery contract remains in the completed Grok
+handoff and opens only after reviewer acceptance of understood behavioral red.
+
+Keep reviewer XHigh. Native layout acceptance and previous valid results remain
+intact. Implementation and ten prior actor evidence records remain uncommitted;
+no usable send flow is delivered. Actual-secret cleanup, native integration and
+remaining security stay open. Launch once, collect after done, no actor polling.
+CURRENT_TASK.md and the active handoff override historical phase authorizations.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
