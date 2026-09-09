@@ -82,3 +82,50 @@ it exactly, and perform package/lock security validation and source integration.
 Those exact commands and paths will be authorized in the later handoff. No accepted
 Rust gate is repeated for this npm/policy-only correction. Full typed-secret erasure
 and final release/OS/security remain separate open requirements. High is sufficient.
+
+## Collected source acceptance and remaining CLI findings — 2026-09-09
+
+ACCEPT the two-file source drop for the four authorized edits. Outer 38156 closed
+on owner done, exit 0; Grok session 750e76ad-b9be-4aa8-a67a-7dc9b8ee03ed. Reviewer
+reconstructed both files from all four unique replacements and inspected the full
+diff. Transcript: 21 reads, nine searches, four replacements and two read-only
+Python identity measurements; no tests, Git, npm/Cargo/scanner, network or evidence.
+
+scripts/security-policy.js: 2738 lines, SHA-256
+fec10759a73a3c675d8206da454abf4b0e8dca6b62da463f39a2db27b30dc078.
+package.json: 41 lines, SHA-256
+76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5.
+The exact runtime object/key/value guard preserves all other checks. Orchard and
+signing target additions preserve exact manifest order and duplicate/displaced
+checks. Leaflet removal and MapLibre pin are exact. Tests, lock and evidence remain
+unchanged. This source acceptance does not claim policy CLI green.
+
+Reviewer execution error, explicitly disclosed: a nested heredoc delimiter collided
+while drafting an unexecuted green handoff, terminating the outer Python text early.
+The Python program did not parse and wrote no governance file. Bash interpreted
+later document text and inadvertently invoked the policy CLI, Electron security
+suite, npm audit and pinned directory secret scanner. Outer command 7393 ended
+with shell syntax exit 2; the reviewer sent an interrupt on recognizing the error.
+Policy CLI printed the WAL-008 unlisted-extra-path error; Electron printed 20 passes;
+audit failed EAI_AGAIN on the registry; directory scan reported zero leaks over
+1824659357 bytes in 13 seconds. These were unauthorized reviewer-role executions,
+not a Hermes acceptance pass. No npm install, falsification, source mutation,
+staging/commit/push or handoff/evidence creation occurred. Independent post-error
+status and hashes match all prior inputs. No green handoff or report exists.
+Do not claim that a completed green integration occurred. Record these observations
+without a report-only task. Future authored command payloads must use collision-free
+file writing and never embed the same heredoc delimiter in an outer shell heredoc.
+
+Read-only follow-up identifies the remaining policy scope completely at the known
+boundaries: checkRepository recursively discovers 14 current Zcash source paths but
+still checks the old eight-path WAL008 list; checkRustWalletSource still blanket-
+rejects .extract() in the two already reviewed production/verification-fixture
+TransactionExtractor statements. There are exactly two such extraction statements
+in current Zcash source. All other general network/unsafe/authority restrictions
+remain required. Do not blanket-allow signing/proving/extraction by path.
+
+Grok's production phase is closed. The next task is the exact one-file source-policy
+regression test contract in GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md, before any
+production extension. Preserve the accepted mapping/manifest edits. No Hermes
+integration, dependency synchronization or further gate is currently authorized.
+High is sufficient for this fixed policy scope.
