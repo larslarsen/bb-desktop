@@ -102,3 +102,31 @@ After source review Hermes will synchronize only the accepted npm graph and coll
 this suite's expected red and CLI findings; exact commands will be in its handoff.
 The remaining source-policy production change follows understood red. All previous
 verified Rust gates remain retained and will not be repeated. No report-only task.
+
+## Collected test-source acceptance — 2026-09-09
+
+ACCEPT the one-file test drop for bounded expected-red execution. Outer 10179 was
+collected once on owner done, exit 0, and is closed. Grok session:
+67b04d89-3cb5-42d7-8a43-59e8d30be4e9. Final test/securityPolicy.node.js: 3810 lines,
+SHA-256 a58d85e5322f0cb01a78b636454f92547bd98e556013cc07712dc0cf64ea565c.
+The reviewer reversed all seven unique transcript replacements and recovered the
+exact accepted fe31a4cb baseline. Production policy/package, lock and evidence
+hashes are unchanged. The full incremental test changes match this contract.
+
+The fourteen-path literal is exact/sorted, real recursive discovery remains, and
+omission coverage now checks each path. Both added test groups use actual source,
+independent exact statement literals, positive-before-negative ordering, unique
+mutation targets, duplicate/cross-file/constructor/mapping checks and all eight
+additional-operation/unsafe/network/mainnet negatives. The unlisted-path call
+checks path binding. Existing ninety tests remain; two added groups give 92 total.
+No blanket source or extraction allowance is introduced by this test-only drop.
+
+Transcript: 28 reads, 15 searches, seven replacements, two directory listings and
+two read-only identity/statement-count command batches. No test, syntax, compiler,
+formatter, scanner, npm/Cargo, Git, network or actor command ran. No evidence change.
+The small extra directory discovery does not affect source correctness.
+
+Grok source authorization is closed. Hermes alone may synchronize the accepted npm
+graph, collect policy suite/CLI expected red and run Electron/npm checks in
+HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md. No Rust gate replay or source-policy
+production change before red review. High is sufficient.

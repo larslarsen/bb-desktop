@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: MAPPING POLICY SOURCE ACCEPTED — CURRENT SOURCE-POLICY TESTS AUTHORIZED
+Status: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED AUTHORIZED
 
-The two-file MapLibre/Orchard/signing-target drop is source accepted and frozen.
-[Collected review](../docs/handoff/GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md#collected-source-acceptance-and-remaining-cli-findings--2026-09-09)
-also discloses a reviewer heredoc error that ran four unintended checks without
-source/lock/Git changes. No green integration or new evidence record exists.
+The exact inventory/extractor test drop is [accepted](../docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md#collected-test-source-acceptance--2026-09-09):
+92 tests retain all prior cases and add actual-source extraction checks with narrow
+statement/path binding. Fourteen current Zcash paths and every omission are covered.
+Grok is closed; production source-policy extension still awaits expected red.
 
-Remaining CLI scope: the current fourteen-file Zcash layout is rejected by the old
-eight-file list, and two reviewed extraction statements hit the old authority guard.
-Grok High alone may author the exact [one-file source-policy regression tests](../docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md).
-All other restrictions and source stay fixed. Production extension, npm lock
-synchronization and green/integration follow reviewed test red. High is sufficient.
+Hermes alone may perform [npm synchronization and expected red](../docs/handoff/HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md):
+offline MapLibre-only graph sync, policy suite/CLI, Electron security and npm audit,
+then one evidence record and stop. No integration or source edits. Retain successful
+package security results for later integration if inputs stay identical. High suffices.
 
-Owner decision remains MapLibre 6.8.0 only, with Leaflet removed. Prior Rust source,
-formatter/library lint and focused test results remain retained. Full Phase-A1,
-wallet/release acceptance, upstream typed-secret erasure and final security remain
-open. Broker/Electron/OS is WAL-011; native/Pay flows are WAL-010. No money-moving
-feature is enabled. CURRENT_TASK.md governs active scope.
+MapLibre 6.8.0/Leaflet removal and Orchard/signing-target source edits remain accepted.
+Prior Rust formatter/library lint and focused tests remain retained without replay.
+Full Phase-A1, wallet/release acceptance, upstream typed-secret erasure and final
+security remain open. Broker/Electron/OS is WAL-011; native/Pay flows are WAL-010.
+No money-moving feature is enabled. CURRENT_TASK.md governs active scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

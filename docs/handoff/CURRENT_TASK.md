@@ -1,39 +1,37 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: MAPPING POLICY SOURCE ACCEPTED — CURRENT SOURCE-POLICY TESTS RUNNING
+State: SOURCE-POLICY TESTS ACCEPTED — NPM SYNC / EXPECTED RED AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; one test file only
-Authorized execution/evidence/integration actors: none
+Authorized source/integration actors: none
+Authorized execution/evidence actor: Hermes; exact five-command task
 Protected parent: publishing commit; one CURRENT-only launch allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [Current source-policy tests](GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md)
-Source review/findings: [Collected production review](GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md#collected-source-acceptance-and-remaining-cli-findings--2026-09-09)
+Active task: [Npm sync and source-policy red](HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md)
+Source acceptance: [Inventory/extractor test review](GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md#collected-test-source-acceptance--2026-09-09)
 Read this prefix and active task; no historical reload.
 
-Grok outer 38156 / session 750e76ad-b9be-4aa8-a67a-7dc9b8ee03ed is closed. Its exact
-mapping/manifest changes are accepted and frozen. A reviewer handoff-writing quoting
-error inadvertently ran four checks; no source, lock, governance or evidence changed.
-The incident and observations are disclosed in the collected review. No green
-handoff or integration exists. No repetition/repair is authorized merely for reports.
+Grok outer 10179 / session 67b04d89-3cb5-42d7-8a43-59e8d30be4e9 is closed. Its exact
+one-file test drop is accepted: 3810 lines, a58d85e5322f0cb01a78b636454f92547bd98e556013cc07712dc0cf64ea565c.
+Hermes may synchronize the reviewed npm graph offline, collect policy suite/CLI
+expected red and run Electron security/npm audit. Only lock/node_modules and one
+new evidence record may change. No production source extension or integration.
+No actor yet launched. Collect only on owner done/Continue; no polling or relaunch.
 
-The policy still expects eight Zcash files instead of the reviewed fourteen and
-rejects two reviewed extraction statements. Grok may update only policy tests for
-that exact current inventory and two narrowly bound statements, preserving every
-other source/authority restriction. Production extension awaits red; existing
-package/policy, Rust, lock and evidence remain frozen. Grok launched once from
-d72d8dc2; outer 10179; session 67b04d89-3cb5-42d7-8a43-59e8d30be4e9.
-Collect only on owner done/Continue; no polling or automatic relaunch.
+The current policy still expects eight Zcash source files and rejects the two
+reviewed extractor statements; the tests now cover the exact fourteen-file layout
+and narrowly bound statements. Preserve all existing authority restrictions. The
+accepted MapLibre 6.8.0/Leaflet removal and manifest policy edits remain frozen.
+Prior Rust formatter/library lint and focused results remain accepted, with no replay.
 
-Owner decision remains keep MapLibre/remove Leaflet, pinning locked 6.8.0. Full
-typed-secret erasure, Phase A1/final validation/security and wallet completion remain
-open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
+Full typed-secret erasure, Phase A1/final validation/security and wallet completion
+remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
 features, hardware and Monero remain parked. High is sufficient.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md and
-docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md only.
+docs/handoff/GROK_BBD_WAL_009_SOURCE_POLICY_TESTS_01.md and
+docs/handoff/HERMES_BBD_WAL_009_SOURCE_POLICY_RED_01.md only.
 
 ## Historical record (superseded by the active state above)
 
