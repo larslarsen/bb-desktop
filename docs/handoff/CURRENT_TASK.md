@@ -37,6 +37,9 @@ Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
 HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md only.
 Launch once and record outer/runtime identity here. Collect after done/explicit
 collection; never poll an actor.
+Hermes launched once from 4d7cfe2d with --pass-session-id, outer terminal 19677.
+Runtime session ID will be collected with completion. No completion collected;
+do not relaunch or poll. Wait for owner done/explicit collection.
 
 ## Historical record (superseded by the active state above)
 
