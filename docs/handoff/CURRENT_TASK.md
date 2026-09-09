@@ -35,7 +35,10 @@ Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md
 docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md and
 docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md only.
 Launch once and record session/outer identity here. Collect after owner done or
-explicit collection; never poll an actor. No cleanup source actor launched yet.
+explicit collection; never poll an actor.
+Launched once from 8ca77e71: Grok session
+9942d648-4b13-43f6-b241-eab7e337a0c8, outer terminal 49550, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
