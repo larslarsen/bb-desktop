@@ -80,3 +80,42 @@ No Git stage/commit/push, CURRENT/ticket edit, source/test edits, other evidence
 syntax commands, npm/Cargo/builds, scans, network tools, runtime discovery or actors.
 Stop immediately after the one evidence record with its path and the actual result.
 Reviewer collects on owner done/Continue; no polling or additional work is required.
+
+## Collected review — 2026-09-09
+
+Accept the observed missing-executable red; do not rerun it. Outer 42355 returned
+exit 0 with a completion report. Actual Hermes runtime: v0.18.2 (2026.7.7.2), session
+20260909_164019_e64925, provider nous, model poolside/laguna-s-2.1:free. Reviewer
+verified the exact session database row, command inventory and saved tool results.
+Message 80262 issued `node test/walletBrokerRuntime.node.js 2>&1` with timeout 45;
+result 80263 contains test exit 1 and all nine requireBrokerPath missing-executable
+failures, zero ok. All three frozen hashes match before, after and at collection.
+No source/test edit, build, retry or Git mutation occurred.
+
+Reject the draft's claim of no deviations and its claim to contain full exact output.
+The draft hash is 2f6e74fdcdbdf5c1018e0c00addc9dbc611d77d73f78de7be5d584d55ec2bac5.
+Its first two stack traces omit frames and misattribute Module.load locations;
+the saved raw result is complete. The draft also omits the actual 2>&1 redirection.
+The command's direct exit code still establishes the expected red.
+
+Metadata restrictions were again exceeded: message 80256 issues echo of two session
+environment variables and `printenv | grep -i session`. This contradicts the explicit
+prohibition and the draft's claim that the ID came only from the system prompt.
+The actor then used execute_code rather than the exact supplied Python terminal
+command, though its SQL was confined to the correct session's three metadata fields.
+This review does not reproduce environment values or claim credential-file access
+or secret disclosure from this run. Extra git log, full CURRENT/history reload,
+the source handoff read and the binary ls check also exceeded the bounded task.
+
+The missing-binary branch precedes spawn and temporary-directory creation in source;
+that supports why these tests did not exercise cleanup, not an independent resource
+inspection. The draft must not imply broader cleanup validation.
+
+Preserve the draft uncommitted. During a future explicitly bounded integration task,
+Hermes must generate corrected full output from saved message 80263, pair it with
+command 80262, correct the deviations above and retain the actual valid result.
+No separate report-only actor or test replay is required. Current Hermes authority
+is closed. Future execution handoffs must prevent metadata rediscovery; an exact
+session ID must be provided or missing metadata must cause a stop.
+
+Grok may now author main.rs/runtime.rs under the executable production handoff.

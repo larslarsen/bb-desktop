@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE TEST SOURCE ACCEPTED — INITIAL EXPECTED RED RUNNING
+State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok source task closed
-Authorized execution actor: Hermes, one executable expected-red run and one evidence record
+Authorized source actor: Grok Build, grok-4.6 High, main.rs/runtime.rs only
+Authorized execution actor: none; Hermes expected-red task closed
 Authorized integration actors: none
-Protected parent: reviewer publication after cf7a9b35; one CURRENT-only launch allowed
+Protected parent: reviewer publication after 9ce6e669; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md), AGENTS.md and TESTING.md.
+[active task](GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md), AGENTS.md and TESTING.md.
 Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
 Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
 passed and response-settlement falsification worked. Preserve these results; no rerun.
@@ -28,17 +28,18 @@ loaded or enable custody/send operations. Preserve pending npm/policy changes an
 WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md,
-docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md.
-Correction 02 outer 91218 collected on owner done, exit 0. The exact seven call
-replacements are accepted; reversing them in memory recovers the prior source hash.
-Accepted test: a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e,
-947 lines, nine groups. The default executable is absent. Hermes may run only the
-linked expected-red handoff. No builds, production edits or integration.
-Launch once; collect on owner done/Continue. No actor polling.
-Hermes launched once from 438c4fb1; outer 42355, requested provider nous /
-poolside/laguna-s-2.1:free. Actual session/provider/model must come from the exact
-metadata query in the handoff and its completion report. Collect on owner done/Continue.
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md,
+docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md.
+Hermes outer 42355 collected on owner done, exit 0. Actual runtime session
+20260909_164019_e64925, nous / poolside/laguna-s-2.1:free. Saved tool result proves
+test exit 1, zero ok and nine missing-executable failures. Expected red accepted;
+no repeat. Its reporting and metadata-discovery deviations are corrected in the
+collected review of the red handoff; the draft evidence remains unintegrated and
+requires correction during later Hermes integration, not a report-only rerun.
+Grok may author only wallet-broker/src/main.rs and wallet-broker/src/runtime.rs
+under the fixed executable contract. Accepted test/source identities stay frozen.
+No tests, builds or integration authorized. Launch once; collect on owner done/Continue.
+No actor polling.
 
 ## Historical record (superseded by the active state above)
 
