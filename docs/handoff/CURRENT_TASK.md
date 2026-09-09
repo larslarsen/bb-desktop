@@ -1,41 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: REAL PIPELINE PANIC VALIDATION — HERMES FIVE TEST INVOCATIONS
+State: REAL PIPELINE PANIC VALIDATION ACCEPTED — REVIEWER NEXT INTEGRATION DESIGN
 Reviewer: Codex, High; no reasoning-setting change requested
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact validation handoff only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [real pipeline panic validation](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md)
-Read this prefix, tickets/BBD-WAL-009.md active prefix and active handoff only.
+Closed handoff and acceptance: [real pipeline panic validation](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#collected-validation-acceptance--2026-09-09)
+Read this prefix and the collected acceptance; no historical handoff reload.
 
-Grok outer 43249, session 536b2be3-3b69-4f81-91f0-e657b766ba37, completed
-exit 0; saved grok-4.6 High. Five-region/two-path correction passes source review;
-exact reversal and independent region comparison prove every other byte unchanged.
-All 38 identities match the reviewed drop, including all frozen tests/evidence.
+Hermes outer 5671 completed exit 0; session 20260909_000439_f17d68,
+nous / poolside/laguna-s-2.1:free, v0.18.2. Five bounded outcomes are accepted:
+real pipeline panic green; intended lock-release fault failure; restored six-test
+cleanup library, signer-error and account-lock greens. All 38 identities and the
+retained backup match restored source. Grok outer 43249 is also closed.
 
-Hermes may run exactly five test invocations: real pipeline panic green; one
-intentional lock-release failure with guarded temporary spend.rs mutation and
-restoration; six cheap cleanup lifecycle library tests; focused signer-error test;
-and account-lock regression. Only the first two generate proofs. Keep the first
-green valid after exact restoration; no repeated proof-heavy happy-path or full
-suite. One new backup and one evidence record only. No permanent source change,
-formatter, broader execution, Git or integration. Stop on unexpected outcomes.
+The test proves actual signing/proving/extraction/verification before panic, three
+actual buffer-owner observations, no publication, released/reacquirable account
+lock and invalidated authorization. The fault detects the broken real lock-release
+mechanism. This bounded software pipeline panic gap is closed. Preserve all prior
+cleanup/signing/decoded-effects results. No accepted test needs rerunning.
 
-Implementation and seventeen prior actor evidence records remain uncommitted.
-Prior regression red and cleanup/signing/decoded-effects acceptance remain valid.
-Real pipeline panic runtime remains unverified. Full typed-secret erasure, native
-OS/owning-thread/capability integration and final security stay open. Network/
-broadcast/mainnet/hardware/Monero/Electron send remain parked; no usable send flow.
+Execution/report limitations are recorded in the acceptance. The full red compiler
+prefix was not retrieved, but all intended failure/outcome diagnostics are present.
+Correct report portability/facts during future bounded integration; no report-only
+actor or proof rerun. Implementation and eighteen actor evidence records remain
+uncommitted. Full typed-secret erasure, native OS/owning-thread/capability integration
+and final security remain open. Next reviewer work is to bound native confirmation
+integration and remaining security requirements. Network/broadcast/mainnet/hardware/
+Monero/Electron send remain parked; no usable send-flow or full-wallet acceptance.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md only.
-Launched once from 4f529036: Hermes outer terminal 5671, --pass-session-id.
-Runtime session/provider/model and completion remain unverified until collection.
-Collect once after owner done; do not poll or relaunch.
+No actor is active. Do not poll or relaunch a completed actor.
 
 ## Historical record (superseded by the active state above)
 

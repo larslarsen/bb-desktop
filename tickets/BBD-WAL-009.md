@@ -1,19 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: REAL PIPELINE PANIC VALIDATION — HERMES FIVE TEST INVOCATIONS
+Status: REAL PIPELINE PANIC VALIDATION ACCEPTED — REVIEWER NEXT INTEGRATION DESIGN
 
-The [active handoff](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md)
-accepts the exact five-region correction and authorizes Hermes alone for real
-panic green, deliberate lock-release failure/restoration, six cleanup unit tests,
-focused signer-error and account-lock regressions. Only two invocations generate
-proofs. No full target or accepted happy-path repetition. All tests remain frozen;
-only the guarded spend.rs fault, one new backup and one evidence record are writable.
+The [collected acceptance](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#collected-validation-acceptance--2026-09-09)
+accepts real software-pipeline panic green, the intended lock-release fault failure,
+and three restored regression runs. All 38 frozen identities and the retained
+backup match restored source. The bounded real panic/owner/account-lock coverage
+gap is closed. No actor or execution/integration task is active or authorized.
 
-All 38 reviewed identities match; production source passes review but awaits this
-runtime validation. No source/evidence integration is authorized. Prior accepted
-results remain valid. Implementation and seventeen prior evidence records remain
-uncommitted. Full typed-secret erasure, native integration and final security stay
-open. High remains sufficient. CURRENT_TASK.md governs scope; never poll an actor.
+Prior cleanup/signing/decoded-effects acceptance remains valid. Report/capture
+limitations are recorded; no accepted proof/test needs repeating. Implementation
+and eighteen actor evidence records remain uncommitted. Next reviewer work is to
+bound native confirmation integration and remaining security requirements. Full
+typed-secret erasure, native integration and final security remain open. High was
+sufficient for this fixed review. CURRENT_TASK.md governs scope; never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

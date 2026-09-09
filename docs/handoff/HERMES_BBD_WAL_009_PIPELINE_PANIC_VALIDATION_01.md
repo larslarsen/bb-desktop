@@ -264,3 +264,85 @@ No source/evidence integration. Launch once, collect on owner done, never poll.
 | wallet-broker/src/zec/spend/cleanup_lifecycle_tests.rs | 174 | ca7a373f8d009e9fc66e65ecfb9d63b4b1483fb924ab9f66dcba511a3f904ccc |
 | docs/testing/BBD-WAL-009-CLEANUP-LIFECYCLE-VALIDATION-01.md | 400 | 46415af46bd4313598c9c30caea3c07b06cb2fdb5d0d6c2ce479919a7c58a869 |
 | docs/testing/BBD-WAL-009-PIPELINE-PANIC-EXPECTED-RED-01.md | 100 | acda820c0aa1b6be7cb8a8eea7a1310dc6b588502c1067d381ea4691795958c3 |
+
+## Collected validation acceptance — 2026-09-09
+
+ACCEPT the real pipeline panic correction and all five bounded validation outcomes.
+Hermes outer 5671 completed exit 0 after one owner-triggered collection; no actor
+polling or relaunch. Saved session 20260909_000439_f17d68, provider nous, model
+poolside/laguna-s-2.1:free. Version output 79565 records Hermes Agent v0.18.2.
+The actor queried HERMES_SESSION_ID through execute_code rather than its terminal
+environment; unavailable there does not establish that the terminal variable was
+unset. Saved session identity is authoritative for this acceptance.
+
+Reviewer verified all five command strings verbatim, both inventory scripts and
+both mutation modes against this handoff. Current bytes match all 38 reviewed
+identities, and the retained backup equals restored spend.rs. The only runtime
+source mutation was the prescribed one-line lock-release omission and restoration.
+All tests remain frozen. No third proof, full target, formatter, Git or integration.
+
+| Run | Command / launch or result / completion | Exit | Passed / failed / filtered | Compile / test seconds |
+| --- | --- | --- | --- | --- |
+| Real pipeline panic green | 79574 / 79575 / 79581 | 0 | 1 / 0 / 15 | 4.94 / 138.88 |
+| Lock-release fault red | 79588 / 79589 / 79595 | 101 | 0 / 1 / 15 | 3.30 / 144.91 |
+| Restored cleanup library | 79602 / 79603 / same foreground result | 0 | 6 / 0 / 7 | 3.04 / 6.03 |
+| Restored signer-error regression | 79606 / 79607 / same foreground result | 0 | 1 / 0 / 15 | 3.37 / 1.70 |
+| Restored account-lock regression | 79610 / 79611 / same foreground result | 0 | 1 / 0 / 15 | 0.16 / 8.89 |
+
+Green process proc_271bc7aa975f used waits 79576/79578/79580 and red process
+proc_456e4daed36a used 79590/79592/79594, all timeout=60. The two real proof
+runs consumed 283.79 seconds of test runtime. The remaining three tests consumed
+16.62 seconds. No accepted proof-heavy happy path was repeated.
+
+The positive regression reaches actual signing/proving/finalization/extraction/
+independent decoding/verification before the fixed INTERNAL panic. It proves no
+verified/broadcast publication, the exact three observed buffer classes at
+PanicUnwind, lock release/reacquisition, invalidated old handle/session and no
+belated observations through harness Drop. The deliberately broken Drop reaches
+INTERNAL at spend.rs:540, passes every preceding stage/publication/hardware guard,
+then fails account_lock_count at zec_sign_verify.rs:1291, left 1 / right 0.
+It is the intended mechanism failure, not a setup, compile or unrelated panic.
+
+Pre-inventory 79570/79571 and post 79614/79615 each match all 38 rows. Apply
+79584/79585 produces the frozen 1159-line b9937a7e... fault. Restore 79598/79599
+returns the exact 1160-line 9c41f984... base. Post verifies the retained backup
+EQUALS_RESTORED_SOURCE. Keep the initial green valid on those restored identical
+bytes; no additional proof run is warranted.
+
+Evidence write 79616/79617 and final measurement 79618/79619 produce
+343 lines / 13637 bytes / SHA-256
+ a25a5868749a0ac9458712ff91c849f02bd29d483cc3c6ea49a1d1fee531efb4.
+The measurement was the final tool operation. The execution authorization is closed.
+
+Record execution/reporting limitations once here, without a correction actor or rerun:
+
+- No process.log call occurred. Reviewer inspected saved completions/foreground
+  results directly. Green and the three short outputs retain their outcome evidence;
+  the red completion is a 55-line tail beginning partway through a compiler warning.
+  It retains all test-stage/failure/result diagnostics, but is not a complete compiler
+  log. Do not claim that the missing warning prefix was retrieved.
+- Invocations 3-5 ran in foreground rather than authorized background/process-log
+  mode. Their exact commands, exit codes and short outputs are present in terminal
+  results. This affects capture procedure, not selected tests or outcomes.
+- execute_code read PROVIDER and MODEL in addition to HERMES_SESSION_ID, outside
+  the requested identity procedure. All returned UNAVAILABLE; no secret/config dump.
+- The evidence omits message IDs and actual inventory rows, abbreviates mutation
+  scripts as ellipses despite calling them verbatim, and retypes alleged full logs.
+  Warning indentation/carets differ; the library report inserts a space inside
+  ZecNativeReview; the red report omits the backtrace note and repeated failure list;
+  the two restored compile outputs omit their Compiling line. Counts/timings and
+  intended assertion are independently verified from saved results above.
+- Local absolute repository paths remain in reported logs, contrary to the required
+  portability normalization. The report must not be integrated unchanged under
+  AGENTS.md. Correct these facts/portability during future bounded integration;
+  no report-only actor or test repetition is needed.
+
+This closes the bounded real software-pipeline panic/observed-owner/account-lock
+coverage gap. It does not prove all possible panic sites, unobserved third-party
+key/prover memory erasure, native OS/owning-thread/capability integration or final
+security. Those remaining gaps must not be mislabeled accepted. Prior lifecycle,
+signing and decoded-effects results remain valid. Implementation and eighteen
+actor evidence records remain uncommitted. No actor is active or authorized;
+next reviewer work is to bound native confirmation integration and the remaining
+security requirements. High is sufficient for this completed fixed review.
+Reviewer publication scope remains this handoff, CURRENT_TASK.md and BBD-WAL-009.md.
