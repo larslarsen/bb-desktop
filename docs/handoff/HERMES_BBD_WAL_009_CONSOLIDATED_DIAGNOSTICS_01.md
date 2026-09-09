@@ -93,3 +93,48 @@ Measure that evidence file's line count, byte count and SHA-256 as the final too
 operation, then stop. No extra todo updates, Git commands, evidence correction run
 or new task after that measurement. Report command exits, actionable findings,
 evidence identity and explicit absence of functional test/proof execution.
+
+## Capacity stop and existing CI review — 2026-09-09
+
+Outer 44655 was collected once on owner done and is closed. The CLI reported
+HTTP 429 upstream model capacity after its three internal API retries, before any
+agent tool call. Saved session 20260909_090226_2eeaa8 records model
+poolside/laguna-s-2.1:free and tool_call_count=0; billing_provider is unset, so no
+provider identity is inferred for this failed run. The outer exit code is 0 but
+is not successful task execution. No preflight, diagnostic, evidence write or
+source change occurred. The diagnostic evidence file is absent and the worktree
+was independently verified clean. All four commands remain unrun. No automatic
+retry, provider change or polling is authorized. The previous launch authorization
+is closed; a fresh reviewer launch authorization can reuse the four-command task
+when the owner next requests continuation.
+
+The reviewer made a read-only inspection of existing CI for source commit
+502580fc12bff1789e2ced2a0692b1b35de587a3, without starting a workflow or local test:
+[Social client run 34327240542](https://github.com/larslarsen/bb-desktop/actions/runs/34327240542),
+check job 102387210886. It completed with failure. Build and social tests passed;
+all 20 Electron security tests passed. The repository policy suite reported 11
+failures and exited 1. All following wallet/Rust/formatter/Clippy/native steps were
+skipped, so CI does not replace the unrun diagnostics.
+
+The job log groups the failures as follows:
+
+- Six package-policy tests reject added runtime dependencies: repository workflow,
+  Gitleaks-ratchet, wallet contract, WAL-005 Pay, broker package, and RATE-001 package.
+  The checkpoint contains leaflet ^1.9.4 and maplibre-gl ^6.8.0 in package.json.
+  These were frozen checkpoint inputs; establish their purpose/provenance before
+  any removal or policy exception. Do not blanket-allow runtime dependencies.
+- Four manifest-policy tests reject the dependency list: WAL-004, WAL-006 direct
+  pins, WAL-006 RNG/SQLite support and WAL-006 NFC normalization. Source inspection
+  finds the reviewed orchard =0.15.5 defaults-off circuit dependency in Cargo.toml
+  but absent from checkWalletBrokerManifest's exact expectedDependencies list.
+- The WAL-008 target-order assertion still expects xmr_distribution immediately
+  after zec_hardware; current Cargo.toml contains zec_sign_verify there instead.
+
+This preserves useful failure evidence for the later consolidated correction
+contract; no policy/source change is authorized now. Passing the secret scan and
+accepting a partial source checkpoint did not imply CI or final wallet acceptance.
+The exact four diagnostics remain available after the capacity stop. High remains
+sufficient for their execution review; no reasoning-setting change is needed.
+
+Reviewer publication scope for this stop: this handoff, CURRENT_TASK.md and
+tickets/BBD-WAL-009.md only. No actor is running.

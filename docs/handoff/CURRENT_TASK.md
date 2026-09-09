@@ -1,44 +1,44 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS RUNNING
+State: DIAGNOSTICS NOT STARTED — UPSTREAM MODEL CAPACITY STOP
 Reviewer: Codex; High suffices for the fixed diagnostics/review task
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, diagnostics 01 only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
-Protected parent: commit publishing diagnostics authorization; one CURRENT-only launch commit is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [consolidated diagnostics 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md)
-Acceptance: [library checkpoint](HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md#collected-checkpoint-acceptance--2026-09-09)
-Read this prefix and the active task only, plus its named workflow inputs.
+Task and stop: [consolidated diagnostics 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#capacity-stop-and-existing-ci-review--2026-09-09)
+Read this prefix and the appended stop; no historical handoff reload.
 
-Partial source integration at 502580fc12bff1789e2ced2a0692b1b35de587a3 is accepted.
-The actual 40-file source/evidence commit is pushed; 21 source input identities and
-18 normalized records match exactly. The worktree was clean at acceptance. The
-single pinned Gitleaks directory scan passed, zero leaks. No functional tests or
-proofs were repeated. Implementation and historical evidence are now committed.
-Hermes outer 1592 / runtime 20260909_004806_499cb3 is completed and closed.
-Its new report/procedure deviations are corrected in the reviewer acceptance;
-no report-only correction or repeated scan is authorized.
+Hermes outer 44655 was collected once on owner done and is closed. It failed with
+upstream model-capacity HTTP 429 after internal API retries, before any tool call.
+Saved session 20260909_090226_2eeaa8 has zero tool calls. No preflight, diagnostic,
+evidence write or source change occurred. The worktree is clean and the diagnostics
+record is absent. All four planned commands remain unrun. Do not poll/relaunch this
+closed outer. No automatic retry or provider change is authorized.
 
-Hermes may now collect exactly four read-only diagnostics: formatter check,
-no-default library Clippy, native-ui library Clippy, and security-policy CLI.
-Ordinary diagnostic failures are collected together, not repaired/retried. No
-source change, functional test/proof, source integration or broader work authorized.
-Hermes launched once from 3ffbb3ac; outer session 44655 is active.
-Collect that outer once only on owner done/Continue. Do not poll or relaunch.
-Actual runtime session/provider/model will be verified from saved records on collection.
+Partial source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 remains accepted,
+committed and pushed. Existing CI run 34327240542 independently passed build, social
+and all 20 Electron security tests, then failed 11 repository-policy tests. Later
+wallet/Rust/formatter/Clippy/native steps were skipped. Failure groups and source
+causes are recorded in the handoff: runtime package additions, missing Orchard pin
+in policy, and stale Zcash target order. Do not weaken policy or remove frozen
+package dependencies without reviewing their purpose/provenance.
 
-Full Phase-A1/ticket/release acceptance remains open. Pinned upstream typed-secret
-erasure requires a separate dependency-level design; consolidated final validation
-and security remain outstanding. Runtime/Electron wiring and OS tests belong to
-WAL-011; usable native/Pay flows belong to WAL-010. Broadcast/mainnet/hardware/
-Monero/Electron send remain parked. No security requirement is waived.
+Next owner continuation: reviewer may issue a fresh launch authorization for the
+same four-command diagnostic pass, preserving existing CI failure evidence. No
+functional signing/proof rerun or separate report-correction task is needed. High
+is sufficient; the capacity error does not require a reasoning-setting change.
+
+Full Phase-A1/ticket/release acceptance remains open. Upstream typed-secret erasure
+and final validation/security remain outstanding. Runtime/Electron/OS integration
+belongs to WAL-011; usable native/Pay flows belong to WAL-010. Money-moving features,
+hardware and Monero remain parked. No security requirement is waived.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md and
-docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md only.
+and docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md only.
+No actor is running.
 
 ## Historical record (superseded by the active state above)
 

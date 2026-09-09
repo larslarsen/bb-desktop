@@ -1,23 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS AUTHORIZED
+Status: DIAGNOSTICS NOT STARTED — UPSTREAM MODEL CAPACITY STOP
 
-The reviewed library source and 18 normalized records are integrated and pushed
-at 502580fc12bff1789e2ced2a0692b1b35de587a3. Exact source/evidence identities and
-zero-leak directory scan are accepted in
-[library checkpoint review](../docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md#collected-checkpoint-acceptance--2026-09-09).
-The review corrects the actor's stale status and inaccurate integration summary.
-No functional test or proof was repeated; no report-only repair is needed.
+Hermes encountered upstream HTTP 429 before any tool call. No diagnostic ran or
+file changed; outer 44655 is closed. The
+[stop and existing CI findings](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#capacity-stop-and-existing-ci-review--2026-09-09)
+preserve all four planned diagnostics as unrun. No actor or automatic retry is
+authorized; CURRENT_TASK.md governs resumption. High remains sufficient.
 
-Hermes alone may collect the four read-only formatter/lint/security-policy
-[diagnostics](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md)
-together. No source edits, functional tests, integration or broader work authorized.
-High is sufficient for this fixed task. CURRENT_TASK.md governs active scope.
+Partial source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 stays accepted
+and pushed. Existing CI passed build, social and 20 Electron security tests, then
+failed 11 repository-policy tests; subsequent Rust and wallet gates were skipped.
+Package-dependency policy, the Orchard manifest pin and Zcash target order need
+review in the later bounded correction task. No source/policy change is authorized.
 
-This partial checkpoint is not full Phase-A1, wallet or release acceptance.
-Upstream typed-secret erasure and final validation/security remain open. The native
-runtime decision is unchanged: actual broker/Electron/OS integration belongs to
-WAL-011 and usable native/Pay flows to WAL-010. No money-moving feature is enabled.
+This is not full Phase-A1, wallet or release acceptance. Typed-secret erasure and
+final validation/security remain open; actual broker/Electron/OS integration is
+WAL-011 and usable native/Pay flows are WAL-010. No money-moving feature is enabled.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
