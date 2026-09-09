@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: POLICY TEST SOURCE ACCEPTED — EXPECTED RED / NATIVE LINT AUTHORIZED
+State: POLICY TEST SOURCE ACCEPTED — EXPECTED RED / NATIVE LINT RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source/integration actors: none
 Authorized execution/evidence actor: Hermes, two-command task only
@@ -16,8 +16,9 @@ Grok outer 86850 / session 1e85f230-a5d3-4e13-bcbd-6840c6dc40ab is closed.
 The exact corrected one-file test drop is accepted: 3643 lines, SHA-256
 fe31a4cbab5c3c179a02812dd892542dcc5bbe9d604435b3609242fa6b7f58c7.
 Hermes may execute the missing native-ui Clippy first, then the policy expected-red,
-write one evidence record and stop. No source edits or integration. No actor yet
-launched for this task. Collect only on owner done/Continue; no polling or relaunch.
+write one evidence record and stop. No source edits or integration. Hermes launched once from a6012da9; active outer 67072.
+Actual runtime session will be verified on collection. Collect only on owner
+done/Continue; no polling or relaunch.
 
 Owner decision: keep MapLibre, remove Leaflet; retain/pin locked MapLibre 6.8.0.
 Package/lock/production policy/Rust changes await expected-red review. Source and
