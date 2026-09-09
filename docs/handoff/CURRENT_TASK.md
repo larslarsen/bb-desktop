@@ -1,43 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: NATIVE RUNTIME INTEGRATION DESIGN — OWNER REQUESTED REASONING CHECKPOINT
-Reviewer: Codex, currently High; recommend XHigh for next architecture decision
+State: PARTIAL LIBRARY CHECKPOINT INTEGRATION AUTHORIZED
+Reviewer: Codex; owner selected XHigh for the completed architecture decision
 Authorized source actors: none
-Authorized execution/evidence actors: none
-Authorized integration actors: none
-Protected governance parent: the commit containing this task update
+Authorized execution/evidence/integration actor: Hermes, checkpoint 01 only
+Protected parent: the commit publishing this authorization; one CURRENT-only reviewer launch checkpoint is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Acceptance and new findings: [pipeline validation / native integration findings](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#next-step-native-integration-findings--2026-09-09)
-Read this prefix and the appended findings; no historical handoff reload.
+Decision and exact task: [library checkpoint 01](HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md)
+Read this prefix and that handoff only, plus its explicitly named workflow inputs.
 
-Real pipeline panic validation is accepted at 2d63b4ef. All five outcomes and
-source restoration are verified. Grok outer 43249 and Hermes outer 5671 are closed.
-Preserve all prior pipeline/cleanup/signing/decoded-effects results; no reruns.
+The runtime scope decision is complete. Keep the native review component: pinned
+eframe already reuses its loop. The eventual broker process main thread owns UI;
+private request/cancel lifetime and capability rules are fixed in the handoff.
+Actual executable/framing/Electron startup and OS evidence belong to later WAL-011
+integration; WAL-010 owns usable native/Pay flows. No native rewrite/extra GUI-test
+slice is authorized for the current fixture signing checkpoint.
 
-Read-only native tracing found no Rust broker executable target/entry point.
-EframeSurface starts a synchronous native event loop from a library method.
-social-main.js creates an unconfigured supervisor and never starts it; supervisor
-spawn requires binary path/hash/data directory. Existing native frame tests and
-injected supervisor tests do not establish the real production process/UI boundary.
-The architecture reserves sidecar packaging for WAL-011 (ticket file not yet present).
+Pinned upstream typed keys/PCZT/prover memory do not have the erasure guarantees
+our buffer observers can prove. Full typed-secret erasure remains a Phase-A1/final-
+release blocker, requiring a separate dependency-level decision before real custody.
+No requirement is waived and no full Phase-A1/ticket/release acceptance is claimed.
 
-Next design must fix scope between WAL-009 native confirmation evidence and actual
-runtime/packaging, UI event-loop ownership, request/cancel/close lifetime and native-
-only capability minting. No implementation or test contract is authorized yet.
-Pause for the owner's XHigh setting change, as requested by the owner for harder
-tasks. No setting change has been observed or claimed; this is not a permission
-requirement from repository instructions. Continue architecture work on owner signal.
+All 39 frozen input identities match. Hermes may normalize 18 evidence records,
+carry forward the two accepted reviewer corrections, scan for secrets, and commit/
+push the 20 changed source/manifest/lock paths plus evidence as a partial checkpoint.
+Source bytes and all accepted signing/native-component/cleanup/panic results remain
+unchanged. No functional tests, proof reruns, source edits or broader work authorized.
 
-Implementation and eighteen actor evidence records remain uncommitted. Full typed-
-secret erasure, native integration and final security remain open. Report portability/
-facts need correction during future bounded integration; no report-only actor.
-Network/broadcast/mainnet/hardware/Monero/Electron send remain parked.
+Implementation and 18 evidence records remain uncommitted until Hermes completes.
+Final validation/security and later send/runtime work remain open. Broadcast/mainnet/
+hardware/Monero/Electron send remain parked. High suffices for the next fixed review.
+Reviewer will launch Hermes once; do not independently launch another actor or poll.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md only.
-No actor is active. Do not poll or relaunch a completed actor.
+and docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md only.
 
 ## Historical record (superseded by the active state above)
 

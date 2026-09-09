@@ -1,19 +1,21 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: NATIVE RUNTIME INTEGRATION DESIGN — OWNER REQUESTED REASONING CHECKPOINT
+Status: PARTIAL LIBRARY CHECKPOINT INTEGRATION AUTHORIZED
 
-Real pipeline panic validation is accepted at 2d63b4ef; all previous acceptance
-remains valid. [Native integration findings](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md#next-step-native-integration-findings--2026-09-09)
-identify the absent Rust executable/runtime connection, library-owned synchronous
-UI loop and unstarted/unconfigured Electron supervisor. Next design must bound
-WAL-009 native confirmation evidence versus later runtime/packaging work and fix
-UI ownership/capability lifetime before authorizing source or tests.
+The XHigh architecture decision is recorded in
+[library checkpoint 01](../docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md).
+Retain the native component; pinned eframe reuses the event loop. The eventual
+main-thread runtime, protocol/framing, Electron startup and OS tests belong to
+WAL-011; usable native/Pay flows belong to WAL-010. Current local fixture tests do
+not establish production process integration.
 
-Reviewer completed the trace at High and recommends XHigh for that architecture
-decision, pausing per the owner's reasoning-level instruction. No actor is active
-or authorized. Source and eighteen evidence records remain uncommitted; full typed-
-secret erasure, native integration and final security remain open. CURRENT_TASK.md
-governs scope. No accepted proof/test repetition or report-only correction actor.
+Hermes alone may normalize 18 evidence records, preserve accepted corrections,
+scan for secrets and integrate the frozen library source as a partial checkpoint.
+No source change, functional test/proof rerun or full Phase-A1 acceptance is authorized.
+Pinned upstream typed-secret erasure remains a Phase-A1/final-release blocker;
+final validation/security and later send/UX/runtime work remain open. This checkpoint
+makes reviewed code durable and does not enable a usable wallet or release.
+High is sufficient for the next fixed review. CURRENT_TASK.md governs active scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
