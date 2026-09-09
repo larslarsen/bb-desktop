@@ -1,20 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: SIX VALIDATION OUTCOMES COLLECTED — XHIGH REVIEW NEXT
+Status: DECODED EFFECTS ACCEPTED — CLEANUP OBSERVATION REGRESSION SOURCE
 
-The [resume collection](../docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md)
-records all six exact commands reaching expected outcomes: regression and restored
-library green, intended receiver-only falsification red, both pipeline tests green,
-and native compilation successful with warnings. Full source restoration and all
-30 frozen identities match. Hermes is completed and closed. Report inaccuracies
-and execution deviations are recorded against saved logs; no rerun or report-only
-correction actor is authorized.
+XHigh [accepts the decoded-effects repair](../docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md)
+and all six collected validation outcomes, with saved-log deviations retained.
+The copied-financial-metadata finding is closed. No repeat of the expensive checks
+or report-only correction is needed; the completed Hermes actor remains closed.
 
-Collection is complete at High. Effects/security acceptance and next implementation
-scope require XHigh review. No source actor, execution or integration is authorized.
-Previously accepted results remain valid. Implementation and thirteen actor evidence
-records remain uncommitted; no usable send flow is delivered. Full cleanup/native/
-security acceptance stays open. Active CURRENT_TASK.md and handoff govern scope.
+The [next bounded source task](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md)
+authorizes Grok High to append one real-signer-error regression exposing fabricated
+cleanup events for unreached proof/transaction classes. Production, execution and
+integration remain frozen. Full actual-secret cleanup and native/security acceptance
+remain open. Implementation and thirteen actor evidence records remain uncommitted;
+no usable send flow is delivered. High is sufficient for next source collection;
+return to XHigh before cleanup production architecture/acceptance. Active handoff
+and CURRENT_TASK.md govern scope. Launch once; collect after done; never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

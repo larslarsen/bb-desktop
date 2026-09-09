@@ -1,37 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: SIX VALIDATION OUTCOMES COLLECTED — XHIGH REVIEW NEXT
-Reviewer: Codex; collection completed at High, XHigh before security acceptance
-Authorized source actors: none
+State: DECODED EFFECTS ACCEPTED — CLEANUP OBSERVATION REGRESSION SOURCE
+Reviewer: Codex, XHigh; High sufficient for the next bounded source collection
+Authorized source actor: Grok Build, grok-4.6 High, append one integration test only
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and collection: [validation resume 01](HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md)
-Read this prefix and the handoff's collected-execution section first.
+Acceptance: [decoded effects](../testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md)
+Active handoff: [cleanup observations regression](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md)
+Read this prefix and active handoff; no historical handoff reload.
 
-Hermes outer 35920 collected once after owner done, exit 0. Runtime session
-20260908_194210_e47f69, nous/poolside/laguna-s-2.1:free, v0.18.2. Actor is closed.
-All six exact commands reached expected outcomes: regression green (1/6), receiver
-fault red (1 failed/6 filtered, receiver:ok only), restored library green (7/0),
-software and synthetic pipelines green (each 1/13), native compile exit 0.
-The temporary fault was immediately restored before stage 3; all 30 frozen
-identities and the full corrected backup match. No rerun is needed for collection.
+XHigh accepts the decoded-effects repair and six collected validation outcomes,
+including receiver-only falsification and exact source restoration. The copied
+financial-metadata finding is closed. Hermes session 20260908_194210_e47f69,
+outer 35920, is completed and closed. All 31 source/evidence baselines match.
+Saved-log exceptions remain recorded; no report-only correction or rerun needed.
 
-Report inaccuracies and execution deviations are recorded against the saved logs
-in the active handoff. No report-only correction actor or broader tests authorized.
-Collection verifies execution facts; security/effects acceptance and next scope
-await XHigh review. Ask the owner to return to XHigh before proceeding with those.
+The next established defect: on a real signer failure before proof/extraction,
+the harness fabricates cleanup observations for uncreated proof and transaction
+objects. Grok may append one regression in tests/zec_sign_verify.rs using the
+existing real signer-failure route. No production edit, test execution, old proof
+rerun or dependency change. The expected red will be authorized after source review.
+This does not claim full cleanup; later production work must observe actual owners.
 
-Previously accepted results remain valid. Implementation and thirteen actor
-evidence records remain uncommitted; no usable send flow is delivered. Full
-cleanup/native/security acceptance stays open. Network/broadcast/mainnet/hardware/
-Monero parked. No actor is running or awaiting collection; never poll or relaunch.
+Implementation and thirteen actor evidence records remain uncommitted; no usable
+send flow is delivered. Full cleanup/native/security acceptance stays open.
+Network/broadcast/mainnet/hardware/Monero parked. High is sufficient for the next
+source collection; flag XHigh before cleanup production architecture/acceptance.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md only.
+docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01-ACCEPTANCE.md and
+docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_TESTS_01.md only.
+Launch once and record session/outer identity here. Collect after owner done or
+explicit collection; never poll an actor. No cleanup source actor launched yet.
 
 ## Historical record (superseded by the active state above)
 
