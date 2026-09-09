@@ -1,20 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: REAL PIPELINE PANIC REGRESSION — GROK TEST SOURCE ONLY
+Status: REAL PIPELINE PANIC EXPECTED RED — HERMES ONE TEST
 
-The [active handoff](../docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md)
-authorizes Grok High to replace the helper-only panic subsection with one focused
-regression requiring real signing/proving/extraction/verification before panic,
-three actual buffer-owner observations, no publication, lock release and invalidation.
-Only two specified regions of tests/zec_sign_verify.rs may change. All production,
-other tests, dependencies, evidence and execution remain frozen. Expected red uses
-the existing helper API and fails because real pipeline stage activity is absent.
+The [active handoff](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md)
+accepts Grok's focused regression source and authorizes Hermes alone for its single
+expected-red test. The specific INTERNAL payload must pass before absent real
+seed activity fails 0 versus 1. All 37 identities are frozen at the reviewed drop;
+no production/test mutation, broader execution or integration is authorized.
 
-Cleanup lifecycle validation is accepted at dfaf06c5; all previous accepted results
-remain valid. No accepted expensive baseline or report-only correction actor is
-needed. Source and sixteen evidence records remain uncommitted. Typed-secret erasure,
-native integration and final security remain open alongside this bounded panic gap.
-XHigh for design, High for source collection. CURRENT_TASK.md governs scope.
+Exact reversal proves the other test content unchanged; the one extra newline in
+the old subsection deletion is accepted as harmless formatting. Sixteen tests now
+exist in the integration target. No test execution has yet been collected.
+Prior cleanup/signing/decoded-effects acceptance remains valid. Source and sixteen
+prior evidence records remain uncommitted; other integration/security gaps stay open.
+The owner confirmed the reviewer was already on High; prior XHigh labeling in this
+panic task was incorrect. High suffices for fixed collection. Never poll an actor.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

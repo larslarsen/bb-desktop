@@ -1,42 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: REAL PIPELINE PANIC REGRESSION — GROK TEST SOURCE ONLY
-Reviewer: Codex, XHigh design; High sufficient for bounded source collection
-Authorized source actor: Grok Build, grok-4.6 High, one integration-test path only
-Authorized execution/evidence actors: none
+State: REAL PIPELINE PANIC EXPECTED RED — HERMES ONE TEST
+Reviewer: Codex, High (owner confirmed; prior XHigh label was incorrect)
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes, exact expected-red handoff only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [real pipeline panic regression](GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md)
+Active handoff: [real pipeline panic expected red](HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Cleanup lifecycle validation is accepted at dfaf06c5. Hermes outer 54437 and
-Grok outer 49083 are closed. Preserve all prior cleanup/signing/decoded-effects
-results and exact source restoration. No report-only correction or baseline rerun.
+Grok outer 3531, session c839c8c4-45a3-4db9-aed2-1d8a97a6f723, completed
+with exit 0, saved model grok-4.6 / High. Its test-source task is closed. The
+new regression is accepted for one focused expected-red invocation. Source review
+verified all 37 identities (only the intended test file changed) and exact reversal
+of the two replacements. The 818-byte deletion includes one extra newline beyond
+the 817-byte region; this harmless formatting deviation is accepted and recorded.
 
-The existing panic helper acquires a lease and panics without executing signing.
-The next test exposes that missing pipeline coverage using the existing API:
-actual signing/proving/extraction/verification stages, no publication, actual
-Seed/PCZT/transaction owner observations, lock release and authorization invalidation.
-Grok may edit only the two exact regions of wallet-broker/tests/zec_sign_verify.rs
-specified in the handoff. All production, other tests and sixteen evidence records
-remain frozen. Expected red is the absent real stage activity; no new API is needed
-for the test-source drop. Execution and the later implementation need separate review.
+The test requires a specific INTERNAL panic followed by real pipeline stage counts,
+three actual buffer-owner wipe observations, no publication, released/reacquirable
+lock and invalidated authorization. Expected red is seed_accesses=0 expected=1;
+no production correction or broader execution is authorized. One new evidence record
+only. Preserve completed cleanup/signing/decoded-effects results; no baseline reruns.
 
-Implementation and sixteen actor evidence records remain uncommitted. Full typed-
-secret erasure, real pipeline panic coverage, native OS/owning-thread/capability
-integration and final security remain open. This stage addresses only real pipeline
-panic coverage. Network/broadcast/mainnet/hardware/Monero/Electron send stay parked.
-No usable send-flow or full-wallet acceptance is claimed.
+Implementation and sixteen prior actor evidence records remain uncommitted. Full
+typed-secret erasure, real pipeline panic, native OS/owning-thread/capability
+integration and final security remain open. Network/broadcast/mainnet/hardware/
+Monero/Electron send stay parked. No full-wallet or usable send-flow acceptance.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md only.
-Launched once from 1204c92d: Grok outer terminal 3531, session
-c839c8c4-45a3-4db9-aed2-1d8a97a6f723, requested grok-4.6 High.
-Runtime model and completion remain unverified until collection. Do not relaunch
-or poll; collect once after owner done.
+and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md only.
+High is sufficient for fixed source/result review; do not claim a setting change.
+Launch once, collect after owner done, never poll. Not launched yet.
 
 ## Historical record (superseded by the active state above)
 
