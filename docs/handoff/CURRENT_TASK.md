@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 RESUME AUTHORIZED
+State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 RESUME RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, executable test Correction 01 only
 Authorized execution/integration actors: none; Hermes green task closed
@@ -39,6 +39,8 @@ completion report. Exact-ID transcript ends at a baseline-check tool request;
 the rejected test hash is unchanged. See the active handoff's resume record.
 Resume the same session f53cb3ef-f7c1-4598-a892-f3c6e7871611 once with automatic
 tool approval and the same bounded authority. Collect on owner done/Continue.
+Resume launched once from 8998fbc3; outer 61377, same session
+f53cb3ef-f7c1-4598-a892-f3c6e7871611. No actor polling.
 
 ## Historical record (superseded by the active state above)
 
