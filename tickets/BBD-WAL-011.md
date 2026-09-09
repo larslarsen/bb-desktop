@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Live transport test source authorized; implementation follows observed red.
+Status: Transport test drop reviewed for initial red; implementation remains closed.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -38,6 +38,11 @@ Targeted green: the same command. Affected regression commands:
 temporarily suppressing matching-response settlement; the real-pipe success case
 must fail for the missing result, then restore exact production bytes. Detailed
 execution/integration instructions follow source review; none are authorized now.
+
+Current execution authorization is the focused expected-red handoff
+[HERMES_BBD_WAL_011_TRANSPORT_RED_01.md](../docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md).
+The source review records bounded harness corrections required before green
+acceptance. Do not claim final coverage or integrate this draft yet.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

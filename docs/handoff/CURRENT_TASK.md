@@ -1,37 +1,30 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE BROKER TRANSPORT — TEST SOURCE RUNNING
+State: LIVE TRANSPORT TEST DROP REVIEWED — INITIAL RED AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, test source only
-Authorized execution/integration actors: none
+Authorized source actors: none; Grok test-source authorization closed
+Authorized execution/evidence actor: Hermes, one focused transport suite only
 Protected parent: publishing reviewer commit; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active source task](GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md), AGENTS.md and TESTING.md.
-Do not reload historical handoffs. The owner authorized returning to direct wallet
-integration after challenging the package-policy detour. That detour is closed.
-Hermes outer 90392 was interrupted once and exited 130; do not resume or poll it.
+[execution task](HERMES_BBD_WAL_011_TRANSPORT_RED_01.md), AGENTS.md and TESTING.md.
+Source review: [collected review](GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md#collected-review--2026-09-09).
+Grok outer 68774 / session b09f971a-4d37-438a-b117-0c9a6463ee7b was collected once,
+exit 0. Three test paths reviewed for expected red only; production is unchanged.
+Bounded harness cleanup/split-delivery/error assertions need correction before green.
+Hermes runs the transport suite once, records observed red, then stops. No integration.
 
-The app never starts its wallet supervisor. The supervisor has no child stream
-listeners, writes objects to stdin and returns acknowledgments instead of replies.
-Rust has a library but no executable entry point. This task repairs the first real
-connection layer. Rust executable and Electron startup follow; transport acceptance
-alone must not be described as a usable or fully connected wallet.
-
-Preserve pending package.json, package-lock.json, scripts/security-policy.js,
-test/securityPolicy.node.js and the untracked prior WAL-009 evidence. Do not revert,
-integrate, audit, or expand that package work in this task. Prior Rust results stay
-retained. Money-moving release, typed-secret erasure, native flows and packaging
-acceptance remain open. No endpoint selection, Monero or MapLibre work is authorized.
+The app-to-wallet connection remains the objective. Actual supervisor transport,
+Rust executable and Electron startup are missing. This is not wallet completion.
+Preserve all pending npm/policy edits and prior WAL-009 evidence; the MapLibre and
+package-policy detour remains stopped. Prior Rust results are retained without replay.
+No endpoint, signing/broadcast, Monero, native-flow or release authorization is added.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-009.md, tickets/BBD-WAL-011.md,
-docs/handoff/GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md,
-docs/engineering/WALLET_ROADMAP_ROUTING.md.
-Launch once; collect once when the owner reports completion. No actor polling.
-Grok launched once from 846b3371; outer 68774,
-session b09f971a-4d37-438a-b117-0c9a6463ee7b. Collect on owner done/Continue.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md,
+docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md.
+Launch once; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

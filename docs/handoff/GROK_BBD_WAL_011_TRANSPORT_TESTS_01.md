@@ -99,3 +99,34 @@ for absent wiring/framing, with an explicit deadline and child cleanup, not hang
 Stop after the three-path test drop. Report changed paths, hashes/line counts,
 case names and expected baseline failure. No execution or integration. Reviewer
 then hands the focused red command to Hermes, followed by bounded implementation.
+
+## Collected review — 2026-09-09
+
+Grok outer 68774 was collected once on owner done, exit 0; source authorization is
+closed. Accept this drop for initial expected-red execution only. The real-pipe
+success and reverse-order reply assertions exercise the missing boundary, with an
+independent child codec/session oracle. Existing authority cases are retained.
+Production supervisor/protocol identities remain unchanged. Transcript inspection
+found source edits limited to the three authorized files, with no tests, dependency
+operations or Git mutation. Two command batches included extra read-only Git status,
+HEAD and log inspection; this does not affect the source result.
+
+Reviewed test identities:
+- test/walletSupervisorTransport.node.js: 630 lines,
+  284546977bd0a1a11ddc92a9fa743c06884e5157029759dd5003001891510b8b
+- test/fixtures/wallet-broker/transport-child.js: 263 lines,
+  17cdea3eaec6c01f839eb34c86e25d1fd93f8cad165cd8e9fb7f108bb9fa7fef
+- test/walletSupervisor.node.js: 507 lines,
+  db02281f9314e382255945d569de4f83be8bc0edbc3ff62e5485f11e3d4e4992
+
+Six transport groups and thirteen supervisor groups exist. This is not final test
+acceptance: the limit case leaves its 32 fake requests unsettled, and live cleanup
+force-kills in finally without first proving supervisor-owned shutdown. Correct
+these harness gaps before green acceptance. Consecutive fixture writes also do not
+guarantee distinct OS read chunks; retain real-pipe tests and prove split decoder
+delivery deterministically at the stream-event seam. Error assertions should check
+that extra diagnostic fields are absent, not only the message. These are bounded
+test corrections to carry into the next source handoff, not unrelated new work.
+
+Hermes may now run only the focused transport suite against frozen production and
+record the observed failure under HERMES_BBD_WAL_011_TRANSPORT_RED_01.md.
