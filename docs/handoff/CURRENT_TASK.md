@@ -1,39 +1,43 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS RED ACCEPTED — XHIGH PRODUCTION CONTRACT NEXT
-Reviewer: Codex, High for completed collection; XHigh before cleanup architecture
-Authorized source actors: none
+State: CLEANUP OBSERVATIONS PRODUCTION 01 — GROK, THREE PATHS
+Reviewer: Codex, XHigh; retain XHigh for this production source review
+Authorized source actor: Grok Build, grok-4.6 High, three exact paths only
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and accepted red: [cleanup expected red](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
-Read this prefix and the handoff's collected-expected-red section first.
+Active handoff: [actual buffer cleanup](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md)
+Read this prefix and active handoff; no historical handoff reload.
 
-Hermes outer 29552 collected once after owner done, exit 0. Runtime session
-20260908_203457_d46097, nous/poolside/laguna-s-2.1:free, v0.18.2. Actor is closed.
-Test completion 79200: exit 101, one failed, 14 filtered, 1.87s. Full log 79202
-confirms exactly four forbidden cleanup observations at the final assertion,
-after real-signer, no-prover/extractor and positive-Seed guards passed. All 31
-frozen source/evidence identities match. The intended failure is understood and
-accepted. No source mutation or test retry; report/command deviations are recorded
-without another correction-only actor. No rerun is needed.
+The cleanup regression red is understood and accepted: exit 101, one failed,
+14 filtered, 1.87s, exactly four invented proof/transaction cleanup entries after
+all real-signer/positive-Seed guards. Hermes session 20260908_203457_d46097,
+outer 29552, is completed and closed. All 33 source/evidence baselines match.
 
-Next is XHigh review of the actual-owner cleanup repair contract. Ask the owner to
-return to XHigh before defining or authorizing production changes. The repair must
-replace invented accounting with observations of actual owners and distinguish
-byte wiping from ordinary third-party object drop. Merely hiding events is not a
-fix. Full cleanup/native/security acceptance remains open.
+Grok may edit vault.rs (two crate-private ownership helpers), zec/spend.rs
+(actual raw-PCZT owner, removal of pseudo-authority seed copy, triggered-fault
+bookkeeping), and zec/test_support.rs (actual seed owner, per-attempt observation/
+classification, removal of fabricated operational events). All tests stay frozen.
+No cryptographic/effect, capability, dependency, UI, execution or integration change.
+Observed byte wiping must be distinguished from unobserved ordinary upstream drop.
+
+The historical synthetic all-classes wipe test was not valid cleanup evidence;
+removing fabricated events exposes its invalid assumption. Preserve its source;
+no ignore/deletion or dummy events. A genuine ownership test contract remains
+necessary before broader cleanup acceptance. This is not full cleanup acceptance.
 
 Decoded-effects acceptance and earlier valid checks remain in force. Implementation
 and fourteen actor evidence records remain uncommitted; no usable send flow is
-delivered. Network/broadcast/mainnet/hardware/Monero parked. No actor is active or
-awaiting collection. Never poll or relaunch a completed actor.
+delivered. Full typed-secret/native/security work remains open; network/broadcast/
+mainnet/hardware/Monero parked. Keep XHigh for production source review.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md only.
+and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md only.
+Launch once and record session/outer identity. Collect after owner done or explicit
+collection; never poll an actor. No cleanup production actor launched yet.
 
 ## Historical record (superseded by the active state above)
 

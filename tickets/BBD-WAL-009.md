@@ -1,20 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS RED ACCEPTED — XHIGH PRODUCTION CONTRACT NEXT
+Status: CLEANUP OBSERVATIONS PRODUCTION 01 — GROK, THREE PATHS
 
-The [collected expected red](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
-is accepted: one failed, 14 filtered, 1.87s. The final assertion reports exactly
-four invented proof/transaction cleanup observations after real-signer and positive
-Seed guards passed. All 31 frozen identities are unchanged. Hermes is completed
-and closed; saved-log/report deviations are recorded without another correction
-cycle. No rerun, source actor, execution or integration is authorized.
+Following the accepted 1.87s cleanup regression red, the
+[production contract](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md)
+authorizes Grok High to connect actual owned seed/PCZT/transaction wipe observations
+and remove fabricated operational events. Exactly vault.rs, zec/spend.rs and
+zec/test_support.rs may change. All tests and cryptographic/effect semantics remain
+frozen. No execution or integration is authorized. Retain reviewer XHigh.
 
-XHigh review is next to define the actual-owner cleanup repair contract. It must
-replace invented accounting and distinguish owned-byte wiping from third-party
-object drop. Decoded-effects acceptance and prior valid checks remain in force.
-Full actual-secret cleanup, native integration and security acceptance stay open.
+Byte wiping is not a claim that ordinary upstream key/proof objects were erased.
+The old synthetic all-classes cleanup test had no valid pipeline coverage; preserve
+it without dummy events or weakened assertions until a real-ownership test contract
+is reviewed. Full typed-secret cleanup, native integration and security acceptance
+remain open. Decoded-effects acceptance and prior valid checks remain in force.
 Implementation and fourteen actor evidence records remain uncommitted; no usable
 send flow is delivered. Active handoff and CURRENT_TASK.md govern scope.
+Launch once, collect after done, never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
