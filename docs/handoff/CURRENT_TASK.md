@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE AUTHORIZED
+State: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; one test file only
 Authorized execution/evidence/integration actors: none
@@ -24,8 +24,9 @@ Grok alone may author exact mapping/Orchard/signing-target policy tests in
  test/securityPolicy.node.js. Production policy, dependencies, locks and Rust remain
 frozen until test-source review and expected red. Owner decision: keep MapLibre,
 remove Leaflet; contract pins the already locked MapLibre 6.8.0. Existing CI policy
-failures remain open. No actor yet launched for this task. Launch once; collect
-only on owner done/Continue; no polling or automatic relaunch.
+failures remain open. Grok launched once from 7451ebcf. Active outer 66797; session
+b0c5ac17-b70d-4f51-a5f4-392a48012d63. Collect only on owner done/Continue;
+no polling or automatic relaunch.
 
 Full typed-secret erasure, Phase A1/final validation/security and wallet completion
 remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
