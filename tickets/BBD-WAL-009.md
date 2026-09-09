@@ -1,19 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: POLICY TEST SOURCE ACCEPTED — EXPECTED RED / NATIVE LINT AUTHORIZED
+Status: POLICY EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 
-The exact corrected policy test source is accepted: three new dependency/manifest/
-signing groups, fixed valid fixture, and strict MapLibre-only Pay/RATE assertions.
-[Source acceptance](../docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md#corrected-test-source-acceptance--2026-09-09)
-closes Grok's source authorization. Hermes alone may execute the [two-command pass](../docs/handoff/HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md):
-previously omitted native-ui Clippy first, then policy expected-red and one evidence
-record. No production changes or integration until collected red is reviewed.
+Native-ui Clippy passed, closing the previously omitted library lint gate. The
+90-test policy suite reported 14 expected failures; the three new positive contract
+failures are verified. [Collected acceptance and capture limits](../docs/handoff/HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md#collected-expected-red-and-native-lint-acceptance--2026-09-09)
+preserve the results without a rerun or report-only task. Hermes is closed.
 
-Owner decision: keep MapLibre/remove Leaflet, retaining and pinning locked 6.8.0.
-Source/formatting at 43e3357c and previously verified formatter, no-default Clippy,
-11 focused tests and directory secret scan remain retained. No repeated proof suite
-or report-only task. Prior report corrections remain in the collected lint review.
+Grok High alone may author the exact [two-file production correction](../docs/handoff/GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md):
+retain/pin MapLibre 6.8.0, remove Leaflet, and include the reviewed Orchard dependency
+and signing target in the strict policy inventories. Tests, Rust and locks are
+frozen. Hermes lock synchronization, policy green/falsification, npm security checks
+and integration follow source acceptance. CURRENT_TASK.md governs active scope.
 
+Prior Rust source/formatter/library lint and focused test results remain retained.
 Full Phase-A1, wallet/release acceptance, upstream typed-secret erasure and final
 security remain open. Broker/Electron/OS integration is WAL-011; usable native/Pay
 flows are WAL-010. No money-moving feature is enabled. High is sufficient.

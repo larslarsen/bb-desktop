@@ -89,3 +89,57 @@ Measure the new record's bytes, logical lines and SHA-256 as the final tool oper
 Then stop: no further todo, Git, report revision, CI, source actor or new task.
 No staging/commit/push, semantic edits, new tests, formatter or other gate. Reviewer
 acceptance and the next production correction follow collection on owner done.
+
+## Collected expected-red and native-lint acceptance — 2026-09-09
+
+ACCEPT native-ui library Clippy exit 0 and the policy expected-red exit 1. Outer
+67072 was collected once on owner done, exit 0, and is closed. Actual saved Hermes
+session is 20260909_123035_d7adb3, provider nous, model poolside/laguna-s-2.1:free,
+21 tool calls. Version result 80021 is v0.18.2. Starting HEAD 80023 is
+58423f75a9caf7e3d538772e79733713acd6aeef. Pre/post hashes 80025/80041 match all six
+frozen inputs. Status 80022/80040 shows only the accepted modified test source.
+
+Both exact standalone commands ran once, sequentially in repo-root workdir:
+
+| Gate | Invocation / start | Completion | Actual result |
+| --- | --- | --- | --- |
+| Native-ui Clippy | 80027/80028, proc_7183c037e433 | 80031/80032 | Exit 0; 4.71 seconds, complete two-line output |
+| Policy expected red | 80033/80034, proc_eb4d7ca18fab | 80035/80036; log 80037/80038 | Exit 1; final summary says 14 failures |
+
+This closes the missing library lint gate from the previous partial checkpoint.
+All prior verified formatter, no-default Clippy, 11 focused tests and directory scan
+remain accepted without replay. It is not all-target, OS, final security, Phase-A1
+or complete wallet acceptance.
+
+The policy harness has 90 tests; 76 passing is inferred from 90 minus its reported
+14 failures. The saved completion contains a 2000-character tail; the explicit log
+captures only the final 200 of 261 lines, with 30 ok and 12 not-ok names visible.
+All three new positive tests visibly fail at the intended old runtime/dependency
+inventory guards. The corrected fixture and target neighborhood do not fail. Negative
+mutations after failing positives are not yet exercised. Those visible expected-red
+failures are sufficient to authorize the fixed production correction; no replay is
+needed merely to recover the first 61 log lines. The two omitted failure names are
+not independently established by this capture.
+
+Evidence 80042/80043, measured 80044/80045, is
+BBD-WAL-009-POLICY-RED-AND-NATIVE-LINT-01.md: 90 lines, 6927 bytes, SHA-256
+1e548d364ac3a39e9bb1941a5c89b0ccb45143d9c8588e35e42f12434120799f.
+Corrections: its failure entries 13 and 14 are unsupported reconstructions; the
+corresponding Pay and RATE source-policy tests visibly PASS in 80038. The Rust
+manifest did not drift from reviewed source: the production policy inventory is
+stale. Runtime identity is established above, not by routing-doc inference. The
+report's local absolute path must be normalized before later integration. Treat
+its process IDs as process IDs; actual invocation/completion IDs are above. Full
+output was not retained by the reported log read. Keep this record uncommitted;
+normalize it and append this authoritative review during source-validation
+integration, without a report-only task or repeated execution.
+
+Deviations: broad CURRENT read, incomplete log paging and extra git status
+80044/80046 alongside the purported final measurement. No source mutation, extra
+gate, Git staging/commit/push, actor, retry or network operation occurred. These
+report/capture deviations do not invalidate the observed gate exits and new red.
+
+Hermes execution is closed. Grok Build High alone may perform the exact two-file
+production correction in GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md. Tests and all Rust
+remain frozen. Package-lock synchronization and policy green/falsification/npm
+security checks follow source review under Hermes. High is sufficient.

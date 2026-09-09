@@ -1,37 +1,37 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: POLICY TEST SOURCE ACCEPTED — EXPECTED RED / NATIVE LINT RUNNING
+State: POLICY EXPECTED RED ACCEPTED — PRODUCTION CORRECTION AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source/integration actors: none
-Authorized execution/evidence actor: Hermes, two-command task only
+Authorized source actor: Grok Build, grok-4.6 High; exact two-file policy/package drop
+Authorized execution/evidence/integration actors: none
 Protected parent: publishing commit; one CURRENT-only launch allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [Policy red and native lint](HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md)
-Source acceptance: [Corrected tests](GROK_BBD_WAL_009_POLICY_TESTS_01.md#corrected-test-source-acceptance--2026-09-09)
+Active task: [Production policy correction](GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md)
+Execution acceptance: [Red/native lint review](HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md#collected-expected-red-and-native-lint-acceptance--2026-09-09)
 Read this prefix and active task; no historical reload.
 
-Grok outer 86850 / session 1e85f230-a5d3-4e13-bcbd-6840c6dc40ab is closed.
-The exact corrected one-file test drop is accepted: 3643 lines, SHA-256
-fe31a4cbab5c3c179a02812dd892542dcc5bbe9d604435b3609242fa6b7f58c7.
-Hermes may execute the missing native-ui Clippy first, then the policy expected-red,
-write one evidence record and stop. No source edits or integration. Hermes launched once from a6012da9; active outer 67072.
-Actual runtime session will be verified on collection. Collect only on owner
-done/Continue; no polling or relaunch.
+Hermes outer 67072 / actual session 20260909_123035_d7adb3 is closed. Native-ui
+Clippy passed, closing the previously omitted library gate. The 90-test policy suite
+reported 14 expected failures; all three new positive contract failures are visible.
+Capture/report limitations are recorded in the acceptance. Source is unchanged.
+No report-only repair or repeated Rust gate is authorized.
 
-Owner decision: keep MapLibre, remove Leaflet; retain/pin locked MapLibre 6.8.0.
-Package/lock/production policy/Rust changes await expected-red review. Source and
-formatting at 43e3357c are reviewed. Prior formatter, no-default Clippy, 11 focused
-tests and secret scan remain accepted. No repeat proof/test suite or report-only run.
+Grok may edit only scripts/security-policy.js and package.json: exact MapLibre 6.8.0
+runtime allowance, Leaflet removal, reviewed Orchard dependency and signing target
+in the exact manifest inventories. Corrected tests, red evidence and Rust are frozen.
+Package-lock synchronization, policy green/falsification and npm security validation
+follow source review under Hermes. No actor yet launched. Collect only on owner
+done/Continue; no polling or automatic relaunch. High is sufficient.
 
 Full typed-secret erasure, Phase A1/final validation/security and wallet completion
 remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
-features, hardware and Monero remain parked. High is sufficient.
+features, hardware and Monero remain parked.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md and
-docs/handoff/HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md only.
+docs/handoff/HERMES_BBD_WAL_009_POLICY_RED_AND_NATIVE_LINT_01.md and
+docs/handoff/GROK_BBD_WAL_009_POLICY_PRODUCTION_01.md only.
 
 ## Historical record (superseded by the active state above)
 
