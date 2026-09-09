@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP AUTHORIZED
+State: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP RUNNING
 Reviewer: Codex; High suffices for this fixed task and review
 Authorized source actor: Grok Build, grok-4.6 High, five named paths only
 Authorized execution/evidence actors: none
@@ -23,7 +23,9 @@ Grok may resolve all 16 Rust lint findings in the exact five-path source task.
 No wallet behavior, authority/verification/cleanup semantics, tests, dependencies,
 policy or other paths may change. Execution and formatting are reserved for a
 subsequent combined validation handoff after source review. No functional proofs
-or signing tests are repeated now. Reviewer will launch Grok once; do not poll.
+or signing tests are repeated now. Grok launched once from 0a3b06c2.
+Active outer: 75023; session: 9aa3e29e-8c84-4cad-9d28-333ab7038ec8.
+Collect once only on owner done/Continue; do not poll or relaunch.
 
 Mapping-dependency intent was asked asynchronously; pending answer, preserve
 leaflet/maplibre and package policy unchanged. Existing CI's 11 policy failures
