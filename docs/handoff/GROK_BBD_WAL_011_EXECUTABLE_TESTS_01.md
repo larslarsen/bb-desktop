@@ -252,3 +252,22 @@ runtime/config/credential/home discovery, tests, syntax checks, builds, dependen
 network tools, evidence edits or Git mutation. Preserve unrelated pending files.
 Report the seven replacements, resulting SHA-256/lines/groups, then stop. Hermes
 execution and integration and all production edits remain unauthorized.
+
+### Correction 02 acceptance — 2026-09-09
+
+Accept test/walletBrokerRuntime.node.js for initial expected-red execution:
+a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e,
+947 lines, nine top-level groups. Outer 91218 collected on owner done, exit 0.
+The exact-ID Markdown export of session f53cb3ef-f7c1-4598-a892-f3c6e7871611 shows
+named reads/searches, separate identity/status commands and one source edit, with
+no test/build execution or Git mutation in the Correction 02 segment.
+
+Reviewer reversed the seven authorized call replacements in memory and recovered
+the exact prior 74469b56 source hash. All other bytes are preserved, including the
+helper. Frozen supervisor/protocol hashes still match. A filesystem existence check
+confirms the default executable is absent. No test, syntax or build command ran.
+
+This accepts the source for the intentionally absent-executable red only. It is not
+runtime correctness, a passed test suite or leak-free lifecycle evidence. Grok is
+closed; Hermes may run the linked executable expected-red handoff exactly once.
+Production follows observed-red review. Preserve the accepted transport results.

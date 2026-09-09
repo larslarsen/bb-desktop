@@ -1,14 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 02 RUNNING
+State: EXECUTABLE TEST SOURCE ACCEPTED — INITIAL EXPECTED RED AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, seven test-call argument replacements only
-Authorized execution/integration actors: none; Hermes green task closed
-Protected parent: reviewer publication after 08fa1941; one CURRENT-only launch allowed
+Authorized source actor: none; Grok source task closed
+Authorized execution actor: Hermes, one executable expected-red run and one evidence record
+Authorized integration actors: none
+Protected parent: reviewer publication after cf7a9b35; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md), AGENTS.md and TESTING.md.
+[active task](HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md), AGENTS.md and TESTING.md.
 Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
 Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
 passed and response-settlement falsification worked. Preserve these results; no rerun.
@@ -27,17 +28,14 @@ loaded or enable custody/send operations. Preserve pending npm/policy changes an
 WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
-Correction 01 resume outer 61377 collected on owner done, exit 0 with a 947-line,
-nine-group drop. The five requested repairs are present, but source review found
-seven existing waitNewFrames calls passing stdout instead of the context object.
-The complete drop is rejected pending exactly those seven argument replacements
-under Correction 02 in the active handoff. Only test/walletBrokerRuntime.node.js
-may change. Production, execution and integration remain closed.
-Launch Correction 02 once in session f53cb3ef-f7c1-4598-a892-f3c6e7871611 with
-automatic tool approval. Collect on owner done/Continue. No actor polling.
-Correction 02 launched once from 4fe9b38e; outer 91218, same session
-f53cb3ef-f7c1-4598-a892-f3c6e7871611.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md,
+docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md.
+Correction 02 outer 91218 collected on owner done, exit 0. The exact seven call
+replacements are accepted; reversing them in memory recovers the prior source hash.
+Accepted test: a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e,
+947 lines, nine groups. The default executable is absent. Hermes may run only the
+linked expected-red handoff. No builds, production edits or integration.
+Launch once; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 
