@@ -32,7 +32,10 @@ Monero parked. High is sufficient now; flag XHigh before security acceptance.
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_RESUME_01.md only.
 Launch once and record outer identity here. Collect after owner done or explicit
-collection; never poll an actor. No resume actor launched yet.
+collection; never poll an actor.
+Launched once from 2638de4a via hermes -z with --pass-session-id; outer terminal
+35920. Runtime session/provider/model will be collected with the completed run.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
