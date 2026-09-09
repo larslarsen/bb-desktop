@@ -1,46 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS PRODUCTION REPAIR 01 — GROK
+State: DECODED EFFECTS VALIDATION 01 — HERMES
 Reviewer: Codex, XHigh
-Authorized source actor: Grok Build, grok-4.6 High, exact handoff paths only
-Authorized execution/evidence actors: none
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes Jr Dev only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and red acceptance: [decoded effects production repair](GROK_BBD_WAL_009_DECODED_EFFECTS_PRODUCTION_01.md)
+Active handoff and source acceptance: [decoded effects validation](HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Hermes outer 81835 collected once after done, exit 0; session
-20260908_182241_3f2ee5, nous/poolside/laguna-s-2.1:free. Exact command 78730 ran
-once; completion 78749 exit 101; full 41-line log 78751. The regression reached
-its final assertion at line 756 after valid recovery and positive verification:
-all ten false metadata claims were accepted. One test failed, 6 filtered, 453.79s.
-This intended behavioral red is accepted. All 27 prior identities match. New
-196-line evidence SHA-256:
-a7def01abd54eae10e663e341ce8b253992d883863a1410c93278fa698d78431.
-The active handoff records procedural/report errors; no rerun or correction task.
-Hermes is closed. Do not resume or poll it.
+Grok session 378e7dc3-8f4e-4afe-989f-468a73a4a9a5, outer 87196, collected once
+after done, exit 0; runtime grok-4.6-build High. The four-file production drop is
+accepted for grouped validation. Saved edits reproduce exact starting identities;
+all 25 other source/evidence identities match. No source-actor tests or Git.
+The new authority has no copied financial oracle, recovered effects drive payment/
+fee/count results, and all ten regression assertions remain unchanged.
 
-Grok may repair actual decoded-effects verification, bind it to pre-sign account/
-spend/hash/anchor context, forward trusted viewing authority on the synthetic
-external route, and mechanically adapt the existing regression calls. Exact
-paths and semantics are in the handoff. No source-actor execution or integration.
-No weakening of the ten-case regression or reuse of metadata as an actual oracle.
+Hermes may run the exact six-stage sequence: regression green; isolated receiver-
+comparison falsification; restored seven-test library green; software integration;
+synthetic integration; native compile. Only the exact temporary effects.rs mutation
+is authorized, with complete restoration on every outcome. All 29 identities are
+frozen in the active handoff. Stop at the first unexpected result, no repair/retry.
+Write one new evidence record with complete logs and accurate deviations. No Git,
+source integration, prior evidence correction or broader execution. Grok is closed.
 
-Previously accepted results remain valid. No UI repeat or new demo milestone.
-Implementation and eleven actor evidence records remain uncommitted. Actual-secret
-cleanup, native integration and remaining security stay open. Network/broadcast/
-mainnet/hardware/Monero parked. Keep reviewer XHigh for this effects work.
+Previously accepted results remain valid, including the ten-case expected red.
+No UI test repeat or new demo milestone. Implementation and eleven prior actor
+evidence records remain uncommitted. Full actual-secret cleanup, OS/capability
+integration and remaining security stay open. Network/broadcast/mainnet/hardware/
+Monero parked. Keep reviewer XHigh for effects acceptance.
 
 Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
-GROK_BBD_WAL_009_DECODED_EFFECTS_PRODUCTION_01.md only.
-Launch once and record session/outer identity here. Collect after done/explicit
+HERMES_BBD_WAL_009_DECODED_EFFECTS_VALIDATION_01.md only.
+Launch once and record outer/runtime identity here. Collect after done/explicit
 collection; never poll an actor.
-Launched once from 302047ec: Grok session
-378e7dc3-8f4e-4afe-989f-468a73a4a9a5, outer terminal 87196, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
