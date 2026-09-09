@@ -1,9 +1,9 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — RUST EXECUTABLE TEST SOURCE RUNNING
+State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, executable test source only
+Authorized source actor: Grok Build, grok-4.6 High, executable test Correction 01 only
 Authorized execution/integration actors: none; Hermes green task closed
 Protected parent: publishing reviewer commit; one CURRENT-only launch allowed
 
@@ -27,11 +27,13 @@ loaded or enable custody/send operations. Preserve pending npm/policy changes an
 WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md,
-docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
-Launch once; collect on owner done/Continue. No actor polling.
-Grok launched once from 1b194248; outer 40380,
-session c0b065f2-55aa-422e-b96c-7ab09a016840. Collect on owner done/Continue.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md.
+The original nine-group, 711-line test drop is rejected for oracle and cleanup gaps
+in the active handoff's collected review. Only test/walletBrokerRuntime.node.js may
+be corrected. Production, execution and integration remain closed.
+Original session c0b065f2-55aa-422e-b96c-7ab09a016840 was collected by exact-ID
+transcript export on owner done; outer 40380 is unavailable in this tool session.
+Launch Correction 01 once; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

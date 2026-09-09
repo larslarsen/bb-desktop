@@ -118,3 +118,75 @@ After red review the production actor supplies main.rs/runtime.rs. Planned green
 then `node test/walletBrokerRuntime.node.js`. Existing target directory is disk-backed.
 Focused source format/lint and actual-Rust session falsification will be specified
 after source review; do not rerun cryptographic proof suites or package-policy gates.
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Decision: reject the original test drop; authorize Grok 4.6 High to correct only
+test/walletBrokerRuntime.node.js. No execution or integration is authorized.
+This section supersedes the original new-file baseline and stop state above.
+Protected parent: reviewer publication following 3ce81e57c280e59065b1d99f879a7c8edf167c0c;
+one CURRENT-only launch commit may follow. Verify the source identities below.
+
+Collected on owner done through exact-ID `grok export` of session
+c0b065f2-55aa-422e-b96c-7ab09a016840. Outer 40380 could not be resumed in the current
+tool session; its exit code is not claimed. The exported transcript contains the
+completion report, six edits to the authorized file, read/search and identity/status
+commands. It shows no tests, builds or Git mutations. It also includes unnecessary
+git-log history and reads of existing protocol/supervisor tests and the transcript
+fixture beyond the named source list. Correction 01 must use only the reads below.
+The Markdown export summarizes tools; this is not a raw tool-result audit.
+
+Measured drop: 711 lines, nine top-level groups, SHA-256
+f29dcecdd34453fc7413741b3a07534c7b88e10be201679217041c0b3ae9b15e.
+Supervisor and protocol retain the two frozen hashes above. The reviewer inspected
+source only; no syntax, test, build, acceptance or falsification command was run.
+The independent wire literals, actual compiled-child route, session derivation,
+degraded-state checks and explicit supervisor quit are retained.
+
+Blocking findings (line numbers refer to the measured original drop):
+
+1. Lines 427–441 accept a resolved null account.list result as though UNAVAILABLE
+   was rejected. Replace the sentinel pattern with an explicit rejection assertion
+   that fails for every resolution and checks the fixed error fields.
+2. Lines 249–288 recursively erase the cwd, suppress removal errors and omit the
+   empty-directory assertion on most negative paths. This can hide runtime file
+   writes. After every child is reaped, inspect the cwd before cleanup on every
+   path, including failures. Remove only the verified empty directory with rmdir;
+   never recursively delete a generated target. Preserve unexpected content and
+   report the path. Reap, filesystem and cleanup failures must fail the test while
+   retaining the original assertion error where applicable.
+3. Lines 88–99, 175–189 and the final assertions do not prove complete output:
+   unread bytes are ignored, frame waits accept an arbitrary extra tail, and exit
+   does not establish that stdout/stderr have finished draining. Await bounded
+   child close/stream completion before final assertions. In every direct case
+   assert the exact complete transcript (hello and only expected replies), zero
+   unread bytes and no canary in either stream, including bytes emitted on shutdown.
+   Apply final canary/output validation to the supervisor case too. Preserve
+   bounded emergency reaping and restore the spawn observer in finally. Observe
+   child spawn errors without unhandled events; failed spawn must fail promptly.
+4. Lines 530–534 send invalid UTF-8 that is also invalid JSON after replacement
+   decoding. A lossy UTF-8 decoder therefore still passes. Place invalid bytes
+   inside a quoted string in an otherwise valid request to a known unavailable
+   method, after a proved bootstrap; lossy decoding would then produce UNAVAILABLE
+   rather than exit. Assert prompt numeric nonzero exit without a signal for all
+   protocol/deadline failures, so crashes/signals cannot stand in for rejection.
+5. Lines 611–628 test only two partial header bytes and allow 1–5 seconds for a
+   two-second ack deadline. Keep absent/header cases, add a complete header plus
+   incomplete ack body held open, and measure from hello observation with monotonic
+   time. Use an explicit 1500–3500 ms observation window around the fixed 2000 ms
+   production deadline; this is scheduler tolerance, not a new protocol timeout.
+   Also cover EOF with an incomplete body, not only an incomplete header.
+
+Bounded coverage completion in the existing method-error group: include
+receiver.fresh and intent.cancel with object params returning exact UNAVAILABLE,
+and nonempty sync.subscribe params returning SCHEMA. Keep the rest of the suite
+focused; do not copy a codec matrix or change the executable contract.
+
+Only reads: AGENTS.md, TESTING.md, active CURRENT prefix, ticket, this handoff,
+test/walletBrokerRuntime.node.js, wallet-broker/supervisor.js and protocol.js.
+Read/search/hash/line-count and exact HEAD/status queries only. No history reload,
+home/config/credential/runtime discovery, actor commands, network, execution,
+syntax checks, builds, dependencies, docs/evidence edits or Git mutations.
+Only write: test/walletBrokerRuntime.node.js. Preserve every unrelated pending file.
+Report the resulting hash, lines, groups and corrections, then stop. Hermes red
+remains future work after reviewer acceptance; do not run it.
