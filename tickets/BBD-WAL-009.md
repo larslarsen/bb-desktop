@@ -1,22 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS CORRECTION 01 — GROK, ONE PATH
+Status: CLEANUP OBSERVATIONS VALIDATION 01 — HERMES, SIX TEST INVOCATIONS
 
-The completed three-path source drop retained actual seed/PCZT/transaction owners
-but failed source review on immutable attempt bindings, premature observation
-finalization and early-error misclassification. The
-[grouped correction](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md)
-authorizes Grok High to fix only zec/test_support.rs. vault.rs, spend.rs, all tests
-and the other inventory rows stay frozen. No execution or integration is authorized.
-Retain reviewer XHigh for the corrected source review.
+The grouped adapter correction passes XHigh source review: events finalize only
+at owner drop with unwind override, actual early-error labels are preserved, and
+success is selected after publication work. The
+[validation handoff](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md)
+authorizes Hermes alone to run focused green, two deliberate-fault failures with
+restoration, restored green and the two affected software/synthetic pipeline tests.
+Only exact temporary adapter mutations, one new backup and one evidence record are
+allowed. No permanent source/test edits, broader execution or integration.
 
-The accepted cleanup regression red, decoded-effects acceptance and prior valid
-checks remain in force. The synthetic all-classes cleanup test stays unchanged and
-unaccepted; real lifecycle coverage is still required. Full typed-secret cleanup,
-native integration and security acceptance remain open. Implementation and fourteen
-actor evidence records remain uncommitted; no usable send flow is delivered.
-Active handoff and CURRENT_TASK.md govern scope. Launch once, collect after done,
-never poll.
+Prior accepted regression red, decoded-effects acceptance and other valid checks
+remain in force. The old synthetic all-classes cleanup test stays unchanged and
+unaccepted; real lifecycle and typed-secret/native/security acceptance remain open.
+Implementation and fourteen prior evidence records remain uncommitted; no usable
+send flow is delivered by this validation. High suffices for bounded collection;
+return to XHigh for lifecycle design/acceptance. Launch once, collect after done,
+never poll. Active handoff and CURRENT_TASK.md govern scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

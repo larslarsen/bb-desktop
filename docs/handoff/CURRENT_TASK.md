@@ -1,45 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS CORRECTION 01 — GROK, ONE PATH
-Reviewer: Codex, XHigh; retain XHigh for corrected cleanup source review
-Authorized source actor: Grok Build, grok-4.6 High, test_support.rs only
-Authorized execution/evidence actors: none
+State: CLEANUP OBSERVATIONS VALIDATION 01 — HERMES, SIX TEST INVOCATIONS
+Reviewer: Codex; corrected source accepted at XHigh, High sufficient for collection
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes, exact validation handoff only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [cleanup completion correction](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md)
+Active handoff: [cleanup observations validation](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Grok production session 58a0aeab-a2f5-4298-8fdf-73e8fa2c43f1, outer 90521,
-was collected once after owner done, exit 0, grok-4.6-build High. It is closed.
-The three-path source review retained the actual seed/PCZT/transaction owners
-and removed fabricated producers, but found a compile blocker, premature event
-finalization and early-error misclassification in test_support.rs.
+Grok correction session f2231b84-4294-48e8-95cb-87f495940173, outer 7343,
+was collected once after owner done, exit 0, grok-4.6-build High, and is closed.
+The bounded correction passes source review: both mutable bindings, finalization
+only at owner drop with unwind override, success selected after publication work,
+and actual early-error labels. Exact reversal reproduces the starting adapter hash;
+the corrected 4463-line hash and all other 32 inventory rows match.
 
-One grouped correction is authorized in that adapter only. finish records an
-outcome; AttemptOwner Drop alone drains events with panic override. Preserve
-actual early error labels and select success after publication work completes.
-Unexpected labels remain observable. vault.rs, spend.rs, all tests and the other
-32 inventory rows stay frozen. No compiler/test or integration is authorized.
+Hermes alone may run the focused green, two exact deliberate-fault failures with
+restoration, restored green and the affected software/synthetic pipeline tests.
+Only the prescribed temporary test_support.rs mutations, one new disk-backed
+backup and one new evidence record are allowed. No permanent source/test changes,
+full-target/library reruns, formatter, other execution, Git or integration.
 
-The accepted 1.87s cleanup regression red, decoded-effects acceptance and earlier
-valid checks remain in force. The old synthetic all-classes wipe test remains
-unchanged and unaccepted as cleanup evidence; real lifecycle coverage remains
-necessary. Full typed-secret/native/security work remains open; network/broadcast/
-mainnet/hardware/Monero/Electron send parked.
-
-Implementation and fourteen actor evidence records remain uncommitted; no usable
-send flow is delivered. Keep XHigh for the corrected cleanup source review.
+The accepted 1.87s regression red, decoded-effects acceptance and earlier valid
+checks remain in force. The old synthetic all-classes cleanup test stays unchanged
+and unaccepted; real lifecycle coverage and typed-secret/native/security acceptance
+remain open. Network/broadcast/mainnet/hardware/Monero/Electron send are parked.
+Implementation and fourteen prior actor evidence records remain uncommitted.
+No usable send flow is delivered by this validation.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md only.
-Launch once and record session/outer identity. Collect after owner done or explicit
-collection; never poll an actor.
-Launched once from 5cc36787: Grok session
-f2231b84-4294-48e8-95cb-87f495940173, outer terminal 7343, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
+and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_VALIDATION_01.md only.
+High is sufficient for bounded result collection; use XHigh for subsequent lifecycle
+design/acceptance. Launch once, collect after owner done, never poll an actor.
+Validation actor not yet launched.
 
 ## Historical record (superseded by the active state above)
 
