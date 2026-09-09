@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 AUTHORIZED
+State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 01 RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, executable test Correction 01 only
 Authorized execution/integration actors: none; Hermes green task closed
@@ -34,6 +34,8 @@ be corrected. Production, execution and integration remain closed.
 Original session c0b065f2-55aa-422e-b96c-7ab09a016840 was collected by exact-ID
 transcript export on owner done; outer 40380 is unavailable in this tool session.
 Launch Correction 01 once; collect on owner done/Continue. No actor polling.
+Correction 01 launched once from bf8bedd6; outer 9893,
+session f53cb3ef-f7c1-4598-a892-f3c6e7871611. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 
