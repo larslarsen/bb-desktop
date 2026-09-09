@@ -1,37 +1,31 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: INITIAL TRANSPORT RED ACCEPTED — PRODUCTION SOURCE RUNNING
+State: TRANSPORT SOURCE REVIEWED — FOCUSED GREEN AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, exact four-path task
-Authorized execution/integration actors: none; Hermes red authorization closed
+Authorized source actors: none; Grok production authorization closed
+Authorized execution/integration actor: Hermes, exact green handoff only
 Protected parent: publishing reviewer commit; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[production task](GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md), AGENTS.md and TESTING.md.
-Red acceptance: [collected review](HERMES_BBD_WAL_011_TRANSPORT_RED_01.md#collected-review--2026-09-09).
-Hermes outer 44012 / runtime 20260909_135906_d3d5a1 was collected once, exit 0.
-Actual test exit 1, six failures on missing framing/handshake and exit handling.
-The initial test-first red is accepted; production and five measured inputs are
-unchanged. Grok may now implement the fixed supervisor transport and bounded harness
-corrections. No execution, Git or docs edits by the source actor.
+[green task](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md), AGENTS.md and TESTING.md.
+Source acceptance: [collected review](GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md#collected-source-review--2026-09-09).
+Grok outer 28116 / session 64e98d89-1d15-4598-893f-f7309376243d was collected once,
+exit 0. Four-path transport source drop is reviewed for focused validation.
+Hermes may falsify response settlement with guaranteed restoration, run the six
+named suites once, correct the red evidence alongside green evidence, and integrate
+only on full success. No repairs/retries; first unexpected failure stops integration.
 
-The unintegrated red evidence misstates the runtime model and some failure causes;
-review records the corrections. Actual runtime model: poolside/laguna-s-2.1:free,
-provider nous. Correct evidence alongside later Hermes integration, no report-only
-actor or test replay. Preserve both untracked evidence records and npm/policy edits.
-
-App-to-wallet connection remains the objective. Transport, Rust executable and
-Electron startup remain unfinished. MapLibre/package-policy work stays stopped.
-Prior Rust results remain retained. No endpoint, money-moving, Monero or release
-scope is added. Transport alone is not a usable wallet.
+Real transport is implemented but not yet validated. Rust executable and Electron
+startup remain missing; no usable-wallet claim. The source review records a remaining
+emergency-fallback cleanup limitation. The real quit case explicitly asserts child
+exit before fallback. Preserve unrelated npm/policy files and WAL-009 evidence;
+MapLibre work remains stopped. No Rust proof replay or release security acceptance.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md,
-docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md,
+docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
-Grok launched once from 2213beff; outer 28116,
-session 64e98d89-1d15-4598-893f-f7309376243d. Collect on owner done/Continue.
 
 ## Historical record (superseded by the active state above)
 

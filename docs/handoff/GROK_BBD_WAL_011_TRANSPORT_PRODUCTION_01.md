@@ -101,3 +101,37 @@ Stop with a four-path source drop, hashes/line counts and a concise description 
 the transport and test corrections. No execution, evidence editing or integration.
 Hermes will run the focused suite, regression suites and response-settlement
 falsification after reviewer source acceptance. No Rust proof or policy detour.
+
+## Collected source review — 2026-09-09
+
+Accept the four-path drop for focused validation, not app/runtime completion. Grok
+outer 28116 was collected once on owner done, exit 0; session
+64e98d89-1d15-4598-893f-f7309376243d is closed. The transcript has seventeen bounded
+source replacements, read/search activity and two identity/status command batches.
+No test execution, dependency operations, evidence changes or Git mutation occurred.
+
+Measured drop:
+- wallet-broker/supervisor.js: 584 lines,
+  1ac92493cb70cd4ea5e1884f4b96424c7fbc89126308299e7221f2b0ba1a8ff8
+- test/walletSupervisorTransport.node.js: 783 lines,
+  e69fdcfa4aaeeca03b4abf8ac100888ff0b42fbb6001f53e461a35a5b7550700
+- test/fixtures/wallet-broker/transport-child.js: 264 lines,
+  ba11ba8a37d4ee7a6df2e3499c40c972ca4a1cfd8ef0eed377afe1c7a1e3ba91
+- test/walletSupervisor.node.js: 520 lines,
+  eaaa63777c8ded89ea6e9b2a07912bd3a680953bdb989a4ff0d6894e5df6ce5c
+
+Protocol stays at its frozen 79b0ac8b hash. Source now routes actual streams through
+the existing strict codec, gates public dispatch on bootstrap, correlates promises,
+normalizes errors and closes pending work on deadline/transport loss. Spawn guards
+and method restrictions remain. Seven transport and thirteen supervisor groups cover
+the principal live and fake-stream paths. The live hold case asserts actual exit
+before fallback cleanup; the limit case settles all 32 requests. Split-byte delivery
+and error-field assertions are present.
+
+Limitation retained for subsequent harness maintenance: emergency finally cleanup
+still catches a reap timeout and leaves the directory when the child remains alive.
+This is not proof of complete fallback cleanup. The explicit live quit assertion
+does fail on missing supervisor-owned termination; focused transport validation may
+proceed. Do not claim general leak-free teardown from this suite alone.
+
+Hermes may execute the exact green/falsification handoff. Source actor is closed.

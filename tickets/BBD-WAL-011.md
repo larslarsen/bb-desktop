@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Initial transport red accepted; bounded production implementation authorized.
+Status: Transport implementation reviewed; focused validation/integration authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -41,10 +41,12 @@ execution/integration instructions follow source review; none are authorized now
 
 Completed execution is the focused expected-red handoff
 [HERMES_BBD_WAL_011_TRANSPORT_RED_01.md](../docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md).
-Its collected review accepts the observed missing-transport failures. Grok now owns
+Its collected review accepts the observed missing-transport failures. Grok completed
 [production implementation](../docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md),
-including bounded harness corrections. No execution or integration is active.
-The source review records corrections required before green acceptance.
+including bounded harness corrections. The collected source review permits
+[focused validation/integration](../docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md).
+Only Hermes is active; its exact handoff governs commands, failure stops and paths.
+The source review records the remaining emergency-cleanup limitation.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
