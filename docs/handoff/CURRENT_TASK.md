@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT TEST DROP REVIEWED — INITIAL RED AUTHORIZED
+State: LIVE TRANSPORT TEST DROP REVIEWED — INITIAL RED RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actors: none; Grok test-source authorization closed
 Authorized execution/evidence actor: Hermes, one focused transport suite only
@@ -25,6 +25,8 @@ Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_TRANSPORT_TESTS_01.md,
 docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_RED_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
+Hermes launched once from 23a62f44; outer 44012. Verify actual runtime session on
+collection; no poll or relaunch.
 
 ## Historical record (superseded by the active state above)
 
