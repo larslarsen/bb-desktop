@@ -1,46 +1,44 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP LIFECYCLE TESTS 01 — GROK, TEST SOURCE ONLY
-Reviewer: Codex, XHigh; retain XHigh for the test-source review
-Authorized source actor: Grok Build, grok-4.6 High, five exact test/declaration paths
-Authorized execution/evidence actors: none
+State: CLEANUP LIFECYCLE VALIDATION 01 — HERMES, NINE TEST INVOCATIONS
+Reviewer: Codex; source/mutation contract accepted at XHigh, High sufficient for collection
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes, exact validation handoff only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [real buffer lifecycle tests](GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md)
+Active handoff: [cleanup lifecycle validation](HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-The owner selected XHigh. The lifecycle test contract is fixed: four test_support
-child-module tests, two spend child-module tests, and one replacement for the old
-unsupported synthetic all-classes integration test. Parent source changes are
-limited to cfg(test) module declarations; production behavior stays unchanged.
-The handoff names all five paths, exact test oracles and later falsifications.
+Grok session c7b99290-f754-4e0e-838c-7950ecaf7840, outer 49083, was collected
+once after owner done, exit 0, grok-4.6-build High, and is closed. The five-path
+test drop passes source review. Both production prefixes and all other 31
+inventory rows match; exact reversal proves the other 14 integration tests unchanged.
+The final inventory has 36 rows, 13 library tests and 15 integration tests.
 
-Coverage includes actual nonzero seed/PCZT/transaction owner Drop, deferred outcome
-selection, marked unwind, real pre-consume cancellation/expiry/missing-handle/schema
-failures, and wrong-seed rejection after PCZT ownership but before counted access.
-Tests must not manufacture events or use synthetic lifecycle helpers as wipe proof.
-Expected counts: 13 library tests (six new), 15 integration tests (one replaced).
-All 34 existing source/evidence identities were verified before authorization.
+Hermes may run initial six-test library green; six exact deliberate-fault failures,
+restoring each; restored library green; and the replacement wrong-seed integration
+test. Only prescribed temporary edits in test_support.rs/spend.rs/vault.rs, three
+new disk-backed backups and one evidence record are allowed. Tests remain frozen.
+No permanent source change, formatter, broader test, proof-heavy rerun, Git or
+integration. Stop on any unexpected result after restoring the known active fault.
 
-The prior six cleanup validation outcomes, exact restorations, decoded-effects
-acceptance and earlier valid results remain in force. No proof-heavy reruns or
-report-only correction. Production source, all other tests, dependencies, evidence,
-execution and integration remain frozen. Source actor stops after its test drop.
+The old synthetic all-classes assertion has been replaced with actual-owner tests.
+Current runtime/compile results for those new tests are still pending. Prior cleanup
+validation, signing-pipeline and decoded-effects acceptance remain in force.
 
 Implementation and fifteen actor evidence records remain uncommitted. Full
-third-party typed-secret erasure, proof-to-publication panic integration, native
-OS/owning-thread/capability and final security acceptance remain open. Network/
-broadcast/mainnet/hardware/Monero/Electron send stay parked.
+typed-secret erasure, proof-to-publication panic integration, native integration
+and final security remain open; network/broadcast/mainnet/hardware/Monero/Electron
+send stay parked. No full wallet or usable send-flow acceptance is claimed.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/GROK_BBD_WAL_009_CLEANUP_LIFECYCLE_TESTS_01.md only.
-Keep XHigh for source review. Launch once, collect after owner done, never poll.
-Launched once from f89d830d: Grok session
-c7b99290-f754-4e0e-838c-7950ecaf7840, outer terminal 49083, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
+and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md only.
+High suffices for fixed result collection; XHigh for new design/broader acceptance.
+Launch once, collect after owner done, never poll an actor.
+Lifecycle validation actor not yet launched.
 
 ## Historical record (superseded by the active state above)
 
