@@ -36,6 +36,9 @@ Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
 GROK_BBD_WAL_009_EFFECTS_COMPILE_CORRECTION_01.md only.
 Launch once and record session/outer identity here. Collect after done/explicit
 collection; never poll an actor.
+Launched once from 8457fe73: Grok session
+9172296c-e3f5-466d-84f9-cf0bc95928f8, outer terminal 76898, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
