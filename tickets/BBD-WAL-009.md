@@ -1,22 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: GROUPED NATIVE LAYOUT VALIDATION 01 — HERMES
+Status: NATIVE WIDGET/LAYOUT VALIDATION ACCEPTED — XHIGH SCOPING NEXT
 
-Capacity continuation: all ten UI tests passed, then the provider returned HTTP
-429 before mutations. Resume the same Hermes session once for the remaining four
-stages and evidence. Preserve stage 1; no rerun. All source identities still match.
+The [reviewer acceptance](../docs/testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md)
+accepts ten UI tests, both intended layout/close-re-entry falsifications, restored
+ten-test green, and native compilation. All 26 frozen identities match. Both
+Hermes executions are collected and closed; no actor remains authorized.
+Execution/report exceptions are recorded without another correction-only task.
 
-Active authorization: [grouped layout validation](../docs/handoff/HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md).
-The [source review](../docs/testing/BBD-WAL-009-NATIVE-LAYOUT-REPAIR-01-SOURCE-REVIEW.md)
-accepts the one-file scrolling-body fix with confirmation/lifecycle logic unchanged.
-Hermes runs ten-test green, two exact falsifications with restoration, restored
-ten-test green, and native compilation; writes one evidence record; then stops.
-No source repair, new tests, old-suite repeats, Git mutation, or integration.
+High review is complete. Pause for the owner's requested switch to XHigh before
+scoping independent transaction-effects verification: recover actual effects
+from the decoded signed artifact instead of comparing prepared metadata clones.
+Actual-secret cleanup, native OS/capability integration, and remaining security
+remain open. No additional speculative UI coverage or old-suite reruns.
 
-High remains sufficient. Keep existing wallet scope with less churn, no demo
-reprioritization or speculative coverage. Implementation remains uncommitted;
-no usable send flow is delivered. Prior gates remain valid, while native
-integration and remaining security stay open. Launch once, no actor polling.
+Implementation and ten actor evidence records remain uncommitted; no usable send
+flow is delivered. Keep the existing wallet scope and previously accepted results.
+The linked acceptance and CURRENT_TASK.md define the active state; historical
+phase authorizations below do not reopen execution. No actor polling.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

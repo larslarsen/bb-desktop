@@ -1,52 +1,43 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: WAL-009 GROUPED NATIVE LAYOUT VALIDATION 01 — HERMES
-Reviewer: Codex; High sufficient for this bounded validation/review
+State: NATIVE WIDGET/LAYOUT VALIDATION ACCEPTED — XHIGH SCOPING NEXT
+Reviewer: Codex; High review complete; pause for owner to switch to XHigh
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md](HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md)
-Reviewer decision: [layout repair source review](../testing/BBD-WAL-009-NATIVE-LAYOUT-REPAIR-01-SOURCE-REVIEW.md)
-Read this prefix and linked records only; no historical handoff reload.
+Reviewer decision: [native layout validation acceptance](../testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md)
+Closed handoff: [grouped layout validation](HERMES_BBD_WAL_009_NATIVE_LAYOUT_VALIDATION_01.md)
+Read this prefix and linked review only; no historical handoff reload.
 
-Grok session 1e93d0db-3e54-4d88-a7e3-ce1c35a7bd9a, outer 38040, collected once
-after done, exit 0; runtime grok-4.6-build High. The one-file layout repair is
-accepted for validation. native_ui.rs: 321 lines,
-d132a164a6413165291abd0582abf3eca4cacd3f33ce6eb4ac2b467e8774d960.
-Only the bounded scrolling review body and button-space calculation changed.
-All state/authority/lifecycle semantics, ten tests, and 25 other identities match.
+Hermes outer 14430 collected once after owner done, exit 0. Resumed runtime
+session 20260908_150421_ce19a4, nous/poolside/laguna-s-2.1:free. Original session
+20260908_145855_f82684 / outer 10169 was already collected after HTTP 429.
+Both executions are closed. No relaunch, resume, actor polling, or new actor.
 
-Hermes may run five commands: ten UI tests green; unbounded-body falsification;
-programmatic-close re-entry falsification; restored ten-test green; native
-compilation. Both exact mutations require complete restoration on every outcome.
-All tests/source are otherwise frozen. Write only the new named evidence record
-and stop. No source repair, extra tests/probes, prior evidence correction, Git
-mutation, or integration. Capture each command once in background with full log.
-Capacity checkpoint: outer 10169 collected once after done. Hermes session
-20260908_145855_f82684 (nous/poolside/laguna-s-2.1:free) hit upstream HTTP 429 after
-stage 1 PASSED: saved 78612, exit 0, ten passed/6 filtered, 0.15 seconds. No mutation
-or later command/evidence was reached. All 26 frozen identities still match.
-Resume the same session ONCE under the active handoff's capacity amendment for
-stages 2-5 and evidence only; do not rerun stage 1 or preflight. No actor polling.
-Continuation launched once from ad6c325b with --resume 20260908_145855_f82684
-and --pass-session-id, outer terminal 14430. No completion collected; do not
-relaunch or poll. Collect after done/explicit collection.
+Accepted: initial ten-test UI green; two deliberate faults failed at their
+intended layout/re-entry assertions; restored ten-test green; native compile.
+All 26 frozen identities match, including both restored mutations. The review
+records the malformed command/retry, truncated log, and report inaccuracies.
+These do not require another test run or a report-only correction task.
 
-High remains appropriate; flag XHigh before cryptographic/custody architecture.
-Owner asks for less churn within existing wallet scope, not a new demo milestone.
-No additional speculative coverage slice. Previously accepted results remain
-valid. Pending implementation and nine evidence records remain uncommitted;
-reviewer checkpoint commits are governance, not a delivered wallet flow.
-OS/capability integration, independent recovered effects, actual-secret cleanup,
-and remaining security stay unaccepted; network/broadcast/mainnet/hardware/Monero
-stay parked. No broader WAL-009 acceptance.
+Next: switch reviewer reasoning to XHigh, then define the independent transaction-
+effects verification repair. Current code compares prepared inspection metadata
+with a clone instead of recovering all authoritative effects from decoded signed
+bytes. Actual-secret cleanup, OS/owning-thread/capability integration, and remaining
+security stay open. No broader WAL-009 acceptance or speculative UI test slice.
 
-Reviewer publication scope: CURRENT_TASK.md, ticket, active handoff, linked review.
-Launch once; collect after done/explicit collection. No actor polling.
+The owner asks for less churn within existing wallet scope, not a new demo
+milestone. Previously accepted gates remain valid. Pending implementation and ten
+actor evidence records remain uncommitted; reviewer commits publish governance,
+not a delivered wallet send flow. Network/broadcast/mainnet/hardware/Monero stay
+parked. Stop here for the requested reasoning-setting handoff.
+
+Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
+and docs/testing/BBD-WAL-009-NATIVE-LAYOUT-VALIDATION-01-ACCEPTANCE.md only.
 
 ## Historical record (superseded by the active state above)
 
