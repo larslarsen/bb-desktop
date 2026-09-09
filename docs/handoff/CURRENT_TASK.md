@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS AUTHORIZED
+State: PARTIAL SOURCE CHECKPOINT ACCEPTED — CONSOLIDATED DIAGNOSTICS RUNNING
 Reviewer: Codex; High suffices for the fixed diagnostics/review task
 Authorized source actors: none
 Authorized execution/evidence actor: Hermes, diagnostics 01 only
@@ -26,7 +26,9 @@ Hermes may now collect exactly four read-only diagnostics: formatter check,
 no-default library Clippy, native-ui library Clippy, and security-policy CLI.
 Ordinary diagnostic failures are collected together, not repaired/retried. No
 source change, functional test/proof, source integration or broader work authorized.
-Reviewer will launch once; do not independently launch another actor or poll.
+Hermes launched once from 3ffbb3ac; outer session 44655 is active.
+Collect that outer once only on owner done/Continue. Do not poll or relaunch.
+Actual runtime session/provider/model will be verified from saved records on collection.
 
 Full Phase-A1/ticket/release acceptance remains open. Pinned upstream typed-secret
 erasure requires a separate dependency-level design; consolidated final validation
