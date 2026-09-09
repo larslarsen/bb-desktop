@@ -1,40 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP LIFECYCLE VALIDATION 01 ACCEPTED — REVIEWER NEXT DESIGN
-Reviewer: Codex; High sufficient for completed collection, XHigh for next design
-Authorized source actors: none
+State: REAL PIPELINE PANIC REGRESSION — GROK TEST SOURCE ONLY
+Reviewer: Codex, XHigh design; High sufficient for bounded source collection
+Authorized source actor: Grok Build, grok-4.6 High, one integration-test path only
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Closed handoff and acceptance: [cleanup lifecycle validation](HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md#collected-validation-acceptance--2026-09-08)
-Read this prefix and the collected acceptance; no historical handoff reload.
+Active handoff: [real pipeline panic regression](GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md)
+Read this prefix and active handoff; no historical handoff reload.
 
-Hermes outer 54437 is complete, exit 0; session 20260908_224941_8c6500,
-nous / poolside/laguna-s-2.1:free, Hermes v0.18.2. Nine invocations are accepted:
-initial six-test library green, six intended fault assertions, restored six-test
-library green, and replacement wrong-seed integration green. All 36 source/prior-
-evidence identities match and all three backups equal restored source. No further
-test run or report-only correction actor is needed. Grok source actor 49083 is closed.
+Cleanup lifecycle validation is accepted at dfaf06c5. Hermes outer 54437 and
+Grok outer 49083 are closed. Preserve all prior cleanup/signing/decoded-effects
+results and exact source restoration. No report-only correction or baseline rerun.
 
-The acceptance records command/report deviations from the saved transcript,
-including the report's incorrect model, missing full logs and absolute path.
-Valid outcomes are retained; report portability/facts require correction during
-future explicitly authorized integration. No source or evidence integration occurred.
+The existing panic helper acquires a lease and panics without executing signing.
+The next test exposes that missing pipeline coverage using the existing API:
+actual signing/proving/extraction/verification stages, no publication, actual
+Seed/PCZT/transaction owner observations, lock release and authorization invalidation.
+Grok may edit only the two exact regions of wallet-broker/tests/zec_sign_verify.rs
+specified in the handoff. All production, other tests and sixteen evidence records
+remain frozen. Expected red is the absent real stage activity; no new API is needed
+for the test-source drop. Execution and the later implementation need separate review.
 
-Implementation and sixteen actor evidence records remain uncommitted. Prior
-cleanup/signing/decoded-effects acceptance remains in force. The synthetic all-
-classes assertion has been replaced and the actual-owner lifecycle coverage passes.
-Full typed-secret erasure, proof-to-publication panic integration, native OS/
-owning-thread/capability integration and final security remain open. Next reviewer
-work is to bound those remaining integration/security gaps. Network/broadcast/
-mainnet/hardware/Monero/Electron send remain parked; no usable send-flow acceptance.
+Implementation and sixteen actor evidence records remain uncommitted. Full typed-
+secret erasure, real pipeline panic coverage, native OS/owning-thread/capability
+integration and final security remain open. This stage addresses only real pipeline
+panic coverage. Network/broadcast/mainnet/hardware/Monero/Electron send stay parked.
+No usable send-flow or full-wallet acceptance is claimed.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md only.
-No actor is active. Never poll or relaunch a completed actor.
+and docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md only.
+Launch once, collect on owner done; never poll. Not launched yet.
 
 ## Historical record (superseded by the active state above)
 

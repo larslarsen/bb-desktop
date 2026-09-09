@@ -1,20 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP LIFECYCLE VALIDATION 01 ACCEPTED — REVIEWER NEXT DESIGN
+Status: REAL PIPELINE PANIC REGRESSION — GROK TEST SOURCE ONLY
 
-The [collected acceptance](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_LIFECYCLE_VALIDATION_01.md#collected-validation-acceptance--2026-09-08)
-accepts initial/restored six-test library greens, all six intended fault failures,
-and replacement wrong-seed integration green. All 36 frozen identities and three
-restored backups match. The source and execution actors are closed; no actor,
-execution or integration is currently authorized. No accepted tests need rerunning.
+The [active handoff](../docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md)
+authorizes Grok High to replace the helper-only panic subsection with one focused
+regression requiring real signing/proving/extraction/verification before panic,
+three actual buffer-owner observations, no publication, lock release and invalidation.
+Only two specified regions of tests/zec_sign_verify.rs may change. All production,
+other tests, dependencies, evidence and execution remain frozen. Expected red uses
+the existing helper API and fails because real pipeline stage activity is absent.
 
-Report and command deviations are recorded in that acceptance. Correct report
-portability/facts during future bounded integration, without a report-only actor.
-Implementation and sixteen actor evidence records remain uncommitted. Prior
-cleanup/signing/decoded-effects results remain accepted. Full typed-secret erasure,
-proof-to-publication panic integration, native integration and final security remain
-open. Next reviewer work is to bound those gaps at XHigh; High sufficed for this
-fixed collection. CURRENT_TASK.md governs scope; never poll an actor.
+Cleanup lifecycle validation is accepted at dfaf06c5; all previous accepted results
+remain valid. No accepted expensive baseline or report-only correction actor is
+needed. Source and sixteen evidence records remain uncommitted. Typed-secret erasure,
+native integration and final security remain open alongside this bounded panic gap.
+XHigh for design, High for source collection. CURRENT_TASK.md governs scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
