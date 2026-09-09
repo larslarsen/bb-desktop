@@ -37,7 +37,10 @@ mainnet/hardware/Monero parked. Keep XHigh for production source review.
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md only.
 Launch once and record session/outer identity. Collect after owner done or explicit
-collection; never poll an actor. No cleanup production actor launched yet.
+collection; never poll an actor.
+Launched once from 5d510544: Grok session
+58a0aeab-a2f5-4298-8fdf-73e8fa2c43f1, outer terminal 90521, CLI grok-4.6 High.
+No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 
