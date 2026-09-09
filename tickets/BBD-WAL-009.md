@@ -1,22 +1,22 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS PRODUCTION 01 — GROK, THREE PATHS
+Status: CLEANUP OBSERVATIONS CORRECTION 01 — GROK, ONE PATH
 
-Following the accepted 1.87s cleanup regression red, the
-[production contract](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md)
-authorizes Grok High to connect actual owned seed/PCZT/transaction wipe observations
-and remove fabricated operational events. Exactly vault.rs, zec/spend.rs and
-zec/test_support.rs may change. All tests and cryptographic/effect semantics remain
-frozen. No execution or integration is authorized. Retain reviewer XHigh.
+The completed three-path source drop retained actual seed/PCZT/transaction owners
+but failed source review on immutable attempt bindings, premature observation
+finalization and early-error misclassification. The
+[grouped correction](../docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md)
+authorizes Grok High to fix only zec/test_support.rs. vault.rs, spend.rs, all tests
+and the other inventory rows stay frozen. No execution or integration is authorized.
+Retain reviewer XHigh for the corrected source review.
 
-Byte wiping is not a claim that ordinary upstream key/proof objects were erased.
-The old synthetic all-classes cleanup test had no valid pipeline coverage; preserve
-it without dummy events or weakened assertions until a real-ownership test contract
-is reviewed. Full typed-secret cleanup, native integration and security acceptance
-remain open. Decoded-effects acceptance and prior valid checks remain in force.
-Implementation and fourteen actor evidence records remain uncommitted; no usable
-send flow is delivered. Active handoff and CURRENT_TASK.md govern scope.
-Launch once, collect after done, never poll.
+The accepted cleanup regression red, decoded-effects acceptance and prior valid
+checks remain in force. The synthetic all-classes cleanup test stays unchanged and
+unaccepted; real lifecycle coverage is still required. Full typed-secret cleanup,
+native integration and security acceptance remain open. Implementation and fourteen
+actor evidence records remain uncommitted; no usable send flow is delivered.
+Active handoff and CURRENT_TASK.md govern scope. Launch once, collect after done,
+never poll.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

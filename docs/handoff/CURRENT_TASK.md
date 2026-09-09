@@ -1,46 +1,43 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS PRODUCTION 01 — GROK, THREE PATHS
-Reviewer: Codex, XHigh; retain XHigh for this production source review
-Authorized source actor: Grok Build, grok-4.6 High, three exact paths only
+State: CLEANUP OBSERVATIONS CORRECTION 01 — GROK, ONE PATH
+Reviewer: Codex, XHigh; retain XHigh for corrected cleanup source review
+Authorized source actor: Grok Build, grok-4.6 High, test_support.rs only
 Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff: [actual buffer cleanup](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md)
+Active handoff: [cleanup completion correction](GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-The cleanup regression red is understood and accepted: exit 101, one failed,
-14 filtered, 1.87s, exactly four invented proof/transaction cleanup entries after
-all real-signer/positive-Seed guards. Hermes session 20260908_203457_d46097,
-outer 29552, is completed and closed. All 33 source/evidence baselines match.
+Grok production session 58a0aeab-a2f5-4298-8fdf-73e8fa2c43f1, outer 90521,
+was collected once after owner done, exit 0, grok-4.6-build High. It is closed.
+The three-path source review retained the actual seed/PCZT/transaction owners
+and removed fabricated producers, but found a compile blocker, premature event
+finalization and early-error misclassification in test_support.rs.
 
-Grok may edit vault.rs (two crate-private ownership helpers), zec/spend.rs
-(actual raw-PCZT owner, removal of pseudo-authority seed copy, triggered-fault
-bookkeeping), and zec/test_support.rs (actual seed owner, per-attempt observation/
-classification, removal of fabricated operational events). All tests stay frozen.
-No cryptographic/effect, capability, dependency, UI, execution or integration change.
-Observed byte wiping must be distinguished from unobserved ordinary upstream drop.
+One grouped correction is authorized in that adapter only. finish records an
+outcome; AttemptOwner Drop alone drains events with panic override. Preserve
+actual early error labels and select success after publication work completes.
+Unexpected labels remain observable. vault.rs, spend.rs, all tests and the other
+32 inventory rows stay frozen. No compiler/test or integration is authorized.
 
-The historical synthetic all-classes wipe test was not valid cleanup evidence;
-removing fabricated events exposes its invalid assumption. Preserve its source;
-no ignore/deletion or dummy events. A genuine ownership test contract remains
-necessary before broader cleanup acceptance. This is not full cleanup acceptance.
+The accepted 1.87s cleanup regression red, decoded-effects acceptance and earlier
+valid checks remain in force. The old synthetic all-classes wipe test remains
+unchanged and unaccepted as cleanup evidence; real lifecycle coverage remains
+necessary. Full typed-secret/native/security work remains open; network/broadcast/
+mainnet/hardware/Monero/Electron send parked.
 
-Decoded-effects acceptance and earlier valid checks remain in force. Implementation
-and fourteen actor evidence records remain uncommitted; no usable send flow is
-delivered. Full typed-secret/native/security work remains open; network/broadcast/
-mainnet/hardware/Monero parked. Keep XHigh for production source review.
+Implementation and fourteen actor evidence records remain uncommitted; no usable
+send flow is delivered. Keep XHigh for the corrected cleanup source review.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_PRODUCTION_01.md only.
+and docs/handoff/GROK_BBD_WAL_009_CLEANUP_OBSERVATIONS_CORRECTION_01.md only.
 Launch once and record session/outer identity. Collect after owner done or explicit
 collection; never poll an actor.
-Launched once from 5d510544: Grok session
-58a0aeab-a2f5-4298-8fdf-73e8fa2c43f1, outer terminal 90521, CLI grok-4.6 High.
-No completion collected. Do not relaunch or poll; collect after owner done.
+Correction actor not yet launched.
 
 ## Historical record (superseded by the active state above)
 
