@@ -151,3 +151,59 @@ automatic relaunch or polling is authorized. All original command, write-scope,
 capture and final-stop rules remain unchanged. Protected parent is the commit
 publishing this resume, with one CURRENT-only reviewer launch commit allowed.
 High is sufficient. No functional signing tests or proofs are authorized.
+
+## Collected diagnostics acceptance — 2026-09-09
+
+ACCEPT the four observed diagnostic outcomes; this is not green acceptance.
+Outer 8844 was collected once on owner done, exit 0, and is closed. Saved runtime
+20260909_092601_7ccfbe records provider nous, model poolside/laguna-s-2.1:free.
+Version result 79785 is Hermes Agent v0.18.2. Initial status 79786 and final source
+status 79799 are clean. Starting/final HEAD results 79787/79801 agree with
+cd4d3f04f376f3b560b55a141b0df827c0c07ef4. Reviewer confirmed no tracked source change;
+the sole untracked path is the diagnostic evidence record.
+
+All four exact command strings ran once, sequentially, in repo-root workdir:
+
+| Diagnostic | Command / result IDs | Exit | Observed result |
+| --- | --- | --- | --- |
+| Formatter check | 79790 / 79791 | 1 | Formatting differences; eight paths visible |
+| No-default library Clippy | 79792 / 79793 | 101 | 15 reported lint errors |
+| Native-ui library Clippy | 79794 / 79795 | 101 | Same 15 plus unused native control geometry |
+| Security-policy CLI | 79796 / 79797 | 1 | Runtime dependencies rejected by package policy |
+
+Clippy outputs are retained (196 and 206 lines). Formatter capture is incomplete:
+49911 characters / 1140 lines retained, with an explicit marker that 16460 characters
+were omitted from 66387 total. The report confuses retained and omitted sizes and
+must not be described as full output. No rerun is required to establish the format
+failure; the later actual formatter/final check will address formatting. Visible
+paths are native_ui/zec_native_app_tests.rs, zec/prepare.rs, zec/spend.rs,
+zec/spend/cleanup_lifecycle_tests.rs, zec/spend/effects.rs,
+zec/spend/verification_context_tests.rs, zec/test_support.rs and
+wallet-broker/tests/zec_sign_verify.rs (src/ prefixes apply to the first seven).
+
+The 16 distinct lint findings are exhausted by three unused items, native control
+geometry, two collapsible conditions, four deliberate long argument lists, explicit
+drop of a non-Drop unified key, three redundant closures, one needless return and
+one len-without-is_empty helper. The bounded source contract is
+GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md. The key lifetime remains explicitly bounded;
+this cleanup must not imply erasure of upstream copies. Existing policy/CI findings
+remain open. The owner has been asked whether the mapping dependencies are intended;
+no dependency removal or policy exception is authorized while that is unresolved.
+
+Evidence write 79802/79803 and final measurement 79804/79805 created
+BBD-WAL-009-CONSOLIDATED-DIAGNOSTICS-01.md: 7270 bytes, SHA-256
+380278a26835d868139ad455041a7d25170dc03171485829f594f91a6d47db74.
+It has 148 newline bytes / 149 logical splitlines (no final newline). The measurement
+was the final tool operation. No functional test, proof, source edit or Git mutation
+occurred. A read-only git log -3 and extra final HEAD query were outside the narrow
+preflight/status list. The report omits IDs, retains a local install path, contains
+contradictory provider prose, and claims full output it does not contain. Actual
+runtime identity and capture limits above supersede that prose. Keep the artifact
+uncommitted; normalize/correct it during the later code-validation integration,
+without a separate report-only actor or repeated diagnostic pass.
+
+Hermes execution is closed. Grok alone is authorized for the fixed five-path Rust
+lint source cleanup. Formatter mutation, further execution and source integration
+require the next reviewer handoff. High is sufficient for this task and review.
+Reviewer publication scope: this handoff, CURRENT_TASK.md, tickets/BBD-WAL-009.md,
+and GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md only.

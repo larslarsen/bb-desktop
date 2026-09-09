@@ -1,23 +1,24 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CONSOLIDATED DIAGNOSTICS RESUME 01 AUTHORIZED
+Status: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP AUTHORIZED
 
-Owner requested continuation after Hermes encountered upstream HTTP 429 before
-any tool call. One fresh Hermes launch may run the unchanged four diagnostics in
-[Resume 01](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#resume-01--owner-requested-continuation-2026-09-09).
-Previous outer 44655 is closed; no diagnostic is being repeated. Source, functional
-tests/proofs, integration and broader work remain unauthorized. CURRENT_TASK.md
-governs the launch and collection. High remains sufficient.
+The four-command diagnostic pass is complete and accepted as findings, not green:
+formatting differences, 15 shared library lints plus one native-ui lint, and package
+policy rejection. Source stayed unchanged; no functional signing test or proof ran.
+[Review and capture limits](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#collected-diagnostics-acceptance--2026-09-09)
+govern the uncommitted report. Hermes outer 8844 is closed.
 
-Partial source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 stays accepted
-and pushed. Existing CI passed build, social and 20 Electron security tests, then
-failed 11 repository-policy tests; subsequent Rust and wallet gates were skipped.
-Package-dependency policy, the Orchard manifest pin and Zcash target order need
-review in the later bounded correction task. No source/policy change is authorized.
+Grok Build High alone may perform the fixed five-path
+[Rust lint cleanup](../docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md).
+No tests, execution, dependencies, policy or source integration are authorized.
+The later formatter and focused validation will be grouped after source acceptance.
+Mapping-dependency intent is pending owner clarification; preserve those inputs.
+High is sufficient. CURRENT_TASK.md governs active scope.
 
-This is not full Phase-A1, wallet or release acceptance. Typed-secret erasure and
-final validation/security remain open; actual broker/Electron/OS integration is
-WAL-011 and usable native/Pay flows are WAL-010. No money-moving feature is enabled.
+Partial source checkpoint 502580fc remains accepted and pushed. Full Phase-A1,
+wallet/release acceptance, upstream typed-secret erasure and final security remain
+open. Actual broker/Electron/OS integration is WAL-011; usable native/Pay flows are
+WAL-010. No money-moving feature is enabled.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

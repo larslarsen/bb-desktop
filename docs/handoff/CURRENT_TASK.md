@@ -1,41 +1,40 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CONSOLIDATED DIAGNOSTICS RESUME 01 RUNNING
-Reviewer: Codex; High suffices for this fixed task
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes, one Resume-01 diagnostics launch only
+State: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP AUTHORIZED
+Reviewer: Codex; High suffices for this fixed task and review
+Authorized source actor: Grok Build, grok-4.6 High, five named paths only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
-Protected parent: commit publishing Resume 01; one CURRENT-only launch commit is allowed
+Protected parent: commit publishing lint cleanup; one CURRENT-only launch commit is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [consolidated diagnostics / Resume 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#resume-01--owner-requested-continuation-2026-09-09)
-Read this prefix and the task's original procedure plus Resume 01. No history reload.
+Active source task: [Rust lint cleanup 01](GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md)
+Accepted findings: [diagnostics review](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#collected-diagnostics-acceptance--2026-09-09)
+Read this prefix and the active source task; no historical handoff reload.
 
-Owner requested continuation. The previous Hermes outer 44655 / runtime
-20260909_090226_2eeaa8 stopped at upstream capacity before any tool call and is
-closed. All four diagnostics remain unrun; worktree is clean and evidence absent.
-Reviewer may launch Hermes once for formatter check, no-default library Clippy,
-native-ui library Clippy and security-policy CLI, exactly as the handoff specifies.
-Collect ordinary findings together; do not repair or rerun commands. No functional
-tests/proofs, source changes, source integration or provider/model changes authorized.
-Hermes launched once from 80a5e8ef; outer session 8844 is active.
-Collect that outer once only on owner done/Continue. Do not poll or relaunch.
-Actual runtime session/provider/model will be verified from saved records on collection.
+Hermes outer 8844 / runtime 20260909_092601_7ccfbe completed and is closed.
+All four diagnostics ran once: formatter 1, no-default Clippy 101 (15 lints),
+native-ui Clippy 101 (16 lints), policy CLI 1 (runtime dependencies rejected).
+Source is unchanged. Diagnostic evidence alone is untracked; its capture/report
+limitations are recorded in the acceptance. No separate report repair or rerun.
 
-Source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 remains accepted and
-pushed. Preserve CI run 34327240542: build/social/20 Electron security checks passed,
-11 policy tests failed, and subsequent wallet/Rust gates were skipped. Its runtime
-package, Orchard pin and target-order findings are in the handoff. No policy
-loosening or dependency removal is authorized by this diagnostics pass.
+Grok may resolve all 16 Rust lint findings in the exact five-path source task.
+No wallet behavior, authority/verification/cleanup semantics, tests, dependencies,
+policy or other paths may change. Execution and formatting are reserved for a
+subsequent combined validation handoff after source review. No functional proofs
+or signing tests are repeated now. Reviewer will launch Grok once; do not poll.
 
-Full Phase-A1/ticket/release acceptance remains open. Typed-secret erasure and
-final validation/security remain outstanding. Runtime/Electron/OS integration is
-WAL-011; usable native/Pay flows are WAL-010. Money-moving features, hardware and
-Monero remain parked. High is sufficient; no reasoning-setting change is needed.
+Mapping-dependency intent was asked asynchronously; pending answer, preserve
+leaflet/maplibre and package policy unchanged. Existing CI's 11 policy failures
+remain open and recorded. Partial source checkpoint 502580fc remains accepted;
+full typed-secret erasure, final validation/security and wallet completion remain
+open. Runtime/Electron/OS is WAL-011; usable native/Pay flows are WAL-010.
+Money-moving features, hardware and Monero remain parked. High is sufficient.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md only.
+docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md and
+docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md only.
 
 ## Historical record (superseded by the active state above)
 
