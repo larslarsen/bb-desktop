@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: MAPPING POLICY SOURCE ACCEPTED — CURRENT SOURCE-POLICY TESTS AUTHORIZED
+State: MAPPING POLICY SOURCE ACCEPTED — CURRENT SOURCE-POLICY TESTS RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; one test file only
 Authorized execution/evidence/integration actors: none
@@ -22,7 +22,8 @@ The policy still expects eight Zcash files instead of the reviewed fourteen and
 rejects two reviewed extraction statements. Grok may update only policy tests for
 that exact current inventory and two narrowly bound statements, preserving every
 other source/authority restriction. Production extension awaits red; existing
-package/policy, Rust, lock and evidence remain frozen. No actor yet launched.
+package/policy, Rust, lock and evidence remain frozen. Grok launched once from
+d72d8dc2; outer 10179; session 67b04d89-3cb5-42d7-8a43-59e8d30be4e9.
 Collect only on owner done/Continue; no polling or automatic relaunch.
 
 Owner decision remains keep MapLibre/remove Leaflet, pinning locked 6.8.0. Full
