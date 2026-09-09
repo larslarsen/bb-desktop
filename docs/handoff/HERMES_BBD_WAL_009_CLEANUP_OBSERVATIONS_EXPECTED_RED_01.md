@@ -155,3 +155,44 @@ tickets/BBD-WAL-009.md only. Launch once; record outer identity; never poll acto
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-EXPECTED-RED-01.md | 196 | a7def01abd54eae10e663e341ce8b253992d883863a1410c93278fa698d78431 |
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-01.md | 165 | fe82cce82ebba2595747a411a5ffd2258d86abed36dc9b3de60517193d4babad |
 | docs/testing/BBD-WAL-009-DECODED-EFFECTS-VALIDATION-RESUME-01.md | 345 | 02d078de8a0269ba2dc41664450965a3eec1036ccb5343db6bb8f90518a64f5a |
+
+## Collected expected red — accepted
+
+Reviewer: Codex, High, applying the previously fixed XHigh regression contract.
+Hermes outer 29552 collected once following owner done, exit 0. Actual runtime
+session 20260908_203457_d46097; completed-session database confirms nous,
+poolside/laguna-s-2.1:free. Version result 79193: v0.18.2 (2026.7.7.2), upstream
+b1f003e1, local 10b6d1a9. Actor is completed and closed.
+
+ACCEPT the understood regression red. Command 79197, launch 79198,
+proc_b7d883627e69 (PID 3500044), completion 79200 exit 101. Full saved log 79202
+contains all 46 reported lines. Test result: 0 passed, 1 failed, 14 filtered,
+1.87s; compilation 2.63s with three recorded dead-code warnings. Final assertion
+at tests/zec_sign_verify.rs:1211:5 reports exactly the four entries specified above.
+The earlier real-signer, zero-prover/extractor, no-publication, released-lock and
+positive-Seed guards all passed. This demonstrates the invented cleanup accounting;
+it does not establish actual key erasure or accept production cleanup.
+
+Preflight result 79196 and postflight 79204 each match all 31 frozen identities.
+Reviewer independently verified those identities unchanged. New evidence record:
+docs/testing/BBD-WAL-009-CLEANUP-OBSERVATIONS-EXPECTED-RED-01.md, 177 lines,
+SHA-256 996f26aeea6b1cb27799200b24258e0e41defaa05505a0ee2b704c60471c2e9e.
+No source/test mutation, retry, additional acceptance command or Git work appears
+in the saved calls. The final evidence measurement 79208 was followed by no tool.
+
+The actor's no-deviations claim is inaccurate. It prefixed both Python inventories
+with rustup run 1.98.0 and appended 2>&1 to the test command. These are recorded
+command deviations; they did not change test arguments, selected test, source or
+observed outcome. Its report omits the test redirection, command/completion/log
+identifiers, changes warning indentation, and retains local absolute paths contrary
+to the normalization instruction. The raw saved log governs. Do not create a
+report-only correction task or rerun the valid red for these reporting differences.
+
+No actor, execution or integration remains authorized. Next: XHigh reviewer fixes
+the production ownership/observer contract before a source actor is launched.
+Remove invented accounting and observe actual owners; do not merely suppress
+unreached counters, relabel exits, or weaken the regression. Distinguish actual
+owned-byte wiping from third-party object drop; do not claim ordinary drop erases
+key memory. Full cleanup/native/security work remains open. The decoded-effects
+acceptance and earlier valid outcomes remain in force. Implementation and fourteen
+actor evidence records remain uncommitted; no usable send flow is delivered.

@@ -1,43 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: CLEANUP OBSERVATIONS EXPECTED RED 01 — HERMES, ONE TEST
-Reviewer: Codex, High for bounded source acceptance and execution collection
+State: CLEANUP OBSERVATIONS RED ACCEPTED — XHIGH PRODUCTION CONTRACT NEXT
+Reviewer: Codex, High for completed collection; XHigh before cleanup architecture
 Authorized source actors: none
-Authorized execution/evidence actor: Hermes, exact expected-red handoff only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and source acceptance: [cleanup expected red](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
-Read this prefix and active handoff; no historical handoff reload.
+Active handoff and accepted red: [cleanup expected red](HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
+Read this prefix and the handoff's collected-expected-red section first.
 
-Grok session 9942d648-4b13-43f6-b241-eab7e337a0c8, outer 49550, collected once
-following owner done, exit 0. One 97-line test appended; original 1118-line prefix
-unchanged, final 1215-line SHA-256
-c95fa9ae836ca7151f35ef92e664dbc569f24b54b1ff4fb8ad78c1fce997a787.
-All other 30 frozen identities match. Source accepted for expected-red execution.
-Grok is completed and closed; its corrected measurement-script error is recorded.
+Hermes outer 29552 collected once after owner done, exit 0. Runtime session
+20260908_203457_d46097, nous/poolside/laguna-s-2.1:free, v0.18.2. Actor is closed.
+Test completion 79200: exit 101, one failed, 14 filtered, 1.87s. Full log 79202
+confirms exactly four forbidden cleanup observations at the final assertion,
+after real-signer, no-prover/extractor and positive-Seed guards passed. All 31
+frozen source/evidence identities match. The intended failure is understood and
+accepted. No source mutation or test retry; report/command deviations are recorded
+without another correction-only actor. No rerun is needed.
 
-Hermes may run the one exact real signer-failure regression and create its named
-evidence. Expected exit 101, one failed, 14 filtered; final assertion must identify
-four spurious ProofWorkspace/ExtractedTransaction touch/wipe events after all
-signer/positive-Seed guards passed. No source mutation, rerun, other test, Git or
-integration. This path stops before expensive proof generation. No result yet.
+Next is XHigh review of the actual-owner cleanup repair contract. Ask the owner to
+return to XHigh before defining or authorizing production changes. The repair must
+replace invented accounting with observations of actual owners and distinguish
+byte wiping from ordinary third-party object drop. Merely hiding events is not a
+fix. Full cleanup/native/security acceptance remains open.
 
 Decoded-effects acceptance and earlier valid checks remain in force. Implementation
-and thirteen prior actor evidence records remain uncommitted. No usable send flow
-is delivered. Full cleanup/native/security acceptance remains open; network,
-broadcast/mainnet/hardware/Monero parked. High is sufficient for next collection;
-flag XHigh before cleanup production architecture/acceptance.
+and fourteen actor evidence records remain uncommitted; no usable send flow is
+delivered. Network/broadcast/mainnet/hardware/Monero parked. No actor is active or
+awaiting collection. Never poll or relaunch a completed actor.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md only.
-Launch once and record outer identity here. Collect after owner done or explicit
-collection; never poll an actor.
-Launched once from e612c5cc via hermes -z with --pass-session-id; outer terminal
-29552. Runtime session/provider/model will be collected with the completed run.
-No completion collected. Do not relaunch or poll; collect after owner done.
 
 ## Historical record (superseded by the active state above)
 

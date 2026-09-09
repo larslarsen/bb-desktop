@@ -1,21 +1,20 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: CLEANUP OBSERVATIONS EXPECTED RED 01 — HERMES, ONE TEST
+Status: CLEANUP OBSERVATIONS RED ACCEPTED — XHIGH PRODUCTION CONTRACT NEXT
 
-The [test-source acceptance and expected-red handoff](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
-accepts Grok's one appended regression. The original test prefix and all other
-frozen identities match. Grok is closed. Hermes may execute the exact regression
-once and write its evidence; no source repair, broader testing or integration.
-Expected red is the final assertion identifying fabricated cleanup observations
-for unreached proof/transaction classes after real-signer and positive-Seed guards.
-The path stops before proof generation. No execution result is claimed yet.
+The [collected expected red](../docs/handoff/HERMES_BBD_WAL_009_CLEANUP_OBSERVATIONS_EXPECTED_RED_01.md)
+is accepted: one failed, 14 filtered, 1.87s. The final assertion reports exactly
+four invented proof/transaction cleanup observations after real-signer and positive
+Seed guards passed. All 31 frozen identities are unchanged. Hermes is completed
+and closed; saved-log/report deviations are recorded without another correction
+cycle. No rerun, source actor, execution or integration is authorized.
 
-Decoded-effects acceptance and prior valid checks remain in force. Full actual-secret
-cleanup, native integration and security acceptance stay open. Implementation and
-thirteen prior actor evidence records remain uncommitted; no usable send flow is
-delivered. High is sufficient for this collection; return to XHigh before cleanup
-production architecture/acceptance. Active handoff and CURRENT_TASK.md govern scope.
-Launch once, collect after done, never poll.
+XHigh review is next to define the actual-owner cleanup repair contract. It must
+replace invented accounting and distinguish owned-byte wiping from third-party
+object drop. Decoded-effects acceptance and prior valid checks remain in force.
+Full actual-secret cleanup, native integration and security acceptance stay open.
+Implementation and fourteen actor evidence records remain uncommitted; no usable
+send flow is delivered. Active handoff and CURRENT_TASK.md govern scope.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
