@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: TRANSPORT SOURCE REVIEWED — FOCUSED GREEN AUTHORIZED
+State: TRANSPORT SOURCE REVIEWED — FOCUSED GREEN RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actors: none; Grok production authorization closed
 Authorized execution/integration actor: Hermes, exact green handoff only
@@ -26,6 +26,8 @@ Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_TRANSPORT_PRODUCTION_01.md,
 docs/handoff/HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md.
 Launch once; collect on owner done/Continue. No actor polling.
+Hermes launched once from 6d57efcb; outer 70919. Verify actual runtime session on
+collection; no polling or relaunch.
 
 ## Historical record (superseded by the active state above)
 
