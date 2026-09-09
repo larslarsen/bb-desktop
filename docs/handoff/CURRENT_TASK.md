@@ -1,41 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: REAL PIPELINE PANIC CORRECTION — GROK TWO SOURCE PATHS
+State: REAL PIPELINE PANIC VALIDATION — HERMES FIVE TEST INVOCATIONS
 Reviewer: Codex, High; no reasoning-setting change requested
-Authorized source actor: Grok Build, grok-4.6 High, exact two-path correction only
-Authorized execution/evidence actors: none
+Authorized source actors: none
+Authorized execution/evidence actor: Hermes, exact validation handoff only
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and red acceptance: [real pipeline panic correction](GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md)
-Read this prefix and active handoff; no historical handoff reload.
+Active handoff: [real pipeline panic validation](HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md)
+Read this prefix, tickets/BBD-WAL-009.md active prefix and active handoff only.
 
-Hermes outer 34696 completed exit 0; session 20260908_232331_f34d0d,
-nous / poolside/laguna-s-2.1:free, v0.18.2. Its single test exited 101,
-1 failed / 15 filtered, at seed_accesses=0 expected=1 after the INTERNAL guard.
-The regression red is accepted; all 37 prior identities remain exact. Command/
-report deviations are recorded in the active handoff, without a rerun or repair actor.
+Grok outer 43249, session 536b2be3-3b69-4f81-91f0-e657b766ba37, completed
+exit 0; saved grok-4.6 High. Five-region/two-path correction passes source review;
+exact reversal and independent region comparison prove every other byte unchanged.
+All 38 identities match the reviewed drop, including all frozen tests/evidence.
 
-Grok may change only the named regions of wallet-broker/src/zec/spend.rs and
-wallet-broker/src/zec/test_support.rs: an explicit panic-after-verification fault,
-unwind-safe observation retention and invalidation, and the existing panic helper
-routed through actual execution. All tests are frozen, including the accepted
-1338-line/16-test integration target. No source/test execution or Git is authorized.
+Hermes may run exactly five test invocations: real pipeline panic green; one
+intentional lock-release failure with guarded temporary spend.rs mutation and
+restoration; six cheap cleanup lifecycle library tests; focused signer-error test;
+and account-lock regression. Only the first two generate proofs. Keep the first
+green valid after exact restoration; no repeated proof-heavy happy-path or full
+suite. One new backup and one evidence record only. No permanent source change,
+formatter, broader execution, Git or integration. Stop on unexpected outcomes.
 
-Implementation and seventeen actor evidence records remain uncommitted. Preserve
-all prior cleanup/signing/decoded-effects acceptance. Full typed-secret erasure,
-real pipeline panic validation, native OS/owning-thread/capability integration and
-final security remain open. Network/broadcast/mainnet/hardware/Monero/Electron send
-stay parked. No full-wallet or usable send-flow acceptance is claimed.
+Implementation and seventeen prior actor evidence records remain uncommitted.
+Prior regression red and cleanup/signing/decoded-effects acceptance remain valid.
+Real pipeline panic runtime remains unverified. Full typed-secret erasure, native
+OS/owning-thread/capability integration and final security stay open. Network/
+broadcast/mainnet/hardware/Monero/Electron send remain parked; no usable send flow.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-and docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md only.
-Launched once from 236901d4: Grok outer terminal 43249, session
-536b2be3-3b69-4f81-91f0-e657b766ba37, requested grok-4.6 High.
-Runtime model/completion remain unverified until collection. Collect once after
-owner done; do not poll or relaunch.
+and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md only.
+Launch once, collect on owner done, never poll. Not launched yet.
 
 ## Historical record (superseded by the active state above)
 

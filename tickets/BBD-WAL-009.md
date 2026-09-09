@@ -1,19 +1,19 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: REAL PIPELINE PANIC CORRECTION — GROK TWO SOURCE PATHS
+Status: REAL PIPELINE PANIC VALIDATION — HERMES FIVE TEST INVOCATIONS
 
-The [active handoff](../docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_SOURCE_01.md)
-accepts the exact missing-pipeline-activity red (1 failed, 15 filtered) and authorizes
-Grok High for the two-source-path correction. The existing panic helper must run
-actual signing/proving/extraction/verification, then unwind before publication.
-Real counters must survive unwind, actual owners/lease must Drop, and authorization
-must be invalidated. Tests, dependencies, other source and execution remain frozen.
+The [active handoff](../docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_VALIDATION_01.md)
+accepts the exact five-region correction and authorizes Hermes alone for real
+panic green, deliberate lock-release failure/restoration, six cleanup unit tests,
+focused signer-error and account-lock regressions. Only two invocations generate
+proofs. No full target or accepted happy-path repetition. All tests remain frozen;
+only the guarded spend.rs fault, one new backup and one evidence record are writable.
 
-The 1338-line/16-test regression target is unchanged. All prior acceptance remains
-valid; no accepted baseline or report-only correction actor is needed. Source and
-seventeen evidence records remain uncommitted. Native integration, full typed-secret
-erasure and final security remain open. High remains sufficient for this bounded
-correction/review. CURRENT_TASK.md governs scope; never poll an actor.
+All 38 reviewed identities match; production source passes review but awaits this
+runtime validation. No source/evidence integration is authorized. Prior accepted
+results remain valid. Implementation and seventeen prior evidence records remain
+uncommitted. Full typed-secret erasure, native integration and final security stay
+open. High remains sufficient. CURRENT_TASK.md governs scope; never poll an actor.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 
