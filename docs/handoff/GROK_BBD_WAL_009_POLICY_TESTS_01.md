@@ -94,3 +94,58 @@ only after source review. No replay of accepted Rust tests/formatter/secret scan
 Stop after the single-file test drop. Report the exact file, logical lines, SHA-256,
 new test groups and residual concern. State no execution or Git occurred. No evidence
 or next task. Reviewer alone accepts and authorizes production after observed red.
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Outer 66797 closed on owner done, exit 0; Grok session
+b0c5ac17-b70d-4f51-a5f4-392a48012d63. The one-file drop is 3649 logical lines,
+SHA-256 812ba42bf440044cc58da45e69ded6913c23f3ba1729157b49f55834c853ff5f.
+Reviewer reconstructed the exact current file from all four unique transcript
+replacements. Frozen production policy/package/lock hashes are unchanged. Transcript
+contains 32 reads, 12 searches, four replacements, three todo updates and two
+identity command batches. Those batches included read-only Git status/HEAD/log
+outside the source actor's no-Git instruction; no Git mutation or execution gate ran.
+
+The three new groups and strict four-entry target neighborhood follow the fixed
+contract. Positive assertions precede negatives, literal oracles are independent,
+and signing rejections cannot be satisfied by unrelated dependency failures.
+Orchard displacement, target move and independent copies are source-reviewed.
+Do not execute this drop yet: its package fixture has a deterministic green blocker.
+wal009PackageJsonWithDependencies asserts its result differs from the actual package,
+including for the valid fixture. Once the package is correctly pinned, that assertion
+would fail before checkPackageJson. Additionally, four existing Pay/RATE package and
+lock-root assertions still require undefined dependencies. The reviewer previously
+froze these as unrelated assertions; the MapLibre decision requires their exact
+inventory transition now. Both findings are test-source defects, not production bugs.
+
+Authorize Grok Build High for one bounded Correction 01 in the same file, from the
+3649-line hash above. Protected parent is the reviewer commit publishing this
+appendix with one subsequent CURRENT-only launch commit allowed. All other source,
+execution and Git mutation remain closed. The previous actor authorization is closed;
+this is one new launch of the following correction only:
+
+1. In wal009PackageJsonWithDependencies remove only the originalDependencies local
+   and its assert.notDeepStrictEqual block. Keep fresh JSON parsing, explicit missing
+   dependency deletion, assignment and serialization. A valid fixture may equal the
+   real package. All negative fixtures are already distinct literal deviations from
+   the independently fixed approved map; keep all their production validator calls,
+   rejection needles and positive-before-negative order.
+2. In the WAL-005 Pay package test and RATE-001 quote-worker package test, change only
+   the two dependencies assertions apiece (package and lock root). Replace strict
+   equality to undefined with deep equality to the literal
+   { 'maplibre-gl': '6.8.0' }. Use literal objects at these sites, not the later
+   WAL009_RUNTIME_DEPENDENCIES const: the custom harness executes Pay before that
+   const is initialized. This continues to reject current Leaflet/range declarations.
+   Preserve Electron/devDependency, script, build, workflow, import and policy calls.
+   Use messages respectively: 'Pay package must retain only the reviewed mapping
+   dependency', 'Pay lock root must retain only the reviewed mapping dependency',
+   'quote worker package must retain only the reviewed mapping dependency', and
+   'quote worker lock root must retain only the reviewed mapping dependency'.
+3. No other test or production change. Report the corrected file identity and stop.
+   No tests, syntax checks, formatting, compiler, scanner, Git command, documentation,
+   network, delegation or integration. Read-only file measurements are sufficient.
+
+The reviewer will collect once on owner done/Continue, then authorize the policy
+expected-red plus missing native-ui Clippy together. No accepted gate is replayed.
+High is sufficient. Reviewer publication scope: this handoff, CURRENT_TASK.md and
+tickets/BBD-WAL-009.md only.

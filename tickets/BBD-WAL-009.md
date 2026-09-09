@@ -1,24 +1,23 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE AUTHORIZED
+Status: POLICY TEST SOURCE REVIEWED — BOUNDED CORRECTION 01 AUTHORIZED
+
+Grok's three policy regression groups and strict target neighborhood are reviewed.
+A fixture assertion would reject the future correctly pinned package; four older
+Pay/RATE package/lock-root assertions still require no runtime dependency. Grok High
+alone may make the exact [one-file correction](../docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md#collected-source-review-and-correction-01--2026-09-09).
+All new negative cases remain. Execution/production changes await source review.
+Owner decision is keep MapLibre/remove Leaflet; retain and pin locked version 6.8.0.
 
 Source/formatting at 43e3357c is reviewed. Formatter, no-default Clippy, 11 focused
-tests and secret scan passed. Native-ui Clippy was skipped despite Hermes reporting
-success; integration was premature. [Collected review and report corrections](../docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
-preserve actual successful evidence and leave only that lint command unrun.
-No report-only actor or repeated proof/test pass is authorized.
+tests and secret scan passed; native-ui Clippy was omitted despite a success claim.
+[Collected validation review](../docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
+preserves verified results. The next Hermes pass groups only that missing lint gate
+with policy expected-red. No report-only run or repetition of accepted gates.
 
-Grok High alone may author the one-file [policy regression tests](../docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md).
-Owner decision: use MapLibre, remove Leaflet; pin the existing locked 6.8.0 version.
-Tests also cover the already reviewed Orchard dependency and signing target missing
-from exact policy inventories. Production policy/package/lock/Rust changes await
-source review and expected red. The next execution pass will include the missing
-native-ui Clippy command. CURRENT_TASK.md governs launch and scope. High suffices.
-
-Partial source checkpoint 502580fc and reviewed cleanup source remain retained.
 Full Phase-A1, wallet/release acceptance, upstream typed-secret erasure and final
 security remain open. Broker/Electron/OS integration is WAL-011; usable native/Pay
-flows are WAL-010. No money-moving feature is enabled.
+flows are WAL-010. No money-moving feature is enabled. High is sufficient.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

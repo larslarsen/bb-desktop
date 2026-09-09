@@ -1,40 +1,36 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE RUNNING
+State: POLICY TEST SOURCE REVIEWED — BOUNDED CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; one test file only
+Authorized source actor: Grok Build, grok-4.6 High; one test file, correction only
 Authorized execution/evidence/integration actors: none
-Protected parent: publishing commit; one CURRENT-only launch allowed
+Protected parent: correction publication; one CURRENT-only launch allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [Exact policy regression tests](GROK_BBD_WAL_009_POLICY_TESTS_01.md)
-Collected review: [Lint validation review](HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
-Read this prefix and active task; no historical reload.
+Active task: [Policy tests Correction 01](GROK_BBD_WAL_009_POLICY_TESTS_01.md#collected-source-review-and-correction-01--2026-09-09)
+Prior validation: [Lint review](HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
+Read this prefix and the active correction; no historical reload.
 
-Hermes outer 14578 / actual session 20260909_103704_48e306 is closed. Source and
-formatting at 43e3357c are reviewed; formatter, no-default Clippy, 10 native-ui tests,
-1 signer-failure test and directory secret scan passed. Native-ui Clippy was NOT RUN,
-despite the report's claim. Integration was premature. Keep the source and valid
-gates; carry only the missing command into the next policy expected-red pass.
-Report identity/capture/appendix errors are corrected in the reviewer appendix;
-no separate report repair or repeat of accepted tests is authorized.
+Grok outer 66797 / session b0c5ac17-b70d-4f51-a5f4-392a48012d63 is closed.
+The one-file policy test drop has a fixture assertion that would reject the correct
+future package. Grok alone may remove that assertion and update four stale Pay/RATE
+package/lock-root assertions to the literal MapLibre-only 6.8.0 map. Keep all three
+new policy groups and other negative tests. No actor yet launched for the correction.
+Launch once; collect only on owner done/Continue; no polling or automatic relaunch.
 
-Grok alone may author exact mapping/Orchard/signing-target policy tests in
- test/securityPolicy.node.js. Production policy, dependencies, locks and Rust remain
-frozen until test-source review and expected red. Owner decision: keep MapLibre,
-remove Leaflet; contract pins the already locked MapLibre 6.8.0. Existing CI policy
-failures remain open. Grok launched once from 7451ebcf. Active outer 66797; session
-b0c5ac17-b70d-4f51-a5f4-392a48012d63. Collect only on owner done/Continue;
-no polling or automatic relaunch.
+Owner decision: keep MapLibre, remove Leaflet. Packages/locks/production policy/Rust
+remain frozen until corrected test-source review and expected red. The next Hermes
+pass groups policy expected-red and the omitted native-ui Clippy. Source/formatting
+at 43e3357c is reviewed; prior formatter, no-default Clippy, 11 focused tests and
+secret scan are retained. No repeat proof/test suite or report-only actor.
 
 Full typed-secret erasure, Phase A1/final validation/security and wallet completion
 remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
 features, hardware and Monero remain parked. High is sufficient.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md and
-docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md only.
+and docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md only.
 
 ## Historical record (superseded by the active state above)
 
