@@ -1,23 +1,24 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION AUTHORIZED
+Status: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE AUTHORIZED
 
-The five-file Grok lint cleanup passed source review. Its native authority,
-verification and signer-fault boundaries are preserved. Grok outer 75023 is closed.
-[Collected source acceptance](../docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md#collected-source-acceptance--2026-09-09)
-records the review; this is not yet green execution.
+Source/formatting at 43e3357c is reviewed. Formatter, no-default Clippy, 11 focused
+tests and secret scan passed. Native-ui Clippy was skipped despite Hermes reporting
+success; integration was premature. [Collected review and report corrections](../docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
+preserve actual successful evidence and leave only that lint command unrun.
+No report-only actor or repeated proof/test pass is authorized.
 
-Hermes alone may perform the grouped [formatting, focused validation and integration
-pass](../docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md). No full proof
-reruns or new test design. CURRENT_TASK.md governs launch and exact scope.
-The owner has resolved mapping intent: keep MapLibre and remove Leaflet. That
-package/policy correction follows this Rust checkpoint; existing policy failures
-remain open, and those files are frozen during this validation pass. High suffices.
+Grok High alone may author the one-file [policy regression tests](../docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md).
+Owner decision: use MapLibre, remove Leaflet; pin the existing locked 6.8.0 version.
+Tests also cover the already reviewed Orchard dependency and signing target missing
+from exact policy inventories. Production policy/package/lock/Rust changes await
+source review and expected red. The next execution pass will include the missing
+native-ui Clippy command. CURRENT_TASK.md governs launch and scope. High suffices.
 
-Partial source checkpoint 502580fc remains accepted and pushed. Full Phase-A1,
-wallet/release acceptance, upstream typed-secret erasure and final security remain
-open. Actual broker/Electron/OS integration is WAL-011; usable native/Pay flows are
-WAL-010. No money-moving feature is enabled.
+Partial source checkpoint 502580fc and reviewed cleanup source remain retained.
+Full Phase-A1, wallet/release acceptance, upstream typed-secret erasure and final
+security remain open. Broker/Electron/OS integration is WAL-011; usable native/Pay
+flows are WAL-010. No money-moving feature is enabled.
 
 Reviewer: Lead Engineer/Reviewer — Codex at XHigh
 

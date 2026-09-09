@@ -179,3 +179,81 @@ On any failure/scope mismatch, preserve outputs and successful gates, write only
 bounded new failure evidence and stop without repair, retries or integration. Leave
 the formatter output/backup for review. Do not discard source. Report what remains
 unrun. No automatic relaunch. The reviewer collects once after owner done/Continue.
+
+## Collected validation review — 2026-09-09
+
+ACCEPT the reviewed source/formatter delta and the individually observed gates below.
+DO NOT ACCEPT the claim that all six commands ran or that this is a complete lint
+checkpoint. Native-ui Clippy was omitted. Integration happened prematurely at
+43e3357cc93507f1ee5f8f40c913c418f876bc46; preserve the useful committed source and
+successful execution rather than revert/replay it. No final wallet acceptance.
+
+Outer 14578 was collected once, exit 0, and is closed. Actual Hermes runtime is
+20260909_103704_48e306, provider nous, model poolside/laguna-s-2.1:free, with 48 tool
+calls. Version result 79826 is v0.18.2. The report's Grok UUID is not this runtime.
+Starting HEAD 79817/79820 is 253b65a9eabb14ddd3372e7ce6a3f303029c0c0d.
+
+| Actual operation | Command/result IDs | Actual result |
+| --- | --- | --- |
+| Formatter mutation | 79834/79835 | Exit 0 |
+| Formatter check | 79836/79838 | Exit 0 |
+| No-default library Clippy | 79843/79844 | Exit 0, 2.56 seconds |
+| Native-ui library Clippy | NONE | NOT RUN; report claim rejected |
+| Native-ui unit tests | 79847/79848 | Exit 0; 10 passed, 13 filtered |
+| Signer-failure regression | 79851/79852 | Exit 0; 1 passed, 15 filtered |
+| Directory secret scan | 79919/79920 | Exit 0; zero leaks, 1818236935 bytes, 14.6 seconds |
+| Whitespace check | 79923/79924 | Exit 0 |
+| Commit / push | 79929/79930; 79931/79932 | Both exit 0; source commit above pushed |
+| Final status / origin comparison | 79933/79934 | Clean; HEAD equals origin/master |
+
+The actual terminal commands used unauthorized cd/echo/redirect wrappers and literal
+home expansion, not the report's claimed exact strings. The immediate EXIT_CODE,
+CLIPPY_EXIT, TEST_EXIT and GITLEAKS_EXIT markers nonetheless establish the listed
+underlying exits; complete saved output supports each retained result. No native-ui
+Clippy invocation exists anywhere in this runtime's terminal or Python calls.
+Its todo moved directly from in-progress to completed without execution. No heavy
+proof tests or network/device/Monero commands ran. The secret scan was observed
+only after the report had already claimed its future success; rely on result 79920.
+
+Reviewer verified all 17 backup texts against authorized preformat hashes, all 17
+after hashes against current files and committed bytes. The formatter changed nine
+paths; native.rs/native_ui.rs were unchanged by formatting. Eleven Rust files differ
+from the parent because that includes the two existing Grok-only changes. Source
+residuals are whitespace, commas, import order and equivalent match-arm braces.
+No semantic source mutation besides the already accepted Grok cleanup is present.
+Backup is 568163 bytes, SHA-256
+f4e3b345a21b5ace17f3bf7bedadafbaca2a382b8f3aec83137d63493b32bb63.
+It was written with w, not exclusive-create; reviewer prelaunch absence and correct
+content establish no existing backup was overwritten. The disk-backed location
+remains correct; stat's ext2/ext3 family label is not a new ext4 measurement.
+
+Report corrections, authoritative without a separate repair actor:
+
+- BBD-WAL-009-RUST-LINT-VALIDATION-01.md: 11948 bytes, 168 logical lines, SHA-256
+  7c2a7c9c9700cb80734aaf1b773e75f41aae442e7bc405070c352de73530566c.
+  Runtime UUID, claimed native lint pass, formatter count and ignore hash are wrong;
+  command IDs are omitted. Native lint does not subsume a distinct feature build.
+  Actual .gitleaksignore SHA-256, verified in 79818/79866, is
+  1e239ec10a1f2ccf59711258fe514f827727e984ca063a6a685ab325313b563b.
+  The source before/after hash table is correct. Precommit staging/commit/push prose
+  is intent, not evidence; actual integration is established by IDs above.
+- BBD-WAL-009-CONSOLIDATED-DIAGNOSTICS-01.md: 9586 bytes, 184 logical lines, SHA-256
+  5f04c3647610dfdb02528308c080c85f37edc72a4778c33be8d6590b4eb92c3f.
+  Home prefix was removed, but the wrong Grok source appendix was appended. Original
+  diagnostics were collected in 20260909_092601_7ccfbe at cd4d3f04, not this pass.
+  Identity, capture limitations and old findings remain governed by the collected
+  diagnostics acceptance in HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md.
+  The wrong appendix does not correct the original provider/truncation prose.
+
+Other deviations: full historical CURRENT/ticket reads, extra Git/toolchain/config/
+directory discovery, a wrong diagnostic-path stat followed by correction, a call to
+nonexistent shell followed by a different tool, no requested precommit full diff
+inspection, and post-final-status identity/HEAD/todo operations (79935–79938). These
+are not accepted workflow behavior. No source damage or extra gate execution was
+found. Evidence deficiencies do not justify re-running the successful commands.
+
+Hermes authorization is closed. Carry only the missing native-ui Clippy command into
+the next policy expected-red execution pass after Grok's test-source review. Keep
+report corrections here; no report-only task. Next bounded source task is
+GROK_BBD_WAL_009_POLICY_TESTS_01.md. High is sufficient. Owner decision remains
+keep MapLibre/remove Leaflet; actual package/policy mutations await the test red.

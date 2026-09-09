@@ -1,35 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION RUNNING
+State: PARTIAL LINT CHECKPOINT REVIEWED — POLICY TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actors: none; Grok drop accepted and source authorization closed
-Authorized execution/evidence/integration actor: Hermes, task below only
-Protected parent: commit publishing this handoff; one CURRENT-only launch is allowed
+Authorized source actor: Grok Build, grok-4.6 High; one test file only
+Authorized execution/evidence/integration actors: none
+Protected parent: publishing commit; one CURRENT-only launch allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active task: [Rust lint validation 01](HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md)
-Source acceptance: [Grok review](GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md#collected-source-acceptance--2026-09-09)
+Active task: [Exact policy regression tests](GROK_BBD_WAL_009_POLICY_TESTS_01.md)
+Collected review: [Lint validation review](HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md#collected-validation-review--2026-09-09)
 Read this prefix and active task; no historical reload.
 
-Grok outer 75023 / session 9aa3e29e-8c84-4cad-9d28-333ab7038ec8 is closed.
-The five-file source cleanup is accepted for validation. Hermes may mechanically
-format the 17 frozen Rust paths, run the two library lint gates and two focused
-existing tests, normalize the old diagnostic report alongside new evidence, scan
-for secrets, and integrate only on success. No full proof rerun. Hermes launched once from 7a714857; active outer 14578. Runtime session will
-be verified at collection. Collect only on owner done/Continue; no polling or relaunch.
+Hermes outer 14578 / actual session 20260909_103704_48e306 is closed. Source and
+formatting at 43e3357c are reviewed; formatter, no-default Clippy, 10 native-ui tests,
+1 signer-failure test and directory secret scan passed. Native-ui Clippy was NOT RUN,
+despite the report's claim. Integration was premature. Keep the source and valid
+gates; carry only the missing command into the next policy expected-red pass.
+Report identity/capture/appendix errors are corrected in the reviewer appendix;
+no separate report repair or repeat of accepted tests is authorized.
 
-Owner decision 2026-09-09: use MapLibre and remove Leaflet. This resolves the pending
-mapping question. Dependency and exact policy corrections are next; this Rust task
-keeps manifests/locks/policy frozen. Existing CI's 11 policy failures remain open.
-Partial source checkpoint 502580fc remains accepted. Full typed-secret erasure,
-Phase A1/final validation/security and wallet completion remain open. Runtime/
-Electron/OS integration is WAL-011; usable native/Pay flows are WAL-010. Money-moving
+Grok alone may author exact mapping/Orchard/signing-target policy tests in
+ test/securityPolicy.node.js. Production policy, dependencies, locks and Rust remain
+frozen until test-source review and expected red. Owner decision: keep MapLibre,
+remove Leaflet; contract pins the already locked MapLibre 6.8.0. Existing CI policy
+failures remain open. No actor yet launched for this task. Launch once; collect
+only on owner done/Continue; no polling or automatic relaunch.
+
+Full typed-secret erasure, Phase A1/final validation/security and wallet completion
+remain open. Runtime/Electron/OS is WAL-011; native/Pay flows are WAL-010. Money-moving
 features, hardware and Monero remain parked. High is sufficient.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md and
-docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md only.
+docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md and
+docs/handoff/GROK_BBD_WAL_009_POLICY_TESTS_01.md only.
 
 ## Historical record (superseded by the active state above)
 
