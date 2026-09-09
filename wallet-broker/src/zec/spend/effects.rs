@@ -1,7 +1,7 @@
+use orchard::Address;
 use orchard::bundle::Authorization as OrchardAuthorization;
 use orchard::keys::{FullViewingKey, Scope};
 use orchard::note::Note;
-use orchard::Address;
 use zcash_keys::address::UnifiedAddress;
 use zcash_keys::keys::UnifiedFullViewingKey;
 use zcash_protocol::consensus::Parameters;
@@ -123,8 +123,8 @@ fn orchard_fvk_for<P: Parameters>(
     params: &P,
     stored_ufvk: &str,
 ) -> Result<FullViewingKey, ZecError> {
-    let ufvk = UnifiedFullViewingKey::decode(params, stored_ufvk)
-        .map_err(|_| ZecError::locked())?;
+    let ufvk =
+        UnifiedFullViewingKey::decode(params, stored_ufvk).map_err(|_| ZecError::locked())?;
     ufvk.orchard().cloned().ok_or_else(ZecError::locked)
 }
 
@@ -182,8 +182,8 @@ pub(super) fn recover_decoded_effects<T: OrchardAuthorization>(
     ironwood: &orchard::Bundle<T, ZatBalance>,
     authority: &TrustedVerificationAuthority,
 ) -> Result<RecoveredEffects, ZecError> {
-    let fee = Zatoshis::try_from(*ironwood.value_balance())
-        .map_err(|_| ZecError::intent_mismatch())?;
+    let fee =
+        Zatoshis::try_from(*ironwood.value_balance()).map_err(|_| ZecError::intent_mismatch())?;
     let external_ovk = authority.fvk().to_ovk(Scope::External);
     let internal_ovk = authority.fvk().to_ovk(Scope::Internal);
     let internal_ivk = authority.fvk().to_ivk(Scope::Internal);
@@ -200,43 +200,39 @@ pub(super) fn recover_decoded_effects<T: OrchardAuthorization>(
             Some((left_note, left_address, left_memo)),
             Some((right_note, right_address, right_memo)),
         ) = (external_outgoing.as_ref(), internal_outgoing.as_ref())
-        {
-            if !same_recovered_note(
+            && !same_recovered_note(
                 left_note,
                 left_address,
                 left_memo,
                 right_note,
                 right_address,
                 right_memo,
-            ) {
-                return Err(ZecError::intent_mismatch());
-            }
+            )
+        {
+            return Err(ZecError::intent_mismatch());
         }
         let outgoing = external_outgoing.or(internal_outgoing);
         if let (
             Some((left_note, left_address, left_memo)),
             Some((right_note, right_address, right_memo)),
         ) = (outgoing.as_ref(), internal_incoming.as_ref())
-        {
-            if !same_recovered_note(
+            && !same_recovered_note(
                 left_note,
                 left_address,
                 left_memo,
                 right_note,
                 right_address,
                 right_memo,
-            ) {
-                return Err(ZecError::intent_mismatch());
-            }
+            )
+        {
+            return Err(ZecError::intent_mismatch());
         }
         if let Some((note, address, memo)) = internal_incoming {
             if change.is_some() {
                 return Err(ZecError::intent_mismatch());
             }
             let value = note.value().inner();
-            if value == 0
-                || authority.fvk().scope_for_address(&address) != Some(Scope::Internal)
-            {
+            if value == 0 || authority.fvk().scope_for_address(&address) != Some(Scope::Internal) {
                 return Err(ZecError::intent_mismatch());
             }
             internal_change_outputs = internal_change_outputs
@@ -248,9 +244,7 @@ pub(super) fn recover_decoded_effects<T: OrchardAuthorization>(
                 return Err(ZecError::intent_mismatch());
             }
             let value = note.value().inner();
-            if value == 0
-                || authority.fvk().scope_for_address(&address) == Some(Scope::Internal)
-            {
+            if value == 0 || authority.fvk().scope_for_address(&address) == Some(Scope::Internal) {
                 return Err(ZecError::intent_mismatch());
             }
             external_outputs = external_outputs
@@ -283,10 +277,7 @@ pub(super) fn recover_decoded_effects<T: OrchardAuthorization>(
     let memo_sha256 = sha256_hex(stripped_memo_bytes(&payment_memo));
     Ok(RecoveredEffects {
         payment_receiver_bytes: payment_address.to_raw_address_bytes().to_vec(),
-        payment_receiver: encode_orchard_unified_address(
-            authority.network(),
-            payment_address,
-        )?,
+        payment_receiver: encode_orchard_unified_address(authority.network(), payment_address)?,
         payment_amount,
         memo_sha256,
         fee,
@@ -341,7 +332,9 @@ pub(super) fn recovered_matches_expectation(
 }
 
 pub(super) fn parse_zatoshis(value: &str) -> Result<Zatoshis, ZecError> {
-    let parsed = value.parse::<u64>().map_err(|_| ZecError::state_corrupt())?;
+    let parsed = value
+        .parse::<u64>()
+        .map_err(|_| ZecError::state_corrupt())?;
     Zatoshis::from_u64(parsed).map_err(|_| ZecError::intent_mismatch())
 }
 
@@ -371,9 +364,7 @@ fn encode_orchard_unified_address(network: Network, address: Address) -> Result<
     let unified = UnifiedAddress::from_receivers(Some(address), None, None)
         .ok_or_else(ZecError::intent_mismatch)?;
     match network {
-        Network::Testnet => {
-            Ok(unified.encode(&zcash_protocol::consensus::Network::TestNetwork))
-        }
+        Network::Testnet => Ok(unified.encode(&zcash_protocol::consensus::Network::TestNetwork)),
         Network::Local(local) => Ok(unified.encode(&local.upstream())),
     }
 }

@@ -49,8 +49,8 @@ struct SignedFixture {
 }
 
 fn signed_fixture(label: &str) -> SignedFixture {
-    let frozen = crate::zec::fixture::FrozenFixture::open(FIXTURE_DIR)
-        .expect("open compact fixture");
+    let frozen =
+        crate::zec::fixture::FrozenFixture::open(FIXTURE_DIR).expect("open compact fixture");
     let validated = frozen
         .validate_complete()
         .expect("validate compact fixture");
@@ -104,9 +104,12 @@ fn signed_fixture(label: &str) -> SignedFixture {
     assert!(pczt.sapling().outputs().is_empty());
     assert!(pczt.orchard().actions().is_empty());
     assert_eq!(pczt.ironwood().actions().len(), 2);
-    let mut unsigned = pczt.ironwood().actions().iter().enumerate().filter_map(
-        |(index, action)| action.spend().spend_auth_sig().is_none().then_some(index),
-    );
+    let mut unsigned = pczt
+        .ironwood()
+        .actions()
+        .iter()
+        .enumerate()
+        .filter_map(|(index, action)| action.spend().spend_auth_sig().is_none().then_some(index));
     let index = unsigned
         .next()
         .expect("exactly one unsigned real Ironwood action");
@@ -115,10 +118,7 @@ fn signed_fixture(label: &str) -> SignedFixture {
         "exactly one unsigned real Ironwood action"
     );
     assert!(
-        pczt.ironwood().actions()[index]
-            .spend()
-            .witness()
-            .is_some(),
+        pczt.ironwood().actions()[index].spend().witness().is_some(),
         "unsigned Ironwood action must be a real spend"
     );
 
@@ -140,8 +140,8 @@ fn signed_fixture(label: &str) -> SignedFixture {
     let signed = signer.finish();
     drop(usk);
 
-    let branch = BranchId::try_from(*signed.global().consensus_branch_id())
-        .expect("pczt consensus branch");
+    let branch =
+        BranchId::try_from(*signed.global().consensus_branch_id()).expect("pczt consensus branch");
     let pool = extract_orchard_spend_auth_signatures(&signed)
         .into_iter()
         .find(|signature| signature.action_index() == index)
@@ -189,8 +189,7 @@ fn decode_complete(bytes: &[u8], branch: BranchId) -> Transaction {
 
 fn ironwood_bundle_bytes(transaction: &Transaction) -> Zeroizing<Vec<u8>> {
     let mut bytes = Zeroizing::new(Vec::new());
-    write_v6_bundle(transaction.ironwood_bundle(), &mut *bytes)
-        .expect("write v6 ironwood bundle");
+    write_v6_bundle(transaction.ironwood_bundle(), &mut *bytes).expect("write v6 ironwood bundle");
     bytes
 }
 
@@ -245,9 +244,7 @@ fn preserves_decoded_v6_ironwood_and_matches_pczt_sighash() {
     assert!(decoded.sapling_bundle().is_none());
     assert!(decoded.orchard_bundle().is_none());
     {
-        let ironwood = decoded
-            .ironwood_bundle()
-            .expect("nonempty ironwood data");
+        let ironwood = decoded.ironwood_bundle().expect("nonempty ironwood data");
         assert_eq!(
             ironwood.bundle_version(),
             orchard::bundle::BundleVersion::ironwood_v3()
@@ -320,11 +317,7 @@ fn rejects_every_present_transparent_bundle() {
         assert!(local.ironwood_bundle().is_some());
         let frozen = local
             .into_data()
-            .map_bundles::<Authorized>(
-                |_| Some(bundle),
-                |sapling| sapling,
-                |orchard| orchard,
-            )
+            .map_bundles::<Authorized>(|_| Some(bundle), |sapling| sapling, |orchard| orchard)
             .freeze()
             .expect("freeze transplanted local fixture");
         let transparent = frozen
@@ -340,7 +333,10 @@ fn rejects_every_present_transparent_bundle() {
             expect_outputs,
             "{label}: output presence"
         );
-        assert!(frozen.ironwood_bundle().is_some(), "{label}: ironwood retained");
+        assert!(
+            frozen.ironwood_bundle().is_some(),
+            "{label}: ironwood retained"
+        );
         reject_present_transparent(frozen);
     }
 }
@@ -350,9 +346,7 @@ fn uses_real_spend_and_binding_signatures() {
     let fixture = signed_fixture("wal009-signatures");
     let decoded = decode_complete(fixture.encoded.as_slice(), BranchId::Nu6_3);
     let (spend_sig, binding_sig) = {
-        let ironwood = decoded
-            .ironwood_bundle()
-            .expect("nonempty ironwood data");
+        let ironwood = decoded.ironwood_bundle().expect("nonempty ironwood data");
         assert_eq!(ironwood.actions().len(), 2);
         (
             <[u8; 64]>::from(ironwood.actions().first().authorization()),
@@ -371,12 +365,7 @@ fn uses_real_spend_and_binding_signatures() {
     assert_eq!(ironwood.actions().len(), 2);
     let mut spend_ok = 0usize;
     for action in ironwood.actions() {
-        assert!(
-            action
-                .rk()
-                .verify(&message, action.authorization())
-                .is_ok()
-        );
+        assert!(action.rk().verify(&message, action.authorization()).is_ok());
         spend_ok += 1;
     }
     assert_eq!(spend_ok, 2);
@@ -499,9 +488,7 @@ fn keeps_proof_verification_independent_of_sighash() {
     let fixture = signed_fixture("wal009-proof");
     let decoded = decode_complete(fixture.encoded.as_slice(), BranchId::Nu6_3);
     let (proof, vk) = {
-        let ironwood = decoded
-            .ironwood_bundle()
-            .expect("nonempty ironwood data");
+        let ironwood = decoded.ironwood_bundle().expect("nonempty ironwood data");
         assert_eq!(ironwood.actions().len(), 2);
         let proof = ironwood.authorization().proof().as_ref();
         assert!(!proof.is_empty());
@@ -527,12 +514,7 @@ fn keeps_proof_verification_independent_of_sighash() {
     let message = mutated_context.shielded_sighash();
     let mut spend_ok = 0usize;
     for action in mutated_ironwood.actions() {
-        assert!(
-            action
-                .rk()
-                .verify(&message, action.authorization())
-                .is_ok()
-        );
+        assert!(action.rk().verify(&message, action.authorization()).is_ok());
         spend_ok += 1;
     }
     assert_eq!(spend_ok, 2);
@@ -560,9 +542,7 @@ fn decoded_effects_reject_agreeing_metadata_that_disagrees_with_signed_bytes() {
     let external_ovk = fixture.orchard_fvk.to_ovk(Scope::External);
     let internal_ovk = fixture.orchard_fvk.to_ovk(Scope::Internal);
     let internal_ivk = fixture.orchard_fvk.to_ivk(Scope::Internal);
-    let ironwood = decoded
-        .ironwood_bundle()
-        .expect("nonempty ironwood data");
+    let ironwood = decoded.ironwood_bundle().expect("nonempty ironwood data");
     let action_count = ironwood.actions().len();
     let value_balance = i64::from(*ironwood.value_balance());
     assert!(value_balance >= 0, "decoded fee must be nonnegative");
@@ -614,8 +594,7 @@ fn decoded_effects_reject_agreeing_metadata_that_disagrees_with_signed_bytes() {
     }
     assert_eq!(accounted, 2);
     assert_eq!(accounted, action_count);
-    let (payment_address, recovered_amount, payment_memo) =
-        payment.expect("one external payment");
+    let (payment_address, recovered_amount, payment_memo) = payment.expect("one external payment");
     let (change_address, change_value, _change_memo) = change.expect("one internal change");
     assert_eq!(recovered_amount, AMOUNT_ZAT);
     assert!(change_value > 0);

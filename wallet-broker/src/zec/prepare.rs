@@ -9,8 +9,8 @@ use zcash_protocol::consensus::Parameters;
 
 use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
-use super::store::{AddressAccount, PreparedBuild};
 use super::spend::{PipelineCalls, SignerViewArtifact, build_signer_view};
+use super::store::{AddressAccount, PreparedBuild};
 use super::{
     AccountId, MAX_DIAGNOSTIC_BYTES, MAX_MEMO_BYTES, MAX_PREPARED_HANDLES, Network, ZecError,
 };
@@ -660,7 +660,10 @@ impl PrepareState {
         if artifact.public.network == "zec-mainnet" {
             return Err(ZecError::network_disabled());
         }
-        if !matches!(artifact.public.network.as_str(), "zec-testnet" | "zec-local") {
+        if !matches!(
+            artifact.public.network.as_str(),
+            "zec-testnet" | "zec-local"
+        ) {
             return Err(ZecError::schema());
         }
         let inspection = artifact
@@ -685,7 +688,10 @@ impl PrepareState {
         Ok(PreparedSigningArtifact {
             raw: artifact.raw.take().ok_or_else(ZecError::state_corrupt)?,
             public: artifact.public,
-            inspection: artifact.inspection.take().ok_or_else(ZecError::state_corrupt)?,
+            inspection: artifact
+                .inspection
+                .take()
+                .ok_or_else(ZecError::state_corrupt)?,
         })
     }
 
@@ -777,10 +783,7 @@ impl PrepareState {
         network: &str,
     ) -> Result<(), ZecError> {
         let mut inner = mutex_lock(&self.inner);
-        let artifact = inner
-            .handles
-            .get_mut(handle)
-            .ok_or_else(ZecError::locked)?;
+        let artifact = inner.handles.get_mut(handle).ok_or_else(ZecError::locked)?;
         let inspection = artifact
             .inspection
             .as_mut()

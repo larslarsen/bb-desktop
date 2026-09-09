@@ -777,7 +777,6 @@ fn account_authorization_lock_is_scoped_and_released_on_every_exit() {
         assert_eq!(harness.account_lock_count(ACCOUNT), 0);
         assert_eq!(harness.observed_calls().broadcast_calls, 0);
     }
-
 }
 
 #[test]
@@ -1266,8 +1265,7 @@ fn real_pipeline_panic_releases_owners_and_never_publishes() {
 
     let calls = harness.observed_calls();
     assert_eq!(
-        calls.seed_accesses,
-        1,
+        calls.seed_accesses, 1,
         "real pipeline panic must access the operation seed"
     );
     assert_eq!(calls.spend_authority_derivations, 1);

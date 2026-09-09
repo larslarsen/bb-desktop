@@ -3,8 +3,8 @@ use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::sync::{Arc, Mutex};
 
 use crate::vault::{WipeEvent, WipeObserver};
-use crate::zec::test_support::cleanup_lifecycle_tests::prepared_artifact;
 use crate::zec::ZecError;
+use crate::zec::test_support::cleanup_lifecycle_tests::prepared_artifact;
 
 use super::{ExtractedTransaction, ObservedSigningArtifact, mutex_lock};
 
@@ -109,10 +109,7 @@ fn pczt_owner_wipes_on_error_and_unwind() {
         reached = true;
         panic!("{INTENDED_PANIC}");
     }));
-    assert!(
-        reached,
-        "label={AUTHORITATIVE_PCZT_LABEL} length={length}"
-    );
+    assert!(reached, "label={AUTHORITATIVE_PCZT_LABEL} length={length}");
     assert!(
         is_intended_panic(result.expect_err("intended panic").as_ref()),
         "label={AUTHORITATIVE_PCZT_LABEL} length={length}"
@@ -138,10 +135,7 @@ fn extracted_owner_wipes_on_error_and_unwind() {
         );
         Err(ZecError::internal())
     })();
-    assert_eq!(
-        error.expect_err("extracted owner error").code(),
-        "INTERNAL"
-    );
+    assert_eq!(error.expect_err("extracted owner error").code(), "INTERNAL");
     assert_single_wipe(&recorder, EXTRACTED_TRANSACTION_LABEL, EXTRACTED_LENGTH);
 
     let recorder = WipeRecorder::new();

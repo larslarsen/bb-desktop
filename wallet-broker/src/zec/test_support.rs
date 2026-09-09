@@ -10,12 +10,12 @@ use sha2::{Digest, Sha256};
 use zcash_keys::address::Address;
 use zcash_protocol::consensus::{BlockHeight, BranchId};
 
-use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 use crate::native::{
-    ActionOrigin, ZecConfirmationCapability, ZecNativeReview,
-    confirm_zec_review_from_method, confirm_zec_review_from_origin,
-    confirm_zec_review_synthetic_test_surface, replay_consumed_confirmation,
+    ActionOrigin, ZecConfirmationCapability, ZecNativeReview, confirm_zec_review_from_method,
+    confirm_zec_review_from_origin, confirm_zec_review_synthetic_test_surface,
+    replay_consumed_confirmation,
 };
+use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
 use super::address::{self, DecodedReceiver, SeedExit};
 use super::fixture;
@@ -943,6 +943,10 @@ impl TestAccount {
 }
 
 impl SignVerifyHarness {
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "reviewed authority/verification/fault inputs deliberately remain explicit"
+    )]
     fn execute(
         &mut self,
         handle: &str,
@@ -977,7 +981,7 @@ impl SignVerifyHarness {
                     .prepare
                     .revalidate_after_sign(&outcome.review, &clock.value);
                 self.finish_failed_pipeline(outcome, WipeExit::Cancellation);
-                return revalidated.and(Err(ZecError::cancelled()));
+                revalidated.and(Err(ZecError::cancelled()))
             }
             Some(BarrierMutation::ClockAfterSignAndProof(now)) => {
                 self.calls.post_sign_clock_reads =
@@ -1021,7 +1025,9 @@ impl SignVerifyHarness {
         if route == SignRoute::ProductionHardware {
             let denied = spend::production_hardware_denied();
             if let Some(account) = self.accounts.get(&account_id) {
-                account.prepare.invalidate(HandleInvalidation::OperationError);
+                account
+                    .prepare
+                    .invalidate(HandleInvalidation::OperationError);
             }
             self.destroy_installed_canary(TouchedSecretClass::ConfirmationCapability);
             return denied.and(Err(ZecError::capability_missing()));
@@ -1029,12 +1035,16 @@ impl SignVerifyHarness {
         if self.mode != HarnessMode::Software {
             return Err(ZecError::capability_missing());
         }
-        let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+        let account = self
+            .accounts
+            .get(&account_id)
+            .ok_or_else(ZecError::schema)?;
         if account.prepare.is_viewing_only() {
             return Err(ZecError::watch_only());
         }
         self.calls.seed_accesses = self.calls.seed_accesses.saturating_add(1);
-        self.calls.spend_authority_derivations = self.calls.spend_authority_derivations.saturating_add(1);
+        self.calls.spend_authority_derivations =
+            self.calls.spend_authority_derivations.saturating_add(1);
         let seed = account.prepare.seed_copy()?;
         let mut attempt = AttemptOwner::new(self.observations.clone());
         let seed_owner = seed.into_observed("zec-operation-seed", Box::new(attempt.collector()));
@@ -1090,9 +1100,14 @@ impl SignVerifyHarness {
             }),
             Err(error) => {
                 if let Some(account) = self.accounts.get(&account_id) {
-                    account.prepare.invalidate(HandleInvalidation::OperationError);
+                    account
+                        .prepare
+                        .invalidate(HandleInvalidation::OperationError);
                 }
-                attempt.finish(wipe_exit_for_error(&error, pipeline_calls.triggered_fault()));
+                attempt.finish(wipe_exit_for_error(
+                    &error,
+                    pipeline_calls.triggered_fault(),
+                ));
                 Err(error)
             }
         }
@@ -1114,7 +1129,10 @@ impl SignVerifyHarness {
         if self.mode != HarnessMode::SyntheticKeystone {
             return Err(ZecError::capability_missing());
         }
-        let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+        let account = self
+            .accounts
+            .get(&account_id)
+            .ok_or_else(ZecError::schema)?;
         let stored_ufvk = account.account.viewing_key_binding()?;
         let network = account.account.network();
         let artifact = account.prepare.consume(&review, &clock.value)?;
@@ -1135,7 +1153,10 @@ impl SignVerifyHarness {
         let effects = match result {
             Ok(effects) => effects,
             Err(error) => {
-                attempt.finish(wipe_exit_for_error(&error, pipeline_calls.triggered_fault()));
+                attempt.finish(wipe_exit_for_error(
+                    &error,
+                    pipeline_calls.triggered_fault(),
+                ));
                 return Err(error);
             }
         };
@@ -1190,7 +1211,9 @@ impl SignVerifyHarness {
         let transaction_id = outcome.effects.derived_transaction_id.clone();
         self.touch_canaries();
         if let Some(account) = self.accounts.get(&outcome.review.public.account_id) {
-            account.prepare.invalidate(HandleInvalidation::OperationError);
+            account
+                .prepare
+                .invalidate(HandleInvalidation::OperationError);
         }
         self.verified.insert(handle.clone(), outcome.effects);
         self.calls.verified_publications = self.calls.verified_publications.saturating_add(1);
@@ -1209,12 +1232,18 @@ impl SignVerifyHarness {
     fn finish_failed_pipeline(&mut self, mut outcome: PipelineOutcome, exit: WipeExit) {
         outcome.attempt.finish(exit);
         if let Some(account) = self.accounts.get(&outcome.review.public.account_id) {
-            account.prepare.invalidate(HandleInvalidation::OperationError);
+            account
+                .prepare
+                .invalidate(HandleInvalidation::OperationError);
         }
         self.touch_canaries();
     }
 
-    fn validate_confirmation(&self, handle: &str, confirmation: &TestConfirmation) -> Result<(), ZecError> {
+    fn validate_confirmation(
+        &self,
+        handle: &str,
+        confirmation: &TestConfirmation,
+    ) -> Result<(), ZecError> {
         capability_matches(handle, &confirmation.review, &confirmation.capability)
     }
 
@@ -1243,7 +1272,10 @@ impl SignVerifyHarness {
     fn find_review(&self, handle: &str, now: &str) -> Result<(String, PreparedReview), ZecError> {
         for (account_id, account) in &self.accounts {
             if account.prepare.contains(handle) {
-                return account.prepare.review(handle, now).map(|review| (account_id.clone(), review));
+                return account
+                    .prepare
+                    .review(handle, now)
+                    .map(|review| (account_id.clone(), review));
             }
         }
         Err(ZecError::locked())
@@ -1254,15 +1286,36 @@ impl SignVerifyHarness {
     }
 
     fn merge_pipeline_calls(&mut self, calls: &PipelineCalls) {
-        self.calls.authoritative_pczt_accesses = self.calls.authoritative_pczt_accesses.saturating_add(calls.authoritative_pczt_accesses);
+        self.calls.authoritative_pczt_accesses = self
+            .calls
+            .authoritative_pczt_accesses
+            .saturating_add(calls.authoritative_pczt_accesses);
         self.calls.signer_calls = self.calls.signer_calls.saturating_add(calls.signer_calls);
         self.calls.prover_calls = self.calls.prover_calls.saturating_add(calls.prover_calls);
-        self.calls.finalizer_calls = self.calls.finalizer_calls.saturating_add(calls.finalizer_calls);
-        self.calls.extractor_calls = self.calls.extractor_calls.saturating_add(calls.extractor_calls);
-        self.calls.independent_decoder_calls = self.calls.independent_decoder_calls.saturating_add(calls.independent_decoder_calls);
-        self.calls.verifier_calls = self.calls.verifier_calls.saturating_add(calls.verifier_calls);
-        self.calls.external_contributions_applied = self.calls.external_contributions_applied.saturating_add(calls.external_contributions_applied);
-        self.calls.external_signatures_verified = self.calls.external_signatures_verified.saturating_add(calls.external_signatures_verified);
+        self.calls.finalizer_calls = self
+            .calls
+            .finalizer_calls
+            .saturating_add(calls.finalizer_calls);
+        self.calls.extractor_calls = self
+            .calls
+            .extractor_calls
+            .saturating_add(calls.extractor_calls);
+        self.calls.independent_decoder_calls = self
+            .calls
+            .independent_decoder_calls
+            .saturating_add(calls.independent_decoder_calls);
+        self.calls.verifier_calls = self
+            .calls
+            .verifier_calls
+            .saturating_add(calls.verifier_calls);
+        self.calls.external_contributions_applied = self
+            .calls
+            .external_contributions_applied
+            .saturating_add(calls.external_contributions_applied);
+        self.calls.external_signatures_verified = self
+            .calls
+            .external_signatures_verified
+            .saturating_add(calls.external_signatures_verified);
     }
 
     fn destroy_installed_canary(&mut self, class: TouchedSecretClass) {
@@ -1372,9 +1425,7 @@ struct AttemptWipeCollector {
 impl AttemptWipeCollector {
     fn new() -> Self {
         Self {
-            inner: Arc::new(Mutex::new(AttemptWipeState {
-                events: Vec::new(),
-            })),
+            inner: Arc::new(Mutex::new(AttemptWipeState { events: Vec::new() })),
         }
     }
 }
@@ -1491,18 +1542,29 @@ pub struct IndependentEffects {
 impl From<&VerifiedEffects> for IndependentEffects {
     fn from(value: &VerifiedEffects) -> Self {
         Self {
-            network: value.network.clone(), mainnet: value.mainnet,
-            transaction_version: value.transaction_version, consensus_branch: value.consensus_branch,
-            external_receiver_bytes: value.external_receiver_bytes.clone(), external_receiver: value.external_receiver.clone(),
-            external_amount_zat: value.external_amount_zat.clone(), fee_zat: value.fee_zat.clone(),
-            fee_bound_zat: value.fee_bound_zat.clone(), fee_zat_u64: value.fee_zat_u64,
-            fee_bound_zat_u64: value.fee_bound_zat_u64, memo_sha256: value.memo_sha256.clone(),
-            request_id_binding: value.request_id_binding.clone(), intent_hash_binding: value.intent_hash_binding.clone(),
-            ironwood_real_spends: value.ironwood_real_spends, ironwood_external_outputs: value.ironwood_external_outputs,
+            network: value.network.clone(),
+            mainnet: value.mainnet,
+            transaction_version: value.transaction_version,
+            consensus_branch: value.consensus_branch,
+            external_receiver_bytes: value.external_receiver_bytes.clone(),
+            external_receiver: value.external_receiver.clone(),
+            external_amount_zat: value.external_amount_zat.clone(),
+            fee_zat: value.fee_zat.clone(),
+            fee_bound_zat: value.fee_bound_zat.clone(),
+            fee_zat_u64: value.fee_zat_u64,
+            fee_bound_zat_u64: value.fee_bound_zat_u64,
+            memo_sha256: value.memo_sha256.clone(),
+            request_id_binding: value.request_id_binding.clone(),
+            intent_hash_binding: value.intent_hash_binding.clone(),
+            ironwood_real_spends: value.ironwood_real_spends,
+            ironwood_external_outputs: value.ironwood_external_outputs,
             ironwood_internal_change_outputs: value.ironwood_internal_change_outputs,
-            transparent_effects: value.transparent_effects, sapling_effects: value.sapling_effects,
-            orchard_effects: value.orchard_effects, proof_present: value.proof_present,
-            proof_valid: value.proof_valid, spend_authorization_present: value.spend_authorization_present,
+            transparent_effects: value.transparent_effects,
+            sapling_effects: value.sapling_effects,
+            orchard_effects: value.orchard_effects,
+            proof_present: value.proof_present,
+            proof_valid: value.proof_valid,
+            spend_authorization_present: value.spend_authorization_present,
             spend_authorization_valid: value.spend_authorization_valid,
             binding_signature_present: value.binding_signature_present,
             binding_signature_valid: value.binding_signature_valid,
@@ -1565,16 +1627,31 @@ fn capability_matches(
     Ok(())
 }
 
-fn reviewed_view(review: &PreparedReview, artifact: SignerViewArtifact, network: Network) -> ReviewedSignerView {
+fn reviewed_view(
+    review: &PreparedReview,
+    artifact: SignerViewArtifact,
+    network: Network,
+) -> ReviewedSignerView {
     let randomized_key = spend::hex(&artifact.randomized_key);
     ReviewedSignerView {
-        route: "keystone_pczt_v2", pczt_encoding_version: 2, batch_len: 1,
-        batch_id: review.review_hash[..32].to_owned(), intent_hash: review.public.intent_hash.clone(),
-        review_hash: review.review_hash.clone(), network: review.public.network.clone(),
+        route: "keystone_pczt_v2",
+        pczt_encoding_version: 2,
+        batch_len: 1,
+        batch_id: review.review_hash[..32].to_owned(),
+        intent_hash: review.public.intent_hash.clone(),
+        review_hash: review.review_hash.clone(),
+        network: review.public.network.clone(),
         transaction_version: review.inspection.transaction_version,
-        consensus_branch: review.inspection.consensus_branch, signing_pool: "ironwood",
-        actions: vec![ReviewedSignerAction { pool: "ironwood", action_index: artifact.action_index, randomized_key, intent_hash: review.public.intent_hash.clone() }],
-        artifact, network_value: network,
+        consensus_branch: review.inspection.consensus_branch,
+        signing_pool: "ironwood",
+        actions: vec![ReviewedSignerAction {
+            pool: "ironwood",
+            action_index: artifact.action_index,
+            randomized_key,
+            intent_hash: review.public.intent_hash.clone(),
+        }],
+        artifact,
+        network_value: network,
     }
 }
 
@@ -1592,29 +1669,37 @@ fn wipe_exit_for_fault(fault: FaultPoint) -> WipeExit {
 fn prepared_commitment(review: &PreparedReview) -> String {
     let mut hasher = Sha256::new();
     for value in [
-        review.public.network.as_bytes(), review.public.receiver.as_bytes(),
-        review.public.amount_zat.as_bytes(), review.public.fee_zat.as_bytes(),
-        review.public.fee_bound_zat.as_bytes(), review.inspection.memo_sha256.as_bytes(),
-        review.public.request_id.as_bytes(), review.public.intent_hash.as_bytes(),
-    ] { hasher.update((value.len() as u64).to_le_bytes()); hasher.update(value); }
+        review.public.network.as_bytes(),
+        review.public.receiver.as_bytes(),
+        review.public.amount_zat.as_bytes(),
+        review.public.fee_zat.as_bytes(),
+        review.public.fee_bound_zat.as_bytes(),
+        review.inspection.memo_sha256.as_bytes(),
+        review.public.request_id.as_bytes(),
+        review.public.intent_hash.as_bytes(),
+    ] {
+        hasher.update((value.len() as u64).to_le_bytes());
+        hasher.update(value);
+    }
     spend::hex(&hasher.finalize())
 }
 
 fn prepared_commitment_from_effects(effects: &VerifiedEffects) -> String {
     let mut hasher = Sha256::new();
     for value in [
-        effects.network.as_bytes(), effects.external_receiver.as_bytes(),
-        effects.external_amount_zat.as_bytes(), effects.fee_zat.as_bytes(),
-        effects.fee_bound_zat.as_bytes(), effects.memo_sha256.as_bytes(),
-        effects.request_id_binding.as_bytes(), effects.intent_hash_binding.as_bytes(),
-    ] { hasher.update((value.len() as u64).to_le_bytes()); hasher.update(value); }
+        effects.network.as_bytes(),
+        effects.external_receiver.as_bytes(),
+        effects.external_amount_zat.as_bytes(),
+        effects.fee_zat.as_bytes(),
+        effects.fee_bound_zat.as_bytes(),
+        effects.memo_sha256.as_bytes(),
+        effects.request_id_binding.as_bytes(),
+        effects.intent_hash_binding.as_bytes(),
+    ] {
+        hasher.update((value.len() as u64).to_le_bytes());
+        hasher.update(value);
+    }
     spend::hex(&hasher.finalize())
-}
-
-fn timestamp_for_test(value: &str) -> Result<u64, ZecError> {
-    let digits = value.bytes().filter(|byte| byte.is_ascii_digit()).collect::<Vec<_>>();
-    if digits.len() != 14 { return Err(ZecError::schema()); }
-    core::str::from_utf8(&digits).map_err(|_| ZecError::schema())?.parse().map_err(|_| ZecError::schema())
 }
 
 impl TestAccount {
@@ -3476,21 +3561,50 @@ impl SignVerifyCanaries {
         receiver: &str,
         memo: &str,
     ) -> Result<Self, ZecError> {
-        if [seed, derived_key, pczt, transaction, signature, receiver, memo]
-            .iter()
-            .any(|value| value.is_empty())
+        if [
+            seed,
+            derived_key,
+            pczt,
+            transaction,
+            signature,
+            receiver,
+            memo,
+        ]
+        .iter()
+        .any(|value| value.is_empty())
         {
             return Err(ZecError::schema());
         }
         Ok(Self {
             values: vec![
-                SignVerifyCanaryValue { class: TouchedSecretClass::Seed, value: seed.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::DerivedAuthorizingKey, value: derived_key.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::AuthoritativePczt, value: pczt.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::ExtractedTransaction, value: transaction.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::SignatureContribution, value: signature.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::SignerView, value: receiver.to_owned() },
-                SignVerifyCanaryValue { class: TouchedSecretClass::ProofWorkspace, value: memo.to_owned() },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::Seed,
+                    value: seed.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::DerivedAuthorizingKey,
+                    value: derived_key.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::AuthoritativePczt,
+                    value: pczt.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::ExtractedTransaction,
+                    value: transaction.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::SignatureContribution,
+                    value: signature.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::SignerView,
+                    value: receiver.to_owned(),
+                },
+                SignVerifyCanaryValue {
+                    class: TouchedSecretClass::ProofWorkspace,
+                    value: memo.to_owned(),
+                },
             ],
         })
     }
@@ -3511,7 +3625,14 @@ pub struct VerifiedZecV1 {
 
 impl VerifiedZecV1 {
     pub fn field_names(&self) -> [&'static str; 6] {
-        ["handle", "transaction_id", "state", "account_id", "request_id", "broadcastable"]
+        [
+            "handle",
+            "transaction_id",
+            "state",
+            "account_id",
+            "request_id",
+            "broadcastable",
+        ]
     }
 
     pub fn sanitized_json_for_test(&self) -> String {
@@ -3578,11 +3699,26 @@ pub struct ReviewedSignerView {
 
 impl ReviewedSignerView {
     pub fn field_names(&self) -> [&'static str; 10] {
-        ["route", "pczt_encoding_version", "batch_id", "intent_hash", "review_hash", "network", "transaction_version", "consensus_branch", "signing_pool", "actions"]
+        [
+            "route",
+            "pczt_encoding_version",
+            "batch_id",
+            "intent_hash",
+            "review_hash",
+            "network",
+            "transaction_version",
+            "consensus_branch",
+            "signing_pool",
+            "actions",
+        ]
     }
 
-    pub fn raw_pczt_bytes(&self) -> usize { 0 }
-    pub fn transaction_bytes(&self) -> usize { 0 }
+    pub fn raw_pczt_bytes(&self) -> usize {
+        0
+    }
+    pub fn transaction_bytes(&self) -> usize {
+        0
+    }
 }
 
 pub struct ReviewedSignerBatch {
@@ -3603,9 +3739,15 @@ pub struct ExternalContribution {
 }
 
 impl ExternalContribution {
-    pub fn signature_bytes(&self) -> &[u8; 64] { self.inner.signature.signature() }
-    pub fn signed_action_index_for_test(&self) -> usize { self.inner.signature.action_index() }
-    pub fn is_unmistakably_test_only(&self) -> bool { self.test_only }
+    pub fn signature_bytes(&self) -> &[u8; 64] {
+        self.inner.signature.signature()
+    }
+    pub fn signed_action_index_for_test(&self) -> usize {
+        self.inner.signature.action_index()
+    }
+    pub fn is_unmistakably_test_only(&self) -> bool {
+        self.test_only
+    }
 }
 
 pub struct ExternalContributions {
@@ -3615,8 +3757,15 @@ pub struct ExternalContributions {
 }
 
 impl ExternalContributions {
-    pub fn route(&self) -> &str { &self.route }
-    pub fn len(&self) -> usize { self.entries.len() }
+    pub fn route(&self) -> &str {
+        &self.route
+    }
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
 
     pub fn with_mutation_for_test(
         mut self,
@@ -3648,18 +3797,26 @@ impl ExternalContributions {
                 }
             }
             ExternalContributionMutation::WrongPool => {
-                if let Some(first) = self.entries.first_mut() { first.pool = "orchard".to_owned(); }
+                if let Some(first) = self.entries.first_mut() {
+                    first.pool = "orchard".to_owned();
+                }
             }
             ExternalContributionMutation::WrongActionIndex => {
-                if let Some(first) = self.entries.first_mut() { first.action_index += 1; }
+                if let Some(first) = self.entries.first_mut() {
+                    first.action_index += 1;
+                }
             }
             ExternalContributionMutation::WrongRandomizedKey => {
-                if let Some(first) = self.entries.first_mut() { first.randomized_key = "ff".repeat(32); }
+                if let Some(first) = self.entries.first_mut() {
+                    first.randomized_key = "ff".repeat(32);
+                }
             }
             ExternalContributionMutation::Replayed => self.replayed = true,
             ExternalContributionMutation::Reordered => self.entries.reverse(),
             ExternalContributionMutation::CrossIntent => {
-                if let Some(first) = self.entries.first_mut() { first.intent_hash = other_intent.to_owned(); }
+                if let Some(first) = self.entries.first_mut() {
+                    first.intent_hash = other_intent.to_owned();
+                }
             }
         }
         self
@@ -3668,7 +3825,9 @@ impl ExternalContributions {
 
 impl core::ops::Index<usize> for ExternalContributions {
     type Output = ExternalContribution;
-    fn index(&self, index: usize) -> &Self::Output { &self.entries[index] }
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.entries[index]
+    }
 }
 
 pub struct SyntheticKeystoneV2;
@@ -3691,7 +3850,9 @@ impl SyntheticKeystoneV2 {
         })
     }
 
-    pub fn sign_batch_for_test(batch: &ReviewedSignerBatch) -> Result<ExternalContributions, ZecError> {
+    pub fn sign_batch_for_test(
+        batch: &ReviewedSignerBatch,
+    ) -> Result<ExternalContributions, ZecError> {
         let mut entries = Vec::with_capacity(batch.entries.len());
         for view in &batch.entries {
             let tagged = spend::synthetic_sign_view(&view.artifact, view.network_value)?;
@@ -3705,7 +3866,11 @@ impl SyntheticKeystoneV2 {
                 test_only: true,
             });
         }
-        Ok(ExternalContributions { route: "keystone_pczt_v2".to_owned(), entries, replayed: false })
+        Ok(ExternalContributions {
+            route: "keystone_pczt_v2".to_owned(),
+            entries,
+            replayed: false,
+        })
     }
 }
 
@@ -3838,7 +4003,10 @@ impl SignVerifyHarness {
         if self.accounts.contains_key(&key) {
             return Err(ZecError::schema());
         }
-        self.accounts.insert(key, Self::new_sign_account(&self.root, account_id, fixture, false)?);
+        self.accounts.insert(
+            key,
+            Self::new_sign_account(&self.root, account_id, fixture, false)?,
+        );
         Ok(())
     }
 
@@ -3851,18 +4019,32 @@ impl SignVerifyHarness {
         if self.accounts.contains_key(&key) {
             return Err(ZecError::schema());
         }
-        self.accounts.insert(key, Self::new_sign_account(&self.root, account_id, fixture, true)?);
+        self.accounts.insert(
+            key,
+            Self::new_sign_account(&self.root, account_id, fixture, true)?,
+        );
         Ok(())
     }
 
     pub fn scan(&mut self, fixture: &FrozenFixture) -> Result<(), ZecError> {
-        let account = self.accounts.get(&self.primary_account).ok_or_else(ZecError::state_corrupt)?;
-        account.account.scan_fixture(&fixture.inner.validate_complete()?, ScanRequest::Canonical)
+        let account = self
+            .accounts
+            .get(&self.primary_account)
+            .ok_or_else(ZecError::state_corrupt)?;
+        account
+            .account
+            .scan_fixture(&fixture.inner.validate_complete()?, ScanRequest::Canonical)
     }
 
-    pub fn scan_account(&mut self, account_id: &str, fixture: &FrozenFixture) -> Result<(), ZecError> {
+    pub fn scan_account(
+        &mut self,
+        account_id: &str,
+        fixture: &FrozenFixture,
+    ) -> Result<(), ZecError> {
         let account = self.accounts.get(account_id).ok_or_else(ZecError::schema)?;
-        account.account.scan_fixture(&fixture.inner.validate_complete()?, ScanRequest::Canonical)
+        account
+            .account
+            .scan_fixture(&fixture.inner.validate_complete()?, ScanRequest::Canonical)
     }
 
     pub fn unlock_with_fixture_seed(&mut self) -> Result<(), ZecError> {
@@ -3883,8 +4065,13 @@ impl SignVerifyHarness {
         clock: &mut ManualClock,
     ) -> Result<PreparedZecV1, ZecError> {
         let account_id = input.account_id.clone();
-        let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
-        account.prepare.prepare(&account.account, input, None, &clock.value)
+        let account = self
+            .accounts
+            .get(&account_id)
+            .ok_or_else(ZecError::schema)?;
+        account
+            .prepare
+            .prepare(&account.account, input, None, &clock.value)
     }
 
     pub fn confirm_native(
@@ -3894,8 +4081,8 @@ impl SignVerifyHarness {
     ) -> Result<TestConfirmation, ZecError> {
         let (_account_id, review) = self.find_review(handle, &clock.value)?;
         let stored = native_review(&review);
-        let capability = confirm_zec_review_synthetic_test_surface(stored)
-            .map_err(|_| ZecError::unauth())?;
+        let capability =
+            confirm_zec_review_synthetic_test_surface(stored).map_err(|_| ZecError::unauth())?;
         if !capability.came_from_synthetic_test_surface() || capability.nonce_len() != 32 {
             return Err(ZecError::unauth());
         }
@@ -3958,7 +4145,9 @@ impl SignVerifyHarness {
             ConfirmationMutation::Fee => presented.fee_zat = "1".to_owned(),
             ConfirmationMutation::FeeBound => presented.fee_bound_zat = "1".to_owned(),
             ConfirmationMutation::MemoHash => presented.memo_sha256 = "cc".repeat(32),
-            ConfirmationMutation::Expiry => presented.expires_at = "2026-08-30T12:15:01Z".to_owned(),
+            ConfirmationMutation::Expiry => {
+                presented.expires_at = "2026-08-30T12:15:01Z".to_owned()
+            }
         }
         if stored != presented {
             return Err(ZecError::intent_mismatch());
@@ -3983,11 +4172,7 @@ impl SignVerifyHarness {
         route: SignRoute,
         clock: &mut ManualClock,
     ) -> Result<SignVerifyReceipt, ZecError> {
-        let marker = confirmation
-            .capability
-            .nonce_len()
-            .to_le_bytes()
-            .to_vec();
+        let marker = confirmation.capability.nonce_len().to_le_bytes().to_vec();
         let verified = self.sign_and_verify(handle, confirmation, route, clock)?;
         self.consumed_confirmations.insert(marker.clone());
         Ok(SignVerifyReceipt {
@@ -4014,45 +4199,69 @@ impl SignVerifyHarness {
         let account_id = confirmation.review.public.account_id.clone();
         match prerequisite {
             SignVerifyPrerequisite::WrongSeed => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
-                account
-                    .prepare
-                    .replace_seed(SecretBytes::new(vec![1; 32]).map_err(|_| ZecError::internal())?)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
+                account.prepare.replace_seed(
+                    SecretBytes::new(vec![1; 32]).map_err(|_| ZecError::internal())?,
+                )?;
             }
             SignVerifyPrerequisite::WrongFullViewingKey => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
-                account
-                    .prepare
-                    .replace_seed(SecretBytes::new(vec![2; 32]).map_err(|_| ZecError::internal())?)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
+                account.prepare.replace_seed(
+                    SecretBytes::new(vec![2; 32]).map_err(|_| ZecError::internal())?,
+                )?;
             }
             SignVerifyPrerequisite::WrongAccount => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
-                account
-                    .prepare
-                    .replace_seed(SecretBytes::new(vec![3; 32]).map_err(|_| ZecError::internal())?)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
+                account.prepare.replace_seed(
+                    SecretBytes::new(vec![3; 32]).map_err(|_| ZecError::internal())?,
+                )?;
             }
             SignVerifyPrerequisite::Locked => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
                 account.prepare.invalidate(HandleInvalidation::Lock);
             }
             SignVerifyPrerequisite::WatchOnly => {
-                let account = self.accounts.get_mut(&account_id).ok_or_else(ZecError::schema)?;
+                let account = self
+                    .accounts
+                    .get_mut(&account_id)
+                    .ok_or_else(ZecError::schema)?;
                 account.prepare = PrepareState::viewing_only();
             }
             SignVerifyPrerequisite::WrongNetwork => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
                 account
                     .prepare
                     .overlay_inspection_network(handle, "zec-regtest")?;
             }
             SignVerifyPrerequisite::Mainnet => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
                 account
                     .prepare
                     .overlay_inspection_network(handle, "zec-mainnet")?;
             }
             SignVerifyPrerequisite::StaleSession => {
-                let account = self.accounts.get(&account_id).ok_or_else(ZecError::schema)?;
+                let account = self
+                    .accounts
+                    .get(&account_id)
+                    .ok_or_else(ZecError::schema)?;
                 account.prepare.invalidate(HandleInvalidation::Lock);
             }
         }
@@ -4092,9 +4301,13 @@ impl SignVerifyHarness {
             entries.push(self.reviewed_signer_view_for_test(handle, confirmation)?);
         }
         let mut hasher = Sha256::new();
-        for entry in &entries { hasher.update(entry.review_hash.as_bytes()); }
+        for entry in &entries {
+            hasher.update(entry.review_hash.as_bytes());
+        }
         let batch_id = spend::hex(&hasher.finalize()[..16]);
-        for entry in &mut entries { entry.batch_id = batch_id.clone(); }
+        for entry in &mut entries {
+            entry.batch_id = batch_id.clone();
+        }
         let actions = entries
             .iter()
             .map(|entry| ReviewedSignerAction {
@@ -4104,7 +4317,12 @@ impl SignVerifyHarness {
                 intent_hash: entry.intent_hash.clone(),
             })
             .collect();
-        Ok(ReviewedSignerBatch { batch_len: N, actions, batch_id, entries })
+        Ok(ReviewedSignerBatch {
+            batch_len: N,
+            actions,
+            batch_id,
+            entries,
+        })
     }
 
     pub fn apply_external_contributions_and_verify(
@@ -4159,12 +4377,17 @@ impl SignVerifyHarness {
     ) -> Result<Vec<VerifiedZecV1>, ZecError> {
         if contributions.route != "keystone_pczt_v2"
             || contributions.entries.len() != N
-            || contributions.entries.iter().enumerate().any(|(index, contribution)| {
-                contribution.intent_hash != inputs[index].1.review.public.intent_hash
-                    || contribution.pool != "ironwood"
-                    || contribution.action_index != contribution.inner.signature.action_index()
-                    || contribution.randomized_key != spend::hex(&contribution.inner.randomized_key)
-            })
+            || contributions
+                .entries
+                .iter()
+                .enumerate()
+                .any(|(index, contribution)| {
+                    contribution.intent_hash != inputs[index].1.review.public.intent_hash
+                        || contribution.pool != "ironwood"
+                        || contribution.action_index != contribution.inner.signature.action_index()
+                        || contribution.randomized_key
+                            != spend::hex(&contribution.inner.randomized_key)
+                })
         {
             return Err(ZecError::signature_invalid());
         }
@@ -4200,7 +4423,15 @@ impl SignVerifyHarness {
         mutation: BarrierMutation,
         clock: &mut ManualClock,
     ) -> Result<VerifiedZecV1, ZecError> {
-        self.execute(handle, confirmation, route, clock, None, None, Some(mutation))
+        self.execute(
+            handle,
+            confirmation,
+            route,
+            clock,
+            None,
+            None,
+            Some(mutation),
+        )
     }
 
     pub fn sign_with_fault_for_test(
@@ -4219,7 +4450,15 @@ impl SignVerifyHarness {
             FaultPoint::Verifier => Some(PipelineFault::Verifier),
             FaultPoint::Cleanup => Some(PipelineFault::Cleanup),
         };
-        self.execute(handle, confirmation, route, clock, pipeline_fault, None, None)
+        self.execute(
+            handle,
+            confirmation,
+            route,
+            clock,
+            pipeline_fault,
+            None,
+            None,
+        )
     }
 
     pub fn pause_after_account_lock_for_test(
@@ -4304,13 +4543,17 @@ impl SignVerifyHarness {
             TerminalExit::Error => {
                 drop(lease);
                 if let Some(account) = self.accounts.get(&account_id) {
-                    account.prepare.invalidate(HandleInvalidation::OperationError);
+                    account
+                        .prepare
+                        .invalidate(HandleInvalidation::OperationError);
                 }
                 self.destroy_software_canaries();
             }
             TerminalExit::Cancellation => {
                 if let Some(account) = self.accounts.get(&account_id) {
-                    account.prepare.cancel_request("00112233445566778899aabbccddeeff");
+                    account
+                        .prepare
+                        .cancel_request("00112233445566778899aabbccddeeff");
                     account.prepare.invalidate(HandleInvalidation::Cancel);
                 }
                 drop(lease);
@@ -4371,16 +4614,31 @@ impl SignVerifyHarness {
         Ok(())
     }
 
-    pub fn observed_calls(&self) -> SignVerifyCalls { self.calls.clone() }
-    pub fn reset_sign_verify_observations(&mut self) { self.calls = SignVerifyCalls::default(); }
-    pub fn verified_handle_count(&self) -> usize { self.verified.len() }
+    pub fn observed_calls(&self) -> SignVerifyCalls {
+        self.calls.clone()
+    }
+    pub fn reset_sign_verify_observations(&mut self) {
+        self.calls = SignVerifyCalls::default();
+    }
+    pub fn verified_handle_count(&self) -> usize {
+        self.verified.len()
+    }
 
-    pub fn independent_effects_observation(&self, handle: &str) -> Result<IndependentEffects, ZecError> {
-        self.verified.get(handle).map(IndependentEffects::from).ok_or_else(ZecError::locked)
+    pub fn independent_effects_observation(
+        &self,
+        handle: &str,
+    ) -> Result<IndependentEffects, ZecError> {
+        self.verified
+            .get(handle)
+            .map(IndependentEffects::from)
+            .ok_or_else(ZecError::locked)
     }
 
     pub fn independently_derived_transaction_id(&self, handle: &str) -> Result<String, ZecError> {
-        self.verified.get(handle).map(|value| value.derived_transaction_id.clone()).ok_or_else(ZecError::locked)
+        self.verified
+            .get(handle)
+            .map(|value| value.derived_transaction_id.clone())
+            .ok_or_else(ZecError::locked)
     }
 
     pub fn authoritative_effects_commitment(&self, handle: &str) -> Result<String, ZecError> {
@@ -4389,32 +4647,52 @@ impl SignVerifyHarness {
     }
 
     pub fn verified_effects_commitment(&self, handle: &str) -> Result<String, ZecError> {
-        self.verified.get(handle).map(|value| prepared_commitment_from_effects(value)).ok_or_else(ZecError::locked)
+        self.verified
+            .get(handle)
+            .map(prepared_commitment_from_effects)
+            .ok_or_else(ZecError::locked)
     }
 
-    pub fn set_untrusted_signer_transaction_id_for_test(&mut self, value: &str) -> Result<(), ZecError> {
-        if value.len() != 64 { return Err(ZecError::schema()); }
+    pub fn set_untrusted_signer_transaction_id_for_test(
+        &mut self,
+        value: &str,
+    ) -> Result<(), ZecError> {
+        if value.len() != 64 {
+            return Err(ZecError::schema());
+        }
         self.untrusted_signer_transaction_id = Some(value.to_owned());
         Ok(())
     }
 
-    pub fn production_positive_hardware_routes(&self) -> usize { PRODUCTION_REVIEWED_PROFILES.len() }
-    pub fn production_hardware_fingerprints(&self) -> Vec<String> { Vec::new() }
+    pub fn production_positive_hardware_routes(&self) -> usize {
+        PRODUCTION_REVIEWED_PROFILES.len()
+    }
+    pub fn production_hardware_fingerprints(&self) -> Vec<String> {
+        Vec::new()
+    }
 
     pub fn attach_sign_verify_observations(&mut self, observations: SignVerifyObservations) {
         self.observations = observations;
     }
 
-    pub fn install_sign_verify_canaries(&mut self, canaries: &SignVerifyCanaries) -> Result<(), ZecError> {
-        self.installed_canaries = canaries.values.iter().map(|value| SignVerifyCanaryValue {
-            class: value.class,
-            value: value.value.clone(),
-        }).collect();
+    pub fn install_sign_verify_canaries(
+        &mut self,
+        canaries: &SignVerifyCanaries,
+    ) -> Result<(), ZecError> {
+        self.installed_canaries = canaries
+            .values
+            .iter()
+            .map(|value| SignVerifyCanaryValue {
+                class: value.class,
+                value: value.value.clone(),
+            })
+            .collect();
         self.canary_owners.clear();
         for value in &self.installed_canaries {
             self.canary_owners.insert(
                 value.class,
-                SecretBytes::new(value.value.as_bytes().to_vec()).map_err(|_| ZecError::internal())?,
+                SecretBytes::new(value.value.as_bytes().to_vec())
+                    .map_err(|_| ZecError::internal())?,
             );
         }
         Ok(())
@@ -4424,10 +4702,18 @@ impl SignVerifyHarness {
         self.canary_touches.get(&class).copied().unwrap_or(0)
     }
 
-    pub fn synthetic_failure_for_test(&self) -> ZecError { ZecError::internal() }
-    pub fn captured_logs(&self) -> Vec<&'static str> { Vec::new() }
-    pub fn diagnostics(&self) -> Vec<&'static str> { vec!["[REDACTED]"] }
-    pub fn diagnostic_field_names(&self) -> [&'static str; 5] { ["operation", "account_id", "request_id", "state", "code"] }
+    pub fn synthetic_failure_for_test(&self) -> ZecError {
+        ZecError::internal()
+    }
+    pub fn captured_logs(&self) -> Vec<&'static str> {
+        Vec::new()
+    }
+    pub fn diagnostics(&self) -> Vec<&'static str> {
+        vec!["[REDACTED]"]
+    }
+    pub fn diagnostic_field_names(&self) -> [&'static str; 5] {
+        ["operation", "account_id", "request_id", "state", "code"]
+    }
 
     pub fn persisted_bytes_for_test(&self) -> Result<Vec<u8>, ZecError> {
         let mut bytes = Vec::new();

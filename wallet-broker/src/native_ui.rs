@@ -118,7 +118,9 @@ enum ZecReviewState {
 }
 
 struct ZecReviewControls {
+    #[cfg(test)]
     confirm: egui::Rect,
+    #[cfg(test)]
     cancel: egui::Rect,
 }
 
@@ -173,7 +175,9 @@ impl ZecReviewDialog {
             self.state = ZecReviewState::Confirmed;
         }
         ZecReviewControls {
+            #[cfg(test)]
             confirm: confirm.rect,
+            #[cfg(test)]
             cancel: cancel.rect,
         }
     }

@@ -74,17 +74,6 @@ impl ZecConfirmationCapability {
         Ok(self)
     }
 
-    pub(crate) fn matches_review(&self, review: &ZecNativeReview) -> bool {
-        self.handle == review.handle
-            && self.session_id == review.session_id
-            && self.account_id == review.account_id
-            && self.network == review.network
-            && self.request_id == review.request_id
-            && self.intent_hash == review.intent_hash
-            && self.review_hash == review.review_hash
-            && self.nonce.len() == 32
-    }
-
     pub(crate) fn handle(&self) -> &str {
         &self.handle
     }

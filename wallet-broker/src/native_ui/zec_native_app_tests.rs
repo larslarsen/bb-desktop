@@ -34,11 +34,7 @@ impl PersistentUi {
         }
     }
 
-    fn take_input(
-        &mut self,
-        events: Vec<egui::Event>,
-        close_requested: bool,
-    ) -> egui::RawInput {
+    fn take_input(&mut self, events: Vec<egui::Event>, close_requested: bool) -> egui::RawInput {
         let mut input = egui::RawInput {
             screen_rect: Some(self.screen),
             time: Some(self.time),

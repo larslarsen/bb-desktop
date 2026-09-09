@@ -304,6 +304,10 @@ impl Drop for ObservedSigningArtifact<'_> {
     }
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "reviewed authority/verification/fault inputs deliberately remain explicit"
+)]
 pub(crate) fn authorize_software(
     artifact: PreparedSigningArtifact,
     seed: &SecretBytes,
@@ -339,6 +343,10 @@ pub(crate) fn authorize_software(
     }
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "reviewed authority/verification/fault inputs deliberately remain explicit"
+)]
 fn authorize_software_for<P: Parameters>(
     artifact: &mut ObservedSigningArtifact<'_>,
     seed: &SecretBytes,
@@ -350,32 +358,35 @@ fn authorize_software_for<P: Parameters>(
     mutation: Option<VerifyMutation>,
 ) -> Result<VerifiedEffects, ZecError> {
     let (signed_pczt, authority) = {
-        let usk = seed.expose(|bytes| {
-            if bytes.len() != 32 {
+        let (signed, pending, pre_sign_sighash) = {
+            let usk = seed.expose(|bytes| {
+                if bytes.len() != 32 {
+                    return Err(ZecError::locked());
+                }
+                UnifiedSpendingKey::from_seed(params, bytes, Default::default())
+                    .map_err(|_| ZecError::locked())
+            })?;
+            if usk.to_unified_full_viewing_key().encode(params) != stored_ufvk {
                 return Err(ZecError::locked());
             }
-            UnifiedSpendingKey::from_seed(params, bytes, Default::default())
-                .map_err(|_| ZecError::locked())
-        })?;
-        if usk.to_unified_full_viewing_key().encode(params) != stored_ufvk {
-            return Err(ZecError::locked());
-        }
-        let fvk = FullViewingKey::from(usk.orchard());
-        calls.authoritative_pczt_accesses = calls.authoritative_pczt_accesses.saturating_add(1);
-        let pczt = artifact
-            .raw
-            .expose(pczt::Pczt::parse)
-            .map_err(|_| ZecError::state_corrupt())?;
-        validate_prepared(&pczt, &artifact.inspection)?;
-        let (pczt, pending) = take_trusted_context(pczt, fvk, network)?;
-        calls.signer_calls = calls.signer_calls.saturating_add(1);
-        let mut signer = Signer::new(pczt).map_err(|_| ZecError::signature_invalid())?;
-        let pre_sign_sighash = signer.shielded_sighash();
-        let signed = signer
-            .sign_ironwood(pending.action_index(), &usk.orchard().into())
-            .map(|_| signer.finish())
-            .map_err(|_| ZecError::signature_invalid())?;
-        drop(usk);
+            let fvk = FullViewingKey::from(usk.orchard());
+            calls.authoritative_pczt_accesses = calls.authoritative_pczt_accesses.saturating_add(1);
+            let pczt = artifact
+                .raw
+                .expose(pczt::Pczt::parse)
+                .map_err(|_| ZecError::state_corrupt())?;
+            validate_prepared(&pczt, &artifact.inspection)?;
+            let (pczt, pending) = take_trusted_context(pczt, fvk, network)?;
+            calls.signer_calls = calls.signer_calls.saturating_add(1);
+            let mut signer = Signer::new(pczt).map_err(|_| ZecError::signature_invalid())?;
+            let pre_sign_sighash = signer.shielded_sighash();
+            let signed = signer
+                .sign_ironwood(pending.action_index(), &usk.orchard().into())
+                .map(|_| signer.finish())
+                .map_err(|_| ZecError::signature_invalid())?;
+            (signed, pending, pre_sign_sighash)
+        };
+        // Inner scope ends USK ownership; this is not a guaranteed upstream memory erasure.
         if fault == Some(PipelineFault::Signer) {
             calls.record_triggered_fault(PipelineFault::Signer);
             return Err(ZecError::internal());
@@ -475,11 +486,8 @@ fn finish_pipeline(
     let finalized = SpendFinalizer::new(proven)
         .finalize_spends()
         .map_err(|_| ZecError::internal())?;
-    let (finalized, clear) = inspect_final_pczt(
-        finalized,
-        &artifact.inspection,
-        authority.retained_spend(),
-    )?;
+    let (finalized, clear) =
+        inspect_final_pczt(finalized, &artifact.inspection, authority.retained_spend())?;
     if fault == Some(PipelineFault::Finalizer) {
         calls.record_triggered_fault(PipelineFault::Finalizer);
         return Err(ZecError::internal());
@@ -603,8 +611,8 @@ impl ShieldedVerificationContext {
                     Some(_) => Err(ZecError::intent_mismatch()),
                     None => Ok(None),
                 },
-                |sapling| Ok(sapling),
-                |orchard| Ok(orchard),
+                Ok,
+                Ok,
             )?;
         Ok(Self { data, txid })
     }
@@ -664,10 +672,7 @@ fn independently_verify(
     }
     let binding_signature_valid = ironwood
         .binding_validating_key()
-        .verify(
-            &sighash_bytes,
-            ironwood.authorization().binding_signature(),
-        )
+        .verify(&sighash_bytes, ironwood.authorization().binding_signature())
         .is_ok();
 
     let circuit_version = ironwood.bundle_version().circuit_version();
@@ -816,7 +821,11 @@ fn validate_prepared(pczt: &pczt::Pczt, inspection: &PcztInspection) -> Result<(
             && action.output().user_address().as_deref() == Some(&inspection.destination)
         {
             matching_outputs += 1;
-            if action.output().recipient().as_ref().map(|value| value.as_slice())
+            if action
+                .output()
+                .recipient()
+                .as_ref()
+                .map(|value| value.as_slice())
                 != Some(inspection.destination_receiver_bytes.as_slice())
             {
                 return Err(ZecError::intent_mismatch());
@@ -878,14 +887,13 @@ fn take_trusted_context(
     let mut captured = None;
     let verifier = Verifier::new(pczt)
         .with_ironwood(|bundle| {
-            let value = effects::validate_retained_action_cryptography(
-                bundle,
-                action_index,
-                &account_fvk,
-            )
-            .map_err(|_| {
-                pczt::roles::verifier::OrchardError::Custom(SpendValueInspectionError::MissingValue)
-            })?;
+            let value =
+                effects::validate_retained_action_cryptography(bundle, action_index, &account_fvk)
+                    .map_err(|_| {
+                        pczt::roles::verifier::OrchardError::Custom(
+                            SpendValueInspectionError::MissingValue,
+                        )
+                    })?;
             captured = Some(value);
             Ok(())
         })
@@ -897,6 +905,7 @@ fn take_trusted_context(
     ))
 }
 
+#[cfg(test)]
 pub(crate) fn capture_trusted_verification_authority(
     pczt: &pczt::Pczt,
     account_fvk: FullViewingKey,
@@ -909,8 +918,8 @@ pub(crate) fn capture_trusted_verification_authority(
 
 fn decode_extracted_transaction(bytes: &[u8]) -> Result<Transaction, ZecError> {
     let mut cursor = Cursor::new(bytes);
-    let transaction = Transaction::read(&mut cursor, BranchId::Nu6_3)
-        .map_err(|_| ZecError::state_corrupt())?;
+    let transaction =
+        Transaction::read(&mut cursor, BranchId::Nu6_3).map_err(|_| ZecError::state_corrupt())?;
     let consumed = usize::try_from(cursor.position()).map_err(|_| ZecError::state_corrupt())?;
     if consumed != bytes.len() {
         return Err(ZecError::state_corrupt());
@@ -1004,7 +1013,11 @@ fn inspect_final_pczt(
             && action.output().user_address().as_deref() == Some(&inspection.destination)
         {
             external_outputs += 1;
-            if action.output().recipient().map(|value| value.to_vec()).as_ref()
+            if action
+                .output()
+                .recipient()
+                .map(|value| value.to_vec())
+                .as_ref()
                 != Some(&inspection.destination_receiver_bytes)
             {
                 return Err(ZecError::intent_mismatch());
@@ -1054,7 +1067,10 @@ fn flip_unique_bytes(haystack: &mut [u8], needle: &[u8]) -> Result<(), ZecError>
     if needle.is_empty() {
         return Err(ZecError::state_corrupt());
     }
-    let Some(index) = haystack.windows(needle.len()).position(|window| window == needle) else {
+    let Some(index) = haystack
+        .windows(needle.len())
+        .position(|window| window == needle)
+    else {
         return Err(ZecError::state_corrupt());
     };
     haystack[index] ^= 0xff;
@@ -1123,6 +1139,10 @@ pub(crate) fn hex(bytes: &[u8]) -> String {
 }
 
 #[allow(dead_code)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "reviewed authority/verification/fault inputs deliberately remain explicit"
+)]
 pub(crate) fn review_matches_capability(
     review: &PreparedReview,
     handle: &str,

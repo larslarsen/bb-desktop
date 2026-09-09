@@ -137,10 +137,7 @@ fn assert_no_published_observations(observations: &SignVerifyObservations) {
     assert_exact_observations(observations, &[], 0);
 }
 
-fn assert_unchanged_snapshot(
-    observations: &SignVerifyObservations,
-    snapshot: ObservationSnapshot,
-) {
+fn assert_unchanged_snapshot(observations: &SignVerifyObservations, snapshot: ObservationSnapshot) {
     assert_eq!(snapshot, observation_snapshot(observations));
 }
 
