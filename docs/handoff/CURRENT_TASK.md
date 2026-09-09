@@ -1,44 +1,39 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DIAGNOSTICS NOT STARTED — UPSTREAM MODEL CAPACITY STOP
-Reviewer: Codex; High suffices for the fixed diagnostics/review task
+State: CONSOLIDATED DIAGNOSTICS RESUME 01 AUTHORIZED
+Reviewer: Codex; High suffices for this fixed task
 Authorized source actors: none
-Authorized execution/evidence actors: none
+Authorized execution/evidence actor: Hermes, one Resume-01 diagnostics launch only
 Authorized integration actors: none
+Protected parent: commit publishing Resume 01; one CURRENT-only launch commit is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Task and stop: [consolidated diagnostics 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#capacity-stop-and-existing-ci-review--2026-09-09)
-Read this prefix and the appended stop; no historical handoff reload.
+Active task: [consolidated diagnostics / Resume 01](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#resume-01--owner-requested-continuation-2026-09-09)
+Read this prefix and the task's original procedure plus Resume 01. No history reload.
 
-Hermes outer 44655 was collected once on owner done and is closed. It failed with
-upstream model-capacity HTTP 429 after internal API retries, before any tool call.
-Saved session 20260909_090226_2eeaa8 has zero tool calls. No preflight, diagnostic,
-evidence write or source change occurred. The worktree is clean and the diagnostics
-record is absent. All four planned commands remain unrun. Do not poll/relaunch this
-closed outer. No automatic retry or provider change is authorized.
+Owner requested continuation. The previous Hermes outer 44655 / runtime
+20260909_090226_2eeaa8 stopped at upstream capacity before any tool call and is
+closed. All four diagnostics remain unrun; worktree is clean and evidence absent.
+Reviewer may launch Hermes once for formatter check, no-default library Clippy,
+native-ui library Clippy and security-policy CLI, exactly as the handoff specifies.
+Collect ordinary findings together; do not repair or rerun commands. No functional
+tests/proofs, source changes, source integration or provider/model changes authorized.
+Reviewer will launch once; do not independently launch another actor or poll.
 
-Partial source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 remains accepted,
-committed and pushed. Existing CI run 34327240542 independently passed build, social
-and all 20 Electron security tests, then failed 11 repository-policy tests. Later
-wallet/Rust/formatter/Clippy/native steps were skipped. Failure groups and source
-causes are recorded in the handoff: runtime package additions, missing Orchard pin
-in policy, and stale Zcash target order. Do not weaken policy or remove frozen
-package dependencies without reviewing their purpose/provenance.
+Source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 remains accepted and
+pushed. Preserve CI run 34327240542: build/social/20 Electron security checks passed,
+11 policy tests failed, and subsequent wallet/Rust gates were skipped. Its runtime
+package, Orchard pin and target-order findings are in the handoff. No policy
+loosening or dependency removal is authorized by this diagnostics pass.
 
-Next owner continuation: reviewer may issue a fresh launch authorization for the
-same four-command diagnostic pass, preserving existing CI failure evidence. No
-functional signing/proof rerun or separate report-correction task is needed. High
-is sufficient; the capacity error does not require a reasoning-setting change.
-
-Full Phase-A1/ticket/release acceptance remains open. Upstream typed-secret erasure
-and final validation/security remain outstanding. Runtime/Electron/OS integration
-belongs to WAL-011; usable native/Pay flows belong to WAL-010. Money-moving features,
-hardware and Monero remain parked. No security requirement is waived.
+Full Phase-A1/ticket/release acceptance remains open. Typed-secret erasure and
+final validation/security remain outstanding. Runtime/Electron/OS integration is
+WAL-011; usable native/Pay flows are WAL-010. Money-moving features, hardware and
+Monero remain parked. High is sufficient; no reasoning-setting change is needed.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md only.
-No actor is running.
 
 ## Historical record (superseded by the active state above)
 

@@ -1,12 +1,13 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DIAGNOSTICS NOT STARTED — UPSTREAM MODEL CAPACITY STOP
+Status: CONSOLIDATED DIAGNOSTICS RESUME 01 AUTHORIZED
 
-Hermes encountered upstream HTTP 429 before any tool call. No diagnostic ran or
-file changed; outer 44655 is closed. The
-[stop and existing CI findings](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#capacity-stop-and-existing-ci-review--2026-09-09)
-preserve all four planned diagnostics as unrun. No actor or automatic retry is
-authorized; CURRENT_TASK.md governs resumption. High remains sufficient.
+Owner requested continuation after Hermes encountered upstream HTTP 429 before
+any tool call. One fresh Hermes launch may run the unchanged four diagnostics in
+[Resume 01](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#resume-01--owner-requested-continuation-2026-09-09).
+Previous outer 44655 is closed; no diagnostic is being repeated. Source, functional
+tests/proofs, integration and broader work remain unauthorized. CURRENT_TASK.md
+governs the launch and collection. High remains sufficient.
 
 Partial source checkpoint 502580fc12bff1789e2ced2a0692b1b35de587a3 stays accepted
 and pushed. Existing CI passed build, social and 20 Electron security tests, then

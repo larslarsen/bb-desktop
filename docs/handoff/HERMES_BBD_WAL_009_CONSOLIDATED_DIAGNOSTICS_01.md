@@ -2,7 +2,7 @@
 
 Actor: Jr Dev — Hermes. Reviewer: Codex; High suffices for this fixed task.
 Source checkpoint: 502580fc12bff1789e2ced2a0692b1b35de587a3.
-Protected parent: reviewer commit publishing this handoff. One following reviewer
+Protected parent: reviewer commit publishing Resume 01 below. One following reviewer
 launch commit may change only CURRENT_TASK.md. No source actor is active.
 
 ## Purpose
@@ -138,3 +138,16 @@ sufficient for their execution review; no reasoning-setting change is needed.
 
 Reviewer publication scope for this stop: this handoff, CURRENT_TASK.md and
 tickets/BBD-WAL-009.md only. No actor is running.
+
+## Resume 01 — owner requested continuation, 2026-09-09
+
+The owner has requested continuation after the capacity stop. Authorize one fresh
+Hermes launch of the unchanged four-command task above. The previous attempt ran
+zero tools, so no diagnostic is repeated. Worktree is clean and the sole evidence
+path remains absent. Preserve the existing CI findings; they do not substitute
+for these diagnostics. This resume supersedes the no-actor/no-retry state of the
+historical capacity stop only for this one launch; no provider/model change,
+automatic relaunch or polling is authorized. All original command, write-scope,
+capture and final-stop rules remain unchanged. Protected parent is the commit
+publishing this resume, with one CURRENT-only reviewer launch commit allowed.
+High is sufficient. No functional signing tests or proofs are authorized.
