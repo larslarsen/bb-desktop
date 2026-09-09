@@ -33,7 +33,10 @@ No usable send-flow or full-wallet acceptance is claimed.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/GROK_BBD_WAL_009_PIPELINE_PANIC_TEST_01.md only.
-Launch once, collect on owner done; never poll. Not launched yet.
+Launched once from 1204c92d: Grok outer terminal 3531, session
+c839c8c4-45a3-4db9-aed2-1d8a97a6f723, requested grok-4.6 High.
+Runtime model and completion remain unverified until collection. Do not relaunch
+or poll; collect once after owner done.
 
 ## Historical record (superseded by the active state above)
 
