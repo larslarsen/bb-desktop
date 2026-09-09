@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 02 AUTHORIZED
+State: LIVE TRANSPORT ACCEPTED — EXECUTABLE TEST CORRECTION 02 RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, seven test-call argument replacements only
 Authorized execution/integration actors: none; Hermes green task closed
@@ -36,6 +36,8 @@ under Correction 02 in the active handoff. Only test/walletBrokerRuntime.node.js
 may change. Production, execution and integration remain closed.
 Launch Correction 02 once in session f53cb3ef-f7c1-4598-a892-f3c6e7871611 with
 automatic tool approval. Collect on owner done/Continue. No actor polling.
+Correction 02 launched once from 4fe9b38e; outer 91218, same session
+f53cb3ef-f7c1-4598-a892-f3c6e7871611.
 
 ## Historical record (superseded by the active state above)
 
