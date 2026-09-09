@@ -505,6 +505,24 @@ impl AddressAccount {
         self.network
     }
 
+    pub(crate) fn viewing_key_binding(&self) -> Result<String, ZecError> {
+        let _guard = mutex_lock(&self.gate);
+        validate_account_paths(&self.root, &self.paths)?;
+        let connection = open_read_only_connection(&self.root, &self.paths.wallet)?;
+        validate_extension_and_binding_with_connection(
+            &connection,
+            &self.account_id,
+            self.network,
+        )?;
+        connection
+            .query_row(
+                "SELECT ufvk FROM ext_bitbook_accounts WHERE account_id = ?1",
+                [self.account_id.as_str()],
+                |row| row.get::<_, String>(0),
+            )
+            .map_err(|_| ZecError::state_corrupt())
+    }
+
     pub(crate) fn inspect_paths(&self) -> StorePaths {
         StorePaths {
             relative_account_dir: format!("{}/{}", self.network.as_str(), self.account_id.as_str()),
@@ -2758,6 +2776,11 @@ fn build_prepared_for<P: Parameters + Clone + Send + 'static>(
             consensus_branch: *global.consensus_branch_id(),
             transaction_version: *global.tx_version(),
             destination: receiver.to_owned(),
+            destination_receiver_bytes: payment_output
+                .output()
+                .recipient()
+                .ok_or_else(ZecError::protocol_incompatible)?
+                .to_vec(),
             amount_zat: amount.to_string(),
             memo_sha256: sha256_hex(memo_bytes),
             fee_zat: fee.to_string(),

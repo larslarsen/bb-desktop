@@ -271,6 +271,7 @@ dependencies = [
  "getrandom 0.4.3",
  "hkdf",
  "md-5",
+ "orchard",
  "pczt",
  "rand_core",
  "rfd",

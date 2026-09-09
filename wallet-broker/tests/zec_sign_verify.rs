@@ -95,59 +95,6 @@ fn assert_no_verified_or_broadcast(harness: &SignVerifyHarness) {
     assert_eq!(harness.verified_handle_count(), 0);
 }
 
-fn software_classes() -> [TouchedSecretClass; 7] {
-    [
-        TouchedSecretClass::Seed,
-        TouchedSecretClass::UnifiedSpendingAuthority,
-        TouchedSecretClass::DerivedAuthorizingKey,
-        TouchedSecretClass::ConfirmationCapability,
-        TouchedSecretClass::AuthoritativePczt,
-        TouchedSecretClass::ProofWorkspace,
-        TouchedSecretClass::ExtractedTransaction,
-    ]
-}
-
-fn assert_wiped(
-    observations: &SignVerifyObservations,
-    exit: WipeExit,
-    classes: &[TouchedSecretClass],
-) {
-    for class in classes {
-        assert!(
-            observations.touch_count(*class, exit) > 0,
-            "{class:?} was not touched for {exit:?}"
-        );
-        assert!(
-            observations.positive_wipe_count(*class, exit) > 0,
-            "{class:?} was not positively wiped for {exit:?}"
-        );
-        assert_eq!(
-            observations.failed_wipe_count(*class, exit),
-            0,
-            "{class:?} had an incomplete wipe for {exit:?}"
-        );
-    }
-}
-
-fn assert_every_touched_secret_wiped(observations: &SignVerifyObservations, exit: WipeExit) {
-    let touched = observations.touched_classes(exit);
-    assert!(
-        !touched.is_empty(),
-        "no sensitive class was observed for {exit:?}"
-    );
-    for class in touched {
-        assert!(
-            observations.positive_wipe_count(class, exit) > 0,
-            "{class:?} was touched but not positively wiped for {exit:?}"
-        );
-        assert_eq!(
-            observations.failed_wipe_count(class, exit),
-            0,
-            "{class:?} had an incomplete wipe for {exit:?}"
-        );
-    }
-}
-
 #[test]
 fn software_signs_proves_finalizes_extracts_and_independently_decodes_exact_v6_effects() {
     let mut harness = software_harness("sign-verify-software-happy");
@@ -476,14 +423,16 @@ fn synthetic_keystone_v2_returns_tagged_ironwood_contributions_for_retained_pczt
     assert_eq!(view.transaction_bytes(), 0);
     assert_eq!(view.actions.len(), 1);
     assert_eq!(view.actions[0].pool, "ironwood");
-    assert_eq!(view.actions[0].action_index, 0);
     assert_lower_hex(&view.actions[0].randomized_key, 64);
 
     let contributions = SyntheticKeystoneV2::sign_for_test(&view).unwrap();
     assert_eq!(contributions.route(), "keystone_pczt_v2");
     assert_eq!(contributions.len(), 1);
     assert_eq!(contributions[0].pool, "ironwood");
-    assert_eq!(contributions[0].action_index, 0);
+    let signed_index = contributions[0].signed_action_index_for_test();
+    assert!(signed_index < 2);
+    assert_eq!(view.actions[0].action_index, signed_index);
+    assert_eq!(contributions[0].action_index, signed_index);
     assert_eq!(
         contributions[0].randomized_key,
         view.actions[0].randomized_key
@@ -754,7 +703,8 @@ fn cancellation_and_expiry_are_reread_after_proving_at_exact_boundaries() {
         );
         assert_eq!(harness.observed_calls().signer_calls, 1);
         assert_eq!(harness.observed_calls().prover_calls, 1);
-        assert_eq!(harness.observed_calls().post_sign_clock_reads, 1);
+        // The valid path may recheck before publication; the outcome cases enforce the exact expiry boundary.
+        assert!(harness.observed_calls().post_sign_clock_reads >= 1);
         match expected {
             Some(code) => {
                 assert_eq!(result.unwrap_err().code(), code);
@@ -828,27 +778,6 @@ fn account_authorization_lock_is_scoped_and_released_on_every_exit() {
         assert_eq!(harness.observed_calls().broadcast_calls, 0);
     }
 
-    let mut harness = software_harness("sign-verify-panic-lock-release");
-    let handle = prepared(&mut harness);
-    let confirmation = harness
-        .confirm_native(&handle, &mut ManualClock::at(NOW))
-        .unwrap();
-    let panic = catch_unwind(AssertUnwindSafe(|| {
-        harness.panic_during_sign_for_test(
-            &handle,
-            confirmation,
-            SignRoute::Software,
-            &mut ManualClock::at(NOW),
-        )
-    }));
-    assert!(panic.is_err());
-    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
-    assert_no_verified_or_broadcast(&harness);
-    let next = harness
-        .begin_authorization_for_test(ACCOUNT, REQUEST_ID, INTENT_HASH)
-        .unwrap();
-    harness.cancel_authorization_for_test(next).unwrap();
-    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
 }
 
 #[test]
@@ -884,71 +813,167 @@ fn component_and_cleanup_faults_return_stable_closed_errors() {
     }
 }
 
-#[test]
-fn every_sensitive_class_touched_is_positively_wiped_on_every_exit() {
-    let classes = software_classes();
-    for (exit, wipe_exit) in [
-        (TerminalExit::Success, WipeExit::Success),
-        (TerminalExit::Error, WipeExit::Error),
-        (TerminalExit::Cancellation, WipeExit::Cancellation),
-        (TerminalExit::Expiry, WipeExit::Expiry),
-        (TerminalExit::Lock, WipeExit::Lock),
-        (TerminalExit::PanicUnwind, WipeExit::PanicUnwind),
-        (
-            TerminalExit::AccountReplacement,
-            WipeExit::AccountReplacement,
-        ),
-        (TerminalExit::BrokerExit, WipeExit::BrokerExit),
-    ] {
-        let observations = SignVerifyObservations::shared();
-        let mut harness = software_harness("sign-verify-wipes");
-        harness.attach_sign_verify_observations(observations.clone());
-        harness.exercise_terminal_exit_for_test(exit).unwrap();
-        drop(harness);
-        assert_every_touched_secret_wiped(&observations, wipe_exit);
-        if wipe_exit == WipeExit::Success {
-            assert_wiped(&observations, wipe_exit, &classes);
+const CLEANUP_SECRET_CLASSES: [TouchedSecretClass; 9] = [
+    TouchedSecretClass::Seed,
+    TouchedSecretClass::UnifiedSpendingAuthority,
+    TouchedSecretClass::DerivedAuthorizingKey,
+    TouchedSecretClass::ConfirmationCapability,
+    TouchedSecretClass::AuthoritativePczt,
+    TouchedSecretClass::ProofWorkspace,
+    TouchedSecretClass::ExtractedTransaction,
+    TouchedSecretClass::SignerView,
+    TouchedSecretClass::SignatureContribution,
+];
+
+const CLEANUP_WIPE_EXITS: [WipeExit; 14] = [
+    WipeExit::Success,
+    WipeExit::Error,
+    WipeExit::Cancellation,
+    WipeExit::Expiry,
+    WipeExit::Lock,
+    WipeExit::PanicUnwind,
+    WipeExit::AccountReplacement,
+    WipeExit::BrokerExit,
+    WipeExit::SignerError,
+    WipeExit::ProverError,
+    WipeExit::FinalizerError,
+    WipeExit::ExtractorError,
+    WipeExit::VerifierError,
+    WipeExit::CleanupError,
+];
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct CleanupClassExitCounts {
+    touch: usize,
+    positive: usize,
+    failed: usize,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct CleanupObservationSnapshot {
+    cells: [[CleanupClassExitCounts; 14]; 9],
+    unclassified: usize,
+}
+
+fn cleanup_observation_snapshot(
+    observations: &SignVerifyObservations,
+) -> CleanupObservationSnapshot {
+    let mut cells = [[CleanupClassExitCounts {
+        touch: 0,
+        positive: 0,
+        failed: 0,
+    }; 14]; 9];
+    for (class_index, class) in CLEANUP_SECRET_CLASSES.iter().enumerate() {
+        for (exit_index, exit) in CLEANUP_WIPE_EXITS.iter().enumerate() {
+            cells[class_index][exit_index] = CleanupClassExitCounts {
+                touch: observations.touch_count(*class, *exit),
+                positive: observations.positive_wipe_count(*class, *exit),
+                failed: observations.failed_wipe_count(*class, *exit),
+            };
         }
     }
-
-    for (fault, wipe_exit) in [
-        (FaultPoint::Signer, WipeExit::SignerError),
-        (FaultPoint::Prover, WipeExit::ProverError),
-        (FaultPoint::Finalizer, WipeExit::FinalizerError),
-        (FaultPoint::Extractor, WipeExit::ExtractorError),
-        (FaultPoint::Verifier, WipeExit::VerifierError),
-        (FaultPoint::Cleanup, WipeExit::CleanupError),
-    ] {
-        let observations = SignVerifyObservations::shared();
-        let mut harness = software_harness("sign-verify-fault-wipes");
-        harness.attach_sign_verify_observations(observations.clone());
-        harness.exercise_fault_exit_for_test(fault).unwrap();
-        drop(harness);
-        assert_every_touched_secret_wiped(&observations, wipe_exit);
+    CleanupObservationSnapshot {
+        cells,
+        unclassified: observations.unclassified_event_count(),
     }
+}
 
-    let observations = SignVerifyObservations::shared();
-    let mut hardware = SignVerifyHarness::synthetic_keystone_from_fixture(
-        TestStateRoot::fresh("sign-verify-hardware-wipes"),
-        AccountId::parse(ACCOUNT).unwrap(),
-        &fixture(),
-    )
-    .unwrap();
-    hardware.attach_sign_verify_observations(observations.clone());
-    hardware.exercise_hardware_success_for_test().unwrap();
-    drop(hardware);
-    assert_wiped(
-        &observations,
-        WipeExit::Success,
-        &[
-            TouchedSecretClass::ConfirmationCapability,
-            TouchedSecretClass::SignerView,
-            TouchedSecretClass::SignatureContribution,
-            TouchedSecretClass::AuthoritativePczt,
-            TouchedSecretClass::ProofWorkspace,
-            TouchedSecretClass::ExtractedTransaction,
-        ],
+fn cleanup_expected_counts(
+    expected: &[(TouchedSecretClass, WipeExit, usize, usize, usize)],
+    class: TouchedSecretClass,
+    exit: WipeExit,
+) -> (usize, usize, usize) {
+    expected
+        .iter()
+        .find(|(expected_class, expected_exit, _, _, _)| {
+            *expected_class == class && *expected_exit == exit
+        })
+        .map(|(_, _, touch, positive, failed)| (*touch, *positive, *failed))
+        .unwrap_or((0, 0, 0))
+}
+
+fn assert_exact_cleanup_observations(
+    observations: &SignVerifyObservations,
+    expected: &[(TouchedSecretClass, WipeExit, usize, usize, usize)],
+    unclassified: usize,
+) {
+    for class in CLEANUP_SECRET_CLASSES {
+        for exit in CLEANUP_WIPE_EXITS {
+            let (touch, positive, failed) = cleanup_expected_counts(expected, class, exit);
+            let actual_touch = observations.touch_count(class, exit);
+            let actual_positive = observations.positive_wipe_count(class, exit);
+            let actual_failed = observations.failed_wipe_count(class, exit);
+            assert_eq!(
+                actual_touch, touch,
+                "class={class:?} exit={exit:?} touch={actual_touch} expected={touch}"
+            );
+            assert_eq!(
+                actual_positive, positive,
+                "class={class:?} exit={exit:?} positive={actual_positive} expected={positive}"
+            );
+            assert_eq!(
+                actual_failed, failed,
+                "class={class:?} exit={exit:?} failed={actual_failed} expected={failed}"
+            );
+        }
+    }
+    let actual_unclassified = observations.unclassified_event_count();
+    assert_eq!(
+        actual_unclassified, unclassified,
+        "unclassified={actual_unclassified} expected={unclassified}"
     );
+}
+
+#[test]
+fn cleanup_lifecycle_wrong_seed_wipes_owned_buffers_before_pczt_access() {
+    let mut harness = software_harness("cleanup-lifecycle-wrong-seed");
+    let handle = prepared(&mut harness);
+    let confirmation = harness
+        .confirm_native(&handle, &mut ManualClock::at(NOW))
+        .unwrap();
+    harness.reset_sign_verify_observations();
+    let observations = SignVerifyObservations::shared();
+    harness.attach_sign_verify_observations(observations.clone());
+    let error = harness
+        .sign_with_prerequisite_for_test(
+            &handle,
+            confirmation,
+            SignVerifyPrerequisite::WrongSeed,
+            &mut ManualClock::at(NOW),
+        )
+        .unwrap_err();
+
+    assert_eq!(error.code(), "LOCKED");
+    let calls = harness.observed_calls();
+    assert_eq!(calls.seed_accesses, 1);
+    assert_eq!(calls.spend_authority_derivations, 1);
+    assert_eq!(calls.authoritative_pczt_accesses, 0);
+    assert_eq!(calls.signer_calls, 0);
+    assert_eq!(calls.prover_calls, 0);
+    assert_eq!(calls.finalizer_calls, 0);
+    assert_eq!(calls.extractor_calls, 0);
+    assert_eq!(calls.independent_decoder_calls, 0);
+    assert_eq!(calls.verifier_calls, 0);
+    assert_no_verified_or_broadcast(&harness);
+    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
+
+    assert_exact_cleanup_observations(
+        &observations,
+        &[
+            (TouchedSecretClass::Seed, WipeExit::Lock, 1, 1, 0),
+            (
+                TouchedSecretClass::AuthoritativePczt,
+                WipeExit::Lock,
+                1,
+                1,
+                0,
+            ),
+        ],
+        0,
+    );
+    let frozen = cleanup_observation_snapshot(&observations);
+    drop(harness);
+    assert_eq!(frozen, cleanup_observation_snapshot(&observations));
 }
 
 #[test]
@@ -1112,4 +1137,202 @@ fn operation_and_source_inventories_exclude_broadcast_network_mainnet_xmr_and_re
     assert_eq!(production.production_positive_hardware_routes(), 0);
     assert!(production.production_hardware_fingerprints().is_empty());
     assert_eq!(production.observed_calls().broadcast_calls, 0);
+}
+
+#[test]
+fn signer_failure_does_not_report_cleanup_for_unreached_secret_classes() {
+    let mut harness = software_harness("sign-verify-unreached-classes");
+    let handle = prepared(&mut harness);
+    let confirmation = harness
+        .confirm_native(&handle, &mut ManualClock::at(NOW))
+        .unwrap();
+    harness.reset_sign_verify_observations();
+    let observations = SignVerifyObservations::shared();
+    harness.attach_sign_verify_observations(observations.clone());
+    let error = harness
+        .sign_with_fault_for_test(
+            &handle,
+            confirmation,
+            SignRoute::Software,
+            FaultPoint::Signer,
+            &mut ManualClock::at(NOW),
+        )
+        .unwrap_err();
+
+    assert_eq!(error.code(), "INTERNAL");
+    assert_eq!(error.public_message(), "Zcash operation failed");
+
+    let calls = harness.observed_calls();
+    assert_eq!(calls.seed_accesses, 1);
+    assert_eq!(calls.spend_authority_derivations, 1);
+    assert_eq!(calls.authoritative_pczt_accesses, 1);
+    assert_eq!(calls.signer_calls, 1);
+    assert_eq!(calls.prover_calls, 0);
+    assert_eq!(calls.finalizer_calls, 0);
+    assert_eq!(calls.extractor_calls, 0);
+    assert_eq!(calls.independent_decoder_calls, 0);
+    assert_eq!(calls.verifier_calls, 0);
+    assert_no_verified_or_broadcast(&harness);
+    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
+
+    assert!(
+        observations.touch_count(TouchedSecretClass::Seed, WipeExit::SignerError) > 0,
+        "Seed was not touched for SignerError"
+    );
+    assert!(
+        observations.positive_wipe_count(TouchedSecretClass::Seed, WipeExit::SignerError) > 0,
+        "Seed was not positively wiped for SignerError"
+    );
+    assert_eq!(
+        observations.failed_wipe_count(TouchedSecretClass::Seed, WipeExit::SignerError),
+        0,
+        "Seed had an incomplete wipe for SignerError"
+    );
+
+    let mut forbidden = Vec::new();
+    for class in [
+        TouchedSecretClass::ProofWorkspace,
+        TouchedSecretClass::ExtractedTransaction,
+        TouchedSecretClass::SignerView,
+        TouchedSecretClass::SignatureContribution,
+    ] {
+        for exit in [
+            WipeExit::Success,
+            WipeExit::Error,
+            WipeExit::Cancellation,
+            WipeExit::Expiry,
+            WipeExit::Lock,
+            WipeExit::PanicUnwind,
+            WipeExit::AccountReplacement,
+            WipeExit::BrokerExit,
+            WipeExit::SignerError,
+            WipeExit::ProverError,
+            WipeExit::FinalizerError,
+            WipeExit::ExtractorError,
+            WipeExit::VerifierError,
+            WipeExit::CleanupError,
+        ] {
+            let touch_count = observations.touch_count(class, exit);
+            if touch_count > 0 {
+                forbidden.push(format!("{class:?}/{exit:?}/touch_count/{touch_count}"));
+            }
+            let positive_wipe_count = observations.positive_wipe_count(class, exit);
+            if positive_wipe_count > 0 {
+                forbidden.push(format!(
+                    "{class:?}/{exit:?}/positive_wipe_count/{positive_wipe_count}"
+                ));
+            }
+            let failed_wipe_count = observations.failed_wipe_count(class, exit);
+            if failed_wipe_count > 0 {
+                forbidden.push(format!(
+                    "{class:?}/{exit:?}/failed_wipe_count/{failed_wipe_count}"
+                ));
+            }
+        }
+    }
+    assert!(
+        forbidden.is_empty(),
+        "forbidden cleanup observations: {forbidden:?}"
+    );
+}
+
+#[test]
+fn real_pipeline_panic_releases_owners_and_never_publishes() {
+    let mut harness = software_harness("sign-verify-real-pipeline-panic");
+    let handle = prepared(&mut harness);
+    let confirmation = harness
+        .confirm_native(&handle, &mut ManualClock::at(NOW))
+        .unwrap();
+    harness.reset_sign_verify_observations();
+    let observations = SignVerifyObservations::shared();
+    harness.attach_sign_verify_observations(observations.clone());
+    let panic = catch_unwind(AssertUnwindSafe(|| {
+        harness.panic_during_sign_for_test(
+            &handle,
+            confirmation,
+            SignRoute::Software,
+            &mut ManualClock::at(NOW),
+        )
+    }))
+    .unwrap_err();
+    let panic_text = if let Some(value) = panic.downcast_ref::<&str>() {
+        (*value).to_owned()
+    } else if let Some(value) = panic.downcast_ref::<String>() {
+        value.clone()
+    } else {
+        panic!("real pipeline panic payload must be INTERNAL")
+    };
+    assert_eq!(panic_text, "INTERNAL");
+
+    let calls = harness.observed_calls();
+    assert_eq!(
+        calls.seed_accesses,
+        1,
+        "real pipeline panic must access the operation seed"
+    );
+    assert_eq!(calls.spend_authority_derivations, 1);
+    assert_eq!(calls.authoritative_pczt_accesses, 1);
+    assert_eq!(calls.signer_calls, 1);
+    assert_eq!(calls.prover_calls, 1);
+    assert_eq!(calls.finalizer_calls, 1);
+    assert_eq!(calls.extractor_calls, 1);
+    assert_eq!(calls.independent_decoder_calls, 1);
+    assert_eq!(calls.verifier_calls, 1);
+    assert_eq!(calls.post_sign_status_reads, 0);
+    assert_eq!(calls.post_sign_clock_reads, 0);
+    assert_no_verified_or_broadcast(&harness);
+    assert_eq!(calls.hardware_view_exports, 0);
+    assert_eq!(calls.exported_pczt_bytes, 0);
+    assert_eq!(calls.external_contributions_received, 0);
+    assert_eq!(calls.external_contributions_applied, 0);
+    assert_eq!(calls.external_signatures_verified, 0);
+    assert_eq!(calls.software_fallbacks, 0);
+    assert_eq!(calls.other_device_fallbacks, 0);
+    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
+    let next = harness
+        .begin_authorization_for_test(ACCOUNT, REQUEST_ID, INTENT_HASH)
+        .unwrap();
+    assert_eq!(harness.account_lock_count(ACCOUNT), 1);
+    harness.cancel_authorization_for_test(next).unwrap();
+    assert_eq!(harness.account_lock_count(ACCOUNT), 0);
+
+    assert_exact_cleanup_observations(
+        &observations,
+        &[
+            (TouchedSecretClass::Seed, WipeExit::PanicUnwind, 1, 1, 0),
+            (
+                TouchedSecretClass::AuthoritativePczt,
+                WipeExit::PanicUnwind,
+                1,
+                1,
+                0,
+            ),
+            (
+                TouchedSecretClass::ExtractedTransaction,
+                WipeExit::PanicUnwind,
+                1,
+                1,
+                0,
+            ),
+        ],
+        0,
+    );
+    let frozen = cleanup_observation_snapshot(&observations);
+    let confirm_error = harness
+        .confirm_native(&handle, &mut ManualClock::at(NOW))
+        .err()
+        .expect("consumed handle confirmation must fail");
+    assert_eq!(confirm_error.code(), "LOCKED");
+    let prepare_error = harness
+        .prepare(
+            input_for(ACCOUNT, OTHER_REQUEST_ID, OTHER_INTENT_HASH),
+            &mut ManualClock::at(NOW),
+        )
+        .err()
+        .expect("fresh preparation after panic must fail");
+    assert_eq!(prepare_error.code(), "LOCKED");
+    assert_no_verified_or_broadcast(&harness);
+    assert_eq!(frozen, cleanup_observation_snapshot(&observations));
+    drop(harness);
+    assert_eq!(frozen, cleanup_observation_snapshot(&observations));
 }

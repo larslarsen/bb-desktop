@@ -5,6 +5,7 @@ mod fixture;
 mod hardware;
 mod prepare;
 mod scan;
+mod spend;
 mod store;
 
 #[doc(hidden)]
@@ -224,6 +225,26 @@ impl ZecError {
 
     pub(crate) fn expired() -> Self {
         Self::new("EXPIRED", "Zcash request has expired")
+    }
+
+    pub(crate) fn unauth() -> Self {
+        Self::new("UNAUTH", "Zcash action requires the native surface")
+    }
+
+    pub(crate) fn intent_mismatch() -> Self {
+        Self::new("INTENT_MISMATCH", "Zcash intent verification failed")
+    }
+
+    pub(crate) fn signature_invalid() -> Self {
+        Self::new("SIGNATURE_INVALID", "Zcash authorization is invalid")
+    }
+
+    pub(crate) fn cancelled() -> Self {
+        Self::new("CANCELLED", "Zcash request was cancelled")
+    }
+
+    pub(crate) fn account_busy() -> Self {
+        Self::new("ACCOUNT_BUSY", "Zcash account is busy")
     }
 
     pub fn code(&self) -> &'static str {

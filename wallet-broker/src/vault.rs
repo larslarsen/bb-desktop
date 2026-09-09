@@ -201,6 +201,18 @@ impl SecretBytes {
         })
     }
 
+    pub(crate) fn into_observed(
+        self,
+        label: &'static str,
+        observer: Box<dyn WipeObserver>,
+    ) -> ObservedSecretBytes {
+        ObservedSecretBytes {
+            secret: self,
+            label,
+            observer,
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.bytes.expose_secret().len()
     }
@@ -256,6 +268,12 @@ impl Drop for SecretBytes {
     fn drop(&mut self) {
         let bytes = self.bytes.expose_secret_mut();
         bytes.zeroize();
+    }
+}
+
+impl ObservedSecretBytes {
+    pub(crate) fn as_secret(&self) -> &SecretBytes {
+        &self.secret
     }
 }
 

@@ -1,6 +1,175 @@
 use core::fmt;
+use std::collections::BTreeSet;
+use std::sync::{Mutex, OnceLock};
 
 use crate::vault::{MAX_PASSPHRASE_BYTES, SecretBytes, WipeObserver, valid_account_id};
+
+fn consumed_confirmation_nonces() -> &'static Mutex<BTreeSet<Vec<u8>>> {
+    static CONSUMED: OnceLock<Mutex<BTreeSet<Vec<u8>>>> = OnceLock::new();
+    CONSUMED.get_or_init(|| Mutex::new(BTreeSet::new()))
+}
+
+/// The exact, already-rendered Zcash review accepted by the native confirmation surface.
+/// This is crate-private so no protocol or Electron caller can construct a confirmation.
+#[derive(Clone, PartialEq, Eq)]
+pub(crate) struct ZecNativeReview {
+    pub(crate) handle: String,
+    pub(crate) session_id: String,
+    pub(crate) account_id: String,
+    pub(crate) network: String,
+    pub(crate) request_id: String,
+    pub(crate) intent_hash: String,
+    pub(crate) receiver: String,
+    pub(crate) amount_zat: String,
+    pub(crate) fee_zat: String,
+    pub(crate) fee_bound_zat: String,
+    pub(crate) memo_sha256: String,
+    pub(crate) expires_at: String,
+    pub(crate) transaction_version: u32,
+    pub(crate) consensus_branch: u32,
+    pub(crate) spend_pool: String,
+    pub(crate) output_pool: String,
+    pub(crate) review_hash: String,
+}
+
+/// A one-shot process-local authority. It deliberately has no public constructor, Clone,
+/// Debug, Display, or serialization implementation.
+pub(crate) struct ZecConfirmationCapability {
+    handle: String,
+    session_id: String,
+    account_id: String,
+    network: String,
+    request_id: String,
+    intent_hash: String,
+    review_hash: String,
+    nonce: SecretBytes,
+    synthetic_test_surface: bool,
+}
+
+impl ZecConfirmationCapability {
+    fn mint(review: ZecNativeReview, synthetic_test_surface: bool) -> Result<Self, NativeError> {
+        let mut nonce = vec![0; 32];
+        getrandom::fill(&mut nonce).map_err(|_| NativeError::locked())?;
+        Ok(Self {
+            handle: review.handle,
+            session_id: review.session_id,
+            account_id: review.account_id,
+            network: review.network,
+            request_id: review.request_id,
+            intent_hash: review.intent_hash,
+            review_hash: review.review_hash,
+            nonce: SecretBytes::new(nonce).map_err(|_| NativeError::locked())?,
+            synthetic_test_surface,
+        })
+    }
+
+    pub(crate) fn consume(self) -> Result<Self, NativeError> {
+        let fingerprint = self.nonce.expose(|bytes| bytes.to_vec());
+        let mut consumed = consumed_confirmation_nonces()
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
+        if !consumed.insert(fingerprint) {
+            return Err(NativeError::unauth());
+        }
+        Ok(self)
+    }
+
+    pub(crate) fn matches_review(&self, review: &ZecNativeReview) -> bool {
+        self.handle == review.handle
+            && self.session_id == review.session_id
+            && self.account_id == review.account_id
+            && self.network == review.network
+            && self.request_id == review.request_id
+            && self.intent_hash == review.intent_hash
+            && self.review_hash == review.review_hash
+            && self.nonce.len() == 32
+    }
+
+    pub(crate) fn handle(&self) -> &str {
+        &self.handle
+    }
+
+    pub(crate) fn session_id(&self) -> &str {
+        &self.session_id
+    }
+
+    pub(crate) fn account_id(&self) -> &str {
+        &self.account_id
+    }
+
+    pub(crate) fn network(&self) -> &str {
+        &self.network
+    }
+
+    pub(crate) fn request_id(&self) -> &str {
+        &self.request_id
+    }
+
+    pub(crate) fn intent_hash(&self) -> &str {
+        &self.intent_hash
+    }
+
+    pub(crate) fn review_hash(&self) -> &str {
+        &self.review_hash
+    }
+
+    pub(crate) fn nonce_len(&self) -> usize {
+        self.nonce.len()
+    }
+
+    pub(crate) fn came_from_synthetic_test_surface(&self) -> bool {
+        self.synthetic_test_surface
+    }
+}
+
+pub(crate) trait ZecNativeReviewSurfacePort {
+    fn confirm_zec_review(&mut self, review: &ZecNativeReview) -> Result<bool, NativeError>;
+}
+
+/// The sole production minting adapter. The capability is produced only after a native surface
+/// reports that it displayed and accepted this exact frozen review.
+pub(crate) fn confirm_zec_review_native(
+    surface: &mut dyn ZecNativeReviewSurfacePort,
+    review: ZecNativeReview,
+) -> Result<ZecConfirmationCapability, NativeError> {
+    if !surface.confirm_zec_review(&review)? {
+        return Err(NativeError::unauth());
+    }
+    ZecConfirmationCapability::mint(review, false)
+}
+
+/// Unmistakable test-only native-surface adapter; it does not accept an ActionOrigin or method.
+#[doc(hidden)]
+pub(crate) fn confirm_zec_review_synthetic_test_surface(
+    review: ZecNativeReview,
+) -> Result<ZecConfirmationCapability, NativeError> {
+    ZecConfirmationCapability::mint(review, true)
+}
+
+pub(crate) fn confirm_zec_review_from_origin(
+    origin: ActionOrigin,
+    surface: &mut dyn ZecNativeReviewSurfacePort,
+    review: ZecNativeReview,
+) -> Result<ZecConfirmationCapability, NativeError> {
+    if origin != ActionOrigin::NativeSurface {
+        return Err(NativeError::unauth());
+    }
+    confirm_zec_review_native(surface, review)
+}
+
+pub(crate) fn confirm_zec_review_from_method(_method: &str) -> Result<(), NativeError> {
+    Err(NativeError::unauth())
+}
+
+pub(crate) fn replay_consumed_confirmation(marker: &[u8]) -> Result<(), NativeError> {
+    let consumed = consumed_confirmation_nonces()
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    if consumed.iter().any(|value| value == marker) || !marker.is_empty() {
+        return Err(NativeError::unauth());
+    }
+    Err(NativeError::unauth())
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ActionOrigin {

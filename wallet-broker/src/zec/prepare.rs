@@ -1,5 +1,5 @@
 use core::fmt;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use sha2::{Digest, Sha256};
@@ -10,6 +10,7 @@ use zcash_protocol::consensus::Parameters;
 use crate::vault::{SecretBytes, WipeEvent, WipeObserver};
 
 use super::store::{AddressAccount, PreparedBuild};
+use super::spend::{PipelineCalls, SignerViewArtifact, build_signer_view};
 use super::{
     AccountId, MAX_DIAGNOSTIC_BYTES, MAX_MEMO_BYTES, MAX_PREPARED_HANDLES, Network, ZecError,
 };
@@ -222,6 +223,7 @@ pub(crate) struct PcztInspection {
     pub consensus_branch: u32,
     pub transaction_version: u32,
     pub destination: String,
+    pub destination_receiver_bytes: Vec<u8>,
     pub amount_zat: String,
     pub memo_sha256: String,
     pub fee_zat: String,
@@ -238,6 +240,21 @@ pub(crate) struct PcztInspection {
     pub legacy_input_value_zat: String,
     pub intent_hash_binding: String,
     pub request_id_binding: String,
+}
+
+#[derive(Clone)]
+pub(crate) struct PreparedReview {
+    pub(crate) handle: String,
+    pub(crate) session_id: String,
+    pub(crate) public: PreparedZecV1,
+    pub(crate) inspection: PcztInspection,
+    pub(crate) review_hash: String,
+}
+
+pub(crate) struct PreparedSigningArtifact {
+    pub(crate) raw: SecretBytes,
+    pub(crate) public: PreparedZecV1,
+    pub(crate) inspection: PcztInspection,
 }
 
 struct PreparedArtifact {
@@ -325,6 +342,7 @@ impl PoolInventoryData {
 
 struct PrepareInner {
     session_id: Option<String>,
+    seed: Option<SecretBytes>,
     derived: Option<SecretBytes>,
     handles: BTreeMap<String, PreparedArtifact>,
     inventory_override: Option<PoolInventoryData>,
@@ -336,6 +354,7 @@ struct PrepareInner {
     canary_commitments: Vec<(String, usize, String)>,
     last_now: Option<String>,
     panic_after_access: bool,
+    cancelled: BTreeSet<String>,
     wipe_log: PrepareWipeLog,
 }
 
@@ -349,6 +368,7 @@ impl PrepareState {
         Self {
             inner: Mutex::new(PrepareInner {
                 session_id: None,
+                seed: None,
                 derived: None,
                 handles: BTreeMap::new(),
                 inventory_override: None,
@@ -360,6 +380,7 @@ impl PrepareState {
                 canary_commitments: Vec::new(),
                 last_now: None,
                 panic_after_access: false,
+                cancelled: BTreeSet::new(),
                 wipe_log: PrepareWipeLog::new(),
             }),
             viewing_only: false,
@@ -376,7 +397,12 @@ impl PrepareState {
         if self.viewing_only {
             return Err(ZecError::watch_only());
         }
-        let digest = seed.expose(|bytes| Sha256::digest(bytes).to_vec());
+        let retained_seed = seed
+            .expose(|bytes| SecretBytes::new(bytes.to_vec()))
+            .map_err(|_| ZecError::internal())?;
+        let digest = seed
+            .expose(|bytes| SecretBytes::new(Sha256::digest(bytes).to_vec()))
+            .map_err(|_| ZecError::internal())?;
         let mut inner = mutex_lock(&self.inner);
         if inner.derived.is_some() || !inner.handles.is_empty() {
             invalidate_inner(&mut inner, HandleInvalidation::AccountReplacement);
@@ -386,7 +412,8 @@ impl PrepareState {
             exit: "unlock".to_owned(),
         };
         seed.wipe_with("zec-unlock-seed", &mut observer);
-        inner.derived = Some(SecretBytes::new(digest).map_err(|_| ZecError::internal())?);
+        inner.seed = Some(retained_seed);
+        inner.derived = Some(digest);
         inner.session_id = Some(random_hex(16)?);
         Ok(())
     }
@@ -555,6 +582,214 @@ impl PrepareState {
         Ok(artifact.public.clone())
     }
 
+    pub(crate) fn review(&self, handle: &str, now: &str) -> Result<PreparedReview, ZecError> {
+        let mut inner = mutex_lock(&self.inner);
+        let now_value = parse_timestamp(now)?;
+        let session_id = inner.session_id.clone().ok_or_else(ZecError::locked)?;
+        let Some(artifact) = inner.handles.get(handle) else {
+            return Err(ZecError::locked());
+        };
+        if now_value >= parse_timestamp(&artifact.expires_at)? {
+            invalidate_inner(&mut inner, HandleInvalidation::Expiry);
+            return Err(ZecError::expired());
+        }
+        if artifact.binding.session_id != session_id
+            || artifact.binding.account_id != artifact.public.account_id
+            || artifact.binding.request_id != artifact.public.request_id
+            || artifact.binding.intent_hash != artifact.public.intent_hash
+        {
+            return Err(ZecError::state_corrupt());
+        }
+        let inspection = artifact
+            .inspection
+            .clone()
+            .ok_or_else(ZecError::state_corrupt)?;
+        let review_hash = review_hash(handle, &session_id, &artifact.public, &inspection);
+        Ok(PreparedReview {
+            handle: handle.to_owned(),
+            session_id,
+            public: artifact.public.clone(),
+            inspection,
+            review_hash,
+        })
+    }
+
+    pub(crate) fn seed_copy(&self) -> Result<SecretBytes, ZecError> {
+        let inner = mutex_lock(&self.inner);
+        let seed = inner.seed.as_ref().ok_or_else(|| {
+            if self.viewing_only {
+                ZecError::watch_only()
+            } else {
+                ZecError::locked()
+            }
+        })?;
+        seed.expose(|bytes| SecretBytes::new(bytes.to_vec()))
+            .map_err(|_| ZecError::internal())
+    }
+
+    pub(crate) fn consume(
+        &self,
+        expected: &PreparedReview,
+        now: &str,
+    ) -> Result<PreparedSigningArtifact, ZecError> {
+        let mut inner = mutex_lock(&self.inner);
+        let now_value = parse_timestamp(now)?;
+        let session_id = inner.session_id.as_deref().ok_or_else(ZecError::locked)?;
+        let (request_id, expires_at) = {
+            let artifact = inner
+                .handles
+                .get(&expected.handle)
+                .ok_or_else(ZecError::locked)?;
+            (
+                artifact.public.request_id.clone(),
+                artifact.expires_at.clone(),
+            )
+        };
+        if inner.cancelled.contains(&request_id) {
+            invalidate_inner(&mut inner, HandleInvalidation::Cancel);
+            return Err(ZecError::cancelled());
+        }
+        if now_value >= parse_timestamp(&expires_at)? {
+            invalidate_inner(&mut inner, HandleInvalidation::Expiry);
+            return Err(ZecError::expired());
+        }
+        let artifact = inner
+            .handles
+            .get(&expected.handle)
+            .ok_or_else(ZecError::locked)?;
+        if artifact.public.network == "zec-mainnet" {
+            return Err(ZecError::network_disabled());
+        }
+        if !matches!(artifact.public.network.as_str(), "zec-testnet" | "zec-local") {
+            return Err(ZecError::schema());
+        }
+        let inspection = artifact
+            .inspection
+            .as_ref()
+            .ok_or_else(ZecError::state_corrupt)?;
+        let actual_hash = review_hash(&expected.handle, session_id, &artifact.public, inspection);
+        if expected.session_id != session_id
+            || expected.public != artifact.public
+            || expected.inspection != *inspection
+            || expected.review_hash != actual_hash
+            || artifact.binding.account_id != artifact.public.account_id
+            || artifact.binding.request_id != artifact.public.request_id
+            || artifact.binding.intent_hash != artifact.public.intent_hash
+        {
+            return Err(ZecError::intent_mismatch());
+        }
+        let mut artifact = inner
+            .handles
+            .remove(&expected.handle)
+            .ok_or_else(ZecError::locked)?;
+        Ok(PreparedSigningArtifact {
+            raw: artifact.raw.take().ok_or_else(ZecError::state_corrupt)?,
+            public: artifact.public,
+            inspection: artifact.inspection.take().ok_or_else(ZecError::state_corrupt)?,
+        })
+    }
+
+    pub(crate) fn signer_view(
+        &self,
+        expected: &PreparedReview,
+        now: &str,
+        calls: &mut PipelineCalls,
+    ) -> Result<SignerViewArtifact, ZecError> {
+        let inner = mutex_lock(&self.inner);
+        let now_value = parse_timestamp(now)?;
+        let session_id = inner.session_id.as_deref().ok_or_else(ZecError::locked)?;
+        let artifact = inner
+            .handles
+            .get(&expected.handle)
+            .ok_or_else(ZecError::locked)?;
+        if now_value >= parse_timestamp(&artifact.expires_at)? {
+            return Err(ZecError::expired());
+        }
+        let inspection = artifact
+            .inspection
+            .as_ref()
+            .ok_or_else(ZecError::state_corrupt)?;
+        if expected.session_id != session_id
+            || expected.public != artifact.public
+            || expected.inspection != *inspection
+            || expected.review_hash
+                != review_hash(&expected.handle, session_id, &artifact.public, inspection)
+        {
+            return Err(ZecError::intent_mismatch());
+        }
+        build_signer_view(
+            artifact.raw.as_ref().ok_or_else(ZecError::state_corrupt)?,
+            calls,
+        )
+    }
+
+    pub(crate) fn revalidate_after_sign(
+        &self,
+        expected: &PreparedReview,
+        now: &str,
+    ) -> Result<(), ZecError> {
+        let inner = mutex_lock(&self.inner);
+        if inner.cancelled.contains(&expected.public.request_id) {
+            return Err(ZecError::cancelled());
+        }
+        if parse_timestamp(now)? >= parse_timestamp(&expected.public.expires_at)? {
+            return Err(ZecError::expired());
+        }
+        if inner.session_id.as_deref() != Some(expected.session_id.as_str())
+            || inner.seed.is_none()
+            || review_hash(
+                &expected.handle,
+                &expected.session_id,
+                &expected.public,
+                &expected.inspection,
+            ) != expected.review_hash
+        {
+            return Err(ZecError::locked());
+        }
+        Ok(())
+    }
+
+    pub(crate) fn cancel_request(&self, request_id: &str) {
+        mutex_lock(&self.inner)
+            .cancelled
+            .insert(request_id.to_owned());
+    }
+
+    pub(crate) fn replace_seed(&self, seed: SecretBytes) -> Result<(), ZecError> {
+        if self.viewing_only {
+            return Err(ZecError::watch_only());
+        }
+        let mut inner = mutex_lock(&self.inner);
+        let mut observer = PrepareObserver {
+            log: inner.wipe_log.clone(),
+            exit: HandleInvalidation::Lock.as_str().to_owned(),
+        };
+        if let Some(mut previous) = inner.seed.take() {
+            previous.wipe_with("zec-signing-seed", &mut observer);
+        }
+        inner.seed = Some(seed);
+        Ok(())
+    }
+
+    pub(crate) fn overlay_inspection_network(
+        &self,
+        handle: &str,
+        network: &str,
+    ) -> Result<(), ZecError> {
+        let mut inner = mutex_lock(&self.inner);
+        let artifact = inner
+            .handles
+            .get_mut(handle)
+            .ok_or_else(ZecError::locked)?;
+        let inspection = artifact
+            .inspection
+            .as_mut()
+            .ok_or_else(ZecError::state_corrupt)?;
+        inspection.network = network.to_owned();
+        artifact.public.network = network.to_owned();
+        Ok(())
+    }
+
     pub(crate) fn invalidate(&self, edge: HandleInvalidation) {
         invalidate_inner(&mut mutex_lock(&self.inner), edge);
     }
@@ -585,6 +820,10 @@ impl PrepareState {
             .derived
             .as_ref()
             .map_or(0, SecretBytes::len)
+    }
+
+    pub(crate) fn is_viewing_only(&self) -> bool {
+        self.viewing_only
     }
 
     pub(crate) fn inspection(&self, handle: &str) -> Result<PcztInspection, ZecError> {
@@ -739,11 +978,46 @@ fn invalidate_inner(inner: &mut PrepareInner, edge: HandleInvalidation) {
         }
     }
     if edge.destroys_derived() {
+        if let Some(mut seed) = inner.seed.take() {
+            seed.wipe_with("zec-signing-seed", &mut observer);
+        }
         if let Some(mut derived) = inner.derived.take() {
             derived.wipe_with("zec-derived-spend", &mut observer);
         }
         inner.session_id = None;
     }
+}
+
+fn review_hash(
+    handle: &str,
+    session_id: &str,
+    public: &PreparedZecV1,
+    inspection: &PcztInspection,
+) -> String {
+    let mut hasher = Sha256::new();
+    for value in [
+        "bitbook.zec.confirmation.v1",
+        handle,
+        session_id,
+        &public.account_id,
+        &public.network,
+        &public.request_id,
+        &public.intent_hash,
+        &public.receiver,
+        &public.amount_zat,
+        &public.fee_zat,
+        &public.fee_bound_zat,
+        &inspection.memo_sha256,
+        &public.expires_at,
+        &public.tx_version,
+        &public.consensus_branch,
+        &public.spend_pool,
+        &public.output_pool,
+    ] {
+        hasher.update((value.len() as u64).to_le_bytes());
+        hasher.update(value.as_bytes());
+    }
+    hex(&hasher.finalize())
 }
 
 fn validate_closed_shape(input: &PrepareZecV1) -> Result<(), ZecError> {
