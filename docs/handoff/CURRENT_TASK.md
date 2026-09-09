@@ -1,44 +1,43 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DECODED EFFECTS EXPECTED RED 01 — HERMES
+State: DECODED EFFECTS PRODUCTION REPAIR 01 — GROK
 Reviewer: Codex, XHigh
-Authorized source actors: none
-Authorized execution/evidence actor: Hermes Jr Dev only
+Authorized source actor: Grok Build, grok-4.6 High, exact handoff paths only
+Authorized execution/evidence actors: none
 Authorized integration actors: none
 Protected governance parent: the commit containing this task update
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active handoff and source acceptance: [decoded effects expected red](HERMES_BBD_WAL_009_DECODED_EFFECTS_EXPECTED_RED_01.md)
+Active handoff and red acceptance: [decoded effects production repair](GROK_BBD_WAL_009_DECODED_EFFECTS_PRODUCTION_01.md)
 Read this prefix and active handoff; no historical handoff reload.
 
-Grok session 7ddfcee6-c773-4d03-af90-51da48895a33, outer 32613, collected once
-after owner done, exit 0; runtime grok-4.6-build High. The one-file test source is
-accepted: verification_context_tests.rs, 757 lines,
-791e8cbb77d556ab05e35946e23cddbc3b5a27659c3ce7b5e2464a665210fda4.
-Reversing all source patches reproduces the exact baseline. The other 26 source/
-evidence identities match. No source-actor test/compiler/Git execution occurred.
+Hermes outer 81835 collected once after done, exit 0; session
+20260908_182241_3f2ee5, nous/poolside/laguna-s-2.1:free. Exact command 78730 ran
+once; completion 78749 exit 101; full 41-line log 78751. The regression reached
+its final assertion at line 756 after valid recovery and positive verification:
+all ten false metadata claims were accepted. One test failed, 6 filtered, 453.79s.
+This intended behavioral red is accepted. All 27 prior identities match. New
+196-line evidence SHA-256:
+a7def01abd54eae10e663e341ce8b253992d883863a1410c93278fa698d78431.
+The active handoff records procedural/report errors; no rerun or correction task.
+Hermes is closed. Do not resume or poll it.
 
-Hermes may execute the one exact regression command once. Expected red is the
-final ten-case assertion after real decoded recovery and positive verification,
-showing that the current verifier accepts agreeing but false metadata. Compile,
-fixture/recovery/crypto failure or unexpected green requires a stop, no repair or
-retry. Capture complete process output and write the one named evidence record.
-Source, other tests, existing evidence, integration and Git mutation are frozen.
+Grok may repair actual decoded-effects verification, bind it to pre-sign account/
+spend/hash/anchor context, forward trusted viewing authority on the synthetic
+external route, and mechanically adapt the existing regression calls. Exact
+paths and semantics are in the handoff. No source-actor execution or integration.
+No weakening of the ten-case regression or reuse of metadata as an actual oracle.
 
-No UI follow-up, report-only correction, old proof-suite repeat or new demo
-milestone. Previously accepted outcomes remain valid. Implementation and ten prior
-actor evidence records remain uncommitted. Independent effects, actual-secret
+Previously accepted results remain valid. No UI repeat or new demo milestone.
+Implementation and eleven actor evidence records remain uncommitted. Actual-secret
 cleanup, native integration and remaining security stay open. Network/broadcast/
 mainnet/hardware/Monero parked. Keep reviewer XHigh for this effects work.
 
 Reviewer publication scope: CURRENT_TASK.md, tickets/BBD-WAL-009.md and
-HERMES_BBD_WAL_009_DECODED_EFFECTS_EXPECTED_RED_01.md only.
-Launch once and record the outer/session identity here. Collect after done or
-explicit collection; never poll an actor.
-Hermes launched once from 123f26c2 with --pass-session-id, outer terminal 81835.
-Runtime session ID will be collected with completion. No completion collected;
-do not relaunch or poll. Wait for owner done/explicit collection.
+GROK_BBD_WAL_009_DECODED_EFFECTS_PRODUCTION_01.md only.
+Launch once and record session/outer identity here. Collect after done/explicit
+collection; never poll an actor.
 
 ## Historical record (superseded by the active state above)
 
