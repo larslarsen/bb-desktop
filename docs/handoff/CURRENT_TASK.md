@@ -1,42 +1,35 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP RUNNING
-Reviewer: Codex; High suffices for this fixed task and review
-Authorized source actor: Grok Build, grok-4.6 High, five named paths only
-Authorized execution/evidence actors: none
-Authorized integration actors: none
-Protected parent: commit publishing lint cleanup; one CURRENT-only launch commit is allowed
+State: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION AUTHORIZED
+Reviewer: Codex; High is sufficient
+Authorized source actors: none; Grok drop accepted and source authorization closed
+Authorized execution/evidence/integration actor: Hermes, task below only
+Protected parent: commit publishing this handoff; one CURRENT-only launch is allowed
 
 Ticket: [BBD-WAL-009.md](../../tickets/BBD-WAL-009.md)
-Active source task: [Rust lint cleanup 01](GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md)
-Accepted findings: [diagnostics review](HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#collected-diagnostics-acceptance--2026-09-09)
-Read this prefix and the active source task; no historical handoff reload.
+Active task: [Rust lint validation 01](HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md)
+Source acceptance: [Grok review](GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md#collected-source-acceptance--2026-09-09)
+Read this prefix and active task; no historical reload.
 
-Hermes outer 8844 / runtime 20260909_092601_7ccfbe completed and is closed.
-All four diagnostics ran once: formatter 1, no-default Clippy 101 (15 lints),
-native-ui Clippy 101 (16 lints), policy CLI 1 (runtime dependencies rejected).
-Source is unchanged. Diagnostic evidence alone is untracked; its capture/report
-limitations are recorded in the acceptance. No separate report repair or rerun.
+Grok outer 75023 / session 9aa3e29e-8c84-4cad-9d28-333ab7038ec8 is closed.
+The five-file source cleanup is accepted for validation. Hermes may mechanically
+format the 17 frozen Rust paths, run the two library lint gates and two focused
+existing tests, normalize the old diagnostic report alongside new evidence, scan
+for secrets, and integrate only on success. No full proof rerun. No actor is yet
+launched for this new task. Launch once; collect only on owner done/Continue; no polling.
 
-Grok may resolve all 16 Rust lint findings in the exact five-path source task.
-No wallet behavior, authority/verification/cleanup semantics, tests, dependencies,
-policy or other paths may change. Execution and formatting are reserved for a
-subsequent combined validation handoff after source review. No functional proofs
-or signing tests are repeated now. Grok launched once from 0a3b06c2.
-Active outer: 75023; session: 9aa3e29e-8c84-4cad-9d28-333ab7038ec8.
-Collect once only on owner done/Continue; do not poll or relaunch.
-
-Mapping-dependency intent was asked asynchronously; pending answer, preserve
-leaflet/maplibre and package policy unchanged. Existing CI's 11 policy failures
-remain open and recorded. Partial source checkpoint 502580fc remains accepted;
-full typed-secret erasure, final validation/security and wallet completion remain
-open. Runtime/Electron/OS is WAL-011; usable native/Pay flows are WAL-010.
-Money-moving features, hardware and Monero remain parked. High is sufficient.
+Owner decision 2026-09-09: use MapLibre and remove Leaflet. This resolves the pending
+mapping question. Dependency and exact policy corrections are next; this Rust task
+keeps manifests/locks/policy frozen. Existing CI's 11 policy failures remain open.
+Partial source checkpoint 502580fc remains accepted. Full typed-secret erasure,
+Phase A1/final validation/security and wallet completion remain open. Runtime/
+Electron/OS integration is WAL-011; usable native/Pay flows are WAL-010. Money-moving
+features, hardware and Monero remain parked. High is sufficient.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
-docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md and
-docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md only.
+docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md and
+docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md only.
 
 ## Historical record (superseded by the active state above)
 

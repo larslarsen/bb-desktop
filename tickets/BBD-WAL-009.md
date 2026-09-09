@@ -1,19 +1,18 @@
 # BBD-WAL-009 — Zcash PCZT Authorization, Verification, and Durable Send Pipeline
 
-Status: DIAGNOSTICS ACCEPTED — BOUNDED RUST LINT SOURCE CLEANUP AUTHORIZED
+Status: RUST LINT SOURCE ACCEPTED — FORMAT/VALIDATION/INTEGRATION AUTHORIZED
 
-The four-command diagnostic pass is complete and accepted as findings, not green:
-formatting differences, 15 shared library lints plus one native-ui lint, and package
-policy rejection. Source stayed unchanged; no functional signing test or proof ran.
-[Review and capture limits](../docs/handoff/HERMES_BBD_WAL_009_CONSOLIDATED_DIAGNOSTICS_01.md#collected-diagnostics-acceptance--2026-09-09)
-govern the uncommitted report. Hermes outer 8844 is closed.
+The five-file Grok lint cleanup passed source review. Its native authority,
+verification and signer-fault boundaries are preserved. Grok outer 75023 is closed.
+[Collected source acceptance](../docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md#collected-source-acceptance--2026-09-09)
+records the review; this is not yet green execution.
 
-Grok Build High alone may perform the fixed five-path
-[Rust lint cleanup](../docs/handoff/GROK_BBD_WAL_009_RUST_LINT_CLEANUP_01.md).
-No tests, execution, dependencies, policy or source integration are authorized.
-The later formatter and focused validation will be grouped after source acceptance.
-Mapping-dependency intent is pending owner clarification; preserve those inputs.
-High is sufficient. CURRENT_TASK.md governs active scope.
+Hermes alone may perform the grouped [formatting, focused validation and integration
+pass](../docs/handoff/HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md). No full proof
+reruns or new test design. CURRENT_TASK.md governs launch and exact scope.
+The owner has resolved mapping intent: keep MapLibre and remove Leaflet. That
+package/policy correction follows this Rust checkpoint; existing policy failures
+remain open, and those files are frozen during this validation pass. High suffices.
 
 Partial source checkpoint 502580fc remains accepted and pushed. Full Phase-A1,
 wallet/release acceptance, upstream typed-secret erasure and final security remain

@@ -110,3 +110,29 @@ After the five-path drop, report exact paths, line counts, SHA-256, which listed
 corrections were made and any unresolved concern. State that no execution or Git
 occurred. Stop for reviewer source acceptance; do not run a formatter or probe
 Clippy, author evidence, integrate, delegate or extend the task.
+
+## Collected source acceptance — 2026-09-09
+
+ACCEPT the five-file drop for formatting and focused validation, not final green.
+Outer 75023 closed with exit 0; saved Grok session
+9aa3e29e-8c84-4cad-9d28-333ab7038ec8 confirms grok-4.6 at High. The reviewer inspected
+the full diff and reconstructed all five files exactly from the transcript's 15
+unique old/new source replacements. No outside source change occurred. The runtime
+contains 37 file reads, 16 searches, 15 replacements, two read-only Python identity
+measurements and three todo updates; no tests, formatter, Cargo, scanner or Git ran.
+
+Removed the two unused helpers with no callers; gated the test-only authority helper
+and control geometry with cfg(test); collapsed two equivalent conditions; preserved
+explicit authority arguments through four narrow, reasoned lint allowances; removed
+three identity closures and one needless return; supplied is_empty beside len.
+The existing dead_code attribute on review_matches_capability was not introduced.
+The USK now ends in an inner lexical scope at the same pre-fault boundary, preserving
+checks, signing order and pending/hash ownership. Ending ownership does not establish
+upstream key erasure. No native confirmation, verification or cleanup invariant was
+weakened. No new functional behavior/test design is involved; the observed lint red
+is already accepted. Source identities are frozen in the next validation handoff.
+
+Source authorization is closed. Hermes alone may execute the combined formatter,
+focused validation and integration in HERMES_BBD_WAL_009_RUST_LINT_VALIDATION_01.md.
+High is sufficient for this bounded review and pass. Owner mapping decision is now
+keep MapLibre/remove Leaflet; package-policy correction follows separately.
