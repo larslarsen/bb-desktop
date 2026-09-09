@@ -33,7 +33,9 @@ Monero/Electron send stay parked. No full-wallet or usable send-flow acceptance.
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_PIPELINE_PANIC_EXPECTED_RED_01.md only.
 High is sufficient for fixed source/result review; do not claim a setting change.
-Launch once, collect after owner done, never poll. Not launched yet.
+Launched once from ea5017ae: Hermes outer terminal 34696, --pass-session-id.
+Runtime session/provider/model and completion remain unverified until collection.
+Collect once after owner done; do not poll or relaunch.
 
 ## Historical record (superseded by the active state above)
 
