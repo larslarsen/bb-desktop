@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-009
-State: PARTIAL LIBRARY CHECKPOINT INTEGRATION AUTHORIZED
+State: PARTIAL LIBRARY CHECKPOINT INTEGRATION RUNNING
 Reviewer: Codex; owner selected XHigh for the completed architecture decision
 Authorized source actors: none
 Authorized execution/evidence/integration actor: Hermes, checkpoint 01 only
@@ -32,7 +32,9 @@ unchanged. No functional tests, proof reruns, source edits or broader work autho
 Implementation and 18 evidence records remain uncommitted until Hermes completes.
 Final validation/security and later send/runtime work remain open. Broadcast/mainnet/
 hardware/Monero/Electron send remain parked. High suffices for the next fixed review.
-Reviewer will launch Hermes once; do not independently launch another actor or poll.
+Hermes launched once from 1284f559; outer session 1592 is active.
+Collect that outer once only on owner done/Continue. Do not poll or relaunch.
+Actual Hermes session/provider/model will be verified from saved runtime on collection.
 
 Reviewer publication scope: docs/handoff/CURRENT_TASK.md, tickets/BBD-WAL-009.md,
 and docs/handoff/HERMES_BBD_WAL_009_LIBRARY_CHECKPOINT_01.md only.
