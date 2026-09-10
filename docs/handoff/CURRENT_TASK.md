@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON NORMAL QUIT INTEGRATED AND ACCEPTED — STARTUP REVIEW NEXT
+State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none
+Authorized source actor: Grok Build, grok-4.6 High; new test file only
 Authorized execution actor: none
 Authorized integration actor: none
-Accepted implementation HEAD: 21e2e4d546adb06321e820ea77a52147fa47a71a
+Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
-Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, the ticket and
-[quit integration acceptance](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
-No implementation or execution is authorized. No actor or result is pending.
-Next work is reviewer scoping of pinned broker startup and application composition.
+Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
+[Grok launch-configuration tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md).
+Only new test/walletBrokerLaunchConfig.node.js is writable by Grok.
+No production stubs, tests, syntax checks, builds, evidence or Git mutation.
+Launch pending reviewer publication. Launch once; collect on owner done/Continue.
+Do not poll an actor or start another while its result is pending.
 
-Quit wiring accepted/pushed at 21e2e4d5: await one shutdown completion, allow
-approved quit re-entry, hold failures with one fixed error box, contain dialog
-failure. Main/test/red/green committed hashes match. All 30 Electron and six
-preload groups passed; early-quit falsification failed as intended and restored
-Electron green passed all 30. No evidence correction or validation replay needed.
-Hermes outer 28190 collected exit 0; actual session 20260909_213252_c3ca6f,
-nous / poolside/laguna-s-2.1:free. Source/execution/integration are closed.
+Reviewer fixed a build-generated four-field manifest in resources/wallet-broker,
+fixed executable basenames and six platform/arch identities. The future resolver
+reads the pin and returns exact supervisor options; no runtime self-pinning,
+process start or data-dir mutation. Five filesystem fixture groups cover valid
+configuration, bad options/manifests, size limits and missing/symlink inventory.
+Existing supervisor keeps executable-byte verification before spawn.
+All three packagers currently omit runtime JS now imported by main and lack a
+broker manifest/artifact. Later contracts must repair inventory/generate pins,
+then connect main startup/status and quit ordering. This test slice does neither.
 
-Awaitable supervisor shutdown remains accepted at 1e45d6d2 with 26 lifecycle groups.
-Async IPC at 3aa5e3d8, degraded Rust executable at 31a6e540 and transport at 5aada7ef
-remain accepted. Do not replay closed validation without an affected new change.
-Whole WAL-011 remains incomplete: main does not start a reviewed pinned broker.
-Next contracts need packaging-derived pin provenance/platform inventory, private
-user-data setup, truthful startup failure/status, startup-versus-quit ordering
-and real Electron-to-Rust composition tests. No runtime self-pinning, arbitrary
-environment-selected executable, package expansion or native-flow claim is authorized.
+Quit at 21e2e4d5 retains 30 Electron/six preload groups plus falsification/restoration.
+Supervisor shutdown, async IPC, degraded Rust and transport evidence is retained.
+No closed-suite replay; whole-ticket/native-wallet/release completion is not claimed.
+The prior integration actor is closed; no prior result awaits collection.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md,
-docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 stays parked.
 No credential/config discovery. Future CURRENT reads specify lines 1–40.
-Future Hermes metadata uses the exact session key and row only, without fallback.
+Future Hermes metadata uses exact session key and row only, without fallback.
+Source test fixtures are small temporary files; no binaries/build artifacts.
 
 ## Historical record (superseded by the active state above)
 

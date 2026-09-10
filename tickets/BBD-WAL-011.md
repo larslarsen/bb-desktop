@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron normal quit integrated and accepted; pinned startup review next.
+Status: Electron normal quit accepted; packaged launch-configuration tests authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -158,6 +158,18 @@ setup, startup failure/status behavior and real application composition require
 the next reviewer contract. Later startup must avoid spawning during pending or
 completed quit. Native account flows and whole-ticket/release acceptance remain
 incomplete. No validation replay or source change is currently authorized.
+
+The next active [launch configuration contract](../docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md)
+authorizes only Grok's new test/walletBrokerLaunchConfig.node.js. It fixes a
+four-field build-generated manifest under resources/wallet-broker, fixed per-platform
+executable names, strict pin/identity validation and a private userData child path.
+The resolver reads the expected pin; existing supervisor code still verifies bytes
+before spawn. Five filesystem fixture groups precede the disconnected production
+module. Expected red/green: node test/walletBrokerLaunchConfig.node.js; affected
+regression: node test/walletSupervisor.node.js. Falsify target-identity enforcement.
+No execution yet. The handoff also records missing runtime JS in all three current
+packagers. Build-time pin generation/inventory repair and main startup composition
+are later contracts; no runtime self-pinning or existing package repair is implied.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
