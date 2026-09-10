@@ -1,14 +1,16 @@
 # Current Task
 
 Ticket: BBD-WAL-013
-State: NATIVE ACCOUNT MANAGEMENT — ACCOUNT SERVICE TESTS AUTHORIZED
+State: NATIVE ACCOUNT MANAGEMENT — SERVICE AND WINDOW TESTS AUTHORIZED
 Reviewer: Codex
 Authorized source: Grok grok-4.6 High, no subagents
 Authorized execution/integration: none until source review
 
 Owner explicitly selected account management after WAL-011 startup completion.
 Active contract: GROK_BBD_WAL_013_ACCOUNTS_01.md.
-Only account_management.rs test and one Cargo test-target registration writable.
+Service: only account_management.rs and one Cargo test registration writable.
+Independent window tests: only account_native_ui.rs under GROK_BBD_WAL_013_NATIVE_UI_01.md.
+No concurrent actor shares writable paths; production and execution still frozen.
 Production follows understood red. Reviewer is fixing native window/runtime scope
 while service test source is authored. Continue through usable native flow, not
 merely a library milestone. No package-policy or installer detour.
