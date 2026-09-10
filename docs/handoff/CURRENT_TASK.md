@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE SOURCE ACCEPTED — FOCUSED VALIDATION AUTHORIZED
+State: RUST EXECUTABLE SOURCE ACCEPTED — FOCUSED VALIDATION RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
 Authorized execution actor: Hermes, exact executable validation handoff only
@@ -44,6 +44,8 @@ sequence, preserve machine-readable output and write one validation evidence rec
 No integration or other source edits. Resume known Hermes session
 20260909_164019_e64925; metadata queries use that literal ID only, no rediscovery.
 Launch once; collect on owner done/Continue. No actor polling.
+Hermes validation launched once from 3b82df5a; outer 99713, resumed session
+20260909_164019_e64925, requested nous / poolside/laguna-s-2.1:free.
 
 ## Historical record (superseded by the active state above)
 
