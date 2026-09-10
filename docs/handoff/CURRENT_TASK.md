@@ -1,24 +1,29 @@
 # Current Task
 
 Ticket: BBD-WAL-013
-State: NATIVE ACCOUNT MANAGEMENT — SERVICE AND WINDOW TESTS AUTHORIZED
+State: NATIVE ACCOUNT MANAGEMENT — SERVICE IMPLEMENTATION / UI AND RUNTIME TEST REVIEW
 Reviewer: Codex
-Authorized source: Grok account service production; Sol UI and runtime test corrections
-Execution: service expected-red accepted/closed; none currently active
-Integration: none
+Owner requested account management; carry through usable native flow without done relays.
 
-Owner explicitly selected account management after WAL-011 startup completion.
-Active contract: GROK_BBD_WAL_013_ACCOUNTS_01.md.
-Service: only account_management.rs and one Cargo test registration writable.
-Independent window tests: only account_native_ui.rs under GROK_BBD_WAL_013_NATIVE_UI_01.md.
-Runtime/menu test actor: only named JS tests under GROK_BBD_WAL_013_RUNTIME_01.md.
-No concurrent actor shares writable paths; production and execution still frozen.
-Service production authorized only under GROK_BBD_WAL_013_ACCOUNTS_PRODUCTION_01.md.
-UI/runtime production frozen. Reviewer is fixing native window/runtime scope
-while service test source is authored. Continue through usable native flow, not
-merely a library milestone. No package-policy or installer detour.
-Preserve unrelated pending npm/policy changes and two older evidence drafts.
-Keep user informed <=60 seconds; collect and route all actors without owner done.
+Active source actors (no subagents; disjoint writes):
+- Grok grok-4.6 High, resumed6481c6a3 / outer92553: accounts.rs + lib registration ONLY,
+  under GROK_BBD_WAL_013_ACCOUNTS_PRODUCTION_01.md.
+- Sol gpt-5.6-sol High / outer30826: account_native_ui.rs two-helper finish ONLY,
+  under SOL_BBD_WAL_013_NATIVE_UI_TEST_FINISH_01.md.
+- Sol gpt-5.6-sol High / outer97914: four JS test corrections ONLY,
+  under SOL_BBD_WAL_013_RUNTIME_TEST_CORRECTION_01.md.
+Grok UI and runtime test actors stopped at turn limits without usable completed drops;
+Sol escalation recorded in named contracts. All prior actors collected and closed.
+
+Execution: service expected-red ACCEPTED (12test source, only missing-accounts E0432),
+HERMES_BBD_WAL_013_ACCOUNTS_RED_01.md. No execution/integration currently active.
+UI/runtime production remains frozen until understood red. UI/runtime semantics fixed
+in GROK_BBD_WAL_013_{NATIVE_UI,RUNTIME}_01.md. Real window proof contract exists but is
+NOT yet source-authorized. Full task includes service, nativewindow, Wallet/Manage
+accounts menu, real runtime/build, actualwindow and persistence proof, integration.
+No package-policy/installer detour. Preserve four unrelated npm/policy pending paths
+and WAL009/WAL011 older evidence drafts. No owner done/permission relay needed.
+Keep user informed <=60seconds and collect/review/route all actors in same task.
 
 --- Previous completed task ---
 
