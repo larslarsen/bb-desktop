@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Async Electron IPC integrated and accepted; startup architecture review next.
+Status: Awaitable shutdown prerequisite scoped; Grok test source authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -75,15 +75,26 @@ is accepted: resolved replies are cloned; synchronous validation remains intact.
 passed all 23 Electron and six preload groups. One-line reversal produced exactly
 the expected failures, then restored Electron green passed all 23.
 [Four-path integration](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09)
-is accepted and pushed at 3aa5e3d844feac54eece517d5c4226dd8608452e. All actors are
-closed. Source/test edits, execution and integration are not currently authorized.
+is accepted and pushed at 3aa5e3d844feac54eece517d5c4226dd8608452e. Its source,
+validation and integration actors are closed.
 
-Next is reviewer scoping of startup/pinning/shutdown. Before another implementation
-handoff, fix binary pin provenance independent of the runtime artifact, platform
-and missing-artifact behavior, private data-directory placement, app readiness and
-quit ordering, and a test-first real-process acceptance route. Runtime self-pinning
-or arbitrary environment-selected executables are not authorized. This stage must
-truthfully report down/degraded until native account composition is available.
+The next bounded prerequisite is
+[awaitable supervisor shutdown](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
+Existing quit() returns before child closure, so main cannot yet wait for cleanup.
+Grok may author only test/walletSupervisorShutdown.node.js and the small new
+shutdown-child.js fixture. Future shutdown() returns one shared Promise, preserves
+existing quit/cancellation/250 ms escalation, resolves on observed child close or
+absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
+supervisor edits follow observed-red review; no execution or integration is now
+authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
+affected lifecycle regressions and early-completion falsification.
+
+Startup pin provenance remains as specified in architecture section 4.2: reviewed
+packaging creates the pin before runtime, without runtime self-pinning or arbitrary
+environment-selected executables. Private storage is a wallet-broker child directory
+under Electron userData. Platform artifact inventory and app startup/before-quit
+composition require subsequent bounded contracts; this shutdown task adds no package
+content or runtime configuration. Tests use a Node child fixture, not a coin binary.
 The whole ticket remains incomplete; no app startup or release acceptance is claimed.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
