@@ -253,3 +253,36 @@ finally:
     print('RESUME_SUCCESS='+str(result['success']), flush=True)
 sys.exit(exit_code)
 ```
+
+## Resume 01 acceptance — 2026-09-09
+
+Accept the executed runtime boundary. Outer 92827 collected on owner done, exit 0.
+Actual session 20260909_173905_d15995, nous / poolside/laguna-s-2.1:free; Hermes
+v0.18.2 (2026.7.7.2), upstream 8e85b276, local 10b6d1a9. Exact-session tool inventory
+shows one handoff read, one unchanged short launcher (80291), one process wait and
+completion (80294), with no other actor commands or edits. The actor read the full
+handoff instead of only the requested section; execution remained bounded.
+
+Format, initial build, warning-denied Clippy, mutant build and restored build all
+exit 0. The wrong-session mutant exits the selected test with 1 and exactly
+`wrong session did not terminate promptly`; source restoration matches the formatted
+runtime hash before rebuilding. All nine full runtime groups pass, zero failures.
+This is actual compiled-Rust transport, degraded status and rejection behavior;
+it is not app startup, native UI, connected accounts, custody or release acceptance.
+
+Final measured inputs:
+- main.rs: 7 lines, 19b1651d88d85e5d968597eb26eeb62f76a11af56eaa311d60a55d3ef282736d
+- runtime.rs: 695 lines, 968194aadd609f54ef28a11a090fcb1ca840cfc851da127456dd5b356437305b
+- runtime test: 947 lines, a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e
+- all other frozen inputs retain their accepted identities.
+
+Raw JSON SHA-256:
+7994b2db6cac49a1e03c99533828617d9f4204f6e2dce9132c5b9f3bfe9ed404.
+The 203-line green-resume evidence has SHA-256
+ed7b7b3c437c21e027805c627b9e447927da5ca5c95c5fb30f0fa6891e1b451e
+and exactly equals the raw JSON after the specified path normalization. Reviewer
+verified the actual session row and eight final source identities independently.
+No gates were rerun during review. The formatted source and green evidence are
+accepted for the exact integration handoff. The older red draft requires the
+already reviewed saved-output correction during that integration; the rejected
+green-01 draft stays untracked. No other work is authorized.

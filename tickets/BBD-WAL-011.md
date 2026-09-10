@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Rust source accepted; focused validation Resume 01 authorized after copied-pin stop.
+Status: Rust executable passed focused validation; five-path integration authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -54,11 +54,11 @@ collected review's corrections during later integration; no test replay.
 The corrected source in the
 [Rust executable handoff](../docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md)
 is accepted for [focused validation](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md).
-The first gate stopped before any stage after Hermes copied a lockfile pin
-incorrectly. Source remains unchanged. Resume 01 extracts the published command
-directly and generates its own metadata/evidence. Grok is closed. Hermes alone may
-execute the exact Resume 01 launcher once;
-integration and broader app/release acceptance remain closed.
+Resume 01 passed build, warning-denied Clippy, session-check falsification and all
+nine runtime groups after exact source restoration/rebuild. Grok is closed. Hermes
+alone may perform [five-path integration](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md).
+No validation replay. App startup/account/native composition and broader release
+acceptance remain future work.
 The source review records the remaining emergency-cleanup limitation.
 
 Existing package-policy failures and pending npm edits are recorded separate work;

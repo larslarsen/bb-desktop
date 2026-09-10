@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE SOURCE ACCEPTED — VALIDATION RESUME 01 RUNNING
+State: RUST EXECUTABLE VALIDATION ACCEPTED — INTEGRATION AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
-Authorized execution actor: Hermes, exact executable validation handoff only
-Authorized integration actors: none
-Protected parent: reviewer publication after 5122eee0; one CURRENT-only launch allowed
+Authorized execution actor: none; no test/build replay
+Authorized integration actor: Hermes, exact five-path integration driver only
+Protected parent: reviewer publication after 85b2820d; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md), AGENTS.md and TESTING.md.
+[active task](HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md), AGENTS.md and TESTING.md.
 Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
 Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
 passed and response-settlement falsification worked. Preserve these results; no rerun.
@@ -28,8 +28,8 @@ loaded or enable custody/send operations. Preserve pending npm/policy changes an
 WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md,
-docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md,
+docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md.
 Hermes outer 42355 collected on owner done, exit 0. Actual runtime session
 20260909_164019_e64925, nous / poolside/laguna-s-2.1:free. Saved tool result proves
 test exit 1, zero ok and nine missing-executable failures. Expected red accepted;
@@ -39,18 +39,16 @@ requires correction during later Hermes integration, not a report-only rerun.
 Source Correction 01 outer 12636 collected on owner done, exit 0. Corrected runtime
 c579bf54af9e17abc2eb49b42c9a944cd6ec2b6be1e5d900963564f27ecd86e9 (692 lines)
 and frozen main are accepted for focused execution. No runtime success is claimed.
-Hermes outer 99713 collected on owner done, exit 0. Actual session was
-20260909_172157_d12849; resume did not preserve the previous session ID. The gate
-stopped before any stage because Hermes mistyped the lockfile pin when copying it.
-All eight source identities still match. Reject the execution/evidence compliance
-claims; preserve the zero-stage raw stop. No format/build/test has run.
-Resume 01 loads the pinned gate directly from the handoff and generates metadata,
-raw JSON and evidence automatically. Only the exact current HERMES_SESSION_ID key
-may be read by that driver; no broad environment or metadata discovery.
-Fresh Hermes invocation; one driver launch only. No integration or source repair.
-Collect on owner done/Continue. No actor polling.
-Resume 01 launched once from 7045f75e; outer 92827, fresh Hermes invocation,
-requested nous / poolside/laguna-s-2.1:free. Actual session comes from driver metadata.
+Resume 01 outer 92827 collected on owner done, exit 0. Actual session
+20260909_173905_d15995, nous / poolside/laguna-s-2.1:free. Pinned formatting, build,
+warning-denied Clippy, actual-Rust session falsification/restoration/rebuild and all
+nine runtime groups passed. Final runtime hash is
+968194aadd609f54ef28a11a090fcb1ca840cfc851da127456dd5b356437305b (695 lines).
+Evidence exactly matches normalized raw JSON. No rerun or source repair is needed.
+Hermes may integrate the three source/test paths, corrected red evidence and accepted
+green evidence using the linked driver, then commit/push and stop. The rejected
+green-01 draft remains untracked. App startup/account/native composition is future work.
+One fresh invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 
