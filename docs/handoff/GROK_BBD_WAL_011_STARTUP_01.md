@@ -113,3 +113,19 @@ existing six policy groups/inventory failure remain recorded release blockers.
 - wallet-broker/Cargo.toml: 73e5e585eb2fd1ca867d66962460cfa010443886a4b59d8a33556ef2a4ff3503
 - wallet-broker/Cargo.lock: b960bc39d9bd32319a59b0dea66817ef926754ad46340a8d5e9fc07522b28b71
 - wallet-broker/src/main.rs: 19b1651d88d85e5d968597eb26eeb62f76a11af56eaa311d60a55d3ef282736d
+
+## Test review correction 01 — before red execution
+
+Startup suite six groups and existing mock-only delta reviewed. Build suite held
+for concrete fixture defects; only test/walletBrokerBuild.node.js writable:
+- In destination-link group, create owned pin directory before writeSource pin/src;
+currently this unconditionally raises ENOENT before testing production.
+- spawn.args is a VM-realm Array; compare Array.from(spawn.args) to expected host
+array so deepStrictEqual does not reject prototypes for an otherwise correct CLI.
+- runCli must capture processMock.exitCode as well as explicit process.exit(code);
+both satisfy the contract. Do not constrain production to one exit API.
+- Ensure all newly created owned fixture entries are discovered for cleanup even
+when an assertion or VM invocation throws. A final trackTree(ctx, root) inside
+withOwnedTemp before unlink/rmdir is adequate for these trusted owned fixtures;
+never follow symlinks. Preserve original and cleanup diagnostics.
+No execution, production, evidence, Git or further discovery. Same six build groups.
