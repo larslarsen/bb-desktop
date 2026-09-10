@@ -44,6 +44,8 @@ Hermes outer 85066 collected on owner done, exit 0; session
 and unchanged source identities are accepted in the red handoff's final review.
 Its full CURRENT read exceeded scope; future reads use an explicit line range.
 One Grok source invocation; collect on owner done/Continue. No actor polling.
+Grok launched once from b1c4fb72; outer 59353, session
+7c3d38bd-4d47-4620-bb76-4b6ce045eb62, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
