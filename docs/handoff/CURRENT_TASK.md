@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+State: ELECTRON QUIT EXPECTED-RED ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
 Authorized execution actor: Hermes, one expected-red driver only
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40) and
 [Hermes quit expected-red handoff](HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md).
 Only its exact extraction launcher, once, with repository workdir is authorized.
 No source edits, extra commands, repairs, test replay or Git integration.
-Correction outer 43867 collected exit 0. Hermes launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Hermes outer 10968 launched once against f7ecb4d2; actual session is driver-recorded.
+Collect on owner done/Continue. No actor polling or additional launch.
 
 Corrected test source accepted at 7f759f81: 2026 lines, 30 groups (23 existing,
 seven new). Compound nested-event assertions now sit outside production's catch;
