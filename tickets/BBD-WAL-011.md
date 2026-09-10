@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Launch resolver integrated and accepted; packaging and main startup remain.
+Status: Packaged JavaScript inventory repair scoped; test source authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -202,3 +202,11 @@ records nine resolver groups/62 rows, 13 supervisor groups, two detected
 falsifications, exact restoration and final green. Resolver component complete.
 Remaining ticket scope: package runtime inventory, build-generated final-artifact
 pins, main startup/status/quit composition and applicable package proof.
+
+The [runtime package inventory contract](../docs/handoff/GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md)
+authorizes a shared five-file JavaScript staging helper and its three packager call
+sites after tests-first review/red. Linux build staging moves to retained dist
+space for actual package/extraction proof without prohibited recursive cleanup.
+This repairs currently missing main/preload dependencies; build-time native pins
+and Electron startup are subsequent work. Source actor initially writes only
+new test/walletRuntimePackage.node.js; production and execution remain closed.

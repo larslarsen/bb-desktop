@@ -1,31 +1,21 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH CONFIGURATION RESOLVER INTEGRATED AND ACCEPTED
+State: PACKAGED RUNTIME INVENTORY TEST SOURCE AUTHORIZED
 Reviewer: Codex
-Authorized source actor: none
+Authorized source actor: Grok Build, grok-4.6 High; tests only
 Authorized execution actor: none
 Authorized integration actor: none
 
-Accepted integration: 05a0ffdac4d32f0c842035132b6f3da5ad33b4c1.
-[Integration acceptance](HERMES_BBD_WAL_011_LAUNCH_CONFIG_INTEGRATION_01.md).
-Source 68adf92e, test 90acd32c; nine resolver + 13 supervisor groups accepted.
-Both falsifications detected, exact source restored, final nine green accepted.
-All actors collected and closed. Resolver component is complete.
-
-Owner workflow: stay with launched actors, show status at least every 60 seconds,
-collect/review/route in the same turn. Never require repeated owner done messages.
-Do not stop solely at a subordinate handoff or leave a hidden run uncollected.
-
-Remaining WAL-011: packaging runtime JS inventory repair, final-artifact build
-pins, main startup/status/quit composition and applicable packaged execution proof.
-Reviewer fixes the next contract before further source/test/acceptance work.
-No native wallet, platform runtime or release completion is claimed.
-Existing package/policy findings remain unwaived. WAL-007 parked, MapLibre stopped.
-Four pending npm/policy files and WAL-009/rejected historical evidence unchanged.
-
-Reviewer closure paths only: CURRENT_TASK.md, launch-config integration handoff,
-and tickets/BBD-WAL-011.md. No acceptance commands executed by reviewer.
+Read [runtime inventory tests](GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md).
+Only new test/walletRuntimePackage.node.js may be written. Helper stays absent.
+Seven groups: exact five-file inventory, preflight, CLI and packager wiring.
+Grok launch pending publication. Reviewer stays with actor and collects directly.
+Owner need not send done; status updates at least every 60 seconds during work.
+Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
+Reviewer publication paths: CURRENT_TASK.md, runtime-package tests handoff,
+and tickets/BBD-WAL-011.md only.
+Resolver accepted at 05a0ffda. Whole WAL-011 incomplete; native pins/startup follow.
 
 ## Historical record (superseded by the active state above)
 
