@@ -8,6 +8,8 @@ Rust service/UI test and all other execution inputs FROZEN except exact authoriz
 formatter and temporary falsification/restoration operations in that handoff.
 Active source: Sol97914 runtime JS test corrections, exact fourfiles under
 SOL_BBD_WAL_013_RUNTIME_TEST_CORRECTION_01.md. Disjoint from executioninputs.
+Additional source: Sol native-window QA, NEW walletAccountWindowSmoke.node.js and
+x11-window.py only, under GROK_BBD_WAL_013_NATIVE_SMOKE_01.md (Sol escalation updated).
 All other prior actors collected/closed. Grok incomplete UI/runtime tests and service
 custody shortcomings have recorded Sol escalations. No source integration authorized.
 

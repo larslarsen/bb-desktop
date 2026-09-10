@@ -1,9 +1,13 @@
-# WAL-013 actual native-window proof — pending source authorization
+# WAL-013 actual native-window proof — source authorized
 
-This contract fixes follow-on QA, not authorization for any currently running actor.
-After current test actors stop, reviewer may authorize Grok source-only in precisely
+Reviewer now authorizes Sol gpt-5.6-sol High source-only, no subagents, in precisely
 NEW test/walletAccountWindowSmoke.node.js and NEW test/fixtures/wallet-broker/x11-window.py.
-No production edits. Tests execute only through Hermes after reviewer source review.
+No production edits or execution. Tests execute only through Hermes after review.
+This continues recorded native UI/runtime fill-in: both Grok actors stopped at turn
+limits without usable completed drops; reviewer records complex native lifecycle QA
+requires the same Sol fill-in. Existing runtime-test correction writes differentfiles.
+No source/test imports from helper harnesses that are still beingcorrected; read only
+for cleanupstyle as needed. No broad research, Git, checks/formatters or otheractors.
 Read AGENTS.md,TESTING.md, original service/UI/runtime contracts, supervisor/protocol,
 actual-child harness from test/walletBrokerRuntime.node.js and startup smoke cleanup.
 
