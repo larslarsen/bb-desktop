@@ -129,3 +129,17 @@ when an assertion or VM invocation throws. A final trackTree(ctx, root) inside
 withOwnedTemp before unlink/rmdir is adequate for these trusted owned fixtures;
 never follow symlinks. Preserve original and cleanup diagnostics.
 No execution, production, evidence, Git or further discovery. Same six build groups.
+
+## Main production authorization
+
+Main expected red collected and accepted in HERMES_BBD_WAL_011_STARTUP_MAIN_RED_01.md.
+Grok may now edit ONLY social-main.js, baseline c7687b52. Follow fixed Main semantics
+above, keep existing IPC/sandbox/quit mechanism. Tests, builder, Rust and other files
+are frozen. Builder production still awaits separate observed red. No execution,
+evidence or Git. Read only this contract, social-main.js and test/walletStartup.node.js,
+plus supervisor/resolver API if needed; no rediscovery. Report source hash/line count.
+
+Build-test correction accepted at 614e3ad8 (619 lines, six groups); smoke correction
+accepted at 35d87dc7 (547 lines, one group). Both correction actors collected/closed.
+Smoke now requires observed close for all cleanup, retains observers/cwd on failure,
+clears polling timer correctly and preserves compound diagnostics.

@@ -80,3 +80,13 @@ finally:
     finish('WAL-011 main startup expected red 01')
 sys.exit(0 if record['accepted'] else 1)
 ```
+
+## Collected acceptance
+
+Hermes outer 68299 closed; session 20260910_084936_e50477, nous /
+poolside/laguna-s-2.1:free, Hermes v0.18.2 upstream 67764dc0/local 10b6d1a9.
+Six expected missing-startup failures, Node exit 1; unchanged ten frozen inputs.
+The two TypeErrors are missing configured supervisor on the old main, not load
+failures; other groups directly prove absent resolver and wrong fallback/quit behavior.
+Raw and normalized evidence independently match. Expected red accepted; no replay.
+Only social-main.js production now authorized under original fixed startup contract.
