@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Reflection regression tests accepted; focused expected red authorized.
+Status: Reflection expected red accepted; public error-boundary correction authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 

@@ -100,3 +100,18 @@ hashes remain unchanged. This is not test evidence. Authorize one fresh attempt
 of the same exact driver using the explicit absolute repository workdir supplied
 in the launch prompt. Set terminal workdir to that exact path; do not infer it.
 No driver or test changes, no extra commands.
+
+## Expected-red acceptance
+
+Resume outer 10847 completed exit 0. Node exit 1: zero ok/four not ok, exactly
+each named code assertion; frozen hashes unchanged. Raw/evidence JSON equality
+and current hashes independently verified. Session 20260909_225544_2c118d,
+nous / poolside/laguna-s-2.1:free; Hermes v0.18.2 (2026.7.7.2), upstream
+8e85b276/local 10b6d1a9, Python 3.11.15. HEAD 1e69bba5. Exact-session messages
+80404–80413 show handoff read, exact launcher with correct workdir, wait and log
+collection, report; no extra command or mutation. Actor report understates pending
+files; raw git status is authoritative. Raw 68 lines, SHA-256
+7e8c27ea8edcf46959f8a29c2e1d8bda375a409c6b84edaf3e00cf0dacd02662.
+Evidence 74 lines, SHA-256
+b19697561f63f4690304f0c57a8eef89e86204ba9d57024758bd509f32063523.
+Hermes closed. Only the Grok reflection correction handoff is authorized.

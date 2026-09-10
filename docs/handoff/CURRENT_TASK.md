@@ -1,21 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: REFLECTION TEST SOURCE ACCEPTED — HERMES EXPECTED RED AUTHORIZED
+State: REFLECTION EXPECTED RED ACCEPTED — GROK CORRECTION AUTHORIZED
 Reviewer: Codex
-Authorized source actor: none
-Authorized execution actor: Hermes, exact reflection-red driver once
+Authorized source actor: Grok Build, grok-4.6 High; source only
+Authorized execution actor: none
 Authorized integration actor: none
 
-Read [reflection red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_RED_01.md).
-Test 90acd32c, 949 lines, nine groups/62 rows; only four reflection groups run now.
-Production 4a639b16 is frozen pending expected-red confirmation and correction.
-Hermes 55437 collected: wrong-workdir extraction stop, no tests. Resume 01 outer 10847 launched.
+Read [reflection correction](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_CORRECTION_01.md).
+Only wallet-broker/launch-config.js changes as the exact rename/public wrapper.
+Test 90acd32c frozen; four expected code failures accepted, no full green yet.
+Grok launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
-No source edits, unrelated commands, retries, Git mutation or additional execution.
-Preserve all unrelated pending policy/npm/evidence files. WAL-007 parked.
-Reviewer publication paths: CURRENT_TASK.md, reflection-tests handoff,
-reflection-red handoff and tickets/BBD-WAL-011.md only.
+Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
+Reviewer publication paths: CURRENT_TASK.md, reflection-red handoff,
+reflection-correction handoff and tickets/BBD-WAL-011.md only.
 Whole WAL-011 incomplete: packaging/pins and main startup still follow later.
 
 ## Historical record (superseded by the active state above)
