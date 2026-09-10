@@ -143,3 +143,12 @@ Build-test correction accepted at 614e3ad8 (619 lines, six groups); smoke correc
 accepted at 35d87dc7 (547 lines, one group). Both correction actors collected/closed.
 Smoke now requires observed close for all cleanup, retains observers/cwd on failure,
 clears polling timer correctly and preserves compound diagnostics.
+
+## Builder production authorization
+
+Build expected red is accepted in HERMES_BBD_WAL_011_STARTUP_BUILD_RED_01.md.
+Grok may now create ONLY scripts/build-wallet-broker.js following fixed Build command
+contract above. Main is owned by an independent actor; do not read/edit it. Tests,
+Cargo, lockfiles, packagers, docs and all other source frozen. No execution, evidence
+or Git. Read only this contract, test/walletBrokerBuild.node.js and existing resolver
+for layout compatibility. No broader discovery. Report SHA256/line count.

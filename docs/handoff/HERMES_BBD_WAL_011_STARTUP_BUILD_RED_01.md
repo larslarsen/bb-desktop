@@ -77,3 +77,11 @@ finally:
     finish('WAL-011 build command expected red 01')
 sys.exit(0 if record['accepted'] else 1)
 ```
+
+## Collected acceptance
+
+Hermes outer 85502 closed, session 20260910_085135_5a8edd; nous /
+poolside/laguna-s-2.1:free, v0.18.2 upstream 67764dc0/local 10b6d1a9.
+Six explicit missing-helper assertions, Node exit 1, no fixture cleanup failure.
+All six frozen inputs unchanged; normalized evidence/raw match independently.
+Expected red accepted. Only builder production is now authorized; no replay.
