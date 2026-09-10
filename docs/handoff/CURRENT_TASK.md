@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST CORRECTION 01 AUTHORIZED
+State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST CORRECTION 01 LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; new test file only
 Authorized execution actor: none
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
 [Grok launch-configuration tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md).
 Only test/walletBrokerLaunchConfig.node.js is writable under appended Correction 01.
 No production stubs, tests, syntax checks, builds, evidence or Git mutation.
-Initial Grok outer 99831 collected exit 0. Correction launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Grok correction outer 51879; session 5ec23c97-67d6-440c-9b30-902739026fba.
+One launch against ca4731f9; collect on owner done/Continue. No actor polling.
 
 Reviewer fixed a build-generated four-field manifest in resources/wallet-broker,
 fixed executable basenames and six platform/arch identities. The future resolver
