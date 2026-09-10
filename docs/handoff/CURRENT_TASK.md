@@ -41,3 +41,10 @@ and Rustinventory releaseblocker remain explicit; no unauthorized policy repairs
 Keep owner informed <=60sec; collect actors without requiring done relays.
 Previous WAL-011 startup accepted at1f11a8718aec2870dd575e90880071696ea3c3f5,
 closure601716cd (fullprior task history retained in Git before this compact index).
+
+
+Update: source41323 and72948 collectedexit0. Hermes29948 partialJSgreen then67481
+finish collectedexit0,92distinctJSgroups green, menu+EOFfalsifications detected and
+restored with7groupgreen aftereach. Exact finalhashes reviewed separately.
+Only pending sourceauthorization is SOL_BBD_WAL_013_NATIVE_UI_CORRECTION_01.md,
+account_ui.rs findings2and4. Allruntime/menu/tests frozen. Combinednative green follows.

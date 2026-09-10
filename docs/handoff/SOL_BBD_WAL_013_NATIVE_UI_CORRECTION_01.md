@@ -27,3 +27,12 @@ unfocused/out-of-form strings never remain in egui event buffers.
 
 Review production for these exact defects; do not redesign or expand scope. No tests
 executed here; accepted9widget tests remain frozen. Stop with final hash/count.
+
+## Collected baseline and remaining work
+
+Actor41323 collectedexit0. account_ui.rs final2b3e57f48b72d5312059b48902a8ae263fe5b3ab510eb18c127c0b5384a742ad (931lines), lib9b39a0f773260a1445b87908ba341ca414728a19906227279a5b202247e5f770.
+Actor self-review already corrected findings1and3; preserve those accepted changes.
+Only remaining findings2and4 require edits: exactallocation transfer and eventcleanup.
+Use a zero-filled boxed slice of exact length BEFORE copying secret, then into_vec
+(capacity==len), wipe original fullcapacity, hand to SecretBytes (no shrinkneeded).
+Do not repeat broad selfreview or fullfileoutput. Two small corrections only.
