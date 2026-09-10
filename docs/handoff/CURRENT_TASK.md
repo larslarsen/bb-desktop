@@ -1,5 +1,13 @@
 # Current Task
 
+BBD-WAL-014 is IN PROGRESS. Owner reconfirmed the original broker-with-built-in-Zcash
+architecture and authorized continuing receive/balance work. Grok may author ONLY
+the two test paths in GROK_BBD_WAL_014_RECEIVE_TESTS_01.md. Production is frozen
+until reviewed red. Native receive uses existing adapter; balance remains explicitly
+unavailable until live sync exists. See tickets/BBD-WAL-014.md. No user profile access.
+
+Previous completed task:
+
 BBD-WAL-013 native account management and actual-desktop empty-window correction
 are COMPLETE. Correction source 25113d5dbf9bc72c058c9f22e9398afde1576f24 and evidence
 f2973f0931c978eb47f3985a16dc606b0bb0e120 are pushed to origin/master.
