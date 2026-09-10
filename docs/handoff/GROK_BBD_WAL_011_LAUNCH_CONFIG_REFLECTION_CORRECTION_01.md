@@ -31,3 +31,17 @@ Reviewer stays with this actor and collects directly, without owner done message
 Later Hermes will run nine resolver groups and 13 supervisor groups, then falsify
 manifest target equality and the public normalization catch separately, restore
 exact source and repeat the nine resolver groups. No integration until accepted.
+
+## Corrected source acceptance
+
+Outer 17974 exit 0, session a2fef2a5-891d-4870-a372-7444a172c9e6 collected.
+Accept 68adf92e2d543e5d51353477b1944c35d4189c5590ac581d3289f1bd72898af8,
+140 lines. Removing exactly the eight-line wrapper and reversing the function
+rename reconstructs the original 4a639b16 hash. Test 90acd32c and reflection-red
+evidence b1969756 unchanged. Wrapper catches all thrown values and calls existing
+generic unavailable without retaining the original exception. No behavior beyond
+the contracted error normalization changed. Grok export shows named reads/checks
+and one source edit, no execution/Git mutation; it read the full named red handoff
+instead of only acceptance, a bounded read deviation. Grok closed. Only the green
+Hermes handoff authorizes the two suites and two temporary falsifications.
+Reviewer AST-parsed its governance driver, executed no acceptance command.

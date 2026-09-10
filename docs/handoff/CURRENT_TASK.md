@@ -1,20 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: REFLECTION EXPECTED RED ACCEPTED — GROK CORRECTION AUTHORIZED
+State: CORRECTED RESOLVER SOURCE ACCEPTED — HERMES GREEN AUTHORIZED
 Reviewer: Codex
-Authorized source actor: Grok Build, grok-4.6 High; source only
-Authorized execution actor: none
+Authorized source actor: none
+Authorized execution actor: Hermes, exact green driver once
 Authorized integration actor: none
 
-Read [reflection correction](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_CORRECTION_01.md).
-Only wallet-broker/launch-config.js changes as the exact rename/public wrapper.
-Test 90acd32c frozen; four expected code failures accepted, no full green yet.
-Grok outer 17974, session a2fef2a5-891d-4870-a372-7444a172c9e6 launched.
+Read [green and falsification](HERMES_BBD_WAL_011_LAUNCH_CONFIG_GREEN_01.md).
+Source 68adf92e, 140 lines; test 90acd32c, 949 lines. Frozen for execution.
+Nine resolver + 13 supervisor groups, two falsifications, restore and nine green.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
-Reviewer publication paths: CURRENT_TASK.md, reflection-red handoff,
-reflection-correction handoff and tickets/BBD-WAL-011.md only.
+Reviewer publication paths: CURRENT_TASK.md, reflection-correction handoff,
+green handoff and tickets/BBD-WAL-011.md only.
 Whole WAL-011 incomplete: packaging/pins and main startup still follow later.
 
 ## Historical record (superseded by the active state above)
