@@ -10,6 +10,7 @@ Owner explicitly selected account management after WAL-011 startup completion.
 Active contract: GROK_BBD_WAL_013_ACCOUNTS_01.md.
 Service: only account_management.rs and one Cargo test registration writable.
 Independent window tests: only account_native_ui.rs under GROK_BBD_WAL_013_NATIVE_UI_01.md.
+Runtime/menu test actor: only named JS tests under GROK_BBD_WAL_013_RUNTIME_01.md.
 No concurrent actor shares writable paths; production and execution still frozen.
 Production follows understood red. Reviewer is fixing native window/runtime scope
 while service test source is authored. Continue through usable native flow, not
