@@ -87,3 +87,25 @@ finally:
     except BrokenPipeError: pass
 sys.exit(0 if record['integrated'] else 1)
 ```
+
+## Collected integration acceptance — 2026-09-10
+
+Integrated and pushed 1f11a8718aec2870dd575e90880071696ea3c3f5. Reviewer
+independently verified exact ten committed file hashes, all 63 frozen worktree
+inputs, and matching HEAD/origin/master before this governance-only closure.
+Hermes outer 32427 collected/closed; session 20260910_090453_8aed19, nous /
+poolside/laguna-s-2.1:free, v0.18.2 upstream 67764dc0/local 10b6d1a9.
+Exact-session messages 80486–80491 show handoff read, foreground launcher, final;
+no independent commands, repairs or test replay. All integration commands exit 0.
+Raw SHA256 1999fc704a417d14c9cd899e3e4260d303edbcacd5010451091ad006c183d80d.
+Original unrelated pending package/policy edits and two evidence drafts preserved.
+
+Local connection is complete: on app ready, fixed generated pin/config starts the
+real broker; unbound status remains truthful, handshake delivers degraded status;
+normal quit waits for observed close. Seventy unit/regression groups and one real
+main/native composition group passed, both falsifications detected and restored.
+Audit and both secret scans clean; six inherited policy failures/Rust inventory
+failure remain release blockers. The compiled executable has no working native
+account operations and returns UNAVAILABLE for those methods. No account-flow,
+GUI smoke, native-platform installer or whole-wallet/release completion claimed.
+Build artifacts retained. All actors closed; no hidden run or collection pending.

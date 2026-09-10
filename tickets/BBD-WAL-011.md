@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Local application startup validated; exact source/evidence integration authorized.
+Status: Local app-to-broker startup complete and integrated; native account flows and release gates remain.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -242,3 +242,11 @@ on PATH, locked dependencies available offline). Main uses its fixed generated
 resources on next launch. Packaged mode requires its own resources; no fallback.
 The executable truthfully reports degraded and account methods UNAVAILABLE; local
 connection completion is not completion of native account flows or release gates.
+
+Local startup integration accepted and pushed at 1f11a8718aec2870dd575e90880071696ea3c3f5.
+[Collected acceptance](../docs/handoff/HERMES_BBD_WAL_011_STARTUP_INTEGRATION_01.md)
+verifies the exact ten source/evidence files and closes all actors. The requested
+local connection is complete, with 71 passing groups and actual pinned broker
+startup/status/close proof. Native account operations remain unavailable in the
+existing executable; release policy and native installer gates remain explicit.
+No further implementation or execution is currently authorized.

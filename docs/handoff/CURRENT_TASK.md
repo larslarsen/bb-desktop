@@ -1,20 +1,23 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LOCAL STARTUP VALIDATED; EXACT INTEGRATION AUTHORIZED
+State: LOCAL APP-TO-BROKER STARTUP COMPLETE — INTEGRATED AND ACCEPTED
 Reviewer: Codex
-Authorized source/execution actors: none; all collected/closed
-Authorized integration actor: Hermes, HERMES_BBD_WAL_011_STARTUP_INTEGRATION_01.md
+Authorized source/execution/integration actors: none
 
-Main 7047253e and build command c96684b9 source accepted.
+Accepted source integration: 1f11a8718aec2870dd575e90880071696ea3c3f5.
+Acceptance: HERMES_BBD_WAL_011_STARTUP_INTEGRATION_01.md.
 71 distinct groups passed, including actual main/resolver/supervisor/Rust composition.
-Pinned Linux broker built at fixed development resources path; status is degraded.
+Build command: node scripts/build-wallet-broker.js (Rust 1.98 rustup on PATH).
+Fixed development resources built; app launches pinned broker on next normal start.
+Real degraded status and confirmed-close shutdown proved; no native account operations.
 Both falsifications detected/restored; audit and Git/working-tree secret scans clean.
-Initial output-pipe interruption resolved by final scan only; no test replay.
-Existing policy failures remain release blockers; native account flows not complete.
-Owner priority delivered: local app-to-broker startup; no further installer detour.
-Reviewer stays through integration, reports meaningful status <=60 seconds.
-No repeated owner done messages required. Final integration actor must be collected.
+Existing six policy failures/Rust inventory failure remain release blockers.
+Local startup request completed; no further installer work automatically authorized.
+All actors collected and closed. No hidden run or result remains pending.
+Owner workflow: stay with actors through review/integration, status <=60 seconds.
+No repeated owner done required; do not return merely after a background launch.
+Next work requires a reviewer scope for account flows or release blockers.
 
 --- Previous closed state ---
 
