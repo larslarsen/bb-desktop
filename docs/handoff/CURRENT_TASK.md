@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH-CONFIGURATION TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+State: LAUNCH-CONFIGURATION EXPECTED-RED ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
 Authorized execution actor: Hermes, one expected-red driver only
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40) and
 [Hermes launch-config expected red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md).
 Only its exact extraction launcher once, with repository workdir, is authorized.
 No independent commands, repairs, source/test edits, stubs or Git mutation.
-Correction outer 51879 collected exit 0. Hermes launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Hermes outer 82063 launched once against ab45d59c; actual session is driver-recorded.
+Collect on owner done/Continue. No actor polling or additional launch.
 
 Accepted test 1b6a7d8c: 851 lines, five groups/58 authored rows. Symlink target is
 valid JSON; unsupported option identities agree with their manifests. Both now
