@@ -2,6 +2,8 @@
 
 Existing real-host regression is RED before production: green01 and diagnostic01 exit broker1 without window; diagnostic02 exact native error GLXBadFBConfig. Runtime restored. Software probe actor86384/session20260910_124832_aee8ef closed: LIBGL_ALWAYS_SOFTWARE=1 alone still fails; that plus __GLX_VENDOR_LIBRARY_NAME=mesa initializes real client hidden, then Manage maps it and the broker exits0 through cleanup. Host assertion then fails because GNOME exposes BOTH a frame and client with the same title. Thus no accepted host screenshot yet. Use raw records, not Hermes verbal conclusions. Xvfb rendered controls and blank-UI falsification already pass.
 
+Actor role clarification: this invoked CLI process IS Principal Dev — Codex Sol (gpt-5.6-sol High), appointed by the parent Lead Engineer/Reviewer. The parent remains reviewer; do not misidentify this source actor as the reviewer. Prior actor48062 stopped without edits due that role confusion; all four pins still match.
+
 Sol gpt-5.6-sol High continued documented native escalation. ONLY four paths below. Author TEST corrections first, then bounded supervisor production; existing actual-host test has already executed red for this graphics bug, so no additional test-red relay is needed. Do not execute tests, formatters, Git, evidence, dependencies or delegation. Read relevant spans; avoid full-file dumps and repeated reviews. All other source, including account_ui/runtime/Cargo, stays unchanged.
 
 Tests first:
