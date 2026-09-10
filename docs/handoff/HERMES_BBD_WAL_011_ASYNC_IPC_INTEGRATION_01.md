@@ -87,3 +87,49 @@ finally:
     print('INTEGRATION_RECORD='+str(report_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+
+## Collected integration acceptance — 2026-09-09
+
+Decision: accept async Electron IPC integration at
+3aa5e3d844feac54eece517d5c4226dd8608452e. Reviewer read-only Git inspection confirms
+HEAD and origin/master identify that commit. Exactly four authorized files changed,
+545 insertions and three deletions: main handler, Electron security tests and the
+two new async IPC evidence records. Both committed bytes and working files match
+the integration record's four accepted hashes.
+
+Outer 45540 collected on owner done with exit 0. Actual session
+20260909_182323_0d2a75, provider nous, model poolside/laguna-s-2.1:free.
+Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15.
+Raw wallet-broker/target/wal011-async-ipc-integration-01.json records success=true,
+pre-integration HEAD 25205249438663fae3e9526f3d8e0db26ac32a5f, empty initial index,
+exact staging, clean staged whitespace, successful commit and push, all exit 0.
+
+Exact-session tool inventory (messages 80324–80331) contains bounded CURRENT and
+handoff reads, one launcher, one process wait and final report. The launcher added
+`cd <repo> &&` instead of supplying the terminal workdir argument. Record this
+command-wrapper deviation; it reached the correct repository and left the embedded
+driver unchanged. No tests/builds, extra Git mutations, discovery, evidence rewrite
+or post-push commands appear in the audited inventory. No replay is needed.
+
+Accepted identities:
+
+| Path | SHA-256 |
+| --- | --- |
+| social-main.js | 2449b0b190a9ad079639e4d4aca628470d93749bdf92200cc796a1ed33fa1aa4 |
+| test/electronSecurity.node.js | df0aab1686f872fbc2e77ab106f0003ad1fbe76f7c74bda9c00756f53bc0e4a3 |
+| docs/testing/BBD-WAL-011-ASYNC-IPC-RED-01.md | fa17e0060ca058560fde00309d6b4c5265c0493ee11c9e327cb150a6ef602435 |
+| docs/testing/BBD-WAL-011-ASYNC-IPC-GREEN-01.md | ab7b047a83bf38c7935cf95e5bd5dc2e70bcc1a66fba77f736b79d2ee37ee6d6 |
+
+The handler now waits for the supervisor reply before cloning it, propagates
+rejections and retains synchronous sender/payload/dispatch validation. Accepted
+validation remains 23 Electron groups plus six preload groups, exact one-line
+reversal failure and restored 23-group green. This is controlled handler-boundary
+validation; real app startup and native wallet availability are still incomplete.
+
+The four unrelated npm/policy files remain modified, WAL-009 evidence and rejected
+EXECUTABLE-GREEN-01 draft remain untracked. Hermes integration and all source/test
+execution are closed. Next is reviewer scoping of startup configuration and app
+lifecycle, including independent binary pin provenance and real-process acceptance.
+No implementation actor is authorized until that contract is published. Reviewer
+executed no tests/builds and makes no package/release acceptance claim.

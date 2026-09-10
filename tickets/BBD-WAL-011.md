@@ -1,13 +1,13 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Async Electron IPC validation accepted; four-path integration authorized.
+Status: Async Electron IPC integrated and accepted; startup architecture review next.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
 At the original baseline, the app registered wallet IPC without starting its
 supervisor, the supervisor lacked real framed request/reply transport, and Rust
 provided only library components. The transport and degraded Rust executable are
-now integrated; Electron still lacks startup and clones unresolved reply Promises.
+now integrated; Electron now waits for resolved replies but still lacks broker startup.
 The objective is a real app-to-broker connection with truthful
 status, followed by native wallet flows. Existing library acceptance is retained.
 
@@ -73,10 +73,18 @@ The [one-line Grok production change](../docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC
 is accepted: resolved replies are cloned; synchronous validation remains intact.
 [Focused validation](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md#collected-validation-acceptance--2026-09-09)
 passed all 23 Electron and six preload groups. One-line reversal produced exactly
-the expected failures, then restored Electron green passed all 23. Only the
-[Hermes four-path integration driver](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md)
-is authorized. Source/test edits and validation replay are closed.
-Startup/pinning/shutdown are a later bounded stage.
+the expected failures, then restored Electron green passed all 23.
+[Four-path integration](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09)
+is accepted and pushed at 3aa5e3d844feac54eece517d5c4226dd8608452e. All actors are
+closed. Source/test edits, execution and integration are not currently authorized.
+
+Next is reviewer scoping of startup/pinning/shutdown. Before another implementation
+handoff, fix binary pin provenance independent of the runtime artifact, platform
+and missing-artifact behavior, private data-directory placement, app readiness and
+quit ordering, and a test-first real-process acceptance route. Runtime self-pinning
+or arbitrary environment-selected executables are not authorized. This stage must
+truthfully report down/degraded until native account composition is available.
+The whole ticket remains incomplete; no app startup or release acceptance is claimed.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

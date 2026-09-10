@@ -1,53 +1,47 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ASYNC IPC VALIDATION ACCEPTED — FOUR-PATH INTEGRATION AUTHORIZED
+State: ASYNC IPC INTEGRATED AND ACCEPTED — STARTUP ARCHITECTURE REVIEW NEXT
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok closed
-Authorized execution actor: none; validation closed
-Authorized integration actor: Hermes, exact four-path driver only
-Protected parent: reviewer publication following d5096342; one CURRENT-only launch allowed
+Authorized source actor: none
+Authorized execution actor: none
+Authorized integration actor: none
+Accepted implementation HEAD: 3aa5e3d844feac54eece517d5c4226dd8608452e
 
-Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md), AGENTS.md and TESTING.md.
-Read only this active prefix of CURRENT; historical records below are superseded.
+Read this active prefix, [ticket](../../tickets/BBD-WAL-011.md), AGENTS.md,
+TESTING.md and the [collected integration acceptance](HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
+No implementation is currently authorized. Next work is reviewer architecture and
+contract scoping for trusted broker startup configuration and app lifecycle.
+No actor is running; there is no pending result to collect or reason to rerun tests.
 
-The real Rust executable is accepted and pushed at
-31a6e54095a0b5519f8ce0b03833ac8862ddf32f. See
-[collected integration acceptance](HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
-Build, warning-denied Clippy, actual-Rust session falsification/restoration/rebuild
-and nine runtime groups are accepted; no replay. It reports degraded with empty
-accounts. Custody/account/native composition and app startup remain incomplete.
-The earlier live supervisor transport at 5aada7eff5df4568232cd284dadd097c713a9c23
-retains its 77 passing groups and response-settlement falsification; no replay.
+Accepted and pushed async IPC implementation: 3aa5e3d8. Main now resolves supervisor
+replies before cloning and propagates rejection, retaining synchronous validation.
+All 23 Electron groups and six preload groups passed. Exact one-line reversal
+produced the two expected failures; restored Electron green passed all 23. Four
+committed source/test/evidence hashes match the accepted drop. Hermes outer 45540
+collected on owner done, exit 0; actual session 20260909_182323_0d2a75,
+nous / poolside/laguna-s-2.1:free. Its command-wrapper deviation is recorded in the
+integration review. No further integration or evidence correction is required.
 
-Next bounded change: prove Electron waits for actual supervisor replies before
-cloning them and propagates rejections. Its present synchronous clone converts a
-Promise to an empty object. The accepted test drop is frozen at df0aab16, 1223
-lines and 23 groups. Expected red is accepted: 21 ok, two not ok, Node exit 1.
-Both delayed groups failed at the missing thenable assertion. The one-line source
-fix is accepted at 2449b0b1, 174 lines, every other byte unchanged. All 23 Electron
-and six preload groups passed. Reversal produced the two expected failures and
-restored Electron green passed all 23. Evidence and nine input hashes match.
-Hermes may integrate only the four linked paths. Startup/pinning/shutdown follow
-separately. No validation replay or source changes.
+The degraded Rust executable remains accepted at 31a6e540 with build, warning-denied
+Clippy, actual-Rust session falsification/restoration/rebuild and nine runtime groups.
+Live supervisor transport remains accepted at 5aada7ef with 77 passing groups and
+response-settlement falsification. Preserve all those results; no replay.
+
+BBD-WAL-011 is still incomplete: the app does not yet start the supervisor with a
+reviewed binary pin/private data directory, manage its app lifecycle, or compose
+native account flows. A later source contract must fix pin provenance, platform
+and missing-artifact behavior, startup/quit ordering and real boundary tests before
+implementation begins. No local runtime self-pinning or arbitrary environment-
+selected broker is authorized. No package-policy expansion or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md,
-docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md,
 docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md.
 Preserve the four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
-No source/test edits, extra execution, package/release claim or
-security waiver is authorized. No credential/config discovery. Future Hermes metadata must
-use the exact session key and row only; the earlier discovery incident is retained
-in the transport acceptance record and must not recur.
-Hermes outer 51172 collected on owner done, exit 0; session
-20260909_181901_686e38, nous / poolside/laguna-s-2.1:free. Exact normalized evidence
-is accepted in the green handoff's final review. Source and execution are closed.
-One fresh integration invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 417e4397; outer 45540, requested nous /
-poolside/laguna-s-2.1:free. Actual session and commit/push are recorded by the driver.
+No credential/config discovery. Future Hermes metadata must use the exact session
+key and row only. Future CURRENT reads must specify the active line range.
 
 ## Historical record (superseded by the active state above)
 
