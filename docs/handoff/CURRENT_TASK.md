@@ -44,6 +44,8 @@ Grok outer 59353 collected on owner done, exit 0; session
 7c3d38bd-4d47-4620-bb76-4b6ce045eb62. Source accepted in its handoff's final review.
 Hermes uses one exact session-key/row metadata query via the embedded driver.
 One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
+Hermes launched once from 8ffe14b0; outer 51172, requested nous /
+poolside/laguna-s-2.1:free. Actual session metadata is recorded by the driver.
 
 ## Historical record (superseded by the active state above)
 
