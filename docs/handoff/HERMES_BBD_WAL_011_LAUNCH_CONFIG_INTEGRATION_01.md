@@ -84,3 +84,41 @@ finally:
     print('INTEGRATION_RECORD='+str(report_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+## Integrated acceptance — 2026-09-09
+
+Accept 05a0ffdac4d32f0c842035132b6f3da5ad33b4c1. Reviewer read-only inspection
+confirmed HEAD and origin/master equal that commit, exactly the five authorized
+paths, and matching committed/working bytes for every integrated hash. All 17
+validation input hashes still match. Commit has 1386 insertions across five files.
+Source 68adf92e (140 lines), test 90acd32c (949 lines), initial-red evidence
+1c98fde5 (73 lines), reflection-red b1969756 (74 lines), green ef19df85 (150 lines).
+
+Outer 34163 completed exit 0. Actual session 20260909_230344_5fb4ff, nous /
+poolside/laguna-s-2.1:free. Hermes v0.18.2 (2026.7.7.2), upstream cfdbbb6e/local
+10b6d1a9, Python 3.11.15. Parent 29e242295fc3f7e681f95a5e57298047c16435aa.
+Integration raw 118 lines, SHA-256
+e205bd138dade7008f8ce089dcf909aa2346bbc6c652cfd52a3fcd040bd8215c.
+Exact-session messages 80422–80429 show one handoff read, exact launcher with
+repository directory supplied as cwd, one wait and report; no test replay,
+rewrites, extra commands or post-push commands. Actual staging/check/commit/push
+all exit 0. Reviewer executed no tests or builds.
+
+Accepted resolver recognizes the six reviewed target identities, fixed package
+layout and bounded closed manifest, returns immutable supervisor options using
+the supplied build pin, rejects invalid inventory and sanitizes errors including
+reflection failures. Supervisor still verifies executable bytes before spawn.
+Validation: nine resolver groups/62 rows, 13 affected supervisor groups; target
+equality and normalization bypass each cause the intended regression failures;
+exact source restored after each and final nine groups pass.
+
+This completes the resolver component. No actor or uncollected result remains.
+Packaging runtime-JS inventory repair, final-artifact build pins and main
+startup/status/quit composition are separate remaining WAL-011 work. No native
+wallet or release acceptance, platform runtime proof, or policy waiver is claimed.
+Four unrelated npm/policy files remain modified and WAL-009/rejected historical
+EXECUTABLE-GREEN-01 evidence remain untracked and unchanged.
+
+Owner workflow preference persists: stay with each launched actor, show status
+updates and collect/review/route without requiring repeated owner done messages.
+Do not end a turn merely because a subordinate task finished.

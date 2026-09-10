@@ -1,21 +1,31 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH RESOLVER GREEN ACCEPTED — FIVE-PATH INTEGRATION AUTHORIZED
+State: LAUNCH CONFIGURATION RESOLVER INTEGRATED AND ACCEPTED
 Reviewer: Codex
 Authorized source actor: none
 Authorized execution actor: none
-Authorized integration actor: Hermes, exact driver once
+Authorized integration actor: none
 
-Read [launch configuration integration](HERMES_BBD_WAL_011_LAUNCH_CONFIG_INTEGRATION_01.md).
+Accepted integration: 05a0ffdac4d32f0c842035132b6f3da5ad33b4c1.
+[Integration acceptance](HERMES_BBD_WAL_011_LAUNCH_CONFIG_INTEGRATION_01.md).
 Source 68adf92e, test 90acd32c; nine resolver + 13 supervisor groups accepted.
 Both falsifications detected, exact source restored, final nine green accepted.
-Hermes integration outer 34163 launched against 75e49ada; reviewer collects directly.
-Owner need not send done; status updates at least every 60 seconds during work.
-Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
-Reviewer publication paths: CURRENT_TASK.md, green handoff,
-integration handoff and tickets/BBD-WAL-011.md only.
-Whole WAL-011 incomplete: packaging/pins and main startup still follow later.
+All actors collected and closed. Resolver component is complete.
+
+Owner workflow: stay with launched actors, show status at least every 60 seconds,
+collect/review/route in the same turn. Never require repeated owner done messages.
+Do not stop solely at a subordinate handoff or leave a hidden run uncollected.
+
+Remaining WAL-011: packaging runtime JS inventory repair, final-artifact build
+pins, main startup/status/quit composition and applicable packaged execution proof.
+Reviewer fixes the next contract before further source/test/acceptance work.
+No native wallet, platform runtime or release completion is claimed.
+Existing package/policy findings remain unwaived. WAL-007 parked, MapLibre stopped.
+Four pending npm/policy files and WAL-009/rejected historical evidence unchanged.
+
+Reviewer closure paths only: CURRENT_TASK.md, launch-config integration handoff,
+and tickets/BBD-WAL-011.md. No acceptance commands executed by reviewer.
 
 ## Historical record (superseded by the active state above)
 

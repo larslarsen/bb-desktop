@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Launch resolver green and falsification accepted; five-path integration authorized.
+Status: Launch resolver integrated and accepted; packaging and main startup remain.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -195,3 +195,10 @@ Resolver production drop 4a639b16 is held for uncaught reflection exceptions at
 the public error boundary. Only the [reflection regression tests handoff](../docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md)
 is authorized. Production is frozen pending focused red; no validation or
 integration is authorized yet.
+
+Launch resolver integration accepted at 05a0ffdac4d32f0c842035132b6f3da5ad33b4c1.
+[Integration acceptance](../docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_INTEGRATION_01.md)
+records nine resolver groups/62 rows, 13 supervisor groups, two detected
+falsifications, exact restoration and final green. Resolver component complete.
+Remaining ticket scope: package runtime inventory, build-generated final-artifact
+pins, main startup/status/quit composition and applicable package proof.
