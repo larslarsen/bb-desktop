@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [reflection correction](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_CORRECTION_01.md).
 Only wallet-broker/launch-config.js changes as the exact rename/public wrapper.
 Test 90acd32c frozen; four expected code failures accepted, no full green yet.
-Grok launch pending publication. Reviewer stays with actor and collects directly.
+Grok outer 17974, session a2fef2a5-891d-4870-a372-7444a172c9e6 launched.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, reflection-red handoff,
