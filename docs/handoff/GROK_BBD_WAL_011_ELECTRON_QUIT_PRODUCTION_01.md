@@ -1,7 +1,7 @@
 # WAL-011 Electron normal quit production 01
 
-Active amendment: collected review/Correction 01 below supersedes the initial
-editable baseline. Only that source correction is authorized; no validation yet.
+Active amendment: Correction 01 is accepted below. Grok is closed; only the linked
+Hermes focused validation is authorized. No integration yet.
 
 Actor: Grok Build, grok-4.6 High, production source only, no subagents.
 Protected parent: reviewer publication following 384ba2398337540d4085e6a2a2a0b444c2d9f365,
@@ -126,3 +126,29 @@ No tests, syntax checks, execution, builds, evidence, docs edits, Git mutations,
 network, actor tools or config/credential discovery. Separate named read-only
 HEAD/status/hash/count and bounded reads/searches only. Report path/hash/lines and
 the correction, then stop. Reviewer source acceptance precedes Hermes validation.
+
+## Correction 01 source acceptance — 2026-09-09
+
+Accept source for focused validation, not as executed green. Outer 17320 collected
+on owner done, exit 0. Exact-session export f2bc7d42-ab64-46be-adc0-0e470ec55489
+shows one source edit, named reads and separate read-only HEAD/status/hash/count
+commands, with no tests, syntax checks, evidence edits or Git mutations. It is a
+tool summary; search paths are omitted. CURRENT again read 2–41 rather than 1–40,
+including one historical heading. No scope expansion follows.
+
+Measured social-main.js: 205 lines, SHA-256
+c7687b52ee45b17c3063cc2b39071be3d4e613a9d1e86558f2a7bbc1567db0a3.
+The conditional/non-Promise success path is gone. shutdown invocation and direct
+Promise subscription share the try/catch; pending precedes the invocation,
+approval precedes resumed app.quit and failure precedes the fixed dialog. Both
+dialog throw and returned continuation rejection are contained. Existing window,
+sandbox and async IPC behavior is preserved. All four frozen source/test hashes
+and accepted red evidence 229c1a97 still match. No test bytes changed.
+
+Only [Hermes focused green/falsification](HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md)
+is authorized next. Exact stages are 30 Electron groups, six preload groups,
+one selected early-quit falsification and restored 30-group Electron green.
+The actor may only apply/restore the specified temporary mutant through that
+driver; no repairs or additional tests. Source acceptance is conditional on those
+results. Integration, startup/packaging/native flows and release gates remain
+closed. Reviewer ran no tests or acceptance commands.
