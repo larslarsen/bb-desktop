@@ -10,7 +10,7 @@ Authorized integration actor: Hermes, exact integration driver once
 Read [runtime package integration](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_INTEGRATION_01.md).
 Seven package + nine resolver + 30 Electron groups, falsification/restoration green.
 Audit and both Gitleaks scans pass. Actual Linux package inventory and sandbox pass.
-Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Hermes integration outer 97368 launched against 532582c5; reviewer collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Six inherited policy failures and Rust-inventory checker failure remain blockers.
 Reviewer publication: CURRENT_TASK.md, runtime-package green/integration handoffs,
