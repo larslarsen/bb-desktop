@@ -45,6 +45,8 @@ Hermes outer 98181 collected on owner done, exit 0; actual session
 20260909_193149_7cb2b0, nous / poolside/laguna-s-2.1:free. Exact normalized evidence
 is accepted in the red handoff's final review. No rerun is needed.
 One Grok source invocation; collect on owner done/Continue. No actor polling.
+Grok launched once from 951ffa66; outer 79618, session
+526aece7-e036-410b-a903-090c6f680174, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
