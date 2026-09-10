@@ -1,21 +1,32 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUNTIME PACKAGE VALIDATION ACCEPTED — SEVEN-PATH INTEGRATION AUTHORIZED
+State: PACKAGED JAVASCRIPT INVENTORY INTEGRATED AND ACCEPTED
 Reviewer: Codex
 Authorized source actor: none
 Authorized execution actor: none
-Authorized integration actor: Hermes, exact integration driver once
+Authorized integration actor: none
 
-Read [runtime package integration](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_INTEGRATION_01.md).
-Seven package + nine resolver + 30 Electron groups, falsification/restoration green.
-Audit and both Gitleaks scans pass. Actual Linux package inventory and sandbox pass.
-Hermes integration outer 97368 launched against 532582c5; reviewer collects directly.
-Owner need not send done; status updates at least every 60 seconds during work.
-Six inherited policy failures and Rust-inventory checker failure remain blockers.
-Reviewer publication: CURRENT_TASK.md, runtime-package green/integration handoffs,
-and ticket only. Preserve unrelated pending files and all retained artifacts.
-Whole WAL-011 incomplete; native pins/startup follow. No release acceptance.
+Accepted integration: 59465f255dbb28fa8b613c6df7ba1c292082bc70.
+[Runtime package acceptance](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_INTEGRATION_01.md).
+All three packagers use the fixed five-file staging helper. Linux staging retained.
+Seven package groups/44 cases + nine resolver + 30 Electron groups accepted.
+Preload-omission falsification and restored green accepted; audit/Gitleaks clean.
+Real Linux package bytes/imports and root/root 4755 sandbox verified.
+All actors collected and closed. No hidden run or result is pending.
+
+Owner workflow: stay with actors, show status at least every 60 seconds,
+collect/review/route in the same turn; no repeated owner done messages required.
+Do not stop solely at a subordinate handoff or leave a hidden run uncollected.
+
+Remaining WAL-011: reviewed native build artifacts and build-time pins, then main
+startup/status/quit composition and applicable native-platform/package proof.
+Six inherited policy failures and Rust source-inventory failure still block release.
+No native wallet, macOS/Windows runtime or release/SBOM acceptance is claimed.
+Four pending npm/policy files and WAL-009/rejected historical evidence unchanged.
+MapLibre stopped; WAL-007 parked. No recursive artifact cleanup authorized.
+Reviewer closure paths only: CURRENT_TASK.md, runtime-package integration handoff,
+and tickets/BBD-WAL-011.md. Reviewer ran no tests or builds.
 
 ## Historical record (superseded by the active state above)
 

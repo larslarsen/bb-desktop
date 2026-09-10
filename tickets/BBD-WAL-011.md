@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Runtime package component validation accepted; seven-path integration authorized.
+Status: Packaged JavaScript inventory integrated and accepted; native build pins and startup remain.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -222,3 +222,11 @@ blockers, with no waiver; record exact current outcomes during the bounded Herme
 validation contract. Rust inputs are unchanged and native proof is not replayed.
 The locally built package is for inventory proof, not release publication; exact
 package SBOM/scanning remains required before distributing a release.
+
+Packaged JavaScript inventory component is integrated and accepted at
+59465f255dbb28fa8b613c6df7ba1c292082bc70. [Integration acceptance](../docs/handoff/HERMES_BBD_WAL_011_RUNTIME_PACKAGE_INTEGRATION_01.md)
+records the exact seven files, 46 distinct passing test groups, detected preload
+omission, restored green, clean audit/secret scans and real Linux package proof.
+All three packagers invoke the shared helper; only Linux native packaging was
+executed. Existing policy blockers remain unwaived. Next scoped work supplies
+reviewed final-artifact native build pins and Electron startup/status/quit wiring.

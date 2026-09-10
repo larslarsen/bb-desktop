@@ -91,3 +91,44 @@ finally:
     print('INTEGRATION_RECORD='+str(report_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+## Integrated component acceptance — 2026-09-10
+
+Accept 59465f255dbb28fa8b613c6df7ba1c292082bc70. Reviewer read-only inspection
+confirmed HEAD and origin/master match, exactly seven authorized paths, and every
+committed/working hash equals the integration record. 1376 insertions/3 deletions.
+All 23 validation input hashes still match, including unrelated pending work.
+
+Outer 97368 exit 0. Session 20260910_080534_c619df, nous / poolside/laguna-s-2.1:free.
+Actual Hermes v0.18.2 (2026.7.7.2), upstream 67764dc0/local 10b6d1a9, Python 3.11.15.
+Parent 58976432c01d659d7076c1e8e57669f55ab385ad. Raw integration record 122 lines,
+SHA-256 ae3f05eebcac7ae983ae7e7d2594be09c38eb4f5c05c1e0466f95e3e0ef4ff4f.
+Exact-session messages 80446–80457 show handoff read, exact launcher/workdir, wait,
+report and two internal todo updates (one after process completion). No extra shell
+commands, source/evidence edits, acceptance replay or post-push shell commands.
+All stage/scope/whitespace/commit/push commands exit 0. No reviewer test execution.
+
+Integrated behavior: all three package scripts stage exactly the five required
+wallet JavaScript files before archive/signing, using one shared exclusive-copy
+helper. It preflights source/destination entries before writes. Linux staging uses
+retained project/dist storage and no recursive EXIT deletion. Existing sandbox,
+signing and package steps remain. macOS/Windows call sites are reviewed/static
+tested; native execution on those platforms is not claimed.
+
+Accepted evidence: seven package groups/44 cases, nine resolver groups, 30 Electron
+groups, Bash syntax, missing-preload falsification and restored seven-group green.
+Audit finds zero vulnerabilities; Gitleaks Git and directory scans find no leaks.
+Real Linux x64 .deb extraction verifies five source-identical modules, nested
+imports and root/root chrome-sandbox mode 4755. Existing .deb was preserved by
+verified exclusive backup, and new package, staging and extraction are retained
+at the exact paths/hashes in the green acceptance. No artifact was published.
+
+Six inherited policy test failures and the Rust source-inventory checker failure
+remain byte-identical to the recorded baseline and block release acceptance.
+No exception or ignore was added. Native broker build-time pins, main startup/
+status/quit composition, other-platform runtime proof and release/SBOM gates remain.
+This completes the packaged JavaScript inventory component, not whole WAL-011 or
+a native wallet. All actors are collected and closed; no result is pending.
+Four npm/policy files remain modified; WAL-009/rejected EXECUTABLE-GREEN-01 evidence
+remain untracked and unchanged. Owner workflow continues to require live updates
+and automatic actor collection/review/routing without repeated done messages.
