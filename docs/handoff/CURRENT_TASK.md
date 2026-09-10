@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [runtime inventory tests](GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md).
 Only test/walletRuntimePackage.node.js may receive Correction 01. Helper absent.
 Seven groups: exact five-file inventory, preflight, CLI and packager wiring.
-Grok outer 1422 collected; correction launch pending publication.
+Grok correction outer 63612, session bbf66bd6-98c3-4dec-9120-d5a671e7ea0d launched.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, runtime-package tests handoff,
