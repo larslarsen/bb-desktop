@@ -1,12 +1,12 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE RUNNING
+State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, main.rs/runtime.rs only
+Authorized source actor: Grok Build, grok-4.6 High, runtime.rs compile/warning correction only
 Authorized execution actor: none; Hermes expected-red task closed
 Authorized integration actors: none
-Protected parent: reviewer publication after 9ce6e669; one CURRENT-only launch allowed
+Protected parent: reviewer publication after 5485ffac; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
 [active task](GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md), AGENTS.md and TESTING.md.
@@ -36,12 +36,12 @@ test exit 1, zero ok and nine missing-executable failures. Expected red accepted
 no repeat. Its reporting and metadata-discovery deviations are corrected in the
 collected review of the red handoff; the draft evidence remains unintegrated and
 requires correction during later Hermes integration, not a report-only rerun.
-Grok may author only wallet-broker/src/main.rs and wallet-broker/src/runtime.rs
-under the fixed executable contract. Accepted test/source identities stay frozen.
-No tests, builds or integration authorized. Launch once; collect on owner done/Continue.
-No actor polling.
-Grok launched once from 1ae19d2f; outer 4288,
-session a6f2c27a-175b-4f44-a414-6698acefa08b. Collect on owner done/Continue.
+Grok outer 4288 collected on owner done, exit 0, with main.rs (7 lines) and runtime.rs
+(692 lines). Source review rejects the drop for a missing return lifetime on field()
+and unread parser payloads. Grok may correct only runtime.rs under the active
+handoff's Source Correction 01. Main, tests and all six prior inputs remain frozen.
+No tests, builds or integration authorized. Launch once in the same session
+a6f2c27a-175b-4f44-a414-6698acefa08b; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

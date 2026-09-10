@@ -97,3 +97,57 @@ contract limitation; stop without execution. Hermes owns later compilation,
 format/lint, actual-Rust session falsification, focused green, evidence correction
 and integration after reviewer source acceptance. No Rust cryptographic proof
 suite replay or package-policy detour is authorized by this source task.
+
+## Collected source review and Source Correction 01 — 2026-09-09
+
+Outer 4288 collected on owner done, exit 0. Session
+a6f2c27a-175b-4f44-a414-6698acefa08b reports the two-path drop:
+
+| Path | SHA-256 | Lines |
+| --- | --- | --- |
+| wallet-broker/src/main.rs | 19b1651d88d85e5d968597eb26eeb62f76a11af56eaa311d60a55d3ef282736d | 7 |
+| wallet-broker/src/runtime.rs | 828ab74b3a72d6ea8dcf229665bb1b584c47af8a2c4f7bd3ddd8e12b500fbf0b | 692 |
+
+All six frozen inputs match. The exact-ID Markdown transcript export shows edits
+only to these two source paths and no execution or Git mutation. Full CURRENT,
+oversized test-handoff reads and directory listings exceed the intended narrow
+read scope; Correction 01 must use the named prefix/section and source regions.
+The export is a tool summary, not a raw tool-result audit.
+
+The bounded channel, frame-length checks before allocation, strict UTF-8 and
+recursive duplicate detection, fixed transcript hash, consecutive sequences,
+4096-ID bound, fixed error replies, degraded snapshot and detached-reader exit
+design are present. Custody/native libraries and inputs remain untouched.
+
+Decision: reject for two source-visible compile/warning blockers:
+
+1. runtime.rs:547, field(), has both object and name reference inputs and an
+   elided reference return. Rust lifetime elision cannot select the owner. Bind
+   the return explicitly to object, with no name lifetime coupling:
+   `fn field<'a>(object: &'a [(String, JsonValue)], name: &str) -> Result<&'a JsonValue, ProtocolClose>`.
+2. runtime.rs:61/64, Bool(bool) and Array(Vec<JsonValue>) store fields never read
+   anywhere. They will produce dead-code diagnostics in the planned warning-denied
+   gate. Retain their distinct JSON type tags without unused payload storage.
+   Bool becomes a unit variant; visit_bool ignores its argument and returns that
+   tag. Array becomes a unit variant; visit_seq still fully traverses every child
+   through the same depth-incremented ValueSeed and propagates every parse error,
+   but drops each parsed child instead of collecting a vector. Do not replace the
+   recursive visitor with IgnoredAny or weaken nested duplicate/depth validation.
+
+These are source-review findings, not observed compiler/test results. No command
+that loads or compiles production/test code was run. No behavioral success is claimed.
+
+Correction 01: Grok 4.6 High, same session, runtime.rs only. Protected parent is the
+reviewer publication following 5485ffac; one CURRENT-only launch may follow. Verify
+the two drop hashes and six frozen input hashes first. Fix exactly the lifetime,
+two enum variants and corresponding bool/sequence visitor bodies. A discarded
+sequence element must still be obtained through next_element_seed(ValueSeed), and
+the unchanged nesting check must precede traversal. No warning suppressions, dummy
+reads, parser bypasses, other semantic changes or additional files.
+
+Read only active CURRENT prefix, this final review section, workflow docs if needed,
+the two source files and named input hash checks. Separate HEAD/status, read/search,
+hash and line-count commands only. No history, directory discovery, tests/builds,
+formatter/syntax/lint, network/dependencies, docs/evidence or Git mutation. Main and
+tests remain frozen. Report the runtime hash/lines and bounded changes, then stop.
+Hermes execution/integration remains closed pending source acceptance.
