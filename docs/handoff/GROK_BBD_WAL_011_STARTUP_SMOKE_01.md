@@ -39,3 +39,21 @@ Target command later: node test/walletStartupSmoke.node.js.
 Falsification of main configured start is already required by startup contract;
 additionally this smoke must fail when that call is suppressed if executed as the
 selected falsification (bounded timeout, followed by exact restoration).
+
+## Review correction 01 (before any execution)
+
+Initial smoke drop is held for three concrete cleanup defects. Only same test path.
+1. waitUntil calls tick synchronously and then starts an interval even if tick already
+settled. Add explicit settled state and only schedule if not settled; finish idempotent.
+2. The contract requires observed CLOSE, not exitCode/signalCode or a spawn error as
+closure proof. All waits/reaping predicates and cwd deletion must require the recorded
+close event for every returned child. A spawn error must remain a test failure, never
+substitute for close. May avoid signalling an already-exited child while still waiting
+for its close. Do not detach error/close observers from an unclosed child; retain cwd
+and report cleanup failure if closure cannot be confirmed. Success asserts closed.
+3. If primary test AND cleanup fail, append cleanup diagnostic to primary error rather
+than discard it (current finally throws testError first). No swallowed cleanup error.
+Also select the latest matching degraded snapshot rather than assuming the first
+subscription message is already degraded. No production, commands or Git authorized.
+
+Initial test SHA256: cba2feed7acaf2292d8039eac6a9324a76361b3edf6bc6cf1b9062b8e456a727
