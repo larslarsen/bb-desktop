@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT INTEGRATION ACTOR LAUNCHED — AWAITING COLLECTION
+State: ELECTRON NORMAL QUIT INTEGRATED AND ACCEPTED — STARTUP REVIEW NEXT
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
 Authorized execution actor: none
-Authorized integration actor: Hermes, exact four-path driver only
-Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
+Authorized integration actor: none
+Accepted implementation HEAD: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
-Read this active prefix (lines 1–40) and
-[Hermes quit integration](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md).
-Only its exact extraction launcher once, with repository workdir, is authorized.
-No independent commands, repair, evidence rewriting, tests or validation replay.
-Hermes outer 28190 launched once against 5695aa3d; actual session is driver-recorded.
-Collect on owner done/Continue. No actor polling or additional launch.
+Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, the ticket and
+[quit integration acceptance](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
+No implementation or execution is authorized. No actor or result is pending.
+Next work is reviewer scoping of pinned broker startup and application composition.
 
-Accepted validation: 30 Electron groups, six preload groups; selected early-quit
-falsification failed at line 1419 (actual 1/expected 0), exact main restoration,
-then restored Electron green passed all 30. Nine input identities match.
-Main c7687b52 (205 lines), test 7f759f81 (2026 lines/30 groups) are frozen.
-Red evidence 229c1a97 and green evidence 6bbe4e88 match their exact raw records.
-Only these four source/test/evidence files may be staged, committed and pushed.
-Actual validation session: 20260909_212608_cf8d10, nous/poolside/laguna-s-2.1:free.
-Validation is closed; no result correction or source change is needed.
+Quit wiring accepted/pushed at 21e2e4d5: await one shutdown completion, allow
+approved quit re-entry, hold failures with one fixed error box, contain dialog
+failure. Main/test/red/green committed hashes match. All 30 Electron and six
+preload groups passed; early-quit falsification failed as intended and restored
+Electron green passed all 30. No evidence correction or validation replay needed.
+Hermes outer 28190 collected exit 0; actual session 20260909_213252_c3ca6f,
+nous / poolside/laguna-s-2.1:free. Source/execution/integration are closed.
 
-The gate waits for shutdown, allows approved re-entry and blocks failure with one
-fixed error box. Startup and native wallet availability remain incomplete.
-Shutdown, transport, degraded Rust executable and async IPC acceptance is retained.
-No startup, self-pinning, package expansion or release acceptance is authorized.
+Awaitable supervisor shutdown remains accepted at 1e45d6d2 with 26 lifecycle groups.
+Async IPC at 3aa5e3d8, degraded Rust executable at 31a6e540 and transport at 5aada7ef
+remain accepted. Do not replay closed validation without an affected new change.
+Whole WAL-011 remains incomplete: main does not start a reviewed pinned broker.
+Next contracts need packaging-derived pin provenance/platform inventory, private
+user-data setup, truthful startup failure/status, startup-versus-quit ordering
+and real Electron-to-Rust composition tests. No runtime self-pinning, arbitrary
+environment-selected executable, package expansion or native-flow claim is authorized.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md,
+tickets/BBD-WAL-011.md,
 docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 stays parked.
 No credential/config discovery. Future CURRENT reads specify lines 1–40.
-Hermes metadata uses the exact session key and row only, without fallback.
-The raw record directory wallet-broker/target is ext4; raw artifacts stay untracked.
+Future Hermes metadata uses the exact session key and row only, without fallback.
 
 ## Historical record (superseded by the active state above)
 

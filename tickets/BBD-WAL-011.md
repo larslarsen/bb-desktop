@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron quit validation accepted; four-path integration authorized.
+Status: Electron normal quit integrated and accepted; pinned startup review next.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -106,7 +106,7 @@ packaging creates the pin before runtime, without runtime self-pinning or arbitr
 environment-selected executables. Private storage is a wallet-broker child directory
 under Electron userData. Platform artifact inventory and startup composition
 require a later reviewer contract.
-The main process does not yet invoke shutdown() or start a pinned broker.
+The main process now invokes shutdown() for normal quit; it does not start a pinned broker.
 This completed shutdown prerequisite adds no package
 content or runtime configuration. Tests use a Node child fixture, not a coin binary.
 The whole ticket remains incomplete; no app startup or release acceptance is claimed.
@@ -150,6 +150,14 @@ selected early-quit falsification failed at the intended assertion, exact main
 restoration was verified, and restored Electron green passed all 30 again.
 Only the [four-path Hermes integration](../docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md)
 is authorized next, without source/evidence rewrite or validation replay.
+That integration is accepted and pushed at 21e2e4d546adb06321e820ea77a52147fa47a71a:
+exact main, test and two evidence hashes match committed bytes. Normal quit waits
+for closure, holds failure and handles re-entry through the approved gate.
+All actors are closed; no result is pending. Pinned startup, private data-directory
+setup, startup failure/status behavior and real application composition require
+the next reviewer contract. Later startup must avoid spawning during pending or
+completed quit. Native account flows and whole-ticket/release acceptance remain
+incomplete. No validation replay or source change is currently authorized.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
