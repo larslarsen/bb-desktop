@@ -1,56 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE VALIDATION ACCEPTED — INTEGRATION RUNNING
+State: RUST EXECUTABLE INTEGRATED AND ACCEPTED — ASYNC IPC TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok closed
-Authorized execution actor: none; no test/build replay
-Authorized integration actor: Hermes, exact five-path integration driver only
-Protected parent: reviewer publication after 85b2820d; one CURRENT-only launch allowed
+Authorized source actor: Grok Build, grok-4.6 High; test-only, no subagents
+Authorized execution actor: none
+Authorized integration actor: none
+Protected parent: reviewer publication following 31a6e540; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md), AGENTS.md and TESTING.md.
-Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
-Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
-passed and response-settlement falsification worked. Preserve these results; no rerun.
-Hermes outer 70919 returned exit 2 after the durable transcript confirmed commit/push.
-Its runtime is 20260909_145144_c96e05, nous / poolside/laguna-s-2.1:free.
+[active task](GROK_BBD_WAL_011_ASYNC_IPC_TESTS_01.md), AGENTS.md and TESTING.md.
+Read only this active prefix of CURRENT; historical records below are superseded.
 
-Hermes printed authentication-file content while exceeding runtime-discovery scope.
-Owner informed; credential rotation advised. No values copied here. The review
-records the incident; no credential/config discovery is authorized for any actor.
-Future Hermes metadata must use an exact narrow database query, no fallback search.
+The real Rust executable is accepted and pushed at
+31a6e54095a0b5519f8ce0b03833ac8862ddf32f. See
+[collected integration acceptance](HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
+Build, warning-denied Clippy, actual-Rust session falsification/restoration/rebuild
+and nine runtime groups are accepted; no replay. It reports degraded with empty
+accounts. Custody/account/native composition and app startup remain incomplete.
+The earlier live supervisor transport at 5aada7eff5df4568232cd284dadd097c713a9c23
+retains its 77 passing groups and response-settlement falsification; no replay.
 
-Next is a real Rust executable providing truthful broker availability over the
-accepted transport. Electron startup and actual account/native-flow binding follow.
-This first executable reports degraded service; it must not pretend accounts are
-loaded or enable custody/send operations. Preserve pending npm/policy changes and
-WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
+Next bounded change: prove Electron waits for actual supervisor replies before
+cloning them and propagates rejections. Its present synchronous clone converts a
+Promise to an empty object. Only test/electronSecurity.node.js may be edited by
+Grok. Main source follows observed red; startup/pinning/shutdown follow separately.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md,
-docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md.
-Hermes outer 42355 collected on owner done, exit 0. Actual runtime session
-20260909_164019_e64925, nous / poolside/laguna-s-2.1:free. Saved tool result proves
-test exit 1, zero ok and nine missing-executable failures. Expected red accepted;
-no repeat. Its reporting and metadata-discovery deviations are corrected in the
-collected review of the red handoff; the draft evidence remains unintegrated and
-requires correction during later Hermes integration, not a report-only rerun.
-Source Correction 01 outer 12636 collected on owner done, exit 0. Corrected runtime
-c579bf54af9e17abc2eb49b42c9a944cd6ec2b6be1e5d900963564f27ecd86e9 (692 lines)
-and frozen main are accepted for focused execution. No runtime success is claimed.
-Resume 01 outer 92827 collected on owner done, exit 0. Actual session
-20260909_173905_d15995, nous / poolside/laguna-s-2.1:free. Pinned formatting, build,
-warning-denied Clippy, actual-Rust session falsification/restoration/rebuild and all
-nine runtime groups passed. Final runtime hash is
-968194aadd609f54ef28a11a090fcb1ca840cfc851da127456dd5b356437305b (695 lines).
-Evidence exactly matches normalized raw JSON. No rerun or source repair is needed.
-Hermes may integrate the three source/test paths, corrected red evidence and accepted
-green evidence using the linked driver, then commit/push and stop. The rejected
-green-01 draft remains untracked. App startup/account/native composition is future work.
-One fresh invocation; collect on owner done/Continue. No actor polling.
-Integration launched once from d3a2d161; outer 93493, requested Hermes nous /
-poolside/laguna-s-2.1:free. Actual session and commit/push are recorded by the driver.
+tickets/BBD-WAL-011.md,
+docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md,
+docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_TESTS_01.md.
+Preserve the four pending npm/policy files, WAL-009 evidence and rejected untracked
+EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
+No source/test integration, test/build execution, package/release claim or security
+waiver is authorized. No credential/config discovery. Future Hermes metadata must
+use the exact session key and row only; the earlier discovery incident is retained
+in the transport acceptance record and must not recur.
+One source invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

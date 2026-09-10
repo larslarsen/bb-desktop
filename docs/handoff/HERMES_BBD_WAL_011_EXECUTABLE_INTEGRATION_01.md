@@ -120,3 +120,42 @@ finally:
     print('INTEGRATION_SUCCESS='+str(report['success']), flush=True)
 sys.exit(0 if report['success'] else 1)
 ```
+
+
+## Collected integration acceptance — 2026-09-09
+
+Decision: accept the five-path Rust executable integration at
+31a6e54095a0b5519f8ce0b03833ac8862ddf32f. Reviewer read-only Git inspection confirms
+HEAD and origin/master both identify that commit. All five files are newly tracked;
+the actor's final phrase “+3 new, +2 modified” was inaccurate. The raw Git result
+correctly records five created files and 1887 insertions. No source correction or
+validation replay is required. This accepts the degraded executable stage, not
+Electron startup, usable wallets or release readiness.
+
+Outer 93493 was collected on owner done with exit 0. Exact runtime session
+20260909_174555_2c6762 is nous / poolside/laguna-s-2.1:free, Hermes v0.18.2
+(2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15. The saved
+wallet-broker/target/wal011-executable-integration-01.json records success=true,
+pre-integration HEAD b49fb5a22961537d7259be3f47f8e3ff6f197297, empty index,
+exact five-path staging, successful whitespace check, commit and push, all exit 0.
+The reviewer checked the exact session/message inventory: initial CURRENT read and
+handoff read, one extraction launcher, one process wait, then final report. The
+initial terminal command unnecessarily read all CURRENT history and added a missing-
+file fallback. Record that read-scope deviation; no extra execution, edits, tests,
+builds, Git mutations or post-push commands appear in the audited tool inventory.
+
+Committed SHA-256 identities independently match the raw integration record:
+
+| Path | SHA-256 |
+| --- | --- |
+| wallet-broker/src/main.rs | 19b1651d88d85e5d968597eb26eeb62f76a11af56eaa311d60a55d3ef282736d |
+| wallet-broker/src/runtime.rs | 968194aadd609f54ef28a11a090fcb1ca840cfc851da127456dd5b356437305b |
+| test/walletBrokerRuntime.node.js | a49c3e0c49ff664997f78222d979e20603d9a2e9985735c6aa07c5c02308f39e |
+| docs/testing/BBD-WAL-011-EXECUTABLE-RED-01.md | 9a1087d5fd2c8dbb014563eabba12765c85a111c77862774cb6c66b8c7d608b4 |
+| docs/testing/BBD-WAL-011-EXECUTABLE-GREEN-RESUME-01.md | ed7b7b3c437c21e027805c627b9e447927da5ca5c95c5fb30f0fa6891e1b451e |
+
+The corrected red record's result equals original message 80263 after explicit
+repository/home path normalization. Green evidence retains the accepted seven-stage
+raw record, nine passing runtime groups and session-check falsification. Unrelated
+npm/policy changes, WAL-009 evidence and rejected GREEN-01 draft remain pending.
+Hermes integration authorization is closed. The reviewer executed no tests/builds.

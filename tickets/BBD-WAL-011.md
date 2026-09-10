@@ -1,13 +1,14 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Rust executable passed focused validation; five-path integration authorized.
+Status: Rust executable integrated and accepted; async Electron IPC test source authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
-The app currently registers wallet IPC without starting its supervisor. The
-supervisor writes JavaScript objects to a byte stream, receives no stream events,
-and returns a synthetic acknowledgment. Rust provides library components without
-an executable. The objective is a real app-to-broker connection with truthful
+At the original baseline, the app registered wallet IPC without starting its
+supervisor, the supervisor lacked real framed request/reply transport, and Rust
+provided only library components. The transport and degraded Rust executable are
+now integrated; Electron still lacks startup and clones unresolved reply Promises.
+The objective is a real app-to-broker connection with truthful
 status, followed by native wallet flows. Existing library acceptance is retained.
 
 The first bounded change implements live framed child-process transport and actual
@@ -17,12 +18,12 @@ the Rust executable and pinned startup configuration, then connect Electron's as
 handlers and shutdown. Native windows stay owned by Rust. No signing, broadcasting,
 endpoint choice, package-policy expansion or wallet-completion claim is authorized.
 
-Test paths now authorized:
+Completed transport test paths (closed):
 - test/walletSupervisorTransport.node.js (new)
 - test/fixtures/wallet-broker/transport-child.js (new)
 - test/walletSupervisor.node.js (adapt existing cases to the fixed async contract)
 
-Future production path: wallet-broker/supervisor.js only, after observed red.
+Completed transport production path: wallet-broker/supervisor.js (closed).
 Reuse wallet-broker/protocol.js framing/session validation and wallet-pay/model.js
 snapshot sanitization unchanged. No dependency or renderer-privilege changes.
 
@@ -49,17 +50,24 @@ That completed task is closed; its collected acceptance retains 77 passing check
 The corrected executable test source is accepted in
 [the executable handoff](../docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_TESTS_01.md#correction-02-acceptance--2026-09-09).
 The [initial executable expected red](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md)
-is accepted from the saved exit-1/nine-failure result. Its evidence draft needs the
-collected review's corrections during later integration; no test replay.
+is accepted from the saved exit-1/nine-failure result. Its evidence was corrected
+from the exact saved transcript during integration; no test replay.
 The corrected source in the
 [Rust executable handoff](../docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md)
 is accepted for [focused validation](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md).
 Resume 01 passed build, warning-denied Clippy, session-check falsification and all
-nine runtime groups after exact source restoration/rebuild. Grok is closed. Hermes
-alone may perform [five-path integration](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md).
+nine runtime groups after exact source restoration/rebuild. The
+[five-path integration](../docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09)
+is accepted and pushed at 31a6e54095a0b5519f8ce0b03833ac8862ddf32f. Hermes is closed.
 No validation replay. App startup/account/native composition and broader release
 acceptance remain future work.
-The source review records the remaining emergency-cleanup limitation.
+The executable source review records the remaining emergency-cleanup limitation.
+
+The active [async IPC test contract](../docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_TESTS_01.md)
+authorizes Grok to edit only test/electronSecurity.node.js. It proves delayed reply
+settlement, cloned resolved values and propagated failures through handlers actually
+registered by social-main.js. Production edits and execution remain closed until
+source review and observed red. Startup/pinning/shutdown are a later bounded stage.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
