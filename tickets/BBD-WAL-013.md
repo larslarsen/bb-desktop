@@ -1,6 +1,8 @@
 # BBD-WAL-013 — Native account management
 
-Status: COMPLETE — reviewed, integrated, and pushed to origin/master.
+Status: REOPENED — empty window reported on actual Wayland desktop.
+Prior functional acceptance missed unsupported native hide/show and rendered pixels.
+Correction contract: docs/handoff/SOL_BBD_WAL_013_BLANK_WINDOW_TESTS_01.md.
 Source commit: b2e160634147c00023b258ba523dacf70d97f0f1.
 Integration evidence: 8b5a60fe7d0f861f063124f2ae53a72e5fba2f70.
 
