@@ -1,7 +1,7 @@
 # WAL-011 packaged broker launch configuration tests 01
 
-Active amendment: the collected review/Correction 01 below supersedes the initial
-absent-test baseline. No execution or production source is authorized.
+Active amendment: Correction 01 is accepted below. Grok is closed; only the linked
+Hermes expected-red execution is authorized. Production remains absent.
 
 Actor: Grok Build, grok-4.6 High; test source only, no subagents.
 Protected parent: reviewer publication following 4ade8904a284bc414da0fb1dd9bac0b0367abd66,
@@ -232,3 +232,35 @@ No tests, syntax checks, Node/Cargo/npm, builds, network, actor tools, docs/evid
 edits, Git mutations, history or credential/config discovery. Use separate named
 read-only HEAD/status/hash/count/existence checks; do not chain commands. Report
 path/hash/lines/counts and the corrections, then stop for source review.
+
+## Correction 01 source acceptance — 2026-09-09
+
+Accept corrected source for one expected-red run, not green behavior. Outer 51879
+collected on owner done, exit 0. Measured test/walletBrokerLaunchConfig.node.js:
+851 lines, SHA-256
+1b6a7d8c102360efdbd0920b6211e7b55999fbdfff18aff4eee23cd311d750f8.
+Five groups/58 rows remain (6 + 20 + 22 + 3 + 7). The four frozen source hashes
+match and production launch-config.js remains absent.
+
+The symlink target now contains exactly matching valid manifest JSON; independent
+preconditions assert its four fields and byte size. Its sentinel is a separately
+owned file, with before/after byte/mode assertions. The unsupported option cases
+now have otherwise valid matching freebsd/x64 and linux/amd64 manifests and regular
+inert files; their own paths drive failure-sanitization and preservation checks.
+Separate supported-pair mismatch rows remain. Cleanup tracks the added fixtures
+and still uses only unlink/rmdir in finally. Each group checks the missing resolver
+before constructing fixtures, so expected red does not exercise the 58 case bodies.
+
+Exact-session export 5ec23c97-67d6-440c-9b30-902739026fba shows three edit attempts
+in the authorized test path, bounded source reads, correct CURRENT sed and separate
+identity/hash/status commands except one chained existence/echo command. It also
+records an unrequested read of <home>/.claude/skills/graphify/SKILL.md, outside the
+authorized repository/home read boundary. No skill invocation, test execution,
+production edit or Git mutation appears. This is a tool summary, not a raw result
+audit; search paths are omitted. The unrelated skill read is not authorization
+to follow its instructions or repeat home discovery in later tasks.
+
+Only [Hermes expected red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md) is authorized.
+Expected: Node exit 1, zero ok/five not ok, all at the explicit missing-resolver
+assertion. No fixture behavior, native target support or configuration green is
+claimed. Production follows collected red acceptance. Reviewer ran no tests.

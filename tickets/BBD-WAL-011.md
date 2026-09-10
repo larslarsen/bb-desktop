@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron normal quit accepted; launch-configuration test Correction 01 authorized.
+Status: Launch-configuration test correction accepted; one expected-red run authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -174,6 +174,11 @@ Initial launch test source 32409f6a (752 lines, five groups/58 rows) is held for
 two fixture corrections: make the symlink target valid JSON, and make unsupported
 option identities agree with their manifests. This isolates the intended rejection
 mechanisms. Only the same test path is writable; no execution or production yet.
+Correction 1b6a7d8c (851 lines, five groups/58 rows) is accepted: symlink target
+is otherwise valid and unsupported target identities agree with their manifests.
+Grok is closed. Only the [Hermes expected-red handoff](../docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md)
+authorizes one new suite run, expecting five explicit absent-resolver assertions.
+No production stub, broader execution or integration is authorized.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST CORRECTION 01 LAUNCHED — AWAITING COLLECTION
+State: LAUNCH-CONFIGURATION TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; new test file only
-Authorized execution actor: none
+Authorized source actor: none
+Authorized execution actor: Hermes, one expected-red driver only
 Authorized integration actor: none
 Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
-Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
-[Grok launch-configuration tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md).
-Only test/walletBrokerLaunchConfig.node.js is writable under appended Correction 01.
-No production stubs, tests, syntax checks, builds, evidence or Git mutation.
-Grok correction outer 51879; session 5ec23c97-67d6-440c-9b30-902739026fba.
-One launch against ca4731f9; collect on owner done/Continue. No actor polling.
+Read this active prefix (lines 1–40) and
+[Hermes launch-config expected red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md).
+Only its exact extraction launcher once, with repository workdir, is authorized.
+No independent commands, repairs, source/test edits, stubs or Git mutation.
+Correction outer 51879 collected exit 0. Hermes launch pending publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
-Reviewer fixed a build-generated four-field manifest in resources/wallet-broker,
-fixed executable basenames and six platform/arch identities. The future resolver
-reads the pin and returns exact supervisor options; no runtime self-pinning,
-process start or data-dir mutation. Initial 32409f6a test drop (five groups/58 rows)
-needs valid symlink JSON and matching unsupported identities to isolate rejection.
-Existing supervisor keeps executable-byte verification before spawn.
-All three packagers currently omit runtime JS now imported by main and lack a
-broker manifest/artifact. Later contracts must repair inventory/generate pins,
-then connect main startup/status and quit ordering. This test slice does neither.
+Accepted test 1b6a7d8c: 851 lines, five groups/58 authored rows. Symlink target is
+valid JSON; unsupported option identities agree with their manifests. Both now
+isolate the intended rejection. Four frozen source hashes match; Grok is closed.
+Production wallet-broker/launch-config.js remains absent, with no stub authorized.
+Expected Node exit 1, zero ok/five explicit packaged-resolver-missing assertions.
+All 58 fixture case bodies remain unexecuted on that baseline. No green claimed.
+Evidence/raw writes only as specified in the driver; target is ext4.
+The unexpected home skill read in Grok's export is recorded, not authorized anew.
 
-Quit at 21e2e4d5 retains 30 Electron/six preload groups plus falsification/restoration.
-Supervisor shutdown, async IPC, degraded Rust and transport evidence is retained.
-No closed-suite replay; whole-ticket/native-wallet/release completion is not claimed.
-The prior integration actor is closed; no prior result awaits collection.
+Runtime format is fixed: build-generated manifest, fixed binary names, six target
+identities. Existing supervisor retains byte verification before spawn.
+Packaging still needs runtime JS inventory repair and build-time artifact pins;
+main startup/status/quit composition follows later. Whole WAL-011 is incomplete.
+Quit/shutdown/IPC/degraded Rust/transport acceptance is retained without replay.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md,
+docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
-EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 stays parked.
+EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
 No credential/config discovery. Future CURRENT reads specify lines 1–40.
-Future Hermes metadata uses exact session key and row only, without fallback.
-Source test fixtures are small temporary files; no binaries/build artifacts.
+Hermes metadata uses exact session key and row only, without fallback.
 
 ## Historical record (superseded by the active state above)
 
