@@ -50,3 +50,27 @@ node test/walletPreload.node.js, then exact one-line reversal falsification and
 restored targeted green, with no accepted transport/Rust proof replay. A future
 Hermes handoff will own the exact commands, restoration and evidence; none may be
 executed by this actor.
+
+
+## Collected source acceptance — 2026-09-09
+
+Accept the production drop for focused validation. Outer 59353 collected on owner
+done with exit 0. social-main.js has SHA-256
+2449b0b190a9ad079639e4d4aca628470d93749bdf92200cc796a1ed33fa1aa4,
+174 lines. Reviewer reversed the one literal replacement in memory and recovered
+the exact baseline b67a6ba8187776f675714cb0ea26934d4ecbc809df5df72d3c738ab4bddea4df.
+Every other byte is unchanged. The accepted test, supervisor and protocol retain
+their frozen hashes. The Promise chain preserves synchronous validation/dispatch
+and applies cloning only to fulfillment, with no catch or new authority.
+
+Exact-ID Markdown export of 7c3d38bd-4d47-4620-bb76-4b6ce045eb62 shows named
+reads, separate read-only identity/status commands, one social-main.js edit and
+final report. No tests, syntax/build commands or Git mutation appear. Displayed
+source/CURRENT ranges are shifted by one line but remain in the bounded relevant
+sections, without historical reload. The final phrase “without Git” means without
+Git mutations; read-only Git commands are present. No raw tool-result audit is
+claimed. Reviewer ran no acceptance commands.
+
+Grok is closed. Hermes alone may run the
+[focused green/falsification driver](HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md).
+No integration, broader tests, startup or native-flow implementation is authorized.
