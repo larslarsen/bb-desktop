@@ -18,6 +18,7 @@ const {
 const PUBLIC_REQUEST_LIMIT = 32;
 const DEADLINE_MS = 2000;
 const KILL_ESCALATE_MS = 250;
+const SHUTDOWN_MS = 1500;
 
 const BROKER_METHODS = Object.freeze([
   'status.get',
@@ -191,6 +192,12 @@ function createWalletSupervisor(options = {}) {
   let downPublished = false;
   let terminating = false;
   let childExited = false;
+  let childClosed = false;
+  let shutdownPromise = null;
+  let shutdownResolve = null;
+  let shutdownReject = null;
+  let shutdownTimer = null;
+  let shutdownSettled = false;
 
   function publish(value) {
     snapshot = sanitizeSnapshot(value);
@@ -253,10 +260,22 @@ function createWalletSupervisor(options = {}) {
     if (child.stderr) child.stderr.removeListener('data', onStderrData);
   }
 
+  function completeShutdown(error) {
+    if (shutdownSettled) return;
+    shutdownSettled = true;
+    if (shutdownTimer) {
+      system.clearTimeout(shutdownTimer);
+      shutdownTimer = null;
+    }
+    if (error) shutdownReject(error);
+    else shutdownResolve(undefined);
+  }
+
   function terminate() {
     if (!child || terminating || childIsGone()) return;
     terminating = true;
     signalChild('SIGTERM');
+    if (childClosed) return;
     killTimer = system.setTimeout(() => {
       killTimer = null;
       if (!childIsGone()) signalChild('SIGKILL');
@@ -285,6 +304,19 @@ function createWalletSupervisor(options = {}) {
     }
     terminate();
     return published;
+  }
+
+  function quit() {
+    if (bootstrapped && !failed) {
+      for (const intentId of [...intents]) {
+        try {
+          const result = dispatch('intent.cancel', { intent_id: intentId });
+          if (result && typeof result.then === 'function') result.catch(() => {});
+        } catch (_) { /* still terminate */ }
+      }
+    }
+    intents.clear();
+    close();
   }
 
   function writeRaw(value) {
@@ -459,12 +491,20 @@ function createWalletSupervisor(options = {}) {
   }
 
   function onChildClose() {
+    childClosed = true;
     childExited = true;
     if (killTimer) {
       system.clearTimeout(killTimer);
       killTimer = null;
     }
+    if (shutdownTimer) {
+      system.clearTimeout(shutdownTimer);
+      shutdownTimer = null;
+    }
     close();
+    if (shutdownPromise && !shutdownSettled) {
+      Promise.resolve().then(() => completeShutdown());
+    }
   }
 
   function attachTransport(target) {
@@ -521,6 +561,7 @@ function createWalletSupervisor(options = {}) {
         downPublished = false;
         terminating = false;
         childExited = false;
+        childClosed = false;
         pendingPublic.clear();
         attachTransport(child);
         handshakeTimer = system.setTimeout(() => close(), DEADLINE_MS);
@@ -560,17 +601,23 @@ function createWalletSupervisor(options = {}) {
         return true;
       };
     },
-    quit() {
-      if (bootstrapped && !failed) {
-        for (const intentId of [...intents]) {
-          try {
-            const result = dispatch('intent.cancel', { intent_id: intentId });
-            if (result && typeof result.then === 'function') result.catch(() => {});
-          } catch (_) { /* still terminate */ }
-        }
+    quit,
+    shutdown() {
+      if (shutdownPromise) return shutdownPromise;
+      shutdownPromise = new Promise((resolve, reject) => {
+        shutdownResolve = resolve;
+        shutdownReject = reject;
+      });
+      if (!child || childClosed) {
+        completeShutdown();
+      } else {
+        shutdownTimer = system.setTimeout(() => {
+          shutdownTimer = null;
+          completeShutdown(makeError('TIMEOUT'));
+        }, SHUTDOWN_MS);
       }
-      intents.clear();
-      close();
+      quit();
+      return shutdownPromise;
     },
   };
   return supervisor;
