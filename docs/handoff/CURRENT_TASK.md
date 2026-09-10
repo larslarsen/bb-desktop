@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE SOURCE ACCEPTED — VALIDATION RESUME 01 AUTHORIZED
+State: RUST EXECUTABLE SOURCE ACCEPTED — VALIDATION RESUME 01 RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
 Authorized execution actor: Hermes, exact executable validation handoff only
@@ -49,6 +49,8 @@ raw JSON and evidence automatically. Only the exact current HERMES_SESSION_ID ke
 may be read by that driver; no broad environment or metadata discovery.
 Fresh Hermes invocation; one driver launch only. No integration or source repair.
 Collect on owner done/Continue. No actor polling.
+Resume 01 launched once from 7045f75e; outer 92827, fresh Hermes invocation,
+requested nous / poolside/laguna-s-2.1:free. Actual session comes from driver metadata.
 
 ## Historical record (superseded by the active state above)
 
