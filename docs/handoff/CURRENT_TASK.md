@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT SOURCE ACCEPTED — FOCUSED VALIDATION AUTHORIZED
+State: ELECTRON QUIT VALIDATION ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
 Authorized execution actor: Hermes, exact focused driver only
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40) and
 [Hermes quit focused validation](HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md).
 Only its exact extraction launcher, once, with repository workdir is authorized.
 No independent commands, repairs, source/test edits or integration.
-Correction outer 17320 collected exit 0. Hermes launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Hermes outer 77990 launched once against 8cf47129; actual session is driver-recorded.
+Collect on owner done/Continue. No actor polling or additional launch.
 
 Accepted main c7687b52 (205 lines) awaits one shutdown Promise inside the failure
 catch; no non-Promise approval fallback. Test source stays 7f759f81 (30 groups).
