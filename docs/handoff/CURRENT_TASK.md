@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [reflection red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_RED_01.md).
 Test 90acd32c, 949 lines, nine groups/62 rows; only four reflection groups run now.
 Production 4a639b16 is frozen pending expected-red confirmation and correction.
-Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Hermes outer 55437 launched against d5198a17. Reviewer collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 No source edits, unrelated commands, retries, Git mutation or additional execution.
 Preserve all unrelated pending policy/npm/evidence files. WAL-007 parked.
