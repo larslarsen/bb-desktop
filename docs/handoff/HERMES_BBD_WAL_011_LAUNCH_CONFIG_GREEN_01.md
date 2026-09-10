@@ -139,3 +139,21 @@ finally:
 sys.exit(0 if record['green'] else 1)
 
 ```
+
+## Green acceptance
+
+Outer 73046 completed exit 0. Accept nine resolver groups (62 authored rows) and
+13 supervisor groups, target-equality falsification detected at platform mismatch
+expected UNAVAILABLE, normalization-bypass falsification detected at all four code
+assertions, exact restoration after each, final nine resolver groups green. All
+17 frozen input hashes are unchanged at collection. Evidence/raw JSON agree.
+Source remains 68adf92e; tests 90acd32c. No acceptance execution by reviewer.
+
+Session 20260909_230128_986ca6, nous / poolside/laguna-s-2.1:free. Actual Hermes
+v0.18.2 (2026.7.7.2), upstream cfdbbb6e/local 10b6d1a9, Python 3.11.15. Record
+the actual upstream value, which differs from the preceding red session. HEAD
+34e622d2. Exact-session messages 80414–80421 show handoff read, exact launcher
+with repository workdir, one wait and report; no extra command or mutation.
+Raw 144 lines, SHA-256 d6131b28088999e7e74194995e2d04a9ae5f6b909a92364891525791f0de8421.
+Evidence 150 lines, SHA-256 ef19df852f51cfe2d113f584d0f083941eb75b3b1aeb45d6db8037e4c507dea8.
+Hermes execution closed. Only the five-path integration handoff is authorized.

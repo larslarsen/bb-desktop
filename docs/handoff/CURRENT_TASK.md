@@ -1,20 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: CORRECTED RESOLVER SOURCE ACCEPTED — HERMES GREEN AUTHORIZED
+State: LAUNCH RESOLVER GREEN ACCEPTED — FIVE-PATH INTEGRATION AUTHORIZED
 Reviewer: Codex
 Authorized source actor: none
-Authorized execution actor: Hermes, exact green driver once
-Authorized integration actor: none
+Authorized execution actor: none
+Authorized integration actor: Hermes, exact driver once
 
-Read [green and falsification](HERMES_BBD_WAL_011_LAUNCH_CONFIG_GREEN_01.md).
-Source 68adf92e, 140 lines; test 90acd32c, 949 lines. Frozen for execution.
-Nine resolver + 13 supervisor groups, two falsifications, restore and nine green.
-Hermes green outer 73046 launched against a3995d1b; reviewer collects directly.
+Read [launch configuration integration](HERMES_BBD_WAL_011_LAUNCH_CONFIG_INTEGRATION_01.md).
+Source 68adf92e, test 90acd32c; nine resolver + 13 supervisor groups accepted.
+Both falsifications detected, exact source restored, final nine green accepted.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
-Reviewer publication paths: CURRENT_TASK.md, reflection-correction handoff,
-green handoff and tickets/BBD-WAL-011.md only.
+Reviewer publication paths: CURRENT_TASK.md, green handoff,
+integration handoff and tickets/BBD-WAL-011.md only.
 Whole WAL-011 incomplete: packaging/pins and main startup still follow later.
 
 ## Historical record (superseded by the active state above)
