@@ -1,25 +1,17 @@
 # Current Task
 
 Ticket: BBD-WAL-013
-State: SERVICE GREEN / NATIVE-WINDOW RED EXECUTION
-Reviewer Codex; owner requested complete usable native account management.
-Active execution: Hermes under HERMES_BBD_WAL_013_ACCOUNTS_GREEN_UI_RED_01.md.
-Rust service/UI test and all other execution inputs FROZEN except exact authorized
-formatter and temporary falsification/restoration operations in that handoff.
-Active source: Sol97914 runtime JS test corrections, exact fourfiles under
-SOL_BBD_WAL_013_RUNTIME_TEST_CORRECTION_01.md. Disjoint from executioninputs.
-Additional source: Sol native-window QA, NEW walletAccountWindowSmoke.node.js and
-x11-window.py only, under GROK_BBD_WAL_013_NATIVE_SMOKE_01.md (Sol escalation updated).
-All other prior actors collected/closed. Grok incomplete UI/runtime tests and service
-custody shortcomings have recorded Sol escalations. No source integration authorized.
-
-Service expected-red accepted. Service/source corrections and9 UItests accepted for
-this run; currentrun checks84 tests, missingaccount_ui red, twofalsifications/restores.
-UI/runtime production frozen until understood red. Nativewindow proof contract pending.
-Continue through nativewindow, Wallet/Manage accounts menu, runtime/native build,
-real-window and persistence proof, exactintegration. No package/installer detour.
-Preserve unrelated four npm/policy pendingpaths and twoolder evidencedrafts.
-Keep ownerinformed <=60seconds, collect/review/route same task, no done/permissionrelay.
+State: SERVICE ACCEPTED / NATIVE UI PRODUCTION / RUNTIME EXPECTED RED
+Owner requests complete usable native account management; reviewer Codex.
+84 service tests and both falsifications accepted, all restored source hashes match.
+Native UI expected red E0432 understood. Sol source authorized only account_ui.rs/lib
+under SOL_BBD_WAL_013_NATIVE_UI_PRODUCTION_01.md. Recorded Grok escalation continues.
+Sol20822 native-window test source active under GROK_BBD_WAL_013_NATIVE_SMOKE_01.md.
+Hermes runtime JS expected red authorized under HERMES_BBD_WAL_013_RUNTIME_JS_RED_01.md.
+Sol97914 corrections and Hermes66085 execution collected, closed and reviewed.
+No source integration yet. Continue menu/runtime/native build/proof/integration.
+Preserve unrelated npm/policy paths and historical drafts. No installer detour.
+Keep owner informed; collect actors without requiring done relays.
 
 --- Previous completed task ---
 
