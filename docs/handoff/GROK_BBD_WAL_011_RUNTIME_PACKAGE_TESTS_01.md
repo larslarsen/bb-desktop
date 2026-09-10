@@ -169,3 +169,16 @@ corrected test hash/line count then stop; reviewer collects immediately. Initial
 export shows named reads/checks and only the test edits; CURRENT was read at
 2–31 rather than requested prefix. Use the exact sed command now. No home/config
 discovery, acceptance execution, chained commands or Git mutation appeared.
+
+## Correction 01 accepted
+
+Accept 5d8a8bf250a4e664fb15853cfb29deee62130efd72cdcf3acdac1129c2324f25,
+794 lines, seven groups/44 cases. Full-command anchors preserve signing verification
+and comments; relative arguments resolve to valid owned roots; cleanup enumerates
+only real directories and never traverses links. All ten frozen hashes match and
+helper remains absent. Outer 63612 completed exit 0; session
+bbf66bd6-98c3-4dec-9120-d5a671e7ea0d closed. Export contains only test edits and
+read-only checks; one chained existence check and git log -1 for the HEAD hash
+exceeded the command restrictions. No acceptance execution, source/Git mutation
+or unrelated discovery appears. Report's no-Git claim means no mutations.
+Only Hermes red/policy-baseline handoff is authorized. Reviewer ran no tests.

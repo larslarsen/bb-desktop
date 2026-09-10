@@ -1,19 +1,19 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUNTIME PACKAGE TEST SOURCE HELD — CORRECTION 01 AUTHORIZED
+State: RUNTIME PACKAGE TESTS ACCEPTED — EXPECTED RED AND POLICY BASELINE AUTHORIZED
 Reviewer: Codex
-Authorized source actor: Grok Build, grok-4.6 High; tests only
-Authorized execution actor: none
+Authorized source actor: none
+Authorized execution actor: Hermes, exact red/baseline driver once
 Authorized integration actor: none
 
-Read [runtime inventory tests](GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md).
-Only test/walletRuntimePackage.node.js may receive Correction 01. Helper absent.
-Seven groups: exact five-file inventory, preflight, CLI and packager wiring.
-Grok correction outer 63612, session bbf66bd6-98c3-4dec-9120-d5a671e7ea0d launched.
+Read [runtime package red](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_RED_01.md).
+Test 5d8a8bf2, 794 lines, seven groups/44 cases. Helper absent; all source frozen.
+Expected seven helper-missing assertions; then capture two policy commands once.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
-Reviewer publication paths: CURRENT_TASK.md, runtime-package tests handoff,
+Reviewer publication paths: CURRENT_TASK.md, runtime-package tests/red handoffs,
 and tickets/BBD-WAL-011.md only.
 Resolver accepted at 05a0ffda. Whole WAL-011 incomplete; native pins/startup follow.
 
