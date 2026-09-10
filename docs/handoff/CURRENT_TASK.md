@@ -46,6 +46,8 @@ Hermes outer 1099 collected on owner done, exit 0; actual session
 20260909_195724_724f82, nous / poolside/laguna-s-2.1:free. Validation and normalized
 evidence accepted in the green handoff's final review. No replay is needed.
 One fresh integration invocation; collect on owner done/Continue. No actor polling.
+Hermes launched once from 000da7cc; outer 68128, requested nous /
+poolside/laguna-s-2.1:free. Actual session and commit/push are recorded by the driver.
 
 ## Historical record (superseded by the active state above)
 
