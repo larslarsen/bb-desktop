@@ -275,3 +275,36 @@ are allowed. No full handoff/history reload, broader searches, command chains,
 execution of tests/syntax/builds, network, config/home/credential discovery, docs/
 evidence edits or Git mutations. Report hash, lines, groups and corrections; stop.
 Hermes expected-red execution and integration remain closed.
+
+
+## Correction 02 source acceptance — 2026-09-09
+
+Accept the corrected two-path test drop for initial expected-red execution only.
+Outer 9196 collected on owner done with exit 0. The test is 983 lines, six Linux
+groups, SHA-256 69eb8bcbc2d169e00cb52a7bff73e1b5f39d7890d24d79383f63e77b3994b5c7.
+The eight-line wrapper remains
+0d8fbfa8179338a8fc05e6c41f4cbbf0ef652c4ccadd73db8876591a51f96dcb.
+All four frozen production/transport inputs match at reviewer collection.
+
+Reviewer inspected the fake-case wrappers and teardown: fake close plus quit is
+followed by observer flushing, explicit pending-Promise and leftover-timer checks,
+and combined primary/cleanup error reporting. Real cwd inspection/removal requires
+child absence or confirmed closure of child and all three streams; otherwise its
+path is preserved/reported. Bounded real Promise observation and removal of owned
+callback listeners still execute on failure. Earlier corrected event-time facts,
+actual close assertions, readiness barrier and close-wait cleanup are retained.
+
+Exact-ID Markdown export of 08cd1c44-d2b1-43c5-bd84-c4d16e250f8d shows edits only
+to the named test, source reads and separate read-only status/hash/count commands.
+No tests/builds, production edits or Git mutations appear. It again read the full
+handoff instead of only the final section; record that read-scope deviation. The
+export is a tool summary, not a raw tool-result audit. Reviewer ran no tests or
+syntax checks.
+
+Grok is closed. Only [Hermes expected red](HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md)
+is authorized: one Node run, expected exit 1, zero ok/six not ok, every group at
+`absent shutdown API`. This missing-API baseline does not exercise later assertions
+or launch real children. The two real-case wrappers do create and empty-remove
+small temporary directories before/after their API checks. No child cleanup or
+shutdown runtime correctness is claimed from this red. Production follows observed
+red review; no integration is authorized yet.

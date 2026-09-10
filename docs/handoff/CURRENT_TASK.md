@@ -1,16 +1,16 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: SHUTDOWN TEST CLEANUP INCOMPLETE — CORRECTION 02 AUTHORIZED
+State: SHUTDOWN TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; shutdown test correction only
-Authorized execution actor: none
+Authorized source actor: none; Grok closed
+Authorized execution actor: Hermes, exact shutdown expected-red driver only
 Authorized integration actor: none
-Protected parent: reviewer publication following 19441e46; one CURRENT-only launch allowed
+Protected parent: reviewer publication following c7f83995; one CURRENT-only launch allowed
 
 Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
-and [active shutdown test contract](GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
-Only write: test/walletSupervisorShutdown.node.js. Current hash 1524a1cc, 949 lines.
+and [active execution contract](HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md).
+Test source frozen: test/walletSupervisorShutdown.node.js at 69eb8bcb, 983 lines.
 The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8. No production edits.
 
 Reviewer found quit() returns before child closure. Before Electron can await
@@ -18,10 +18,10 @@ cleanup during normal quit, the supervisor needs a shared shutdown Promise with
 close-event completion and a fixed 1500 ms failure deadline. Existing cancellation,
 250 ms kill escalation and synchronous quit semantics remain. See the active
 contract for lifecycle ordering, injected-clock and real-child assertions.
-Correction 01 fixed early SIGTERM, callback assertions and close-wait cleanup.
-Two teardown defects remain: cwd removal after failed reaping and unchecked fake
-Promise/timer settlement. Correct only the final Correction 02 findings.
-No tests, builds, evidence or Git mutations; missing-API red is not yet authorized.
+Both corrections are accepted. Only one expected-red suite execution is authorized:
+node test/walletSupervisorShutdown.node.js, expected exit 1, zero ok/six not ok
+through absent shutdown API. Later cases and real child lifecycle remain unproved.
+No source edits, other tests/builds, integration or Git mutations by Hermes.
 
 Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
 reversal falsification and restored green. Rust executable at 31a6e540 retains
@@ -35,15 +35,14 @@ expansion is authorized. App startup/before-quit wiring and native account flows
 follow this prerequisite in later contracts. No wallet/release completion claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md,
+docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
-Correction 01 outer 4709 collected on owner done, exit 0; Grok session
-24b53eb0-f83e-4541-8078-c85178825b9a. Retain repaired source, but no execution yet.
-One Correction 02 invocation; collect on owner done/Continue. No actor polling.
-Correction 02 launched once from 3ba077ce; outer 9196, Grok session
-08cd1c44-d2b1-43c5-bd84-c4d16e250f8d, requested grok-4.6 High, no subagents.
+Correction 02 outer 9196 collected on owner done, exit 0; Grok session
+08cd1c44-d2b1-43c5-bd84-c4d16e250f8d. Source acceptance is in the final test review.
+One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

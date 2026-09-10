@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Shutdown harness partly corrected; bounded cleanup Correction 02 authorized.
+Status: Corrected shutdown test source accepted; Hermes expected red authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -81,16 +81,16 @@ validation and integration actors are closed.
 The next bounded prerequisite is
 [awaitable supervisor shutdown](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
 Existing quit() returns before child closure, so main cannot yet wait for cleanup.
-Correction 01 repaired the pre-handler SIGTERM race, callback assertions and
-close-wait listener cleanup. Two defects remain: removing the cwd after failed
-reaping and unchecked fake Promise/timer settlement. Correction 02 permits only
-those teardown repairs in
-test/walletSupervisorShutdown.node.js; shutdown-child.js is frozen.
+Corrections 01 and 02 are accepted: signal readiness, event-time assertions,
+close-wait cleanup, preserved cwd after incomplete reaping and explicit fake
+Promise/timer cleanup. Test source is frozen at 69eb8bcb (983 lines, six Linux
+groups); the wrapper stays at 0d8fbfa8. Only the
+[Hermes shutdown expected-red driver](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md)
+is authorized; production and integration follow observed-red review.
 Future shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or
 absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
-supervisor edits follow observed-red review; no execution or integration is now
-authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
+supervisor edits follow observed-red review; no integration is now authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
 affected lifecycle regressions and early-completion falsification.
 
 Startup pin provenance remains as specified in architecture section 4.2: reviewed
