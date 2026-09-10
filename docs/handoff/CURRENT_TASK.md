@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT EXPECTED-RED ACTOR LAUNCHED — AWAITING COLLECTION
+State: ELECTRON QUIT EXPECTED RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none
-Authorized execution actor: Hermes, one expected-red driver only
+Authorized source actor: Grok Build, grok-4.6 High; social-main.js only
+Authorized execution actor: none
 Authorized integration actor: none
 Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
-Read this active prefix (lines 1–40) and
-[Hermes quit expected-red handoff](HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md).
-Only its exact extraction launcher, once, with repository workdir is authorized.
-No source edits, extra commands, repairs, test replay or Git integration.
-Hermes outer 10968 launched once against f7ecb4d2; actual session is driver-recorded.
-Collect on owner done/Continue. No actor polling or additional launch.
+Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
+[Grok quit production handoff](GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md).
+Only its one-file source change is authorized. Tests/evidence stay frozen.
+No tests, syntax checks, builds, source integration or Git mutation by Grok.
+Hermes outer 10968 collected exit 0. Grok launch pending reviewer publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
-Corrected test source accepted at 7f759f81: 2026 lines, 30 groups (23 existing,
-seven new). Compound nested-event assertions now sit outside production's catch;
-shared cleanup keeps exit/rejection hooks active through settlement and drain.
-All frozen production/preload hashes match. Grok is closed; no tests run yet.
-Expected node test/electronSecurity.node.js: exit 1, 23 ok/seven not ok, each
-new group at before-quit handler is missing, with complete seven-failure footer.
-This proves absence only. New lifecycle bodies/second rejection row remain unrun.
+Accepted observed red: Node exit 1, 23 existing groups passed/seven new groups
+failed at before-quit handler is missing with complete seven-failure footer.
+Actual Hermes session 20260909_205604_2ac4dd, nous/poolside/laguna-s-2.1:free.
+Exact raw/evidence and five input hashes verified; no replay or repair needed.
+Test source frozen at 7f759f81 (2026 lines, 30 groups). New lifecycle bodies and
+second rejection row remain unexecuted until later green. Hermes is closed.
+The gate must await one shutdown, allow approved re-entry, and hold failures with
+one fixed error box; even dialog failure must not escape or permit termination.
 
 Shutdown at 1e45d6d2 retains 26 passing lifecycle groups and falsification/restoration.
-Async IPC at 3aa5e3d8 and Rust/transport evidence remain accepted without replay.
-Whole WAL-011 remains incomplete: main lacks broker startup and normal-quit wiring.
-Packaging-derived pins/platform inventory need a later contract; no self-pinning.
-Normal-quit production follows accepted observed red, never an inferred result.
+Async IPC, degraded Rust executable and transport remain accepted without replay.
+Whole WAL-011 remains incomplete: pinned startup and native account flows remain.
+No startup, self-pinning, package expansion or release acceptance is authorized.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md,
-docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md.
-Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
-EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md,
+docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md.
+Preserve four pending npm/policy files, WAL-009 evidence, current quit test/evidence
+and rejected EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
 No credential/config discovery. Future CURRENT reads specify lines 1–40.
-Hermes metadata uses exact HERMES_SESSION_ID key and its row only, without fallback.
-The raw record directory wallet-broker/target was verified ext4 this turn.
+Future Hermes metadata uses exact session key and row only, without fallback.
+The raw record directory wallet-broker/target was verified ext4.
 
 ## Historical record (superseded by the active state above)
 

@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron quit test-source correction accepted; one expected-red run authorized.
+Status: Electron quit expected red accepted; one-file production source authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -131,7 +131,11 @@ both corrections in the same test path. Corrected source is accepted at 7f759f81
 2026 lines/30 groups. Only the [Hermes expected-red handoff](../docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md)
 now authorizes one Electron suite run: expected 23 existing passes/seven missing
 before-quit-handler failures. No production or integration authorization follows
-until the observed red is accepted. Source actors are closed.
+until the observed red is accepted. That red is now accepted: 23 existing passes,
+seven absent-handler failures, Node exit 1, unchanged inputs and matching evidence.
+Hermes is closed. The [Grok production handoff](../docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md)
+authorizes only social-main.js to await shutdown through the fixed normal-quit gate.
+Tests, execution, evidence and integration stay frozen pending production review.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

@@ -100,3 +100,30 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+## Collected expected-red acceptance — 2026-09-09
+
+Accept the observed red; no replay. Outer 10968 collected on owner done, exit 0.
+Node itself exited 1: all 23 existing security/IPC groups passed, all seven new
+quit groups failed at `before-quit handler is missing`, and the complete
+seven-failure footer appeared. No cleanup failure, timeout or unrelated failure
+appears. This proves the gate is absent; the new lifecycle bodies and second
+rejection row remain unexecuted until green.
+
+Actual session 20260909_205604_2ac4dd, nous / poolside/laguna-s-2.1:free.
+Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15.
+Observed HEAD 384ba2398337540d4085e6a2a2a0b444c2d9f365. All five input hashes match
+before execution, after execution and at reviewer collection. The normalized
+evidence JSON exactly matches the raw driver record after repository/home
+replacement. Exact-session tool inventory 80359–80367 shows two bounded document
+reads, one extraction launcher with repository workdir, one process wait and final
+report. No extra command, source edit, replay or Git mutation appears.
+
+- Evidence: docs/testing/BBD-WAL-011-ELECTRON-QUIT-RED-01.md, 71 lines,
+  SHA-256 229c1a97b501dcf0a1f60865245e76c644520776500b06f3c3ff5d0ddedf167b.
+- Raw: wallet-broker/target/wal011-electron-quit-red-01.json, 65 lines,
+  SHA-256 059c99a2756adf8be8197ebe8e53af18a895a89cc17bf68d7d9af91fdb6eaefb.
+
+Evidence remains untracked for later Hermes integration. Hermes is closed; only
+the [Grok production handoff](GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md)
+is now authorized. The reviewer ran no tests or acceptance commands.
