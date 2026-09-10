@@ -1,7 +1,8 @@
 # Current Task
 
-BBD-WAL-014 is IN PROGRESS. Grok exited without usable test edits; Sol gpt-5.6-sol
-High now owns the same two-file test task under SOL_BBD_WAL_014_RECEIVE_TESTS_01.md.
+BBD-WAL-014 is IN PROGRESS. Focused red accepted: only missing receive APIs.
+Sol gpt-5.6-sol High owns production under SOL_BBD_WAL_014_RECEIVE_PRODUCTION_01.md
+(four production files and two narrow cleanup-helper refinements). No execution/Git.
 Owner reconfirmed the original broker-with-built-in-Zcash
 architecture and authorized continuing receive/balance work. Grok may author ONLY
 the two test paths in GROK_BBD_WAL_014_RECEIVE_TESTS_01.md. Production is frozen
