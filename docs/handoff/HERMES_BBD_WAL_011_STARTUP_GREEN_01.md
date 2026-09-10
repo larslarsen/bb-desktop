@@ -149,3 +149,18 @@ finally:
     finish('WAL-011 application startup and native composition green 01')
 sys.exit(0 if record['accepted'] else 1)
 ```
+
+## Collected partial execution — retained proof accepted
+
+Outer 2349 returned prematurely; exact-session messages 80474–80479 show read,
+launcher, then final without process wait. Session 20260910_085930_0dff59, nous /
+poolside/laguna-s-2.1:free, v0.18.2 upstream 67764dc0/local 10b6d1a9. Driver raw
+9035d3ee833ed2aa53f15a6844ffbb4cf701c14388999586fce5a27343eed688 retains
+23 command results and stopped on BrokenPipeError printing successful Git-scan output.
+70 unit groups, real native smoke, both falsifications and restored green all passed.
+All 59 inputs match before/after/current. Actual 8,437,624-byte Linux x64 executable
+5f112d4f5997615bfc43f585ac79a9e6754364273ea3ca348fa0654797eb0f26 is staged
+and matches manifest; Rust 1.98 build succeeded. Audit zero vulnerabilities, Git scan
+5274 commits/no leaks, policy outputs byte-identical to inherited failing baseline.
+Evidence/raw normalized equality verified. Retain these completed results; only
+HERMES_BBD_WAL_011_STARTUP_GREEN_FINISH_01.md is authorized next. No replay.

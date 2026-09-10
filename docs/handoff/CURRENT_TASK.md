@@ -1,10 +1,10 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: FULL LOCAL STARTUP VALIDATION AUTHORIZED
+State: 71 GROUPS AND REAL STARTUP PASSED; FINAL SECRET SCAN
 Reviewer: Codex
 Authorized source actor: none; all collected/closed
-Authorized execution: Hermes under HERMES_BBD_WAL_011_STARTUP_GREEN_01.md
+Authorized execution: Hermes under HERMES_BBD_WAL_011_STARTUP_GREEN_FINISH_01.md
 Authorized integration: none
 
 Active contract: [startup](GROK_BBD_WAL_011_STARTUP_01.md).
@@ -14,7 +14,9 @@ Initial source actors collected and closed.
 All test and red actors collected/closed.
 Main production Grok c3f8e672 collected/closed; source accepted at 7047253e.
 Builder Grok 6354be17 collected/closed; c96684b9 accepted.
-Hermes full validation next: units, real build/main/Rust smoke, falsification and scans.
+Hermes initial validation collected; 71 groups, real build/smoke, both falsifications
+and restoration passed. Only working-tree scan remains after output-pipe failure.
+No prior validation replay. Finish actor must collect its process before returning.
 Owner priority: finish local app-to-broker startup, no further installer detour.
 Reviewer stays with actors and collects/reviews/routes in the same turn.
 Provide meaningful status at least every 60 seconds; no repeated done required.
