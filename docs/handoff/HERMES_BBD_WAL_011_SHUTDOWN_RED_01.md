@@ -108,3 +108,33 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+
+## Collected expected-red acceptance — 2026-09-09
+
+Accept expected red; no replay. Outer 98181 collected on owner done with exit 0.
+Node exited 1 with zero ok/six not ok; all six groups failed at assertShutdownApi
+with the exact absent shutdown API assertion. No skips or cleanup failures appear.
+This establishes absence only: later lifecycle assertions and real child behavior
+are unexecuted, and no child-reaping success is claimed.
+
+Actual runtime session 20260909_193149_7cb2b0, provider nous, model
+poolside/laguna-s-2.1:free. Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local
+10b6d1a9, Python 3.11.15. Observed HEAD
+82598823b72fe4a6247669ba1ea961646bc7a1e4. All six input hashes agree before and
+after execution and at reviewer collection. Source remains unchanged.
+
+Exact-session tool inventory (80333–80340) shows bounded CURRENT/handoff reads,
+one exact extraction launcher with repository workdir, one process wait and final
+report. No extra commands, source edits, discovery, replay or Git mutations appear.
+Reviewer compared evidence JSON with the normalized raw record; exact match.
+
+- docs/testing/BBD-WAL-011-SHUTDOWN-RED-01.md: 73 lines, SHA-256
+  32e6d2b69e05e95def6eaac0ccce6d4ff606b535fc362376934716c028b443ae.
+- wallet-broker/target/wal011-shutdown-red-01.json: SHA-256
+  13a977fd513233936a56c59e3d18f88b1682e13e5fd857d519a14c11723eb198.
+
+The evidence and two test files remain untracked for later Hermes integration.
+Hermes execution is closed. Only the
+[Grok production contract](GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md) is authorized.
+Reviewer ran no tests/builds; unrelated pending npm/policy files and evidence remain.

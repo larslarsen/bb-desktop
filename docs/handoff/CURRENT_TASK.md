@@ -1,27 +1,28 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: SHUTDOWN TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+State: SHUTDOWN EXPECTED RED ACCEPTED — PRODUCTION SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok closed
-Authorized execution actor: Hermes, exact shutdown expected-red driver only
+Authorized source actor: Grok Build, grok-4.6 High; supervisor.js only
+Authorized execution actor: none; Hermes closed
 Authorized integration actor: none
-Protected parent: reviewer publication following c7f83995; one CURRENT-only launch allowed
+Protected parent: reviewer publication following 82598823; one CURRENT-only launch allowed
 
 Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
-and [active execution contract](HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md).
+and [active production contract](GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md).
 Test source frozen: test/walletSupervisorShutdown.node.js at 69eb8bcb, 983 lines.
-The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8. No production edits.
+The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8.
+Only production write: wallet-broker/supervisor.js, baseline 1ac92493.
 
 Reviewer found quit() returns before child closure. Before Electron can await
 cleanup during normal quit, the supervisor needs a shared shutdown Promise with
 close-event completion and a fixed 1500 ms failure deadline. Existing cancellation,
 250 ms kill escalation and synchronous quit semantics remain. See the active
 contract for lifecycle ordering, injected-clock and real-child assertions.
-Both corrections are accepted. Only one expected-red suite execution is authorized:
-node test/walletSupervisorShutdown.node.js, expected exit 1, zero ok/six not ok
-through absent shutdown API. Later cases and real child lifecycle remain unproved.
-No source edits, other tests/builds, integration or Git mutations by Hermes.
+Observed expected red is accepted: Node exit 1, zero ok/six not ok through absent
+shutdown API. No cleanup failures or changed inputs. Grok may add shutdown() under
+the fixed production contract. Tests, execution and integration are frozen.
+Later cases and real child lifecycle remain unproved until focused green.
 
 Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
 reversal falsification and restored green. Rust executable at 31a6e540 retains
@@ -35,16 +36,15 @@ expansion is authorized. App startup/before-quit wiring and native account flows
 follow this prerequisite in later contracts. No wallet/release completion claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md,
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md,
 docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
-Correction 02 outer 9196 collected on owner done, exit 0; Grok session
-08cd1c44-d2b1-43c5-bd84-c4d16e250f8d. Source acceptance is in the final test review.
-One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 859966c8; outer 98181, requested nous /
-poolside/laguna-s-2.1:free. Actual session metadata is recorded by the driver.
+Hermes outer 98181 collected on owner done, exit 0; actual session
+20260909_193149_7cb2b0, nous / poolside/laguna-s-2.1:free. Exact normalized evidence
+is accepted in the red handoff's final review. No rerun is needed.
+One Grok source invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

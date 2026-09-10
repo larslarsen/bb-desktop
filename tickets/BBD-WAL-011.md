@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Corrected shutdown test source accepted; Hermes expected red authorized.
+Status: Shutdown expected red accepted; bounded supervisor production authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -84,13 +84,15 @@ Existing quit() returns before child closure, so main cannot yet wait for cleanu
 Corrections 01 and 02 are accepted: signal readiness, event-time assertions,
 close-wait cleanup, preserved cwd after incomplete reaping and explicit fake
 Promise/timer cleanup. Test source is frozen at 69eb8bcb (983 lines, six Linux
-groups); the wrapper stays at 0d8fbfa8. Only the
-[Hermes shutdown expected-red driver](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md)
-is authorized; production and integration follow observed-red review.
+groups); the wrapper stays at 0d8fbfa8.
+[Observed expected red](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md#collected-expected-red-acceptance--2026-09-09)
+is accepted: zero ok/six absent-API failures, Node exit 1, unchanged inputs.
+Only the [Grok supervisor production contract](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md)
+is authorized; execution, test edits and integration are frozen.
 Future shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or
 absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
-supervisor edits follow observed-red review; no integration is now authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
+supervisor edits are now authorized within the linked contract; no integration is authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
 affected lifecycle regressions and early-completion falsification.
 
 Startup pin provenance remains as specified in architecture section 4.2: reviewed
