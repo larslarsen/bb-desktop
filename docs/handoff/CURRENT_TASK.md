@@ -11,7 +11,7 @@ Read [runtime package validation](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_GREEN_01.md
 Helper 97d04b44 and three reviewed packagers frozen; test 5d8a8bf2 frozen.
 Seven package + nine resolver + 30 Electron groups, falsification, policy/scans,
 then preserved-old-artifact Linux package/extraction proof. No native broker start.
-Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Hermes outer 18673 launched against ce95e12e; reviewer collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Six inherited policy failures and Rust-inventory checker failure remain blockers.
 Reviewer publication: CURRENT_TASK.md, runtime-package production/green handoffs,
