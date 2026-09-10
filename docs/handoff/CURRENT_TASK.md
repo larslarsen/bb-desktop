@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH-CONFIGURATION EXPECTED RED ACCEPTED — RESOLVER PRODUCTION AUTHORIZED
+State: LAUNCH-CONFIGURATION RESOLVER PRODUCTION ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; no subagents
 Authorized execution actor: none
@@ -12,7 +12,7 @@ Read this active prefix (lines 1–40) and
 [Grok resolver production](GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md).
 Only new wallet-broker/launch-config.js may be written; verify absence first.
 No tests, syntax checks, builds, docs/evidence edits or Git mutation by Grok.
-Grok launch pending reviewer publication. Hermes outer 82063 collected and closed.
+Grok outer 20952 launched once against 08d31eeb; Hermes outer 82063 is closed.
 Launch once; collect on owner done/Continue. No actor polling or additional launch.
 
 Accepted red: Node exit 1, zero ok/five explicit missing-resolver assertions.
@@ -35,7 +35,7 @@ tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_0
 docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
-Future CURRENT reads specify lines 1–40; named bounded reads only.
+Grok session bd2da903-141e-486a-92a8-403ec942dbfb; CURRENT reads lines 1–40.
 Later Hermes green/falsification/restoration requires separate authorization.
 
 ## Historical record (superseded by the active state above)
