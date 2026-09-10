@@ -1,12 +1,18 @@
 # WAL-013 final visibility correction/window/security — authorized
 
+Executionroute update: poolside actor27519/session20260910_113319_9a22f4 returned
+upstream429capacity after3retries, before anytoolcalls (session hasuserrowonly).
+No command/metadata/artifact was executed/created. Per HERMES_JR_DEV_ROUTING.md model
+isnotpermanentpin; reviewer authorizes Hermes nous/meituan/longcat-2.0:free for exact
+sameunstarteddriver. Actualsession/model stillrecorded fromDB. No priorcommand replay.
+
 Reviewer accepts Sol40799 collectedexit0, exactlyone UIcommand f8a47778d00be2cd7a448aec33117172880bde6e70e220b9f783dcca1ad8c1c7 (931lines).
 Hiddenpass reasserts Visible(false) after scrubbing, stillticks/repaints, noFocus.
 Priorfinal01 failedinitialwindowvisibility beforemanage; therefore NOTacceptedfault
 proof. Runtime exactsource+stagedproduction restored/rebuilt; no advisory/policy/scans
 executed. Raw/evidence retained. Allotherfunctionaltests andoldfalsifications accepted.
 
-Hermes nous/poolside/laguna-s-2.1:free only. Allactorsclosed/inputs frozen. New bounded
+Hermes nous/meituan/longcat-2.0:free only. Allactorsclosed/inputs frozen. New bounded
 UIvisibility change warrants9widgetregression+nativeClippy+actualrebuiltwindowgreen.
 Then exactruntime no-open mutation/build/stage/windowmustfailhiddenvisibility effect,
 finallyrestore runtime+rebuildproduction, restoredwindowgreen. Finish actualartifact
