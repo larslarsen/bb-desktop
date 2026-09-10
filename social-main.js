@@ -106,7 +106,7 @@ function walletHandler(channel, method) {
     const result = params === undefined
       ? walletSupervisor.dispatch(method)
       : walletSupervisor.dispatch(method, params);
-    return cloneBoundary(result);
+    return Promise.resolve(result).then(cloneBoundary);
   };
 }
 

@@ -224,10 +224,11 @@ function createElectronMock() {
 
 let runtime;
 
-function loadMaintainedMain() {
+function loadMaintainedMain(options = {}) {
   assert.ok(fs.existsSync(mainPath), 'maintained Electron entry social-main.js is missing');
   const mock = createElectronMock();
   const originalLoad = Module._load;
+  const previousMain = require.cache[mainPath];
   const trackedSanitizer = (value) => {
     mock.state.sanitizerCalls.push(value);
     return sanitizeWalletSnapshot(value);
@@ -243,7 +244,9 @@ function loadMaintainedMain() {
           return {
             dispatch(method, params) {
               mock.state.supervisorCalls.push([method, params]);
-              const result = { ok: true, value: params };
+              const result = typeof options.dispatch === 'function'
+                ? options.dispatch(method, params)
+                : { ok: true, value: params };
               mock.state.supervisorResults.push(result);
               return result;
             },
@@ -265,6 +268,10 @@ function loadMaintainedMain() {
     require(mainPath);
   } finally {
     Module._load = originalLoad;
+    if (options.restoreMainCache) {
+      if (previousMain) require.cache[mainPath] = previousMain;
+      else delete require.cache[mainPath];
+    }
   }
   mock.emitApp('ready');
   return mock;
@@ -275,6 +282,94 @@ function boot() {
     runtime = loadMaintainedMain();
   }
   return runtime;
+}
+
+const SETTLEMENT_TIMEOUT_MS = 1000;
+
+function loadIsolatedMaintainedMain(options = {}) {
+  return loadMaintainedMain(Object.assign({}, options, { restoreMainCache: true }));
+}
+
+function copyJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function fixtureSupervisorError(code, message) {
+  const error = new Error(message);
+  error.name = 'SupervisorError';
+  error.code = code;
+  return error;
+}
+
+function createDeferred() {
+  let resolveFn;
+  let rejectFn;
+  const deferred = {
+    settled: false,
+    promise: null,
+    resolve(value) {
+      if (deferred.settled) return;
+      deferred.settled = true;
+      resolveFn(value);
+    },
+    reject(reason) {
+      if (deferred.settled) return;
+      deferred.settled = true;
+      rejectFn(reason);
+    },
+  };
+  deferred.promise = new Promise((resolve, reject) => {
+    resolveFn = resolve;
+    rejectFn = reject;
+  });
+  deferred.promise.then(() => {}, () => {});
+  return deferred;
+}
+
+function waitEventLoopTurn() {
+  return new Promise((resolve) => {
+    setImmediate(resolve);
+  });
+}
+
+function withSettlementTimeout(promise, message) {
+  let timer = null;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(message));
+    }, SETTLEMENT_TIMEOUT_MS);
+  });
+  return Promise.race([Promise.resolve(promise), timeout]).finally(() => {
+    if (timer !== null) clearTimeout(timer);
+  });
+}
+
+async function observeFinally(values, message) {
+  await withSettlementTimeout(
+    Promise.all(
+      values.filter((value) => value != null).map((value) => Promise.resolve(value).then(() => {}, () => {}))
+    ),
+    message
+  );
+}
+
+function trustedWalletEvent(ctx) {
+  assert.strictEqual(ctx.state.windows.length, 1, 'isolated client must create exactly one BrowserWindow');
+  const win = ctx.state.windows[0];
+  return { senderFrame: win.webContents.mainFrame, sender: win.webContents };
+}
+
+async function settleDeferreds(deferreds, observed, currentDeferred, message) {
+  if (currentDeferred && !currentDeferred.settled) {
+    currentDeferred.reject(new Error(message));
+  }
+  for (const deferred of deferreds) {
+    if (!deferred.settled) deferred.reject(new Error(message));
+  }
+  await observeFinally(
+    deferreds.map((deferred) => deferred.promise).concat(observed),
+    message
+  );
 }
 
 function windowUnderTest() {
@@ -671,6 +766,261 @@ test('wallet IPC valid calls map once to fixed supervisor methods with cloned pa
     assert.strictEqual(Object.prototype.hasOwnProperty.call(rawResult, 'renderer_mutation'), false);
   }
   assert.deepStrictEqual(ctx.state.supervisorCalls, rows.map(([, method, params]) => [method, params]));
+});
+
+test('wallet IPC delayed supervisor replies stay pending then clone fulfilled values for every channel', async () => {
+  const deferreds = [];
+  const observed = [];
+  let currentDeferred = null;
+  const rows = [
+    ['wallet:snapshot:get', 'status.get', undefined, { v: 1, broker: 'degraded', accounts: [] }],
+    ['wallet:accounts:list', 'account.list', undefined, {
+      accounts: [{
+        account_id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nested: { label: 'opaque-list-fixture', tags: ['alpha'] },
+      }],
+    }],
+    ['wallet:intent:begin', 'intent.begin', { payment_request: { v: 1, request_id: '0'.repeat(32) } }, {
+      intent_id: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      nested: { state: 'opaque-begin-fixture', items: [{ n: 1 }] },
+    }],
+    ['wallet:intent:cancel', 'intent.cancel', { intent_id: '1'.repeat(32) }, {
+      intent_id: 'cccccccccccccccccccccccccccccccc',
+      nested: { state: 'opaque-cancel-fixture', ok: true },
+    }],
+    ['wallet:payee-request:get', 'receiver.fresh', {
+      account_id: '2'.repeat(32), asset: 'ZEC', network: 'zec-testnet', request_id: '3'.repeat(32),
+    }, {
+      request_id: 'dddddddddddddddddddddddddddddddd',
+      nested: { uri: 'opaque-payee-fixture', asset: 'ZEC' },
+    }],
+  ];
+  const ctx = loadIsolatedMaintainedMain({
+    dispatch() {
+      assert.ok(currentDeferred, 'supervisor dispatch had no deferred fixture');
+      const deferred = currentDeferred;
+      currentDeferred = null;
+      deferreds.push(deferred);
+      return deferred.promise;
+    },
+  });
+  try {
+    assert.deepStrictEqual(rows.map(([channel]) => channel).sort(), WALLET_IPC_CHANNELS);
+    const event = trustedWalletEvent(ctx);
+    for (const [channel, method, params, replyLiteral] of rows) {
+      const handler = ctx.state.ipcHandlers[channel];
+      assert.strictEqual(typeof handler, 'function');
+      const deferred = createDeferred();
+      currentDeferred = deferred;
+      const input = params === undefined ? undefined : copyJson(params);
+      const inputBytes = input === undefined ? undefined : JSON.stringify(input);
+      const returned = handler(event, input);
+      assert.strictEqual(currentDeferred, null, `${channel} did not dispatch once`);
+      const resultState = { status: 'pending' };
+      const resultObserved = Promise.resolve(returned).then(
+        (value) => {
+          resultState.status = 'fulfilled';
+          resultState.value = value;
+          return value;
+        },
+        (reason) => {
+          resultState.status = 'rejected';
+          resultState.reason = reason;
+          throw reason;
+        }
+      );
+      observed.push(resultObserved);
+      assert.ok(returned && typeof returned.then === 'function', `${channel} did not return a thenable`);
+      const received = ctx.state.supervisorCalls[ctx.state.supervisorCalls.length - 1][1];
+      assert.strictEqual(ctx.state.supervisorCalls[ctx.state.supervisorCalls.length - 1][0], method);
+      if (input) {
+        assert.notStrictEqual(received, input);
+        assert.deepStrictEqual(received, params);
+        received.observer_mutation = true;
+        assert.strictEqual(Object.prototype.hasOwnProperty.call(input, 'observer_mutation'), false);
+        delete received.observer_mutation;
+        assert.strictEqual(JSON.stringify(input), inputBytes);
+        if (method === 'intent.begin') {
+          assert.notStrictEqual(received.payment_request, input.payment_request);
+          const originalRequestId = received.payment_request.request_id;
+          received.payment_request.request_id = 'f'.repeat(32);
+          assert.strictEqual(JSON.stringify(input), inputBytes);
+          received.payment_request.request_id = originalRequestId;
+        }
+      } else {
+        assert.strictEqual(received, undefined);
+      }
+      await withSettlementTimeout(waitEventLoopTurn(), `${channel} event-loop turn timed out`);
+      assert.strictEqual(deferred.settled, false, `${channel} fixture settled before resolve`);
+      assert.strictEqual(resultState.status, 'pending', `${channel} handler settled before the fixture resolved`);
+      const reply = copyJson(replyLiteral);
+      const expected = copyJson(replyLiteral);
+      deferred.resolve(reply);
+      const output = await withSettlementTimeout(
+        resultObserved,
+        `${channel} did not settle after the fixture resolved`
+      );
+      assert.strictEqual(resultState.status, 'fulfilled', `${channel} did not fulfill`);
+      assert.deepStrictEqual(output, expected);
+      assert.notStrictEqual(output, reply);
+      const replyBytes = JSON.stringify(reply);
+      output.renderer_mutation = true;
+      assert.strictEqual(JSON.stringify(reply), replyBytes);
+      delete output.renderer_mutation;
+      reply.source_mutation = true;
+      assert.deepStrictEqual(output, expected);
+      delete reply.source_mutation;
+      for (const key of Object.keys(expected)) {
+        if (!expected[key] || typeof expected[key] !== 'object') continue;
+        assert.notStrictEqual(output[key], reply[key], `${channel} aliased nested ${key}`);
+        const nestedReplyBytes = JSON.stringify(reply);
+        if (Array.isArray(output[key])) {
+          output[key].push({ renderer_nested_mutation: true });
+          assert.strictEqual(JSON.stringify(reply), nestedReplyBytes);
+          output[key].pop();
+          reply[key].push({ source_nested_mutation: true });
+          assert.deepStrictEqual(output, expected);
+          reply[key].pop();
+          if (output[key][0] && typeof output[key][0] === 'object') {
+            assert.notStrictEqual(output[key][0], reply[key][0], `${channel} aliased ${key}[0]`);
+            if (output[key][0].nested) {
+              assert.notStrictEqual(output[key][0].nested, reply[key][0].nested, `${channel} aliased ${key}[0].nested`);
+              const deepBytes = JSON.stringify(reply);
+              output[key][0].nested.renderer_nested_mutation = true;
+              assert.strictEqual(JSON.stringify(reply), deepBytes);
+              delete output[key][0].nested.renderer_nested_mutation;
+              reply[key][0].nested.source_nested_mutation = true;
+              assert.deepStrictEqual(output, expected);
+              delete reply[key][0].nested.source_nested_mutation;
+            }
+          }
+        } else {
+          output[key].renderer_nested_mutation = true;
+          assert.strictEqual(JSON.stringify(reply), nestedReplyBytes);
+          delete output[key].renderer_nested_mutation;
+          reply[key].source_nested_mutation = true;
+          assert.deepStrictEqual(output, expected);
+          delete reply[key].source_nested_mutation;
+        }
+      }
+    }
+    assert.deepStrictEqual(
+      ctx.state.supervisorCalls,
+      rows.map(([, method, params]) => [method, params])
+    );
+    assert.strictEqual(currentDeferred, null);
+  } finally {
+    await settleDeferreds(
+      deferreds,
+      observed,
+      currentDeferred,
+      'unsettled delayed wallet IPC reply fixture'
+    );
+  }
+});
+
+test('wallet IPC delayed supervisor rejections propagate original UNAVAILABLE and TIMEOUT errors', async () => {
+  const cases = [
+    ['wallet:snapshot:get', 'status.get', fixtureSupervisorError('UNAVAILABLE', 'fixture broker unavailable')],
+    ['wallet:accounts:list', 'account.list', fixtureSupervisorError('TIMEOUT', 'fixture request timeout')],
+  ];
+  for (const [channel, method, error] of cases) {
+    const deferreds = [];
+    const observed = [];
+    let currentDeferred = null;
+    const ctx = loadIsolatedMaintainedMain({
+      dispatch() {
+        assert.ok(currentDeferred, 'supervisor dispatch had no deferred fixture');
+        const deferred = currentDeferred;
+        currentDeferred = null;
+        deferreds.push(deferred);
+        return deferred.promise;
+      },
+    });
+    try {
+      const handler = ctx.state.ipcHandlers[channel];
+      assert.strictEqual(typeof handler, 'function');
+      const deferred = createDeferred();
+      currentDeferred = deferred;
+      const returned = handler(trustedWalletEvent(ctx));
+      assert.strictEqual(currentDeferred, null, `${channel} did not dispatch once`);
+      const inputState = { status: 'pending' };
+      const inputObserved = deferred.promise.then(
+        (value) => {
+          inputState.status = 'fulfilled';
+          inputState.value = value;
+          return value;
+        },
+        (reason) => {
+          inputState.status = 'rejected';
+          inputState.reason = reason;
+          return reason;
+        }
+      );
+      observed.push(inputObserved);
+      const resultState = { status: 'pending' };
+      const resultObserved = Promise.resolve(returned).then(
+        (value) => {
+          resultState.status = 'fulfilled';
+          resultState.value = value;
+          return value;
+        },
+        (reason) => {
+          resultState.status = 'rejected';
+          resultState.reason = reason;
+          return reason;
+        }
+      );
+      observed.push(resultObserved);
+      assert.ok(returned && typeof returned.then === 'function', `${channel} did not return a thenable`);
+      await withSettlementTimeout(waitEventLoopTurn(), `${channel} event-loop turn timed out`);
+      assert.strictEqual(deferred.settled, false, `${channel} fixture settled before reject`);
+      assert.strictEqual(inputState.status, 'pending', `${channel} input promise settled before the fixture rejected`);
+      assert.strictEqual(resultState.status, 'pending', `${channel} handler settled before the fixture rejected`);
+      deferred.reject(error);
+      await withSettlementTimeout(
+        Promise.all([inputObserved, resultObserved]),
+        `${channel} rejection did not settle`
+      );
+      assert.strictEqual(inputState.status, 'rejected');
+      assert.strictEqual(inputState.reason, error);
+      assert.strictEqual(
+        resultState.status,
+        'rejected',
+        `${channel} resolved ${JSON.stringify(resultState.value)} instead of rejecting`
+      );
+      assert.strictEqual(resultState.reason, error);
+      assert.deepStrictEqual(ctx.state.supervisorCalls, [[method, undefined]]);
+    } finally {
+      await settleDeferreds(
+        deferreds,
+        observed,
+        currentDeferred,
+        'unsettled delayed wallet IPC rejection fixture'
+      );
+    }
+  }
+});
+
+test('wallet IPC synchronous dispatch failure throws immediately', () => {
+  const error = fixtureSupervisorError('SCHEMA', 'fixture synchronous dispatch failure');
+  const ctx = loadIsolatedMaintainedMain({
+    dispatch() {
+      throw error;
+    },
+  });
+  const handler = ctx.state.ipcHandlers['wallet:snapshot:get'];
+  assert.strictEqual(typeof handler, 'function');
+  let returned;
+  let thrown;
+  try {
+    returned = handler(trustedWalletEvent(ctx));
+  } catch (caught) {
+    thrown = caught;
+  }
+  assert.strictEqual(thrown, error);
+  assert.strictEqual(returned, undefined);
+  assert.deepStrictEqual(ctx.state.supervisorCalls, [['status.get', undefined]]);
 });
 
 test('wallet snapshot subscription targets only the maintained main frame with sanitized cloned data', () => {
