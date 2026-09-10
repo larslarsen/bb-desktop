@@ -27,3 +27,11 @@ add sleeps/retries or weaken existing actualcallcount/absence assertions.
 
 All other source accepted, including cleanupproof, generichelper, exactbyteboundary,
 actualgeometry, fourpreparations and no-replay assertions. Finish hash/lines/tests only.
+
+## Final one-line correction
+
+Collected Sol30826 exit0, draft5ced0bdc885fe82ad49783c374960a8e4437c85c2a114413793bb8a61bd3b01b.
+from_output parameter is &egui::FullOutput; restoredaccesskit field accidentally uses
+output.accesskit_update. Correct EXACTLY to output.platform_output.accesskit_update.
+Everything else accepted. Only same test file, no execution/research/otherchanges;
+report finalhash/counts. This restores originallycorrect nestedfieldaccess.
