@@ -124,3 +124,12 @@ Expected missing account_ui import. Green same; existing native_surface/native w
 regressions scoped by reviewer. Falsify confirm-required or close-clear mechanism and
 prove corresponding actual-widget test fails, restore. Runtime/process/menu follows
 separate contract; do not substitute unit UI proof for whole user flow.
+
+## Reviewer production hygiene clarification
+
+Preallocate each password's Zeroizing<String> capacity1024 and reject excess UTF8
+bytes BEFORE mutation; never grow/reallocate a buffer containing a secret. The pinned
+zeroize1.9 String wipe clears full capacity but cannot erase retired reallocation
+buffers. Wipe/clear retains capacity. Drop covers cancel/error/unwind; no plaintext
+in egui TextEdit undo history, context data or cloned application input events.
+This is production review guidance, no extra test source path or secret getter.
