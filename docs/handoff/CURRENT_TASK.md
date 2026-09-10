@@ -1,42 +1,22 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: REFLECTION TEST ACTOR COMPLETED AND COLLECTED — SOURCE REVIEW PENDING
-Reviewer: Codex; High is sufficient
-Authorized source actor: none; completed Grok test drop awaits source review
-Authorized execution actor: none
+State: REFLECTION TEST SOURCE ACCEPTED — HERMES EXPECTED RED AUTHORIZED
+Reviewer: Codex
+Authorized source actor: none
+Authorized execution actor: Hermes, exact reflection-red driver once
 Authorized integration actor: none
-Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
-Read this active prefix (lines 1–40) and
-[reflection regression tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md).
-Test-source authorization is closed; no source edits until the next review contract.
-Production launch-config.js remains frozen at 4a639b16, 132 lines.
-Grok production outer 20952 completed exit 0 and is collected/closed.
-Grok outer 32296 collected exit 0; test report 90acd32c, 949 lines. No actor active.
-Owner visibility preference: stay with launched actors and collect in the same turn.
-
-Source finding: revoked Proxy and throwing reflection traps escape as raw errors
-without the fixed UNAVAILABLE code/message. This violates the error contract.
-It is not a claim of renderer reachability or a demonstrated exploit.
-Four regression groups were authored; inspect the drop before authorizing red.
-Existing five groups/58 rows and all helpers remain unchanged.
-No test, syntax/build execution, production correction or Git mutation by Grok.
-Reviewer source review is recorded in the production handoff.
-
-Packaging still needs runtime JS inventory repair and build-time artifact pins;
-main startup/status/quit composition follows later. Whole WAL-011 is incomplete.
-Quit/shutdown/IPC/degraded Rust/transport acceptance is retained without replay.
-Expected missing-resolver red is retained; no configuration green is claimed.
-
-Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md,
-docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md.
-Preserve pending npm/policy files, WAL-009 evidence and rejected untracked
-EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
-Give live status updates; do not require owner done messages to collect completion.
-Grok session e8ddbd20-50d2-4fb2-a152-2225ff0b95f8; CURRENT reads lines 1–40.
-Later Hermes focused red requires separate reviewer authorization.
+Read [reflection red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_RED_01.md).
+Test 90acd32c, 949 lines, nine groups/62 rows; only four reflection groups run now.
+Production 4a639b16 is frozen pending expected-red confirmation and correction.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Owner need not send done; status updates at least every 60 seconds during work.
+No source edits, unrelated commands, retries, Git mutation or additional execution.
+Preserve all unrelated pending policy/npm/evidence files. WAL-007 parked.
+Reviewer publication paths: CURRENT_TASK.md, reflection-tests handoff,
+reflection-red handoff and tickets/BBD-WAL-011.md only.
+Whole WAL-011 incomplete: packaging/pins and main startup still follow later.
 
 ## Historical record (superseded by the active state above)
 

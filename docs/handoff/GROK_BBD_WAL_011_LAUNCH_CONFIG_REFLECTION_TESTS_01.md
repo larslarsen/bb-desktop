@@ -49,3 +49,14 @@ chaining, history, home skills/config, unrelated discovery, production edits, te
 syntax checks, Node/npm/Cargo/build execution, evidence/docs edits, Git mutation,
 network or additional actors. Preserve all pending files. Report the one path,
 SHA-256, line count, four added groups and stop for source review.
+
+## Source acceptance — 2026-09-09
+
+Accept 90acd32c9863df0206364eb04f707d92a5979ee66c7e15b2ec7b8250a5fc2113,
+949 lines. Removing the single 98-line insertion reconstructs the exact accepted
+851-line hash. Four independent public-boundary calls cover revoked proxy and
+three throwing reflection operations; trap counters and the shared diagnostic
+assertions are non-vacuous on green. Production remains 4a639b16. Exact Grok export
+e8ddbd20-50d2-4fb2-a152-2225ff0b95f8 shows named reads/checks, one test edit,
+no execution or Git mutation. Source actor is closed. Only the reflection-red
+Hermes handoff authorizes execution; reviewer ran no tests.
