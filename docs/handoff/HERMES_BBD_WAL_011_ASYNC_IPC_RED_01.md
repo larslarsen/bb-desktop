@@ -102,3 +102,39 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+
+## Collected expected-red acceptance — 2026-09-09
+
+Decision: accept expected red; no rerun. Outer 85066 collected on owner done,
+exit 0. The Node command itself exited 1 with exactly 21 ok and two not ok,
+both at `wallet:snapshot:get did not return a thenable`, with the complete
+`2 electron security test(s) failed` footer. All other groups, including synchronous
+dispatch failure and existing security assertions, passed. Later rows of both
+delayed groups remain unexecuted until green; no broader completion is claimed.
+
+Actual session 20260909_181137_0cfb89, provider nous, model
+poolside/laguna-s-2.1:free. Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local
+10b6d1a9, Python 3.11.15. Observed HEAD was
+34c297b0ff35feff2f0d4350bbd1addd82faa384. Four source hashes agree before execution,
+after execution and at reviewer collection. No source repair or integration occurred.
+
+Exact-session database audit shows two document reads, one extraction launcher,
+one process wait and final report (messages 80306–80313). The initial CURRENT
+read included full history despite the active-prefix restriction; record this
+read-scope deviation. Future prompts must give an explicit line range for CURRENT.
+No extra terminal commands, source edits, test replay or Git mutations appear in
+this tool inventory. The final report's claim of no other reads is qualified by
+this observed excessive CURRENT read.
+
+The reviewer compared the evidence JSON with the raw driver record after explicit
+repository/home normalization; they match exactly:
+
+- docs/testing/BBD-WAL-011-ASYNC-IPC-RED-01.md: 69 lines, SHA-256
+  fa17e0060ca058560fde00309d6b4c5265c0493ee11c9e327cb150a6ef602435.
+- wallet-broker/target/wal011-async-ipc-red-01.json: SHA-256
+  5fbefbd6488f2ca27befe18d445b803feb99f2f110edd9dcffcd2d6ae883da05.
+
+The evidence remains untracked for later Hermes integration. Hermes is closed.
+Only the [one-line Grok production handoff](GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md)
+is now authorized. No tests/builds were executed by the reviewer.

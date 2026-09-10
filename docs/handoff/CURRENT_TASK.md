@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ASYNC IPC TEST SOURCE ACCEPTED — EXPECTED RED AUTHORIZED
+State: ASYNC IPC EXPECTED RED ACCEPTED — ONE-LINE PRODUCTION SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok closed
-Authorized execution actor: Hermes, exact async IPC expected-red driver only
+Authorized source actor: Grok Build, grok-4.6 High; social-main.js one-line change only
+Authorized execution actor: none; Hermes closed
 Authorized integration actor: none
-Protected parent: reviewer publication following 46310708; one CURRENT-only launch allowed
+Protected parent: reviewer publication following 34c297b0; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_ASYNC_IPC_RED_01.md), AGENTS.md and TESTING.md.
+[active task](GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md), AGENTS.md and TESTING.md.
 Read only this active prefix of CURRENT; historical records below are superseded.
 
 The real Rust executable is accepted and pushed at
@@ -24,26 +24,26 @@ retains its 77 passing groups and response-settlement falsification; no replay.
 Next bounded change: prove Electron waits for actual supervisor replies before
 cloning them and propagates rejections. Its present synchronous clone converts a
 Promise to an empty object. The accepted test drop is frozen at df0aab16, 1223
-lines and 23 groups. Hermes runs the suite once and records expected red: 21 ok,
-two not ok, exit 1. Main source follows observed-red review; startup/pinning/shutdown
-follow separately.
+lines and 23 groups. Expected red is accepted: 21 ok, two not ok, Node exit 1.
+Both delayed groups fail at the missing thenable assertion. Grok may make only
+the linked exact one-line main-handler change. Startup/pinning/shutdown follow
+separately. No test replay or integration is authorized.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md,
 docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_RED_01.md,
-docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_TESTS_01.md.
+docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md.
 Preserve the four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
-No source/test edits or integration, extra execution, package/release claim or
+No test edits or integration, execution, package/release claim or
 security waiver is authorized. No credential/config discovery. Future Hermes metadata must
 use the exact session key and row only; the earlier discovery incident is retained
 in the transport acceptance record and must not recur.
-Grok outer 58847 collected on owner done, exit 0; session
-e1f08576-2e17-4f42-9001-f544249bcab3. Source accepted with read-scope deviations
-recorded in the final source-handoff review. No production changes.
-One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 5686d7c5; outer 85066, requested nous /
-poolside/laguna-s-2.1:free. The driver records its actual session metadata.
+Hermes outer 85066 collected on owner done, exit 0; session
+20260909_181137_0cfb89, nous / poolside/laguna-s-2.1:free. Exact normalized evidence
+and unchanged source identities are accepted in the red handoff's final review.
+Its full CURRENT read exceeded scope; future reads use an explicit line range.
+One Grok source invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

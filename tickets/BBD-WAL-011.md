@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Rust executable accepted; async Electron IPC test source accepted for expected red.
+Status: Async Electron IPC expected red accepted; one-line main-handler fix authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -64,12 +64,14 @@ acceptance remain future work.
 The executable source review records the remaining emergency-cleanup limitation.
 
 The active [async IPC test contract](../docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_TESTS_01.md)
-accepts Grok's test/electronSecurity.node.js drop for expected-red execution. It tests delayed reply
+accepts Grok's test/electronSecurity.node.js drop. It tests delayed reply
 settlement, cloned resolved values and propagated failures through handlers actually
-registered by social-main.js. Only the
-[Hermes red driver](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_RED_01.md)
-is authorized. Production edits and integration remain closed until observed-red
-review. Startup/pinning/shutdown are a later bounded stage.
+registered by social-main.js. The
+[observed red](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_RED_01.md#collected-expected-red-acceptance--2026-09-09)
+is accepted: 21 passing groups, two missing-thenable failures, Node exit 1.
+Only the [one-line Grok production change](../docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md)
+is authorized. Tests, execution and integration remain frozen until source review.
+Startup/pinning/shutdown are a later bounded stage.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
