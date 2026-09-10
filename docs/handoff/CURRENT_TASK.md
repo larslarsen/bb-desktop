@@ -1,25 +1,25 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: REFLECTION REGRESSION TEST ACTOR LAUNCHED — AWAITING COLLECTION
+State: REFLECTION TEST ACTOR COMPLETED AND COLLECTED — SOURCE REVIEW PENDING
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; test source only, no subagents
+Authorized source actor: none; completed Grok test drop awaits source review
 Authorized execution actor: none
 Authorized integration actor: none
 Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
 Read this active prefix (lines 1–40) and
 [reflection regression tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md).
-Only test/walletBrokerLaunchConfig.node.js may change by the specified insertion.
+Test-source authorization is closed; no source edits until the next review contract.
 Production launch-config.js remains frozen at 4a639b16, 132 lines.
 Grok production outer 20952 completed exit 0 and is collected/closed.
-Grok regression-test outer 32296 launched once against 70e46786.
-Launch once; collect on owner done/Continue or explicit status check.
+Grok outer 32296 collected exit 0; test report 90acd32c, 949 lines. No actor active.
+Owner visibility preference: stay with launched actors and collect in the same turn.
 
 Source finding: revoked Proxy and throwing reflection traps escape as raw errors
 without the fixed UNAVAILABLE code/message. This violates the error contract.
 It is not a claim of renderer reachability or a demonstrated exploit.
-Four independently registered regression groups are authorized before correction.
+Four regression groups were authored; inspect the drop before authorizing red.
 Existing five groups/58 rows and all helpers remain unchanged.
 No test, syntax/build execution, production correction or Git mutation by Grok.
 Reviewer source review is recorded in the production handoff.
@@ -34,7 +34,7 @@ tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_0
 docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md.
 Preserve pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
-No home skills/config/history discovery or chained commands.
+Give live status updates; do not require owner done messages to collect completion.
 Grok session e8ddbd20-50d2-4fb2-a152-2225ff0b95f8; CURRENT reads lines 1–40.
 Later Hermes focused red requires separate reviewer authorization.
 
