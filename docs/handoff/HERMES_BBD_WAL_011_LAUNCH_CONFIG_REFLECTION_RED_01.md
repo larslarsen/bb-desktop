@@ -91,3 +91,12 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+## Launcher stop and resume 01
+
+Outer 55437 completed without driver execution: relative handoff path lookup
+failed before extraction. No raw/evidence files exist and the two source/test
+hashes remain unchanged. This is not test evidence. Authorize one fresh attempt
+of the same exact driver using the explicit absolute repository workdir supplied
+in the launch prompt. Set terminal workdir to that exact path; do not infer it.
+No driver or test changes, no extra commands.
