@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Finishing local application startup under [bounded contract](../docs/handoff/GROK_BBD_WAL_011_STARTUP_01.md).
+Status: Local application startup validated; exact source/evidence integration authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -230,3 +230,15 @@ omission, restored green, clean audit/secret scans and real Linux package proof.
 All three packagers invoke the shared helper; only Linux native packaging was
 executed. Existing policy blockers remain unwaived. Next scoped work supplies
 reviewed final-artifact native build pins and Electron startup/status/quit wiring.
+
+Local application startup is now fully validated under the [startup contract](../docs/handoff/GROK_BBD_WAL_011_STARTUP_01.md).
+[Final validation acceptance](../docs/handoff/HERMES_BBD_WAL_011_STARTUP_GREEN_FINISH_01.md)
+retains 71 distinct passing groups, real Rust build/pin and main-process startup,
+status and observed-close quit; both falsifications/restorations, audit and secret
+scans pass. Existing policy outputs remain unchanged failures. Only exact ten-path
+[integration](../docs/handoff/HERMES_BBD_WAL_011_STARTUP_INTEGRATION_01.md) remains.
+Development build command: `node scripts/build-wallet-broker.js` (Rust 1.98 rustup
+on PATH, locked dependencies available offline). Main uses its fixed generated
+resources on next launch. Packaged mode requires its own resources; no fallback.
+The executable truthfully reports degraded and account methods UNAVAILABLE; local
+connection completion is not completion of native account flows or release gates.

@@ -96,3 +96,14 @@ finally:
     finish('WAL-011 completed application startup validation')
 sys.exit(0 if record['accepted'] else 1)
 ```
+
+## Collected final validation acceptance
+
+Hermes outer 79760 collected/closed; session 20260910_090154_3794cc, nous /
+poolside/laguna-s-2.1:free, v0.18.2 upstream 67764dc0/local 10b6d1a9.
+Foreground launcher completed; exact-session messages 80480–80485 contain handoff
+read, exact launcher and final only. Working-tree Gitleaks scanned 1.94 GB in
+16.2 seconds, exit 0/no leaks. All 61 frozen inputs unchanged/current; normalized
+evidence/raw equality verified. Raw SHA256 c7c7ec41d475df89d4c6c92a2f02b4ff1c9ec459bc2f290420136b79821f3de8.
+Together with retained prior results this completes local startup acceptance.
+Only HERMES_BBD_WAL_011_STARTUP_INTEGRATION_01.md is authorized next; no replay.
