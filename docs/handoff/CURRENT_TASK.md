@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE VALIDATION ACCEPTED — INTEGRATION AUTHORIZED
+State: RUST EXECUTABLE VALIDATION ACCEPTED — INTEGRATION RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
 Authorized execution actor: none; no test/build replay
@@ -49,6 +49,8 @@ Hermes may integrate the three source/test paths, corrected red evidence and acc
 green evidence using the linked driver, then commit/push and stop. The rejected
 green-01 draft remains untracked. App startup/account/native composition is future work.
 One fresh invocation; collect on owner done/Continue. No actor polling.
+Integration launched once from d3a2d161; outer 93493, requested Hermes nous /
+poolside/laguna-s-2.1:free. Actual session and commit/push are recorded by the driver.
 
 ## Historical record (superseded by the active state above)
 
