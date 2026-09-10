@@ -152,3 +152,26 @@ contract above. Main is owned by an independent actor; do not read/edit it. Test
 Cargo, lockfiles, packagers, docs and all other source frozen. No execution, evidence
 or Git. Read only this contract, test/walletBrokerBuild.node.js and existing resolver
 for layout compatibility. No broader discovery. Report SHA256/line count.
+
+## Main source acceptance
+
+Grok c3f8e672, outer 30736, collected and closed. social-main.js 7047253ee27955b0838ec226cd1e49c4a7dca8c3cc2a54a776fb1211c8a820d0,
+238 lines. Fixed resource selection and resolver fields; no environment inherited.
+One ready attempt, configured subscription precedes start, idle checked after factory;
+unbound snapshot path validates first then returns a cloned cached sanitized status.
+Cache updates with window absent; activation and startup respect quit. Existing
+normal-quit and all other IPC guards/dispatch unchanged. Source accepted, pending
+combined executable validation with reviewed builder. No execution yet.
+
+Initial source actors performed some extra read-only test/style discovery beyond
+requested read lists; no unauthorized source changes or execution were observed.
+Correction actors stayed in their exact paths. Reviewer accepts the source identities
+above, not the actors' unexecuted proof claims.
+
+## Builder source acceptance
+
+Grok 6354be17, outer 99816 collected/closed. Builder c96684b9d7242a020a93c0ea8a96d590c7a262482f44726ac12ce14ab618e382,
+150 lines. Preflights all destination entries before writes, rejects dangling links,
+hashes copied bytes, promotes binary then manifest and retains staging. Fixed
+Rust toolchain/locked offline build, no runtime self-pin. No installer edits.
+Source accepted pending HERMES_BBD_WAL_011_STARTUP_GREEN_01.md execution.

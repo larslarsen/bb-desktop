@@ -1,19 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: MAIN AND BUILDER PRODUCTION AUTHORIZED
+State: FULL LOCAL STARTUP VALIDATION AUTHORIZED
 Reviewer: Codex
-Authorized source actor: Grok Build grok-4.6 High; no subagents
-Authorized execution: none until production source review
+Authorized source actor: none; all collected/closed
+Authorized execution: Hermes under HERMES_BBD_WAL_011_STARTUP_GREEN_01.md
 Authorized integration: none
 
 Active contract: [startup](GROK_BBD_WAL_011_STARTUP_01.md).
-Only social-main.js and scripts/build-wallet-broker.js production authorized; tests frozen.
+Source/tests frozen. Main 7047253e and builder c96684b9 accepted for validation.
 Independent smoke source authorized by GROK_BBD_WAL_011_STARTUP_SMOKE_01.md.
 Initial source actors collected and closed.
 All test and red actors collected/closed.
-Main production Grok c3f8e672 (outer 30736); builder production independent.
-No implementation execution yet; reviewer collecting both source drops.
+Main production Grok c3f8e672 collected/closed; source accepted at 7047253e.
+Builder Grok 6354be17 collected/closed; c96684b9 accepted.
+Hermes full validation next: units, real build/main/Rust smoke, falsification and scans.
 Owner priority: finish local app-to-broker startup, no further installer detour.
 Reviewer stays with actors and collects/reviews/routes in the same turn.
 Provide meaningful status at least every 60 seconds; no repeated done required.
