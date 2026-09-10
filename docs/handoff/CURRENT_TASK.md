@@ -42,6 +42,8 @@ No credential/config discovery. Use only named reads and separate read-only comm
 Grok outer 20254 collected on owner done, exit 0; session
 6d0b7d41-29c1-4ed8-bda9-7225b190f34b. Source review rejects this drop for execution.
 One correction invocation; collect on owner done/Continue. No actor polling.
+Correction 01 launched once from f18fb308; outer 4709, Grok session
+24b53eb0-f83e-4541-8078-c85178825b9a, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
