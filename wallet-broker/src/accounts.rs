@@ -1,7 +1,7 @@
 use core::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use serde::Serialize;
@@ -142,6 +142,7 @@ impl PreparedRestore {
 
 pub struct AccountManager<C: MonotonicClock, E: EntropyPort, W: WipeObserver> {
     _root_guard: File,
+    broker_root: PathBuf,
     accounts_dir: String,
     store: VaultStore<LinuxStorePort>,
     sessions: SessionManager<C, SilentWipes>,
@@ -170,6 +171,7 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
         let store = VaultStore::new(&accounts_dir, LinuxStorePort::new()).map_err(map_store)?;
         Ok(Self {
             _root_guard: root_guard,
+            broker_root: broker_root.to_path_buf(),
             accounts_dir,
             store,
             sessions: SessionManager::new(clock, SilentWipes),
@@ -332,6 +334,32 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
         self.sessions
             .check_deadlines()
             .map_err(|_| AccountError::unavailable())
+    }
+
+    pub fn fresh_receiver(
+        &mut self,
+        origin: ActionOrigin,
+        account_id: &str,
+    ) -> Result<crate::zec::FreshReceiverV1, AccountError> {
+        self.require_native(origin)?;
+        if !valid_account_id(account_id) {
+            return Err(AccountError::schema());
+        }
+        let catalog = self.load_catalog()?;
+        if !catalog.iter().any(|existing| existing == account_id) {
+            return Err(AccountError::unavailable());
+        }
+        self.read_active_account(account_id)
+            .map_err(|_| AccountError::unavailable())?;
+
+        let broker_root = &self.broker_root;
+        let wipes = &mut self.wipes;
+        self.sessions
+            .with_spend_material(account_id, |seed| {
+                crate::zec::fresh_receiver_for_account(broker_root, account_id, seed, wipes)
+            })
+            .map_err(|_| AccountError::locked())?
+            .map_err(map_receive)
     }
 
     pub fn export_encrypted(
@@ -588,6 +616,14 @@ fn ensure_accounts_directory(accounts_dir: &str) -> Result<(), AccountError> {
 
 fn inspect_path(path: &str) -> Result<crate::store::EntryInfo, StoreError> {
     LinuxStorePort::new().inspect(path)
+}
+
+fn map_receive(error: crate::zec::ZecError) -> AccountError {
+    if error.code() == "LIMIT" {
+        AccountError::limit()
+    } else {
+        AccountError::unavailable()
+    }
 }
 
 fn read_bounded_path(path: &str, maximum: usize) -> Result<Vec<u8>, StoreError> {

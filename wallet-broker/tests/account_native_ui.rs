@@ -1,6 +1,7 @@
 #![cfg(feature = "native-ui")]
 
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::fs;
 use std::io::ErrorKind;
 use std::os::unix::fs::PermissionsExt;
@@ -17,7 +18,12 @@ use bitbook_wallet_broker::vault::{
     SecretBytes, VaultError, VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes,
     parse_vault,
 };
+use bitbook_wallet_broker::zec::test_support::decode_unified_address;
+use bitbook_wallet_broker::zec::{AccountId, FreshReceiverV1, Network as ZecNetwork};
 use eframe::egui;
+use rusqlite::Connection;
+use zcash_keys::keys::{UnifiedAddressRequest, UnifiedSpendingKey};
+use zcash_protocol::consensus::Network::TestNetwork;
 
 const FRAME_DT: f64 = 1.0 / 60.0;
 const NATIVE_SIZE: [f32; 2] = [520.0, 720.0];
@@ -55,6 +61,14 @@ const LOCKED_ID: &str = "00112233445566778899aabbccddeeff";
 const UNLOCKED_ID: &str = "ffeeddccbbaa99887766554433221100";
 const CREATED_ID: &str = "cafecafecafecafecafecafecafecafe";
 const RESTORE_ID: &str = "abcdefabcdefabcdefabcdefabcdefab";
+const RECEIVE: &str = "Receive";
+const RECEIVE_TITLE: &str = "Receive Zcash";
+const RECEIVE_NETWORK: &str = "Zcash testnet";
+const BALANCE_UNAVAILABLE: &str = "Balance unavailable — not synced";
+const COPY_ADDRESS: &str = "Copy address";
+const BACK: &str = "Back";
+const UI_SEED_A: [u8; 32] = [0x71; 32];
+const UI_SEED_B: [u8; 32] = [0x92; 32];
 
 struct PersistentUi {
     ctx: egui::Context,
@@ -104,6 +118,8 @@ struct PortState {
     export_calls: Vec<(String, PathBuf)>,
     prepare_calls: Vec<(PathBuf, Vec<u8>)>,
     confirm_calls: usize,
+    receive_calls: Vec<String>,
+    receive_results: VecDeque<Result<FreshReceiverV1, &'static str>>,
 }
 
 struct FakePort {
@@ -128,6 +144,7 @@ struct Work;
 
 struct Scratch {
     root: PathBuf,
+    zec_accounts: Vec<String>,
 }
 
 impl PersistentUi {
@@ -412,6 +429,8 @@ impl Default for PortState {
             export_calls: Vec::new(),
             prepare_calls: Vec::new(),
             confirm_calls: 0,
+            receive_calls: Vec::new(),
+            receive_results: VecDeque::new(),
         }
     }
 }
@@ -487,6 +506,15 @@ impl AccountUiPort for FakePort {
         for account in &mut state.accounts {
             account.locked = true;
         }
+    }
+
+    fn receive(&mut self, id: &str) -> Result<FreshReceiverV1, &'static str> {
+        let mut state = self.inner.borrow_mut();
+        state.receive_calls.push(id.to_owned());
+        state
+            .receive_results
+            .pop_front()
+            .unwrap_or(Err("UNAVAILABLE"))
     }
 
     fn export(&mut self, id: &str, path: &Path) -> Result<(), &'static str> {
@@ -586,15 +614,30 @@ impl Scratch {
         }
         fs::create_dir(&root).unwrap();
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
-        Self { root }
+        Self {
+            root,
+            zec_accounts: Vec::new(),
+        }
     }
 
     fn accounts(&self) -> PathBuf {
         self.root.join("accounts")
     }
 
+    fn track_zec_account(&mut self, account_id: &str) {
+        assert!(AccountId::parse(account_id).is_ok());
+        if !self.zec_accounts.iter().any(|known| known == account_id) {
+            self.zec_accounts.push(account_id.to_owned());
+        }
+    }
+
     fn cleanup(&mut self) -> Result<(), String> {
         let mut errors = Vec::new();
+        let zec_network = self.root.join("zec-testnet");
+        for account_id in &self.zec_accounts {
+            push_cleanup_error(&mut errors, unlink_zec_account(&zec_network, account_id));
+        }
+        push_cleanup_error(&mut errors, unlink_any(&zec_network));
         let accounts = self.accounts();
         push_cleanup_error(&mut errors, unlink_dir_contents(&accounts));
         push_cleanup_error(&mut errors, unlink_any(&accounts));
@@ -608,6 +651,41 @@ impl Scratch {
             Err(errors.join("; "))
         }
     }
+}
+
+fn unlink_zec_account(network: &Path, account_id: &str) -> Result<(), String> {
+    let network_metadata = match fs::symlink_metadata(network) {
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(()),
+        Err(_) => return Err("cannot inspect owned Zcash network directory".to_owned()),
+        Ok(metadata) => metadata,
+    };
+    if !network_metadata.file_type().is_dir() || network_metadata.file_type().is_symlink() {
+        return Ok(());
+    }
+    let directory = network.join(account_id);
+    let metadata = match fs::symlink_metadata(&directory) {
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(()),
+        Err(error) => {
+            return Err(format!("cannot inspect {}: {error}", directory.display()));
+        }
+        Ok(metadata) => metadata,
+    };
+    if metadata.file_type().is_symlink() || !metadata.file_type().is_dir() {
+        return unlink_any(&directory);
+    }
+    for name in [
+        "wallet.sqlite3",
+        "wallet.sqlite3-journal",
+        "wallet.sqlite3-wal",
+        "wallet.sqlite3-shm",
+        "compact.sqlite3",
+        "compact.sqlite3-journal",
+        "compact.sqlite3-wal",
+        "compact.sqlite3-shm",
+    ] {
+        unlink_any(&directory.join(name))?;
+    }
+    unlink_any(&directory)
 }
 
 impl Drop for Scratch {
@@ -630,6 +708,39 @@ fn summary(account_id: &str, locked: bool) -> AccountSummary {
         kind: "software",
         locked,
     }
+}
+
+fn oracle_receiver(seed: &[u8], index: u64) -> String {
+    let viewing = UnifiedSpendingKey::from_seed(&TestNetwork, seed, Default::default())
+        .expect("reviewed seed must derive")
+        .to_unified_full_viewing_key();
+    let (address, actual_index) = viewing
+        .find_address(index.into(), UnifiedAddressRequest::ORCHARD)
+        .expect("reviewed Orchard-only request must derive");
+    assert_eq!(u64::try_from(actual_index).unwrap(), index);
+    address.encode(&TestNetwork)
+}
+
+fn fake_receiver(account_id: &str, seed: &[u8; 32], index: u64, sequence: u64) -> FreshReceiverV1 {
+    FreshReceiverV1 {
+        account_id: AccountId::parse(account_id).unwrap(),
+        network: ZecNetwork::Testnet,
+        receiver: oracle_receiver(seed, index),
+        diversifier_index: index.to_string(),
+        issued_at_sequence: sequence.to_string(),
+    }
+}
+
+fn assert_testnet_orchard(receiver: &str) {
+    let decoded = decode_unified_address(receiver).unwrap();
+    assert_eq!(decoded.network, ZecNetwork::Testnet);
+    assert_eq!(decoded.receivers.len(), 1);
+    assert!(decoded.receivers[0].is_orchard_protocol());
+    assert!(!decoded.receivers[0].is_p2pkh());
+    assert!(!decoded.receivers[0].is_p2sh());
+    assert!(!decoded.receivers[0].is_sapling());
+    assert!(!decoded.receivers[0].is_tex());
+    assert!(!decoded.receivers[0].is_unknown());
 }
 
 fn push_cleanup_error(errors: &mut Vec<String>, result: Result<(), String>) {
@@ -836,10 +947,19 @@ fn click<P: AccountUiPort, D: AccountDialogs>(
     app: &mut AccountWindow<P, D>,
     pos: egui::Pos2,
 ) -> FrameObservation {
+    click_release_and_settle(ui, app, pos).1
+}
+
+fn click_release_and_settle<P: AccountUiPort, D: AccountDialogs>(
+    ui: &mut PersistentUi,
+    app: &mut AccountWindow<P, D>,
+    pos: egui::Pos2,
+) -> (FrameObservation, FrameObservation) {
     let _ = ui.run(app, vec![egui::Event::PointerMoved(pos)], false);
     let _ = ui.run(app, vec![primary_button(pos, true)], false);
-    let _ = ui.run(app, vec![primary_button(pos, false)], false);
-    ui.run(app, Vec::new(), false)
+    let release = ui.run(app, vec![primary_button(pos, false)], false);
+    let settled = ui.run(app, Vec::new(), false);
+    (release, settled)
 }
 
 fn click_label<P: AccountUiPort, D: AccountDialogs>(
@@ -1422,6 +1542,260 @@ fn small_and_tall_layouts_keep_action_controls_usable() {
         form.assert_usable(CANCEL);
         form.assert_usable(PASSPHRASE);
     }
+}
+
+#[test]
+fn wal014_receive_scene_issues_once_paints_honestly_and_copies_release_output() {
+    let (mut app, records, _) =
+        open_window(vec![summary(LOCKED_ID, true), summary(UNLOCKED_ID, false)]);
+    let first = fake_receiver(UNLOCKED_ID, &UI_SEED_A, 0, 1);
+    let second = fake_receiver(UNLOCKED_ID, &UI_SEED_A, 1, 2);
+    let first_address = first.receiver.clone();
+    let second_address = second.receiver.clone();
+    records
+        .borrow_mut()
+        .receive_results
+        .extend([Ok(first), Ok(second)]);
+    let mut ui = PersistentUi::new(SMALL_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let locked_click = click_label(&mut ui, &mut app, RECEIVE);
+    assert!(locked_click.paints(CREATE_ACCOUNT));
+    assert!(records.borrow().receive_calls.is_empty());
+
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let scene = click_label(&mut ui, &mut app, RECEIVE);
+    assert_eq!(records.borrow().receive_calls, vec![UNLOCKED_ID]);
+    scene.assert_usable(RECEIVE_TITLE);
+    scene.assert_usable(RECEIVE_NETWORK);
+    scene.assert_usable(UNLOCKED_ID);
+    scene.assert_usable(&first_address);
+    scene.assert_usable(BALANCE_UNAVAILABLE);
+    scene.assert_usable(COPY_ADDRESS);
+    scene.assert_usable(BACK);
+    assert!(scene.copy_texts.is_empty());
+    assert!(!scene.painted.iter().any(|(text, _, _)| {
+        text.starts_with("Balance") && text.chars().any(|character| character.is_ascii_digit())
+    }));
+    assert!(!scene.paints("Sync ready"));
+    assert!(!scene.paints("QR code"));
+    assert_testnet_orchard(&first_address);
+
+    let repaint = ui.run(&mut app, Vec::new(), false);
+    assert_eq!(records.borrow().receive_calls, vec![UNLOCKED_ID]);
+    assert!(repaint.copy_texts.is_empty());
+    repaint.assert_usable(&first_address);
+
+    let copy_rect = repaint.visible_label(COPY_ADDRESS);
+    let (copy_release, copy_settled) =
+        click_release_and_settle(&mut ui, &mut app, copy_rect.center());
+    assert_eq!(copy_release.copy_texts, vec![first_address.clone()]);
+    assert!(copy_settled.copy_texts.is_empty());
+    assert_eq!(records.borrow().receive_calls, vec![UNLOCKED_ID]);
+
+    let list = click_label(&mut ui, &mut app, BACK);
+    assert!(list.paints(CREATE_ACCOUNT));
+    assert!(!list.paints(&first_address));
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let next = click_label(&mut ui, &mut app, RECEIVE);
+    assert_eq!(
+        records.borrow().receive_calls,
+        vec![UNLOCKED_ID.to_owned(), UNLOCKED_ID.to_owned()]
+    );
+    next.assert_usable(&second_address);
+    assert!(!next.paints(&first_address));
+    assert!(next.copy_texts.is_empty());
+}
+
+#[test]
+fn wal014_receive_state_clears_on_lock_catalog_change_error_selection_and_hide() {
+    let (mut app, records, _) =
+        open_window(vec![summary(LOCKED_ID, false), summary(UNLOCKED_ID, false)]);
+    let issued = [
+        fake_receiver(LOCKED_ID, &UI_SEED_A, 0, 1),
+        fake_receiver(LOCKED_ID, &UI_SEED_A, 1, 2),
+        fake_receiver(LOCKED_ID, &UI_SEED_A, 2, 3),
+        fake_receiver(UNLOCKED_ID, &UI_SEED_B, 0, 1),
+        fake_receiver(LOCKED_ID, &UI_SEED_A, 3, 4),
+    ];
+    let addresses: Vec<String> = issued
+        .iter()
+        .map(|receiver| receiver.receiver.clone())
+        .collect();
+    records
+        .borrow_mut()
+        .receive_results
+        .extend(issued.into_iter().map(Ok));
+    let control = app.control();
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let first_scene = click_label(&mut ui, &mut app, RECEIVE);
+    first_scene.assert_usable(COPY_ADDRESS);
+    first_scene.assert_usable(&addresses[0]);
+    records
+        .borrow_mut()
+        .accounts
+        .iter_mut()
+        .find(|account| account.account_id == LOCKED_ID)
+        .unwrap()
+        .locked = true;
+    let expired = ui.run(&mut app, Vec::new(), false);
+    assert!(!expired.paints(&addresses[0]));
+    assert!(!expired.paints(COPY_ADDRESS));
+    assert!(
+        ui.run(&mut app, vec![egui::Event::Copy], false)
+            .copy_texts
+            .is_empty()
+    );
+
+    records
+        .borrow_mut()
+        .accounts
+        .iter_mut()
+        .find(|account| account.account_id == LOCKED_ID)
+        .unwrap()
+        .locked = false;
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let second_scene = click_label(&mut ui, &mut app, RECEIVE);
+    second_scene.assert_usable(&addresses[1]);
+    records.borrow_mut().list_error = Some(RAW_ERROR_CANARY);
+    let list_failed = ui.run(&mut app, Vec::new(), false);
+    list_failed.assert_no_substr(RAW_ERROR_CANARY);
+    assert!(list_failed.paints(UNAVAILABLE_MESSAGE));
+    assert!(!list_failed.paints(&addresses[1]));
+    assert!(!list_failed.paints(COPY_ADDRESS));
+
+    records.borrow_mut().list_error = None;
+    let _ = ui.run(&mut app, Vec::new(), false);
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let third_scene = click_label(&mut ui, &mut app, RECEIVE);
+    third_scene.assert_usable(&addresses[2]);
+    records
+        .borrow_mut()
+        .accounts
+        .retain(|account| account.account_id != LOCKED_ID);
+    let removed = ui.run(&mut app, Vec::new(), false);
+    assert!(!removed.paints(&addresses[2]));
+    assert!(!removed.paints(COPY_ADDRESS));
+
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let other_scene = click_label(&mut ui, &mut app, RECEIVE);
+    other_scene.assert_usable(&addresses[3]);
+    let back = click_label(&mut ui, &mut app, BACK);
+    assert!(!back.paints(&addresses[3]));
+    records
+        .borrow_mut()
+        .accounts
+        .push(summary(LOCKED_ID, false));
+    let _ = ui.run(&mut app, Vec::new(), false);
+    let selected_other = click_label(&mut ui, &mut app, LOCKED_ID);
+    assert!(!selected_other.paints(&addresses[3]));
+    assert!(!selected_other.paints(COPY_ADDRESS));
+
+    let hidden_scene = click_label(&mut ui, &mut app, RECEIVE);
+    hidden_scene.assert_usable(&addresses[4]);
+    let hidden = ui.run(&mut app, vec![escape()], false);
+    assert!(hidden.visible.contains(&false));
+    assert!(!hidden.paints(&addresses[4]));
+    assert!(!hidden.paints(COPY_ADDRESS));
+    assert!(control.request_open());
+    let reopened = ui.run(&mut app, Vec::new(), false);
+    assert!(reopened.paints(CREATE_ACCOUNT));
+    assert!(!reopened.paints(&addresses[4]));
+    assert!(!reopened.paints(COPY_ADDRESS));
+
+    records
+        .borrow_mut()
+        .receive_results
+        .push_back(Err(RAW_ERROR_CANARY));
+    records
+        .borrow_mut()
+        .accounts
+        .iter_mut()
+        .find(|account| account.account_id == LOCKED_ID)
+        .unwrap()
+        .locked = false;
+    let _ = ui.run(&mut app, Vec::new(), false);
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let receive_failed = click_label(&mut ui, &mut app, RECEIVE);
+    receive_failed.assert_no_substr(RAW_ERROR_CANARY);
+    assert!(receive_failed.paints(UNAVAILABLE_MESSAGE));
+    assert!(!receive_failed.paints(COPY_ADDRESS));
+}
+
+#[test]
+fn wal014_shared_port_pointer_receive_and_copy_persist_real_issuance() {
+    let mut scratch = Scratch::new("wal014-real-receive");
+    let manager = LocalAccountManager::open(&scratch.root).expect("open local manager");
+    let port = SharedAccountPort::new(Arc::new(Mutex::new(manager)));
+    let (dialogs, _) = FakeDialogs::new(DialogState::default());
+    let mut app = AccountWindow::new(port, dialogs, true);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+
+    let _ = click_label(&mut ui, &mut app, CREATE_ACCOUNT);
+    fill_matching(&mut ui, &mut app, UNICODE_PASS);
+    let created = click_label(&mut ui, &mut app, CREATE);
+    created.assert_no_substr(UNICODE_PASS);
+    let vaults: Vec<_> = walk_regular_files(&scratch.accounts())
+        .into_iter()
+        .filter(|(path, _)| path.extension().and_then(|ext| ext.to_str()) == Some("vault"))
+        .collect();
+    assert_eq!(vaults.len(), 1);
+    let (vault_path, vault_bytes) = &vaults[0];
+    let account_id = vault_path
+        .file_stem()
+        .and_then(|stem| stem.to_str())
+        .expect("vault stem")
+        .to_owned();
+    scratch.track_zec_account(&account_id);
+    let mut passphrase = SecretBytes::new(UNICODE_PASS.as_bytes().to_vec()).unwrap();
+    let opened = open_vault_bytes(vault_bytes, &mut passphrase, &mut Work, &mut Ignore)
+        .expect("open persisted vault");
+    let expected = opened.expose(|seed| oracle_receiver(seed, 0));
+
+    let _ = click_label(&mut ui, &mut app, &account_id);
+    let _ = click_label(&mut ui, &mut app, UNLOCK);
+    let _ = focus_field(&mut ui, &mut app, PASSPHRASE);
+    let _ = type_text(&mut ui, &mut app, UNICODE_PASS);
+    let unlocked = click_label(&mut ui, &mut app, UNLOCK_ACCOUNT);
+    unlocked.assert_usable(STATUS_UNLOCKED);
+    let _ = click_label(&mut ui, &mut app, &account_id);
+    let received = click_label(&mut ui, &mut app, RECEIVE);
+    received.assert_usable(&expected);
+    received.assert_usable(BALANCE_UNAVAILABLE);
+    received.assert_no_substr(UNICODE_PASS);
+    assert!(!received.painted.iter().any(|(text, _, _)| {
+        text.starts_with("Balance") && text.chars().any(|character| character.is_ascii_digit())
+    }));
+    assert_testnet_orchard(&expected);
+
+    let copy_rect = received.visible_label(COPY_ADDRESS);
+    let (copy_release, copy_settled) =
+        click_release_and_settle(&mut ui, &mut app, copy_rect.center());
+    assert_eq!(copy_release.copy_texts, vec![expected.clone()]);
+    assert!(copy_settled.copy_texts.is_empty());
+
+    let wallet_db = scratch
+        .root
+        .join("zec-testnet")
+        .join(&account_id)
+        .join("wallet.sqlite3");
+    let connection = Connection::open(&wallet_db).unwrap();
+    let state: (Option<i64>, i64) = connection
+        .query_row(
+            "SELECT r.last_diversifier_index, s.issued_at_sequence
+             FROM ext_bitbook_receiver_state r
+             JOIN ext_bitbook_sequence_state s USING (account_id)
+             WHERE r.account_id = ?1",
+            [&account_id],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .unwrap();
+    assert_eq!(state, (Some(0), 1));
 }
 
 #[test]

@@ -1,4 +1,10 @@
 use core::fmt;
+use std::fs;
+use std::io::ErrorKind;
+use std::path::Path;
+use std::sync::{Arc, Mutex};
+
+use crate::vault::{SecretBytes, WipeObserver};
 
 mod address;
 mod fixture;
@@ -22,6 +28,54 @@ pub const MAX_DIAGNOSTIC_BYTES: usize = 4096;
 pub use prepare::{HandleBinding, HandleInvalidation, PrepareZecV1, PreparedZecV1};
 
 pub type ScanError = ZecError;
+
+pub(crate) fn fresh_receiver_for_account(
+    broker_root: &Path,
+    account_id: &str,
+    session_seed: &SecretBytes,
+    observer: &mut dyn WipeObserver,
+) -> Result<FreshReceiverV1, ZecError> {
+    let account_id = AccountId::parse(account_id)?;
+    let network = Network::Testnet;
+    let root = store::StateRoot::new(broker_root.to_path_buf(), Arc::new(Mutex::new(Vec::new())));
+    let network_directory = broker_root.join(network.as_str());
+    let account_directory = network_directory.join(account_id.as_str());
+
+    let account_present = match fs::symlink_metadata(&network_directory) {
+        Err(error) if error.kind() == ErrorKind::NotFound => false,
+        Err(_) => return Err(ZecError::state_corrupt()),
+        Ok(metadata) if metadata.file_type().is_dir() && !metadata.file_type().is_symlink() => {
+            match fs::symlink_metadata(&account_directory) {
+                Ok(_) => true,
+                Err(error) if error.kind() == ErrorKind::NotFound => false,
+                Err(_) => return Err(ZecError::state_corrupt()),
+            }
+        }
+        Ok(_) => return Err(ZecError::state_corrupt()),
+    };
+
+    let mut expected_seed = copy_session_seed(session_seed)?;
+    let expected_ufvk = address::derive_ufvk(network, &mut expected_seed, observer)?;
+    let account = if account_present {
+        store::AddressAccount::open_viewing_with_network(root, account_id, network)?
+    } else {
+        store::AddressAccount::bootstrap(
+            root,
+            account_id,
+            network,
+            copy_session_seed(session_seed)?,
+            observer,
+        )?
+    };
+    if account.viewing_key_binding()? != expected_ufvk {
+        return Err(ZecError::state_corrupt());
+    }
+    account.fresh_receiver(0)
+}
+
+fn copy_session_seed(seed: &SecretBytes) -> Result<SecretBytes, ZecError> {
+    seed.expose(|bytes| SecretBytes::new(bytes.to_vec()).map_err(|_| ZecError::internal()))
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StoreFault {

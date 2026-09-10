@@ -11,6 +11,7 @@ use crate::accounts::{AccountManager, AccountSummary, PreparedRestore};
 use crate::native::ActionOrigin;
 use crate::session::MonotonicClock;
 use crate::vault::{EntropyPort, SecretBytes, WipeObserver};
+use crate::zec::{FreshReceiverV1, Network as ZecNetwork};
 
 const MAX_PASSPHRASE_BYTES: usize = 1_024;
 const TITLE: &str = "BitBook accounts";
@@ -23,6 +24,9 @@ pub trait AccountUiPort {
     fn create(&mut self, passphrase: SecretBytes) -> Result<AccountSummary, &'static str>;
     fn unlock(&mut self, id: &str, passphrase: SecretBytes) -> Result<(), &'static str>;
     fn lock(&mut self, id: &str) -> Result<(), &'static str>;
+    fn receive(&mut self, _id: &str) -> Result<FreshReceiverV1, &'static str> {
+        Err(UNAVAILABLE)
+    }
     fn lock_all(&mut self);
     fn export(&mut self, id: &str, path: &Path) -> Result<(), &'static str>;
     fn prepare_restore(
@@ -81,6 +85,10 @@ impl<C: MonotonicClock + Send, E: EntropyPort + Send, W: WipeObserver + Send> Ac
 
     fn lock(&mut self, id: &str) -> Result<(), &'static str> {
         self.with_manager(|manager| manager.lock(id))
+    }
+
+    fn receive(&mut self, id: &str) -> Result<FreshReceiverV1, &'static str> {
+        self.with_manager(|manager| manager.fresh_receiver(ActionOrigin::NativeSurface, id))
     }
 
     fn lock_all(&mut self) {
@@ -429,6 +437,9 @@ fn scrub_secret_events(context: &egui::Context) {
 
 enum Scene<R> {
     List,
+    Receive {
+        receiver: FreshReceiverV1,
+    },
     Create {
         passphrase: MaskedInput,
         confirmation: MaskedInput,
@@ -537,6 +548,16 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
         match self.port.list() {
             Ok(mut accounts) => {
                 accounts.sort_by(|left, right| left.account_id.cmp(&right.account_id));
+                let receive_stale = match &self.scene {
+                    Scene::Receive { receiver } => {
+                        self.selected.as_deref() != Some(receiver.account_id.as_str())
+                            || !accounts.iter().any(|account| {
+                                account.account_id == receiver.account_id.as_str()
+                                    && !account.locked
+                            })
+                    }
+                    _ => false,
+                };
                 self.accounts = accounts;
                 if self.selected.as_ref().is_some_and(|selected| {
                     !self
@@ -546,12 +567,16 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 }) {
                     self.selected = None;
                 }
+                if receive_stale {
+                    self.scene = Scene::List;
+                }
                 if self.list_failed {
                     self.message = None;
                     self.list_failed = false;
                 }
             }
             Err(_) => {
+                self.clear_receive_scene();
                 self.accounts.clear();
                 self.selected = None;
                 self.message = Some(SafeMessage::WalletUnavailable);
@@ -561,6 +586,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
     }
 
     fn port_error(&mut self, code: &'static str) {
+        self.clear_receive_scene();
         self.accounts.clear();
         self.selected = None;
         self.message = Some(if code == "LOCKED" {
@@ -577,6 +603,12 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
         self.message = None;
     }
 
+    fn clear_receive_scene(&mut self) {
+        if matches!(&self.scene, Scene::Receive { .. }) {
+            self.scene = Scene::List;
+        }
+    }
+
     fn show_list(&mut self, ui: &mut egui::Ui) {
         ui.heading(TITLE);
         ui.label("Zcash testnet accounts");
@@ -585,7 +617,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             ui.label(message.text());
         }
 
-        let body_height = (ui.available_height() - 170.0).max(40.0);
+        let body_height = (ui.available_height() - 195.0).max(40.0);
         egui::ScrollArea::vertical()
             .id_salt("account-list")
             .max_height(body_height)
@@ -656,11 +688,52 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             return;
         }
         if ui
+            .add_enabled(
+                selected.as_ref().is_some_and(|(_, locked)| !*locked),
+                egui::Button::new("Receive"),
+            )
+            .clicked()
+            && let Some((account_id, _)) = selected.as_ref()
+        {
+            let account_id = account_id.clone();
+            match self.port.receive(&account_id) {
+                Ok(receiver)
+                    if receiver.account_id.as_str() == account_id
+                        && receiver.network == ZecNetwork::Testnet =>
+                {
+                    self.message = None;
+                    self.scene = Scene::Receive { receiver };
+                }
+                Ok(_) => self.port_error(UNAVAILABLE),
+                Err(error) => self.port_error(error),
+            }
+            return;
+        }
+        if ui
             .add_enabled(selected.is_some(), egui::Button::new("Export backup"))
             .clicked()
             && let Some((account_id, _)) = selected
         {
             self.begin_export_dialog(&account_id);
+        }
+    }
+
+    fn show_receive(&mut self, ui: &mut egui::Ui) {
+        let receiver = match &self.scene {
+            Scene::Receive { receiver } => receiver.clone(),
+            _ => return,
+        };
+        ui.heading("Receive Zcash");
+        ui.label("Zcash testnet");
+        ui.label(receiver.account_id.as_str());
+        ui.add(egui::Label::new(receiver.receiver.as_str()).wrap());
+        ui.label("Balance unavailable — not synced");
+        if ui.button("Copy address").clicked() {
+            ui.ctx().copy_text(receiver.receiver);
+        }
+        if ui.button("Back").clicked() {
+            self.scene = Scene::List;
+            self.message = None;
         }
     }
 
@@ -908,6 +981,8 @@ impl<P: AccountUiPort, D: AccountDialogs> eframe::App for AccountWindow<P, D> {
         egui::CentralPanel::default().show(ui, |ui| {
             if matches!(&self.scene, Scene::List) {
                 self.show_list(ui);
+            } else if matches!(&self.scene, Scene::Receive { .. }) {
+                self.show_receive(ui);
             } else if matches!(&self.scene, Scene::Create { .. }) {
                 self.show_create(ui);
             } else if matches!(&self.scene, Scene::Unlock { .. }) {

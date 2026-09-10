@@ -15,6 +15,11 @@ use bitbook_wallet_broker::vault::{
     Asset, EntropyPort, MAX_ENVELOPE_BYTES, Network, SecretBytes, VaultError, VaultMetadata,
     VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, parse_vault, seal_vault,
 };
+use bitbook_wallet_broker::zec::test_support::decode_unified_address;
+use bitbook_wallet_broker::zec::{FreshReceiverV1, Network as ZecNetwork};
+use rusqlite::{Connection, params};
+use zcash_keys::keys::{UnifiedAddressRequest, UnifiedSpendingKey};
+use zcash_protocol::consensus::Network::TestNetwork;
 
 const ID_A: [u8; 16] = [
     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
@@ -82,6 +87,11 @@ impl Scratch {
             push_cleanup_error(&mut errors, unlink_dir_contents(extra));
             push_cleanup_error(&mut errors, unlink_any(extra));
         }
+        let zec_network = self.root.join("zec-testnet");
+        for account_id in [id_hex(&ID_A), id_hex(&ID_B), id_hex(&ID_C)] {
+            push_cleanup_error(&mut errors, unlink_zec_account(&zec_network, &account_id));
+        }
+        push_cleanup_error(&mut errors, unlink_any(&zec_network));
         let accounts = self.root.join("accounts");
         push_cleanup_error(&mut errors, unlink_dir_contents(&accounts));
         push_cleanup_error(&mut errors, unlink_any(&accounts));
@@ -98,6 +108,41 @@ impl Scratch {
             Err(errors.join("; "))
         }
     }
+}
+
+fn unlink_zec_account(network: &Path, account_id: &str) -> Result<(), String> {
+    let network_metadata = match fs::symlink_metadata(network) {
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(()),
+        Err(_) => return Err("cannot inspect owned Zcash network directory".to_owned()),
+        Ok(metadata) => metadata,
+    };
+    if !network_metadata.file_type().is_dir() || network_metadata.file_type().is_symlink() {
+        return Ok(());
+    }
+    let directory = network.join(account_id);
+    let metadata = match fs::symlink_metadata(&directory) {
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(()),
+        Err(error) => {
+            return Err(format!("cannot inspect {}: {error}", directory.display()));
+        }
+        Ok(metadata) => metadata,
+    };
+    if metadata.file_type().is_symlink() || !metadata.file_type().is_dir() {
+        return unlink_any(&directory);
+    }
+    for name in [
+        "wallet.sqlite3",
+        "wallet.sqlite3-journal",
+        "wallet.sqlite3-wal",
+        "wallet.sqlite3-shm",
+        "compact.sqlite3",
+        "compact.sqlite3-journal",
+        "compact.sqlite3-wal",
+        "compact.sqlite3-shm",
+    ] {
+        unlink_any(&directory.join(name))?;
+    }
+    unlink_any(&directory)
 }
 
 impl Drop for Scratch {
@@ -298,6 +343,13 @@ impl SharedWipes {
             .iter()
             .any(|event| event.label == "plaintext" && event.length == length && event.all_zero)
     }
+
+    fn labeled_wipe(&self, label: &str, length: usize) -> bool {
+        self.0
+            .borrow()
+            .iter()
+            .any(|event| event.label == label && event.length == length && event.all_zero)
+    }
 }
 
 impl WipeObserver for SharedWipes {
@@ -486,6 +538,47 @@ fn assert_no_secrets(text: &str) {
 fn assert_public_error(error: &AccountError, code: &str) {
     assert_eq!(error.code(), code);
     assert_no_secrets(&format!("{error:?}{error}"));
+}
+
+fn oracle_ufvk(seed: &[u8; 32]) -> String {
+    UnifiedSpendingKey::from_seed(&TestNetwork, seed, Default::default())
+        .expect("scripted seed must derive")
+        .to_unified_full_viewing_key()
+        .encode(&TestNetwork)
+}
+
+fn oracle_receiver(seed: &[u8; 32], index: u64) -> String {
+    let viewing = UnifiedSpendingKey::from_seed(&TestNetwork, seed, Default::default())
+        .expect("scripted seed must derive")
+        .to_unified_full_viewing_key();
+    let (address, actual_index) = viewing
+        .find_address(index.into(), UnifiedAddressRequest::ORCHARD)
+        .expect("reviewed Orchard-only request must derive");
+    assert_eq!(u64::try_from(actual_index).unwrap(), index);
+    address.encode(&TestNetwork)
+}
+
+fn assert_scripted_receiver(
+    receiver: &FreshReceiverV1,
+    account_id: &str,
+    seed: &[u8; 32],
+    index: u64,
+    sequence: u64,
+) {
+    assert_eq!(receiver.account_id.as_str(), account_id);
+    assert_eq!(receiver.network, ZecNetwork::Testnet);
+    assert_eq!(receiver.receiver, oracle_receiver(seed, index));
+    assert_eq!(receiver.diversifier_index, index.to_string());
+    assert_eq!(receiver.issued_at_sequence, sequence.to_string());
+    let decoded = decode_unified_address(&receiver.receiver).unwrap();
+    assert_eq!(decoded.network, ZecNetwork::Testnet);
+    assert_eq!(decoded.receivers.len(), 1);
+    assert!(decoded.receivers[0].is_orchard_protocol());
+    assert!(!decoded.receivers[0].is_p2pkh());
+    assert!(!decoded.receivers[0].is_p2sh());
+    assert!(!decoded.receivers[0].is_sapling());
+    assert!(!decoded.receivers[0].is_tex());
+    assert!(!decoded.receivers[0].is_unknown());
 }
 
 fn assert_locked_software(summary: &AccountSummary, account_id: &str) {
@@ -1539,4 +1632,270 @@ fn second_manager_same_root_is_unavailable_until_first_drops() {
     let listed = reopened.list().unwrap();
     assert_eq!(listed.len(), 1);
     assert_locked_software(&listed[0], &id_hex(&ID_A));
+}
+
+#[test]
+fn wal014_receiver_matches_seed_oracle_is_durable_private_and_preserves_vault() {
+    let harness = Harness::new("wal014-receiver");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xd1, 0xd2, 0x11);
+    let account_id = id_hex(&ID_A);
+    let vault_path = harness
+        .scratch
+        .accounts()
+        .join(format!("{account_id}.vault"));
+
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    let vault_before = fs::read(&vault_path).unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    harness.wipes.clear();
+    let first = manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert!(harness.wipes.labeled_wipe("zec-seed", SEED_A.len()));
+    let second = manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert_scripted_receiver(&first, &account_id, &SEED_A, 0, 1);
+    assert_scripted_receiver(&second, &account_id, &SEED_A, 1, 2);
+    assert_ne!(first.receiver, second.receiver);
+    assert_eq!(fs::read(&vault_path).unwrap(), vault_before);
+
+    let zec_network = harness.scratch.root.join("zec-testnet");
+    let zec_account = zec_network.join(&account_id);
+    assert_eq!(mode(&zec_network), 0o700);
+    assert_eq!(mode(&zec_account), 0o700);
+    for file in ["wallet.sqlite3", "compact.sqlite3"] {
+        let path = zec_account.join(file);
+        assert!(fs::symlink_metadata(&path).unwrap().file_type().is_file());
+        assert_eq!(mode(&path), 0o600);
+    }
+    assert_no_plaintext(&harness.scratch.root, &[&SEED_A, PASSPHRASE]);
+
+    drop(manager);
+    let mut restarted = harness.manager();
+    restarted
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    harness.wipes.clear();
+    let third = restarted
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert!(harness.wipes.labeled_wipe("zec-seed", SEED_A.len()));
+    assert_scripted_receiver(&third, &account_id, &SEED_A, 2, 3);
+    assert_eq!(fs::read(&vault_path).unwrap(), vault_before);
+    assert_no_plaintext(&harness.scratch.root, &[&SEED_A, PASSPHRASE]);
+}
+
+#[test]
+fn wal014_receive_is_native_unlocked_valid_and_does_not_extend_idle_deadline() {
+    let harness = Harness::new("wal014-gates");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xd3, 0xd4, 0x12);
+    harness
+        .entropy
+        .script_create(&ID_B, &SEED_B, 0xd5, 0xd6, 0x13);
+    let account_a = id_hex(&ID_A);
+    let account_b = id_hex(&ID_B);
+    let zec_network = harness.scratch.root.join("zec-testnet");
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+
+    for origin in FORBIDDEN {
+        harness.wipes.clear();
+        assert_public_error(
+            &manager.fresh_receiver(origin, &account_a).unwrap_err(),
+            "UNAUTH",
+        );
+        assert!(!zec_network.exists());
+        assert!(!harness.wipes.labeled_wipe("zec-seed", SEED_A.len()));
+    }
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, "../not-an-account")
+            .unwrap_err(),
+        "SCHEMA",
+    );
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &id_hex(&ID_C))
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_a)
+            .unwrap_err(),
+        "LOCKED",
+    );
+    assert!(!zec_network.exists());
+
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_a, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_b, passphrase())
+        .unwrap();
+    harness.clock.set(1_000 + AUTHORIZATION_IDLE_MILLIS - 1);
+    let first = manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_a)
+        .unwrap();
+    assert_scripted_receiver(&first, &account_a, &SEED_A, 0, 1);
+
+    harness.clock.set(1_000 + AUTHORIZATION_IDLE_MILLIS);
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_a)
+            .unwrap_err(),
+        "LOCKED",
+    );
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_b)
+            .unwrap_err(),
+        "LOCKED",
+    );
+    assert!(!zec_network.join(&account_b).exists());
+}
+
+#[test]
+fn wal014_corrupt_viewing_db_and_symlink_directory_are_never_replaced() {
+    let mut harness = Harness::new("wal014-hostile-state");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xd7, 0xd8, 0x14);
+    harness
+        .entropy
+        .script_create(&ID_B, &SEED_B, 0xd9, 0xda, 0x15);
+    let account_a = id_hex(&ID_A);
+    let account_b = id_hex(&ID_B);
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_a, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_b, passphrase())
+        .unwrap();
+    manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_a)
+        .unwrap();
+
+    let wallet_db = harness
+        .scratch
+        .root
+        .join("zec-testnet")
+        .join(&account_a)
+        .join("wallet.sqlite3");
+    let corrupt = b"WAL014 intentionally corrupt existing wallet DB";
+    fs::write(&wallet_db, corrupt).unwrap();
+    fs::set_permissions(&wallet_db, fs::Permissions::from_mode(0o600)).unwrap();
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_a)
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert_eq!(fs::read(&wallet_db).unwrap(), corrupt);
+
+    let foreign = harness.scratch.sibling("wal014-zec-symlink-target");
+    fs::create_dir(&foreign).unwrap();
+    fs::set_permissions(&foreign, fs::Permissions::from_mode(0o700)).unwrap();
+    let sentinel = foreign.join("sentinel");
+    write_private(&sentinel, b"do-not-touch");
+    let linked_account = harness.scratch.root.join("zec-testnet").join(&account_b);
+    symlink(&foreign, &linked_account).unwrap();
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_b)
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert!(
+        fs::symlink_metadata(&linked_account)
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
+    assert_eq!(fs::read(&sentinel).unwrap(), b"do-not-touch");
+    assert_eq!(fs::read_dir(&foreign).unwrap().count(), 1);
+}
+
+#[test]
+fn wal014_foreign_ufvk_binding_refuses_without_advancing_issuance() {
+    let harness = Harness::new("wal014-foreign-ufvk");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xdb, 0xdc, 0x16);
+    let account_id = id_hex(&ID_A);
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+
+    let wallet_db = harness
+        .scratch
+        .root
+        .join("zec-testnet")
+        .join(&account_id)
+        .join("wallet.sqlite3");
+    let connection = Connection::open(&wallet_db).unwrap();
+    assert_eq!(
+        connection
+            .execute(
+                "UPDATE ext_bitbook_accounts SET ufvk = ?1 WHERE account_id = ?2",
+                params![oracle_ufvk(&SEED_B), &account_id],
+            )
+            .unwrap(),
+        1
+    );
+    let read_state = |connection: &Connection| {
+        connection
+            .query_row(
+                "SELECT r.last_diversifier_index, s.issued_at_sequence
+                 FROM ext_bitbook_receiver_state r
+                 JOIN ext_bitbook_sequence_state s USING (account_id)
+                 WHERE r.account_id = ?1",
+                [&account_id],
+                |row| Ok((row.get::<_, Option<i64>>(0)?, row.get::<_, i64>(1)?)),
+            )
+            .unwrap()
+    };
+    let before = read_state(&connection);
+    assert_eq!(before, (Some(0), 1));
+    drop(connection);
+
+    harness.wipes.clear();
+    assert_public_error(
+        &manager
+            .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert!(harness.wipes.labeled_wipe("zec-seed", SEED_A.len()));
+    let connection = Connection::open(&wallet_db).unwrap();
+    assert_eq!(read_state(&connection), before);
 }

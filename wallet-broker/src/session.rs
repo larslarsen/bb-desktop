@@ -55,6 +55,10 @@ impl SessionError {
         Self { code: "SCHEMA" }
     }
 
+    fn locked() -> Self {
+        Self { code: "LOCKED" }
+    }
+
     pub fn code(&self) -> &'static str {
         self.code
     }
@@ -200,6 +204,30 @@ impl<C: MonotonicClock, W: WipeObserver> SessionManager<C, W> {
             self.lock_account(&account);
         }
         Ok(())
+    }
+
+    pub(crate) fn with_spend_material<R>(
+        &mut self,
+        account_id: &str,
+        operation: impl FnOnce(&SecretBytes) -> R,
+    ) -> Result<R, SessionError> {
+        if !valid_account_id(account_id) {
+            return Err(SessionError::schema());
+        }
+        let now = self.read_clock()?;
+        if self
+            .sessions
+            .get(account_id)
+            .is_some_and(|session| now >= session.deadline)
+        {
+            self.lock_account(account_id);
+            return Err(SessionError::locked());
+        }
+        let session = self
+            .sessions
+            .get(account_id)
+            .ok_or_else(SessionError::locked)?;
+        Ok(operation(&session.spend_material))
     }
 
     pub fn is_unlocked(&self, account_id: &str) -> bool {
