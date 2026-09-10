@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT VALIDATION ACCEPTED — INTEGRATION AUTHORIZED
+State: ELECTRON QUIT INTEGRATION ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
 Authorized execution actor: none
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40) and
 [Hermes quit integration](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md).
 Only its exact extraction launcher once, with repository workdir, is authorized.
 No independent commands, repair, evidence rewriting, tests or validation replay.
-Validation outer 77990 collected exit 0. Integration launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Hermes outer 28190 launched once against 5695aa3d; actual session is driver-recorded.
+Collect on owner done/Continue. No actor polling or additional launch.
 
 Accepted validation: 30 Electron groups, six preload groups; selected early-quit
 falsification failed at line 1419 (actual 1/expected 0), exact main restoration,
