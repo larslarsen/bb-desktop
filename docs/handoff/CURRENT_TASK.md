@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: SHUTDOWN PRODUCTION SOURCE ACCEPTED — FOCUSED VALIDATION AUTHORIZED
+State: SHUTDOWN VALIDATION ACCEPTED — FIVE-PATH INTEGRATION AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
-Authorized execution actor: Hermes, exact shutdown green/falsification driver only
-Authorized integration actor: none
-Protected parent: reviewer publication following b16b6aa6; one CURRENT-only launch allowed
+Authorized execution actor: none; validation closed
+Authorized integration actor: Hermes, exact five-path integration driver only
+Protected parent: reviewer publication following 4ec2cf35; one CURRENT-only launch allowed
 
 Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
-and [active validation contract](HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md).
+and [active integration contract](HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md).
 Test source frozen: test/walletSupervisorShutdown.node.js at 69eb8bcb, 983 lines.
 The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8.
 Production frozen: wallet-broker/supervisor.js at c1410bfc, 631 lines.
@@ -20,10 +20,10 @@ close-event completion and a fixed 1500 ms failure deadline. Existing cancellati
 250 ms kill escalation and synchronous quit semantics remain. See the active
 contract for lifecycle ordering, injected-clock and real-child assertions.
 Observed expected red is accepted: Node exit 1, zero ok/six not ok through absent
-shutdown API. Production is now source-accepted. Hermes may run shutdown and
-affected lifecycle regressions, exact premature-completion falsification, restore
-and focused green. No repairs, other suites, integration or source/test redesign.
-Real child lifecycle remains unproved until focused green.
+shutdown API. Green is now accepted: six shutdown, seven transport and 13
+supervisor groups passed. Premature-completion falsification failed correctly,
+and restored shutdown green passed all six again. Eight input hashes match.
+Only exact five-path integration is authorized; no tests/builds or source edits.
 
 Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
 reversal falsification and restored green. Rust executable at 31a6e540 retains
@@ -37,16 +37,15 @@ expansion is authorized. App startup/before-quit wiring and native account flows
 follow this prerequisite in later contracts. No wallet/release completion claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md,
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md,
 docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
-Grok outer 79618 collected on owner done, exit 0; session
-526aece7-e036-410b-a903-090c6f680174. Source review accepted; execution follows.
-One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 2a155877; outer 1099, requested nous /
-poolside/laguna-s-2.1:free. Actual session metadata is recorded by the driver.
+Hermes outer 1099 collected on owner done, exit 0; actual session
+20260909_195724_724f82, nous / poolside/laguna-s-2.1:free. Validation and normalized
+evidence accepted in the green handoff's final review. No replay is needed.
+One fresh integration invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

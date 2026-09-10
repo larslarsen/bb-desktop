@@ -133,3 +133,47 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+
+## Collected validation acceptance — 2026-09-09
+
+Accept focused lifecycle validation and premature-completion falsification; no
+rerun. Outer 1099 collected on owner done with exit 0. Actual session
+20260909_195724_724f82, provider nous, model poolside/laguna-s-2.1:free.
+Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15.
+Observed HEAD 4ec2cf351c9ddee96d7ba0f4104a955ca48feb82.
+
+| Stage | Exit | Outcome |
+| --- | --- | --- |
+| Shutdown green | 0 | six ok, zero not ok, no skips |
+| Transport regression | 0 | seven ok, zero not ok |
+| Supervisor regression | 0 | 13 ok, zero not ok |
+| Premature-completion falsification | 1 | ERR_ASSERTION, actual resolved, expected pending |
+| Restored shutdown green | 0 | six ok, zero not ok, no skips |
+
+The six shutdown groups execute both real-child cases: normal termination and
+SIGTERM-ignore/SIGKILL termination, with observed closure and accepted cleanup.
+Fake-clock deadline/ordering and repeated-call cases pass. These are 26 distinct
+passing groups; the final six-group pass repeats the focused suite after restoration.
+The selected falsification fails at the held-close assertion (test line 670), with
+no cleanup failure. Its JSON output uses no ok/not-ok lines, so the raw stage's
+zero/zero counters do not describe a skipped or passing test.
+
+Restored source is c1410bfc5cd4c205ad014a42154c9d9d9714794b134a5acab7ed499934cad51a.
+All eight input hashes agree before, after and at reviewer collection. Evidence
+JSON exactly matches normalized raw JSON. Identities:
+
+- wallet-broker/target/wal011-shutdown-green-01.json: SHA-256
+  bda8e5a9a421a115c426ec431117ad61b9c691767027921b9b393c8fea5b4177.
+- docs/testing/BBD-WAL-011-SHUTDOWN-GREEN-01.md: 135 lines, SHA-256
+  a34373da4315d49f95953d996e3a573b468513a512af19abfb2e80137b838248.
+
+Exact-session inventory (80342–80349) shows bounded CURRENT/handoff reads, one
+exact extraction launcher with correct workdir, one process wait and final report.
+No extra commands, repair, discovery, source/test redesign or Git mutations appear.
+Reviewer ran no tests/builds. This accepts the Node supervisor lifecycle boundary,
+not Electron app lifecycle wiring, native descendants or package/release readiness.
+
+Execution is closed. Only the linked
+[five-path integration driver](HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md) is
+authorized. Preserve unrelated npm/policy changes and other untracked evidence.
