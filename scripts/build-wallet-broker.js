@@ -109,6 +109,8 @@ function main() {
       '--locked',
       '--offline',
       '--no-default-features',
+      '--features',
+      'native-ui',
       '--bin',
       'bitbook-wallet-broker',
     ],

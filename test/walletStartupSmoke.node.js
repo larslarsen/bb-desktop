@@ -152,6 +152,7 @@ function createElectronMock(userData) {
     permissionRequestHandler: null,
     permissionCheckHandler: null,
     menuSet: [],
+    menuTemplates: [],
     appHandlers: Object.create(null),
     quitCalls: 0,
     ipcHandlers: Object.create(null),
@@ -259,6 +260,11 @@ function createElectronMock(userData) {
     app,
     BrowserWindow,
     Menu: {
+      buildFromTemplate(template) {
+        state.menuTemplates = state.menuTemplates || [];
+        state.menuTemplates.push(template);
+        return { items: template };
+      },
       setApplicationMenu(menu) { state.menuSet.push(menu); },
     },
     session: {
@@ -310,7 +316,7 @@ function subscribedSnapshot(state, broker) {
   return latest;
 }
 
-test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE list, and awaited quit', async () => {
+test('ready starts the pinned development broker, degraded snapshot, empty account.list, and awaited quit', async () => {
   requireRegularFile(MANIFEST_PATH, 'wallet broker manifest');
   requireRegularFile(BROKER_PATH, 'wallet broker binary');
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
@@ -325,6 +331,11 @@ test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE
   const children = [];
   const spawnErrors = new WeakMap();
   const closed = new WeakMap();
+  const headlessEnvKeys = ['DISPLAY', 'WAYLAND_DISPLAY'];
+  const savedHeadlessEnv = new Map(headlessEnvKeys.map((key) => [
+    key,
+    Object.getOwnPropertyDescriptor(process.env, key),
+  ]));
   let ctx = null;
   let testError = null;
   let quitRequested = false;
@@ -368,6 +379,7 @@ test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE
 
     assert.strictEqual(spawnCalls.length, 0, 'broker spawned before ready');
     assert.strictEqual(children.length, 0, 'child existed before ready');
+    for (const key of headlessEnvKeys) delete process.env[key];
     ctx.emitApp('ready');
 
     assert.strictEqual(spawnCalls.length, 1, 'ready did not spawn one broker');
@@ -377,7 +389,26 @@ test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE
     throwIfSpawnFailed(child);
     assert.strictEqual(spawned.file, BROKER_PATH);
     assert.deepStrictEqual(spawned.argv, []);
-    assert.deepStrictEqual(spawned.options.env, {});
+    assert.notStrictEqual(spawned.options.env, process.env);
+    assert.ok(spawned.options.env && typeof spawned.options.env === 'object');
+    {
+      const allowed = new Set([
+        'LANG', 'PATH', 'DISPLAY', 'WAYLAND_DISPLAY',
+        'XDG_RUNTIME_DIR', 'XAUTHORITY', 'DBUS_SESSION_BUS_ADDRESS',
+      ]);
+      for (const key of Object.keys(spawned.options.env)) {
+        assert.ok(allowed.has(key), `unexpected child env ${key}`);
+        assert.strictEqual(typeof spawned.options.env[key], 'string');
+        assert.ok(!spawned.options.env[key].includes('\0'));
+        assert.ok(Buffer.byteLength(spawned.options.env[key], 'utf8') <= 4096);
+      }
+      for (const key of headlessEnvKeys) {
+        assert.ok(
+          !Object.prototype.hasOwnProperty.call(spawned.options.env, key),
+          `headless child received ${key}`
+        );
+      }
+    }
     assert.strictEqual(spawned.options.cwd, expectedCwd);
     assert.strictEqual(spawned.options.shell, false);
     assert.deepStrictEqual(spawned.options.stdio, ['pipe', 'pipe', 'pipe']);
@@ -409,20 +440,12 @@ test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE
 
     const listHandler = ctx.state.ipcHandlers['wallet:accounts:list'];
     assert.strictEqual(typeof listHandler, 'function');
-    await assert.rejects(
-      async () => {
-        const value = await withTimeout(
-          Promise.resolve().then(() => listHandler(event)),
-          SNAPSHOT_MS,
-          'account.list did not settle'
-        );
-        assert.fail(`account.list resolved with ${JSON.stringify(value)}`);
-      },
-      (error) => {
-        assert.strictEqual(error && error.code, 'UNAVAILABLE');
-        return true;
-      }
+    const listed = await withTimeout(
+      Promise.resolve().then(() => listHandler(event)),
+      SNAPSHOT_MS,
+      'account.list did not settle'
     );
+    assert.deepStrictEqual(listed, []);
     throwIfSpawnFailed(child);
 
     const prevented = ctx.emitBeforeQuit();
@@ -503,6 +526,15 @@ test('ready starts the pinned development broker, degraded snapshot, UNAVAILABLE
     }
 
     const unreaped = children.some((child) => child && !closed.get(child));
+    for (const key of headlessEnvKeys) {
+      try {
+        const descriptor = savedHeadlessEnv.get(key);
+        if (descriptor) Object.defineProperty(process.env, key, descriptor);
+        else delete process.env[key];
+      } catch (error) {
+        cleanupError = appendCleanup(cleanupError, error);
+      }
+    }
     if (unreaped) {
       cleanupError = appendCleanup(
         cleanupError,

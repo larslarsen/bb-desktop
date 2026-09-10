@@ -85,6 +85,7 @@ function createElectronMock(options = {}) {
     permissionRequestHandler: null,
     permissionCheckHandler: null,
     menuSet: [],
+    menuTemplates: [],
     openExternalCalls: [],
     appHandlers: Object.create(null),
     quitCalls: 0,
@@ -251,6 +252,11 @@ function createElectronMock(options = {}) {
   };
 
   const Menu = {
+    buildFromTemplate(template) {
+      state.menuTemplates = state.menuTemplates || [];
+      state.menuTemplates.push(template);
+      return { items: template };
+    },
     setApplicationMenu(menu) {
       state.menuSet.push(menu);
     },

@@ -17,6 +17,7 @@ const {
 
 const PUBLIC_REQUEST_LIMIT = 32;
 const DEADLINE_MS = 2000;
+const GRACEFUL_EOF_MS = 1000;
 const KILL_ESCALATE_MS = 250;
 const SHUTDOWN_MS = 1500;
 
@@ -24,6 +25,7 @@ const BROKER_METHODS = Object.freeze([
   'status.get',
   'account.list',
   'account.lock',
+  'account.manage',
   'receiver.fresh',
   'intent.begin',
   'intent.cancel',
@@ -31,7 +33,16 @@ const BROKER_METHODS = Object.freeze([
 ]);
 const ID = /^[0-9a-f]{32}$/;
 const PIN = /^[0-9a-f]{64}$/;
-const SAFE_ENV = Object.freeze(['LANG', 'PATH']);
+const SAFE_ENV = Object.freeze([
+  'LANG',
+  'PATH',
+  'DISPLAY',
+  'WAYLAND_DISPLAY',
+  'XDG_RUNTIME_DIR',
+  'XAUTHORITY',
+  'DBUS_SESSION_BUS_ADDRESS',
+]);
+const ENV_VALUE_LIMIT = 4096;
 
 class SupervisorError extends Error {
   constructor(code, message) {
@@ -91,7 +102,7 @@ function cloneSafe(value) {
 
 function validateParams(method, params) {
   let descriptors;
-  if (['status.get', 'account.list', 'sync.subscribe'].includes(method)) {
+  if (['status.get', 'account.list', 'account.manage', 'sync.subscribe'].includes(method)) {
     descriptors = exactDataObject(params, []);
   } else if (method === 'account.lock') {
     descriptors = exactDataObject(params, ['account_id']);
@@ -165,7 +176,9 @@ function cleanEnvironment(source) {
   const result = {};
   for (const name of SAFE_ENV) {
     const descriptor = source && Object.getOwnPropertyDescriptor(source, name);
-    if (descriptor && Object.prototype.hasOwnProperty.call(descriptor, 'value') && typeof descriptor.value === 'string') {
+    if (descriptor && Object.prototype.hasOwnProperty.call(descriptor, 'value') &&
+        typeof descriptor.value === 'string' && !descriptor.value.includes('\0') &&
+        Buffer.byteLength(descriptor.value, 'utf8') <= ENV_VALUE_LIMIT) {
       result[name] = descriptor.value;
     }
   }
@@ -180,6 +193,7 @@ function createWalletSupervisor(options = {}) {
   let child = null;
   let decoder = null;
   let handshakeTimer = null;
+  let graceTimer = null;
   let killTimer = null;
   let protocolSession = null;
   let sessionId = null;
@@ -198,6 +212,8 @@ function createWalletSupervisor(options = {}) {
   let shutdownReject = null;
   let shutdownTimer = null;
   let shutdownSettled = false;
+  let gracefulShutdown = false;
+  let stdinEnded = false;
 
   function publish(value) {
     snapshot = sanitizeSnapshot(value);
@@ -271,6 +287,12 @@ function createWalletSupervisor(options = {}) {
     else shutdownResolve(undefined);
   }
 
+  function clearGraceTimer() {
+    if (!graceTimer) return;
+    system.clearTimeout(graceTimer);
+    graceTimer = null;
+  }
+
   function terminate() {
     if (!child || terminating || childIsGone()) return;
     terminating = true;
@@ -282,7 +304,7 @@ function createWalletSupervisor(options = {}) {
     }, KILL_ESCALATE_MS);
   }
 
-  function close() {
+  function close(immediate = !gracefulShutdown) {
     failed = true;
     bootstrapped = false;
     if (handshakeTimer) {
@@ -302,11 +324,11 @@ function createWalletSupervisor(options = {}) {
       downPublished = true;
       published = publish({ v: 1, broker: 'down', accounts: [] });
     }
-    terminate();
+    if (immediate) terminate();
     return published;
   }
 
-  function quit() {
+  function cancelIntents() {
     if (bootstrapped && !failed) {
       for (const intentId of [...intents]) {
         try {
@@ -316,7 +338,39 @@ function createWalletSupervisor(options = {}) {
       }
     }
     intents.clear();
-    close();
+  }
+
+  function quit() {
+    cancelIntents();
+    close(!gracefulShutdown);
+  }
+
+  function beginGracefulShutdown() {
+    if (failed) {
+      close(true);
+      return;
+    }
+    gracefulShutdown = true;
+    cancelIntents();
+    close(false);
+    if (!child || childClosed || childIsGone()) return;
+    if (stdinEnded) return;
+    stdinEnded = true;
+    if (!child.stdin || typeof child.stdin.end !== 'function') {
+      terminate();
+      return;
+    }
+    try {
+      child.stdin.end();
+    } catch (_) {
+      terminate();
+      return;
+    }
+    if (childClosed || childIsGone()) return;
+    graceTimer = system.setTimeout(() => {
+      graceTimer = null;
+      terminate();
+    }, GRACEFUL_EOF_MS);
   }
 
   function writeRaw(value) {
@@ -478,21 +532,23 @@ function createWalletSupervisor(options = {}) {
   }
 
   function onTransportError() {
-    close();
+    close(true);
   }
 
   function onChildExit() {
     childExited = true;
+    clearGraceTimer();
     if (killTimer) {
       system.clearTimeout(killTimer);
       killTimer = null;
     }
-    close();
+    close(false);
   }
 
   function onChildClose() {
     childClosed = true;
     childExited = true;
+    clearGraceTimer();
     if (killTimer) {
       system.clearTimeout(killTimer);
       killTimer = null;
@@ -501,7 +557,7 @@ function createWalletSupervisor(options = {}) {
       system.clearTimeout(shutdownTimer);
       shutdownTimer = null;
     }
-    close();
+    close(false);
     if (shutdownPromise && !shutdownSettled) {
       Promise.resolve().then(() => completeShutdown());
     }
@@ -562,6 +618,9 @@ function createWalletSupervisor(options = {}) {
         terminating = false;
         childExited = false;
         childClosed = false;
+        gracefulShutdown = false;
+        stdinEnded = false;
+        clearGraceTimer();
         pendingPublic.clear();
         attachTransport(child);
         handshakeTimer = system.setTimeout(() => close(), DEADLINE_MS);
@@ -616,7 +675,7 @@ function createWalletSupervisor(options = {}) {
           completeShutdown(makeError('TIMEOUT'));
         }, SHUTDOWN_MS);
       }
-      quit();
+      beginGracefulShutdown();
       return shutdownPromise;
     },
   };

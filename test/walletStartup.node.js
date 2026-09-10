@@ -93,6 +93,7 @@ function createHarness(options = {}) {
     appHandlers: Object.create(null),
     ipcHandlers: Object.create(null),
     menuSet: [],
+    menuTemplates: [],
     permissionRequestHandler: null,
     permissionCheckHandler: null,
     errorBoxes: [],
@@ -188,7 +189,13 @@ function createHarness(options = {}) {
   const electron = {
     app,
     BrowserWindow,
-    Menu: { setApplicationMenu(menu) { state.menuSet.push(menu); } },
+    Menu: {
+      buildFromTemplate(template) {
+        state.menuTemplates.push(template);
+        return { items: template };
+      },
+      setApplicationMenu(menu) { state.menuSet.push(menu); },
+    },
     ipcMain: {
       handle(channel, handler) {
         state.order.push('ipc');
@@ -327,7 +334,19 @@ function assertConfiguredFactory(factoryOptions, launch) {
   assert.strictEqual(factoryOptions.expectedSha256, launch.expectedSha256);
   assert.strictEqual(factoryOptions.dataDir, launch.dataDir);
   if (Object.prototype.hasOwnProperty.call(factoryOptions, 'env')) {
-    assert.deepStrictEqual(factoryOptions.env, {});
+    assert.notStrictEqual(factoryOptions.env, process.env);
+    const env = factoryOptions.env;
+    assert.ok(env && typeof env === 'object' && !Array.isArray(env));
+    const allowed = new Set([
+      'LANG', 'PATH', 'DISPLAY', 'WAYLAND_DISPLAY',
+      'XDG_RUNTIME_DIR', 'XAUTHORITY', 'DBUS_SESSION_BUS_ADDRESS',
+    ]);
+    for (const key of Object.keys(env)) {
+      assert.ok(allowed.has(key), `unexpected supervisor env ${key}`);
+      assert.strictEqual(typeof env[key], 'string');
+      assert.ok(!env[key].includes('\0'));
+      assert.ok(Buffer.byteLength(env[key], 'utf8') <= 4096);
+    }
   }
   assert.notStrictEqual(factoryOptions.env, process.env);
   const serialized = JSON.stringify(factoryOptions);

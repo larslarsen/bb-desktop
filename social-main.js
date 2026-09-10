@@ -13,6 +13,16 @@ let quitState = 'idle';
 let walletSupervisor = createWalletSupervisor();
 let walletStartupAttempted = false;
 const ID = /^[0-9a-f]{32}$/;
+const WALLET_ENV = Object.freeze([
+  'LANG',
+  'PATH',
+  'DISPLAY',
+  'WAYLAND_DISPLAY',
+  'XDG_RUNTIME_DIR',
+  'XAUTHORITY',
+  'DBUS_SESSION_BUS_ADDRESS',
+]);
+const ENV_VALUE_LIMIT = 4096;
 
 function dataDescriptors(value) {
   if (value === null || typeof value !== 'object' || Array.isArray(value) ||
@@ -51,6 +61,18 @@ function cloneBoundary(value) {
   const result = {};
   for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
     result[key] = cloneBoundary(descriptor.value);
+  }
+  return result;
+}
+
+function walletEnvironment(source) {
+  const result = {};
+  for (const name of WALLET_ENV) {
+    const descriptor = Object.getOwnPropertyDescriptor(source, name);
+    if (!descriptor || !Object.prototype.hasOwnProperty.call(descriptor, 'value') ||
+        typeof descriptor.value !== 'string' || descriptor.value.includes('\0') ||
+        Buffer.byteLength(descriptor.value, 'utf8') > ENV_VALUE_LIMIT) continue;
+    result[name] = descriptor.value;
   }
   return result;
 }
@@ -139,6 +161,44 @@ function failNormalQuit() {
   } catch (_) {}
 }
 
+function showAccountsUnavailable() {
+  if (quitState !== 'idle') return;
+  try {
+    dialog.showErrorBox(
+      'Accounts unavailable',
+      'The account window could not be opened. Please restart BitBook.'
+    );
+  } catch (_) {}
+}
+
+function manageAccounts() {
+  if (quitState !== 'idle') return;
+  if (!walletSupervisor.bound) {
+    showAccountsUnavailable();
+    return;
+  }
+  let result;
+  try {
+    result = walletSupervisor.dispatch('account.manage', {});
+  } catch (_) {
+    showAccountsUnavailable();
+    return;
+  }
+  Promise.resolve(result).then(() => {}, () => showAccountsUnavailable());
+}
+
+function installApplicationMenu() {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Wallet',
+      submenu: [
+        { label: 'Manage accounts', click: manageAccounts },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(menu);
+}
+
 app.on('before-quit', (event) => {
   if (quitState === 'approved') return;
   event.preventDefault();
@@ -167,6 +227,7 @@ function startWalletBroker() {
       brokerPath: launch.brokerPath,
       expectedSha256: launch.expectedSha256,
       dataDir: launch.dataDir,
+      env: walletEnvironment(process.env),
     });
     if (quitState !== 'idle') return;
     walletSupervisor = configured;
@@ -212,7 +273,7 @@ function createWindow() {
 app.on('ready', () => {
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   session.defaultSession.setPermissionCheckHandler(() => false);
-  Menu.setApplicationMenu(null);
+  installApplicationMenu();
   if (quitState !== 'idle' || walletStartupAttempted) return;
   walletStartupAttempted = true;
   createWindow();

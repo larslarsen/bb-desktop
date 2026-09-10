@@ -1,10 +1,13 @@
 use std::collections::HashSet;
 use std::fmt;
 use std::io::{self, Read, Write};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
+use std::sync::{Arc, Mutex, TryLockError};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
+use bitbook_wallet_broker::accounts::{AccountSummary, LocalAccountManager};
 use serde::Serialize;
 use serde::de::{DeserializeSeed, Deserializer, Error, MapAccess, SeqAccess, Visitor};
 use serde_json::Number;
@@ -16,6 +19,7 @@ const MAX_FRAME_BODY: u32 = 65_536;
 const MAX_JSON_DEPTH: u32 = 128;
 const MAX_SEEN_IDS: usize = 4096;
 const ACK_DEADLINE: Duration = Duration::from_secs(2);
+const WORKER_POLL: Duration = Duration::from_secs(1);
 const HEX: &[u8; 16] = b"0123456789abcdef";
 const CLOSED_DIAGNOSTIC: &[u8] = b"broker closed\n";
 
@@ -241,6 +245,7 @@ struct Request {
     id: String,
     method: String,
     params_empty: bool,
+    account_id: Option<String>,
     expires_ms: i64,
 }
 
@@ -264,18 +269,21 @@ struct Hello<'a> {
 struct Snapshot {
     v: u8,
     broker: &'static str,
-    accounts: [&'static str; 0],
+    accounts: Vec<AccountSummary>,
 }
 
 #[derive(Serialize)]
-struct Response<'a> {
+struct Response<'a, T: Serialize> {
     v: u8,
     id: &'a str,
     seq: u64,
     kind: &'static str,
-    result: Snapshot,
+    result: T,
     session: &'a str,
 }
+
+#[derive(Serialize)]
+struct EmptyResult {}
 
 #[derive(Serialize)]
 struct ErrorBody {
@@ -294,19 +302,122 @@ struct ErrorEnvelope<'a> {
     session: &'a str,
 }
 
+type SharedManager = Arc<Mutex<LocalAccountManager>>;
+
+struct ProtocolUi {
+    request_open: Box<dyn Fn() -> bool + Send>,
+    request_quit: Box<dyn Fn() + Send>,
+}
+
 pub fn run() -> i32 {
-    match run_session() {
-        Ok(()) => 0,
-        Err(ProtocolClose) => {
-            let mut stderr = io::stderr();
-            let _ = stderr.write_all(CLOSED_DIAGNOSTIC);
-            let _ = stderr.flush();
-            1
-        }
+    let manager = open_manager();
+    #[cfg(feature = "native-ui")]
+    if native_display_available()
+        && let Some(manager) = manager.as_ref().map(Arc::clone)
+    {
+        return finish(run_native(manager));
+    }
+
+    let stop = Arc::new(AtomicBool::new(false));
+    finish(run_protocol(manager, stop, None))
+}
+
+fn finish(result: Result<(), ProtocolClose>) -> i32 {
+    if result.is_ok() {
+        return 0;
+    }
+    let mut stderr = io::stderr();
+    let _ = stderr.write_all(CLOSED_DIAGNOSTIC);
+    let _ = stderr.flush();
+    1
+}
+
+fn open_manager() -> Option<SharedManager> {
+    let root = std::env::current_dir().ok()?;
+    if !root.is_absolute() {
+        return None;
+    }
+    LocalAccountManager::open(&root)
+        .ok()
+        .map(|manager| Arc::new(Mutex::new(manager)))
+}
+
+#[cfg(feature = "native-ui")]
+fn native_display_available() -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        std::env::var_os("DISPLAY").is_some() || std::env::var_os("WAYLAND_DISPLAY").is_some()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        true
     }
 }
 
-fn run_session() -> Result<(), ProtocolClose> {
+#[cfg(feature = "native-ui")]
+fn run_native(manager: SharedManager) -> Result<(), ProtocolClose> {
+    use bitbook_wallet_broker::account_ui::{
+        AccountWindow, NativeAccountDialogs, SharedAccountPort,
+    };
+
+    let port = SharedAccountPort::new(Arc::clone(&manager));
+    let app = AccountWindow::new(port, NativeAccountDialogs, false);
+    let control = app.control();
+    let open_control = control.clone();
+    let quit_control = control.clone();
+    let ui = ProtocolUi {
+        request_open: Box::new(move || open_control.request_open()),
+        request_quit: Box::new(move || quit_control.request_quit()),
+    };
+    let stop = Arc::new(AtomicBool::new(false));
+    let worker_stop = Arc::clone(&stop);
+    let worker_manager = Arc::clone(&manager);
+    let worker = thread::Builder::new()
+        .name("wallet-broker-protocol".to_string())
+        .spawn(move || run_protocol(Some(worker_manager), worker_stop, Some(ui)))
+        .map_err(|_| ProtocolClose)?;
+
+    let options = eframe::NativeOptions {
+        viewport: eframe::egui::ViewportBuilder::default()
+            .with_title("BitBook accounts")
+            .with_inner_size([520.0, 720.0])
+            .with_min_inner_size([360.0, 480.0])
+            .with_visible(false),
+        ..eframe::NativeOptions::default()
+    };
+    let ui_result = eframe::run_native(
+        "BitBook accounts",
+        options,
+        Box::new(move |_context| Ok(Box::new(app))),
+    );
+    stop.store(true, Ordering::Release);
+    control.request_quit();
+    let protocol_result = worker.join().map_err(|_| ProtocolClose)?;
+    lock_all_manager(&Some(Arc::clone(&manager)));
+    if ui_result.is_err() {
+        return Err(ProtocolClose);
+    }
+    protocol_result
+}
+
+fn run_protocol(
+    manager: Option<SharedManager>,
+    stop: Arc<AtomicBool>,
+    ui: Option<ProtocolUi>,
+) -> Result<(), ProtocolClose> {
+    let result = run_session(&manager, &stop, ui.as_ref());
+    lock_all_manager(&manager);
+    if let Some(ui) = ui {
+        (ui.request_quit)();
+    }
+    result
+}
+
+fn run_session(
+    manager: &Option<SharedManager>,
+    stop: &AtomicBool,
+    ui: Option<&ProtocolUi>,
+) -> Result<(), ProtocolClose> {
     let child_pid = std::process::id().to_string();
     let child_nonce = fresh_nonce()?;
     let (tx, rx) = mpsc::sync_channel(1);
@@ -328,7 +439,9 @@ fn run_session() -> Result<(), ProtocolClose> {
     };
     write_json(&mut stdout, &hello)?;
     let deadline = Instant::now() + ACK_DEADLINE;
-    let ack = wait_ack(&rx, deadline)?;
+    let Some(ack) = wait_ack(&rx, deadline, stop)? else {
+        return Ok(());
+    };
     let session_id =
         derive_session_id(&ack.parent_pid, &child_pid, &ack.parent_nonce, &child_nonce);
     let mut session = Session {
@@ -338,21 +451,38 @@ fn run_session() -> Result<(), ProtocolClose> {
         seen_ids: HashSet::new(),
     };
     loop {
+        if stop.load(Ordering::Acquire) {
+            return Ok(());
+        }
+        tick_manager(manager);
         match recv_inbound(&rx, None)? {
-            Inbound::Frame(body) => handle_request(&mut stdout, &mut session, &body)?,
-            Inbound::CleanEof => return Ok(()),
-            Inbound::PartialEof | Inbound::Protocol | Inbound::Io => {
+            Some(Inbound::Frame(body)) => {
+                handle_request(&mut stdout, &mut session, &body, manager, ui)?
+            }
+            Some(Inbound::CleanEof) => return Ok(()),
+            Some(Inbound::PartialEof | Inbound::Protocol | Inbound::Io) => {
                 return Err(ProtocolClose);
             }
+            None => {}
         }
     }
 }
 
-fn wait_ack(rx: &Receiver<Inbound>, deadline: Instant) -> Result<Ack, ProtocolClose> {
-    match recv_inbound(rx, Some(deadline))? {
-        Inbound::Frame(body) => parse_ack(&body),
-        Inbound::CleanEof | Inbound::PartialEof | Inbound::Protocol | Inbound::Io => {
-            Err(ProtocolClose)
+fn wait_ack(
+    rx: &Receiver<Inbound>,
+    deadline: Instant,
+    stop: &AtomicBool,
+) -> Result<Option<Ack>, ProtocolClose> {
+    loop {
+        if stop.load(Ordering::Acquire) {
+            return Ok(None);
+        }
+        match recv_inbound(rx, Some(deadline))? {
+            Some(Inbound::Frame(body)) => return parse_ack(&body).map(Some),
+            Some(Inbound::CleanEof | Inbound::PartialEof | Inbound::Protocol | Inbound::Io) => {
+                return Err(ProtocolClose);
+            }
+            None => {}
         }
     }
 }
@@ -360,21 +490,24 @@ fn wait_ack(rx: &Receiver<Inbound>, deadline: Instant) -> Result<Ack, ProtocolCl
 fn recv_inbound(
     rx: &Receiver<Inbound>,
     deadline: Option<Instant>,
-) -> Result<Inbound, ProtocolClose> {
+) -> Result<Option<Inbound>, ProtocolClose> {
     match deadline {
         Some(deadline) => {
             let remaining = deadline.saturating_duration_since(Instant::now());
             if remaining.is_zero() {
                 return Err(ProtocolClose);
             }
-            match rx.recv_timeout(remaining) {
-                Ok(inbound) => Ok(inbound),
-                Err(RecvTimeoutError::Timeout) | Err(RecvTimeoutError::Disconnected) => {
-                    Err(ProtocolClose)
-                }
+            match rx.recv_timeout(remaining.min(WORKER_POLL)) {
+                Ok(inbound) => Ok(Some(inbound)),
+                Err(RecvTimeoutError::Timeout) => Ok(None),
+                Err(RecvTimeoutError::Disconnected) => Err(ProtocolClose),
             }
         }
-        None => rx.recv().map_err(|_| ProtocolClose),
+        None => match rx.recv_timeout(WORKER_POLL) {
+            Ok(inbound) => Ok(Some(inbound)),
+            Err(RecvTimeoutError::Timeout) => Ok(None),
+            Err(RecvTimeoutError::Disconnected) => Err(ProtocolClose),
+        },
     }
 }
 
@@ -382,6 +515,8 @@ fn handle_request<W: Write>(
     stdout: &mut W,
     session: &mut Session,
     body: &[u8],
+    manager: &Option<SharedManager>,
+    ui: Option<&ProtocolUi>,
 ) -> Result<(), ProtocolClose> {
     let request = parse_request(body, &session.id, session.expected_parent_seq)?;
     if session.seen_ids.len() >= MAX_SEEN_IDS && !session.seen_ids.contains(&request.id) {
@@ -400,12 +535,43 @@ fn handle_request<W: Write>(
     match request.method.as_str() {
         "status.get" | "sync.subscribe" => {
             if request.params_empty {
-                write_snapshot(stdout, session, &request.id)
+                match account_list(manager) {
+                    Ok(accounts) => write_snapshot(stdout, session, &request.id, accounts),
+                    Err(error) => write_error(stdout, session, &request.id, error),
+                }
             } else {
                 write_error(stdout, session, &request.id, ERROR_SCHEMA)
             }
         }
-        "account.list" | "account.lock" | "receiver.fresh" | "intent.begin" | "intent.cancel" => {
+        "account.list" => {
+            if !request.params_empty {
+                return write_error(stdout, session, &request.id, ERROR_SCHEMA);
+            }
+            match account_list(manager) {
+                Ok(accounts) => write_response(stdout, session, &request.id, accounts),
+                Err(error) => write_error(stdout, session, &request.id, error),
+            }
+        }
+        "account.lock" => {
+            let Some(account_id) = request.account_id.as_deref() else {
+                return write_error(stdout, session, &request.id, ERROR_SCHEMA);
+            };
+            match with_manager(manager, |manager| manager.lock(account_id)) {
+                Ok(()) => write_response(stdout, session, &request.id, EmptyResult {}),
+                Err(error) => write_error(stdout, session, &request.id, error),
+            }
+        }
+        "account.manage" => {
+            if !request.params_empty {
+                return write_error(stdout, session, &request.id, ERROR_SCHEMA);
+            }
+            if ui.is_some_and(|ui| (ui.request_open)()) {
+                write_response(stdout, session, &request.id, EmptyResult {})
+            } else {
+                write_error(stdout, session, &request.id, ERROR_UNAVAILABLE)
+            }
+        }
+        "receiver.fresh" | "intent.begin" | "intent.cancel" => {
             write_error(stdout, session, &request.id, ERROR_UNAVAILABLE)
         }
         _ => write_error(stdout, session, &request.id, ERROR_SCHEMA),
@@ -416,6 +582,25 @@ fn write_snapshot<W: Write>(
     stdout: &mut W,
     session: &mut Session,
     id: &str,
+    accounts: Vec<AccountSummary>,
+) -> Result<(), ProtocolClose> {
+    write_response(
+        stdout,
+        session,
+        id,
+        Snapshot {
+            v: 1,
+            broker: "degraded",
+            accounts,
+        },
+    )
+}
+
+fn write_response<W: Write, T: Serialize>(
+    stdout: &mut W,
+    session: &mut Session,
+    id: &str,
+    result: T,
 ) -> Result<(), ProtocolClose> {
     let seq = take_child_seq(session)?;
     let envelope = Response {
@@ -423,11 +608,7 @@ fn write_snapshot<W: Write>(
         id,
         seq,
         kind: "res",
-        result: Snapshot {
-            v: 1,
-            broker: "degraded",
-            accounts: [],
-        },
+        result,
         session: &session.id,
     };
     write_json(stdout, &envelope)
@@ -467,12 +648,61 @@ fn write_json<W: Write, T: Serialize>(stdout: &mut W, value: &T) -> Result<(), P
 }
 
 fn write_frame<W: Write>(stdout: &mut W, body: &[u8]) -> Result<(), ProtocolClose> {
+    if body.is_empty() || body.len() > MAX_FRAME_BODY as usize {
+        return Err(ProtocolClose);
+    }
     let length = u32::try_from(body.len()).map_err(|_| ProtocolClose)?;
     stdout
         .write_all(&length.to_be_bytes())
         .and_then(|_| stdout.write_all(body))
         .and_then(|_| stdout.flush())
         .map_err(|_| ProtocolClose)
+}
+
+fn with_manager<T>(
+    manager: &Option<SharedManager>,
+    action: impl FnOnce(
+        &mut LocalAccountManager,
+    ) -> Result<T, bitbook_wallet_broker::accounts::AccountError>,
+) -> Result<T, SafeError> {
+    let Some(manager) = manager else {
+        return Err(ERROR_UNAVAILABLE);
+    };
+    match manager.try_lock() {
+        Ok(mut manager) => action(&mut manager).map_err(|_| ERROR_UNAVAILABLE),
+        Err(TryLockError::WouldBlock) => Err(ERROR_UNAVAILABLE),
+        Err(TryLockError::Poisoned(error)) => {
+            error.into_inner().lock_all();
+            Err(ERROR_UNAVAILABLE)
+        }
+    }
+}
+
+fn account_list(manager: &Option<SharedManager>) -> Result<Vec<AccountSummary>, SafeError> {
+    with_manager(manager, |manager| manager.list())
+}
+
+fn tick_manager(manager: &Option<SharedManager>) {
+    let Some(manager) = manager else {
+        return;
+    };
+    match manager.try_lock() {
+        Ok(mut manager) => {
+            let _ = manager.tick();
+        }
+        Err(TryLockError::WouldBlock) => {}
+        Err(TryLockError::Poisoned(error)) => error.into_inner().lock_all(),
+    }
+}
+
+fn lock_all_manager(manager: &Option<SharedManager>) {
+    let Some(manager) = manager else {
+        return;
+    };
+    match manager.lock() {
+        Ok(mut manager) => manager.lock_all(),
+        Err(error) => error.into_inner().lock_all(),
+    }
 }
 
 fn parse_json_object(body: &[u8]) -> Result<Vec<(String, JsonValue)>, ProtocolClose> {
@@ -524,7 +754,12 @@ fn parse_request(
     let seq = json_u64(field(&object, "seq")?)?;
     let kind = json_str(field(&object, "kind")?)?;
     let method = json_str(field(&object, "method")?)?;
-    let params_empty = json_object_empty(field(&object, "params")?)?;
+    let params_empty = json_object_empty(field(&object, "params")?);
+    let account_id = if method == "account.lock" {
+        json_account_id(field(&object, "params")?).map(str::to_string)
+    } else {
+        None
+    };
     let session = json_str(field(&object, "session")?)?;
     let expires_ms = json_i64(field(&object, "expires_ms")?)?;
     if version != 1
@@ -540,6 +775,7 @@ fn parse_request(
         id: id.to_string(),
         method: method.to_string(),
         params_empty,
+        account_id,
         expires_ms,
     })
 }
@@ -569,11 +805,19 @@ fn json_str(value: &JsonValue) -> Result<&str, ProtocolClose> {
     }
 }
 
-fn json_object_empty(value: &JsonValue) -> Result<bool, ProtocolClose> {
-    match value {
-        JsonValue::Object(fields) => Ok(fields.is_empty()),
-        _ => Err(ProtocolClose),
+fn json_object_empty(value: &JsonValue) -> bool {
+    matches!(value, JsonValue::Object(fields) if fields.is_empty())
+}
+
+fn json_account_id(value: &JsonValue) -> Option<&str> {
+    let JsonValue::Object(fields) = value else {
+        return None;
+    };
+    if !exact_keys(fields, &["account_id"]) {
+        return None;
     }
+    let account_id = json_str(field(fields, "account_id").ok()?).ok()?;
+    is_hex_lower(account_id, 32).then_some(account_id)
 }
 
 fn json_u64(value: &JsonValue) -> Result<u64, ProtocolClose> {

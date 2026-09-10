@@ -22,6 +22,7 @@ const FAKE_BROKER = '/app/resources/bitbook-wallet-broker';
 const FAKE_DATA = '/user-data/wallet-broker';
 const OBSERVE_MS = 3000;
 const KILL_MS = 250;
+const GRACE_MS = 1000;
 const SHUTDOWN_MS = 1500;
 const TRANSCRIPT = require('./fixtures/wallet-broker/transcript-v1.json');
 const BOOTSTRAP_SNAPSHOT = { v: 1, broker: 'ready', accounts: [] };
@@ -224,6 +225,13 @@ function createFakeHarness(config = {}) {
     calls.push(['protocol', value]);
     return true;
   };
+  if (config.stdinEnd) {
+    child.stdin.end = function endStdin() {
+      calls.push(['end']);
+      if (typeof config.onEnd === 'function') return config.onEnd(child, calls);
+      return undefined;
+    };
+  }
   child.stdout = new EventEmitter();
   child.stderr = new EventEmitter();
   child.kill = (signal) => {
@@ -424,7 +432,7 @@ function appendCleanup(previous, error) {
   return previous;
 }
 
-async function withRealChild(argvTail, fn) {
+async function withRealChild(argvTail, fn, options = {}) {
   let originalError = null;
   let cleanupError = null;
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bb-wal011-shutdown-'));
@@ -441,6 +449,10 @@ async function withRealChild(argvTail, fn) {
   let spawnAllowed = false;
   let spawnError = null;
   const spawnCalls = [];
+  let wrapperDir = null;
+  let wrapperPath = null;
+  let wrapperCreated = false;
+  let childScript = FIXTURE_PATH;
   const closed = { child: { value: false }, stdout: { value: false }, stderr: { value: false }, stdin: { value: false } };
   const trackedPromises = [];
   const ownedListeners = [];
@@ -490,7 +502,7 @@ async function withRealChild(argvTail, fn) {
       spawnError = error;
       throw error;
     }
-    child = childProcess.spawn(BROKER_PATH, [FIXTURE_PATH, ...argvTail], {
+    child = childProcess.spawn(BROKER_PATH, [childScript, ...argvTail], {
       cwd: spawnOptions.cwd,
       env: spawnOptions.env,
       shell: false,
@@ -516,6 +528,25 @@ async function withRealChild(argvTail, fn) {
 
   let result;
   try {
+    if (options.ignoreEof === true) {
+      wrapperDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bb-wal013-eof-'));
+      wrapperPath = path.join(wrapperDir, 'ignore-eof-child.js');
+      fs.writeFileSync(wrapperPath, [
+        '\'use strict\';',
+        'process.on(\'SIGTERM\', () => {});',
+        'setInterval(() => {}, 60000);',
+        'const stdin = process.stdin;',
+        'const originalOn = stdin.on;',
+        'stdin.on = function patchedOn(event, listener) {',
+        '  if (event === \'end\') return stdin;',
+        '  return originalOn.call(this, event, listener);',
+        '};',
+        `require(${JSON.stringify(FIXTURE_PATH)});`,
+        '',
+      ].join('\n'));
+      wrapperCreated = true;
+      childScript = wrapperPath;
+    }
     assertShutdownApi(supervisor);
     spawnAllowed = true;
     result = await fn({
@@ -525,6 +556,9 @@ async function withRealChild(argvTail, fn) {
       closed,
       observe,
       captureClose,
+      childScript,
+      wrapperPath,
+      ignoreEof: options.ignoreEof === true,
       get child() { return child; },
       get spawnError() { return spawnError; },
     });
@@ -563,6 +597,24 @@ async function withRealChild(argvTail, fn) {
       closed.stderr.value === true &&
       closed.stdin.value === true
     );
+    if (wrapperPath && cwdReady) {
+      try {
+        const wrapperStat = fs.lstatSync(wrapperPath);
+        if (wrapperStat.isSymbolicLink() || !wrapperStat.isFile()) {
+          throw new Error(`refusing to unlink unexpected wrapper path ${wrapperPath}`);
+        }
+        fs.unlinkSync(wrapperPath);
+      } catch (error) {
+        if (error.code !== 'ENOENT' || wrapperCreated) {
+          cleanupError = appendCleanup(cleanupError, error);
+        }
+      }
+    }
+    if (wrapperDir && cwdReady) {
+      try { fs.rmdirSync(wrapperDir); } catch (error) {
+        cleanupError = appendCleanup(cleanupError, error);
+      }
+    }
     if (cwdReady) {
       try {
         removeEmptyCwd(dataDir);
@@ -572,7 +624,10 @@ async function withRealChild(argvTail, fn) {
     } else {
       cleanupError = appendCleanup(
         cleanupError,
-        new Error(`preserving cwd ${dataDir}; child or streams were not confirmed closed`)
+        new Error(
+          `preserving cwd ${dataDir}${wrapperDir ? ` and wrapper ${wrapperDir}` : ''}; ` +
+          'child or streams were not confirmed closed'
+        )
       );
     }
   }
@@ -923,14 +978,157 @@ test('shutdown: real child normal termination observes close and closed streams'
   });
 });
 
+test('shutdown: graceful stdin.end waits 1000ms then SIGTERM and SIGKILL; close still owns the promise', async () => {
+  await withFakeHarness({ stdinEnd: true }, async (ctx) => {
+    assertShutdownApi(ctx.supervisor);
+    bindFake(ctx);
+    ctx.supervisor.trackIntent(INTENT_ID);
+    const pending = ctx.supervisor.dispatch('account.list', {});
+    const pendingWatch = ctx.observe(pending);
+    const first = ctx.supervisor.shutdown();
+    const shutdownWatch = ctx.observe(first);
+    await flush();
+    assert.ok(decodeWriteList(ctx.protocolWrites).some((frame) => frame.method === 'intent.cancel'));
+    const cancelIndex = ctx.calls.findIndex((call) => (
+      call[0] === 'protocol' && decodeFrames([call[1]]).values.some(
+        (frame) => frame.method === 'intent.cancel'
+      )
+    ));
+    const endIndex = ctx.calls.findIndex((call) => call[0] === 'end');
+    assert.ok(cancelIndex >= 0, 'intent.cancel was not written');
+    assert.ok(endIndex >= 0, 'stdin.end was not called');
+    assert.ok(cancelIndex < endIndex, 'stdin.end preceded intent.cancel');
+    assert.strictEqual(pendingWatch.state, 'rejected');
+    assert.strictEqual(pendingWatch.error.code, 'UNAVAILABLE');
+    assert.deepStrictEqual(ctx.supervisor.pendingRequests(), []);
+    assert.strictEqual(ctx.calls.filter((call) => call[0] === 'end').length, 1);
+    assert.deepStrictEqual(killSignals(ctx), []);
+    assert.strictEqual(shutdownWatch.state, 'pending');
+    ctx.supervisor.shutdown();
+    assert.strictEqual(ctx.calls.filter((call) => call[0] === 'end').length, 1);
+
+    ctx.advance(GRACE_MS - 1);
+    await flush();
+    assert.deepStrictEqual(killSignals(ctx), []);
+    ctx.advance(1);
+    await flush();
+    assert.deepStrictEqual(killSignals(ctx), ['SIGTERM']);
+    ctx.advance(KILL_MS - 1);
+    await flush();
+    assert.deepStrictEqual(killSignals(ctx), ['SIGTERM']);
+    ctx.advance(1);
+    await flush();
+    assert.deepStrictEqual(killSignals(ctx), ['SIGTERM', 'SIGKILL']);
+    ctx.child.emit('exit', null, 'SIGKILL');
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'pending');
+    ctx.advance(SHUTDOWN_MS - GRACE_MS - KILL_MS - 1);
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'pending');
+    ctx.advance(1);
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'rejected');
+    assert.strictEqual(shutdownWatch.error.code, 'TIMEOUT');
+    assert.strictEqual(activeTimers(ctx, GRACE_MS).length, 0);
+    assert.strictEqual(activeTimers(ctx, KILL_MS).length, 0);
+    assert.strictEqual(activeTimers(ctx, SHUTDOWN_MS).length, 0);
+    assert.strictEqual(first, ctx.supervisor.shutdown());
+  });
+});
+
+test('shutdown: asynchronous/synchronous close from end are safe and throwing end falls back', async () => {
+  await withFakeHarness({ stdinEnd: true }, async (ctx) => {
+    bindFake(ctx);
+    ctx.supervisor.trackIntent(INTENT_ID);
+    const first = ctx.supervisor.shutdown();
+    const shutdownWatch = ctx.observe(first);
+    await flush();
+    const cancelIndex = ctx.calls.findIndex((call) => (
+      call[0] === 'protocol' && decodeFrames([call[1]]).values.some(
+        (frame) => frame.method === 'intent.cancel'
+      )
+    ));
+    const endIndex = ctx.calls.findIndex((call) => call[0] === 'end');
+    assert.ok(cancelIndex >= 0 && endIndex >= 0 && cancelIndex < endIndex);
+    assert.deepStrictEqual(killSignals(ctx), []);
+    assert.strictEqual(shutdownWatch.state, 'pending');
+
+    ctx.child.exitCode = 0;
+    ctx.child.emit('exit', 0, null);
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'pending', 'shutdown resolved on asynchronous exit');
+    assert.deepStrictEqual(killSignals(ctx), []);
+
+    ctx.child.emit('close', 0, null);
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'resolved');
+    assert.strictEqual(shutdownWatch.value, undefined);
+    assert.strictEqual(first, ctx.supervisor.shutdown());
+    assert.strictEqual(
+      ctx.timers.filter((timer) => timer.cleared !== true && timer.fired !== true).length,
+      0,
+      'graceful close left an active timer'
+    );
+    ctx.advance(SHUTDOWN_MS * 2);
+    await flush();
+    assert.deepStrictEqual(killSignals(ctx), [], 'graceful close produced a late signal');
+  });
+
+  await withFakeHarness({
+    stdinEnd: true,
+    onEnd(child) {
+      child.exitCode = 0;
+      child.emit('close', 0, null);
+    },
+  }, async (ctx) => {
+    bindFake(ctx);
+    const first = ctx.supervisor.shutdown();
+    const shutdownWatch = ctx.observe(first);
+    await flush();
+    assert.strictEqual(ctx.calls.filter((call) => call[0] === 'end').length, 1);
+    assert.deepStrictEqual(killSignals(ctx), []);
+    assert.strictEqual(shutdownWatch.state, 'resolved');
+    assert.strictEqual(shutdownWatch.value, undefined);
+    assert.strictEqual(first, ctx.supervisor.shutdown());
+    assert.strictEqual(activeTimers(ctx, GRACE_MS).length, 0);
+    assert.strictEqual(activeTimers(ctx, KILL_MS).length, 0);
+    assert.strictEqual(activeTimers(ctx, SHUTDOWN_MS).length, 0);
+  });
+
+  await withFakeHarness({
+    stdinEnd: true,
+    onEnd() { throw new Error('CANARY end failed'); },
+  }, async (ctx) => {
+    bindFake(ctx);
+    const first = ctx.supervisor.shutdown();
+    const shutdownWatch = ctx.observe(first);
+    await flush();
+    assert.strictEqual(ctx.calls.filter((call) => call[0] === 'end').length, 1);
+    assert.deepStrictEqual(killSignals(ctx), ['SIGTERM']);
+    ctx.child.emit('close', 0, 'SIGTERM');
+    await flush();
+    assert.strictEqual(shutdownWatch.state, 'resolved');
+    assert.strictEqual(first, ctx.supervisor.shutdown());
+  });
+});
+
 if (process.platform !== 'win32') {
   test('shutdown: real child ignoring SIGTERM terminates with SIGKILL after close', async () => {
     await withRealChild(
       ['hold', `child-nonce=${CHILD_NONCE}`, '--ignore-sigterm'],
       async (ctx) => {
+        assert.strictEqual(ctx.ignoreEof, true, 'ignoreEof option was not selected');
+        assert.ok(ctx.wrapperPath, 'ignoreEof wrapper path was not created');
+        assert.strictEqual(ctx.childScript, ctx.wrapperPath, 'real child did not select the wrapper');
+        const wrapperSource = fs.readFileSync(ctx.wrapperPath, 'utf8');
+        assert.ok(wrapperSource.includes('setInterval(() => {}, 60000);'));
+        assert.ok(wrapperSource.includes("process.on('SIGTERM', () => {});"));
+        assert.ok(wrapperSource.includes("if (event === 'end') return stdin;"));
+        assert.ok(wrapperSource.includes(`require(${JSON.stringify(FIXTURE_PATH)});`));
         const started = ctx.supervisor.start();
         assert.strictEqual(started.ok, true);
         if (ctx.spawnError) throw ctx.spawnError;
+        assert.strictEqual(ctx.child.spawnargs[1], ctx.wrapperPath, 'spawn bypassed ignoreEof wrapper');
         await waitBound(ctx.supervisor);
         assert.ok(childStillRunning(ctx.child), 'child exited before ignored-SIGTERM shutdown');
 
@@ -957,7 +1155,8 @@ if (process.platform !== 'win32') {
         assert.ok(ctx.closed.child.value, 'harness did not observe child close');
         assert.ok(!childStillRunning(ctx.child), 'SIGTERM-ignore child still running');
         assert.deepStrictEqual(fs.readdirSync(ctx.dataDir), []);
-      }
+      },
+      { ignoreEof: true }
     );
   });
 }

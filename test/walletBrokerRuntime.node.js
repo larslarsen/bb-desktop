@@ -155,9 +155,9 @@ function childSpawnError(child) {
   return child ? spawnErrors.get(child) : undefined;
 }
 
-function observeSpawnError(child) {
+function observeSpawnError(ctx, child) {
   if (!child) return;
-  child.on('error', (error) => {
+  ctx.listen(child, 'error', (error) => {
     if (!spawnErrors.has(child)) spawnErrors.set(child, error);
   });
 }
@@ -323,8 +323,87 @@ function assertNoCanary(chunks, label) {
   assert.ok(!text.includes(CANARY), `${label} leaked canary`);
 }
 
-function assertEmptyCwd(dataDir) {
-  assert.deepStrictEqual(fs.readdirSync(dataDir), [], 'broker wrote files into its private cwd');
+function canonicalVaultBytes(accountId) {
+  const body = {
+    format: 'bitbook-wallet-vault',
+    version: 1,
+    account_id: accountId,
+    asset: 'ZEC',
+    network: 'zec-testnet',
+    epoch: '7',
+    kdf: {
+      algorithm: 'argon2id',
+      version: 19,
+      m_cost_kib: 65536,
+      t_cost: 3,
+      p_cost: 1,
+      salt_b64: 'AAAAAAAAAAAAAAAAAAAAAA',
+    },
+    aead: {
+      algorithm: 'xchacha20poly1305',
+      nonce_b64: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      ciphertext_b64: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  };
+  return Buffer.from(`${JSON.stringify(body)}\n`, 'utf8');
+}
+
+function accountSummary(accountId) {
+  return {
+    account_id: accountId,
+    asset: 'ZEC',
+    network: 'zec-testnet',
+    kind: 'software',
+    locked: true,
+  };
+}
+
+function writeLockedAccounts(ctx, ids) {
+  for (const id of ids) {
+    assert.ok(HEX32.test(id), `invalid fixture account id ${id}`);
+    const abs = ctx.registerAccountFile(`${id}.vault`);
+    fs.writeFileSync(abs, canonicalVaultBytes(id));
+    fs.chmodSync(abs, 0o600);
+  }
+  return ids.slice().sort().map(accountSummary);
+}
+
+function assertPrivateCwd(dataDir, options = {}) {
+  const rootStat = fs.lstatSync(dataDir);
+  assert.ok(!rootStat.isSymbolicLink() && rootStat.isDirectory(), 'cwd is not a real directory');
+  assert.strictEqual(rootStat.mode & 0o777, 0o700);
+  assert.deepStrictEqual(fs.readdirSync(dataDir).sort(), ['accounts']);
+
+  const accountsDir = path.join(dataDir, 'accounts');
+  const accountsStat = fs.lstatSync(accountsDir);
+  assert.ok(
+    !accountsStat.isSymbolicLink() && accountsStat.isDirectory(),
+    'accounts is not a real directory'
+  );
+  assert.strictEqual(accountsStat.mode & 0o777, 0o700);
+  const expectedFiles = new Set(options.accountFiles || []);
+  for (const id of options.vaultIds || []) expectedFiles.add(`${id}.vault`);
+  const entries = fs.readdirSync(accountsDir).sort();
+  assert.deepStrictEqual(entries, [...expectedFiles].sort(), 'unexpected accounts inventory');
+  for (const entry of entries) {
+    assert.ok(!entry.includes(CANARY), `accounts leaked canary ${entry}`);
+    const accountPath = path.join(accountsDir, entry);
+    const accountStat = fs.lstatSync(accountPath);
+    assert.ok(
+      !accountStat.isSymbolicLink() && accountStat.isFile(),
+      `${entry} is not a regular fixture file`
+    );
+    assert.strictEqual(accountStat.mode & 0o777, 0o600);
+    const bytes = fs.readFileSync(accountPath);
+    assert.ok(!bytes.includes(Buffer.from(CANARY)), `${entry} contains the canary`);
+    assert.ok(!bytes.includes(Buffer.from(dataDir)), `${entry} contains the private cwd`);
+  }
+}
+
+function assertNoPathOrCanary(chunks, dataDir, label) {
+  const text = Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString('utf8');
+  assert.ok(!text.includes(CANARY), `${label} leaked canary`);
+  assert.ok(!text.includes(dataDir), `${label} leaked path`);
 }
 
 function assertProtocolFailureExit(child, label) {
@@ -355,9 +434,10 @@ async function assertPromptProtocolFailure(ctx, ms, label, expectedCount) {
   return assertDrainedTranscript(ctx, expectedCount, label);
 }
 
-function retainCause(error, originalError) {
-  if (originalError) error.cause = originalError;
-  return error;
+function appendCleanup(previous, error) {
+  if (!previous) return error;
+  previous.message = `${previous.message}\ncleanup also failed: ${error.stack || error.message}`;
+  return previous;
 }
 
 function parentAck(parentNonce, parentPid) {
@@ -371,74 +451,145 @@ function parentAck(parentNonce, parentPid) {
 
 async function withTempCwd(fn) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bb-wal011-exec-'));
-  fs.chmodSync(dataDir, 0o700);
-  const children = [];
-  let originalError = null;
+  const accountsDir = path.join(dataDir, 'accounts');
   try {
-    return await fn({
-      dataDir,
-      track(child) {
-        if (child) children.push(child);
-        return child;
-      },
-    });
+    fs.chmodSync(dataDir, 0o700);
+    fs.mkdirSync(accountsDir, { mode: 0o700 });
+    fs.chmodSync(accountsDir, 0o700);
+  } catch (error) {
+    try { fs.rmdirSync(accountsDir); } catch (removeError) {
+      if (removeError.code !== 'ENOENT') error.message += `\naccounts cleanup also failed: ${removeError.message}`;
+    }
+    try { fs.rmdirSync(dataDir); } catch (removeError) {
+      error.message += `\ncwd cleanup also failed: ${removeError.message}`;
+    }
+    throw error;
+  }
+
+  const childRecords = [];
+  const accountFiles = new Set();
+  let originalError = null;
+  let cleanupError = null;
+  let result;
+  const ctx = {
+    dataDir,
+    registerAccountFile(name) {
+      assert.strictEqual(typeof name, 'string', 'fixture account filename must be a string');
+      assert.ok(name.length > 0 && path.basename(name) === name, `nested fixture path ${name}`);
+      assert.ok(name !== '.' && name !== '..', `invalid fixture path ${name}`);
+      assert.ok(!name.includes(CANARY), `fixture filename contains canary ${name}`);
+      accountFiles.add(name);
+      return path.join(accountsDir, name);
+    },
+    track(child) {
+      if (!child) return child;
+      const record = {
+        child,
+        closed: {
+          child: false,
+          stdout: !child.stdout,
+          stderr: !child.stderr,
+          stdin: !child.stdin,
+        },
+        listeners: [],
+      };
+      childRecords.push(record);
+      ctx.listen(child, 'close', () => { record.closed.child = true; });
+      if (child.stdout) ctx.listen(child.stdout, 'close', () => { record.closed.stdout = true; });
+      if (child.stderr) ctx.listen(child.stderr, 'close', () => { record.closed.stderr = true; });
+      if (child.stdin) ctx.listen(child.stdin, 'close', () => { record.closed.stdin = true; });
+      return child;
+    },
+    listen(target, event, handler) {
+      const record = childRecords.find((entry) => (
+        entry.child === target || entry.child.stdout === target ||
+        entry.child.stderr === target || entry.child.stdin === target
+      ));
+      assert.ok(record, `listener target was not registered for ${event}`);
+      target.on(event, handler);
+      record.listeners.push({ target, event, handler });
+    },
+  };
+  try {
+    result = await fn(ctx);
   } catch (error) {
     originalError = error;
-    throw error;
   } finally {
-    for (const child of children) {
-      if (child && !hasExited(child)) {
-        try { child.kill('SIGKILL'); } catch (_) { /* already gone */ }
+    for (const record of childRecords) {
+      if (!record.closed.child && !hasExited(record.child)) {
+        try { record.child.kill('SIGKILL'); } catch (error) {
+          cleanupError = appendCleanup(cleanupError, error);
+        }
       }
     }
-    let cleanupError = null;
-    for (const child of children) {
-      if (!child) continue;
+    for (const record of childRecords) {
       try {
-        await waitForExit(child, CLEANUP_MS, 'child could not be reaped');
+        await waitUntil(
+          () => Object.values(record.closed).every(Boolean),
+          CLEANUP_MS,
+          'child close and closed stdio were not observed'
+        );
       } catch (error) {
-        if (!cleanupError) cleanupError = error;
+        cleanupError = appendCleanup(cleanupError, error);
       }
     }
-    const unreaped = children.some((child) => child && !hasExited(child));
-    if (unreaped) {
-      const reapError = cleanupError || new Error('child could not be reaped');
-      throw retainCause(reapError, originalError);
-    }
-    let entries;
-    try {
-      entries = fs.readdirSync(dataDir);
-    } catch (error) {
-      throw retainCause(error, originalError);
-    }
-    if (entries.length !== 0) {
-      const leftoverError = new Error(
-        `broker wrote files into its private cwd (${dataDir}): ${entries.join(', ')}`
+    const allClosed = childRecords.every((record) => Object.values(record.closed).every(Boolean));
+    if (allClosed) {
+      for (const record of childRecords) {
+        for (const { target, event, handler } of record.listeners) {
+          target.removeListener(event, handler);
+        }
+        record.listeners.length = 0;
+      }
+    } else {
+      cleanupError = appendCleanup(
+        cleanupError,
+        new Error(`preserving cwd ${dataDir}; child close and closed stdio were not confirmed`)
       );
-      leftoverError.path = dataDir;
-      leftoverError.entries = entries.slice();
-      throw retainCause(leftoverError, originalError);
     }
-    try {
-      fs.rmdirSync(dataDir);
-    } catch (error) {
-      throw retainCause(error, originalError);
+    if (allClosed) {
+      let inventoryValid = false;
+      try {
+        assertPrivateCwd(dataDir, { accountFiles: [...accountFiles] });
+        inventoryValid = true;
+      } catch (error) {
+        cleanupError = appendCleanup(cleanupError, error);
+      }
+      if (inventoryValid) {
+        for (const name of [...accountFiles].sort().reverse()) {
+          try { fs.unlinkSync(path.join(accountsDir, name)); } catch (error) {
+            cleanupError = appendCleanup(cleanupError, error);
+          }
+        }
+        try { fs.rmdirSync(accountsDir); } catch (error) {
+          cleanupError = appendCleanup(cleanupError, error);
+        }
+        try { fs.rmdirSync(dataDir); } catch (error) {
+          cleanupError = appendCleanup(cleanupError, error);
+        }
+      }
     }
-    if (cleanupError) throw retainCause(cleanupError, originalError);
   }
+  if (originalError && cleanupError) {
+    originalError.message = `${originalError.message}\ncleanup also failed: ${cleanupError.stack || cleanupError.message}`;
+    throw originalError;
+  }
+  if (originalError) throw originalError;
+  if (cleanupError) throw cleanupError;
+  return result;
 }
 
-function attachCapture(child, stdout, stderr) {
-  observeSpawnError(child);
+function attachCapture(ctx, child, stdout, stderr) {
+  observeSpawnError(ctx, child);
   if (child.stdout) {
-    child.stdout.on('data', (chunk) => stdout.push(Buffer.from(chunk)));
-    child.stdout.on('error', () => {});
+    ctx.listen(child.stdout, 'data', (chunk) => stdout.push(Buffer.from(chunk)));
+    ctx.listen(child.stdout, 'error', () => {});
   }
   if (child.stderr) {
-    child.stderr.on('data', (chunk) => stderr.push(Buffer.from(chunk)));
-    child.stderr.on('error', () => {});
+    ctx.listen(child.stderr, 'data', (chunk) => stderr.push(Buffer.from(chunk)));
+    ctx.listen(child.stderr, 'error', () => {});
   }
-  if (child.stdin) child.stdin.on('error', () => {});
+  if (child.stdin) ctx.listen(child.stdin, 'error', () => {});
 }
 
 function spawnBroker(brokerPath, dataDir) {
@@ -463,7 +614,7 @@ async function withSupervisor(fn) {
       spawnCalls.push({ file: args[0], argv: args[1], options: args[2] });
       child = originalSpawn.apply(this, args);
       ctx.track(child);
-      attachCapture(child, stdout, stderr);
+      attachCapture(ctx, child, stdout, stderr);
       return child;
     };
     try {
@@ -482,6 +633,7 @@ async function withSupervisor(fn) {
           dataDir: ctx.dataDir,
           brokerPath,
           expectedSha256,
+          registerAccountFile: ctx.registerAccountFile,
           get child() { return child; },
         });
       } finally {
@@ -493,14 +645,73 @@ async function withSupervisor(fn) {
   });
 }
 
-async function withDirectChild(fn) {
+async function withObservedSupervisors(fn) {
+  const brokerPath = requireBrokerPath();
+  const expectedSha256 = pinBroker(brokerPath);
+  return withTempCwd(async (ctx) => {
+    const originalSpawn = childProcess.spawn;
+    const spawnCalls = [];
+    const sessions = [];
+    childProcess.spawn = function observe(...args) {
+      spawnCalls.push({ file: args[0], argv: args[1], options: args[2] });
+      const child = originalSpawn.apply(this, args);
+      ctx.track(child);
+      const stdout = [];
+      const stderr = [];
+      attachCapture(ctx, child, stdout, stderr);
+      sessions.push({ child, stdout, stderr });
+      return child;
+    };
+    const supervisors = [];
+    try {
+      return await fn({
+        dataDir: ctx.dataDir,
+        brokerPath,
+        expectedSha256,
+        spawnCalls,
+        sessions,
+        registerAccountFile: ctx.registerAccountFile,
+        makeSupervisor() {
+          const supervisor = createWalletSupervisor({
+            brokerPath,
+            expectedSha256,
+            dataDir: ctx.dataDir,
+            env: { LANG: 'C.UTF-8', PATH: '/usr/bin', SECRET_TOKEN: CANARY },
+          });
+          supervisors.push(supervisor);
+          return supervisor;
+        },
+        current() {
+          return sessions[sessions.length - 1];
+        },
+      });
+    } finally {
+      for (const supervisor of supervisors) {
+        try { supervisor.quit(); } catch (_) { /* still reap */ }
+      }
+      childProcess.spawn = originalSpawn;
+    }
+  });
+}
+
+async function withDirectChild(setup, fn) {
+  const prepare = fn ? setup : null;
+  const body = fn || setup;
   const brokerPath = requireBrokerPath();
   return withTempCwd(async (ctx) => {
+    if (prepare) await prepare(ctx);
     const stdout = [];
     const stderr = [];
     const child = ctx.track(spawnBroker(brokerPath, ctx.dataDir));
-    attachCapture(child, stdout, stderr);
-    return fn({ child, stdout, stderr, dataDir: ctx.dataDir, brokerPath });
+    attachCapture(ctx, child, stdout, stderr);
+    return body({
+      child,
+      stdout,
+      stderr,
+      dataDir: ctx.dataDir,
+      brokerPath,
+      registerAccountFile: ctx.registerAccountFile,
+    });
   });
 }
 
@@ -532,7 +743,7 @@ test('runtime: compiled native executable is present', () => {
   requireBrokerPath();
 });
 
-test('supervisor: real compiled child binds, degraded snapshot, status.get, account.list UNAVAILABLE, quit reaps', async () => {
+test('supervisor: real compiled child binds, degraded snapshot, status.get, account.list [], quit reaps', async () => {
   await withSupervisor(async (ctx) => {
     const snapshots = [];
     ctx.supervisor.subscribeSnapshot((value) => snapshots.push(value));
@@ -570,23 +781,13 @@ test('supervisor: real compiled child binds, degraded snapshot, status.get, acco
     assert.deepStrictEqual(status, DEGRADED_PUBLIC);
     assert.deepStrictEqual(status.accounts, []);
 
-    await assert.rejects(
-      async () => {
-        const value = await withDeadline(
-          ctx.supervisor.dispatch('account.list', {}),
-          SETTLE_MS,
-          'account.list did not settle'
-        );
-        assert.fail(`account.list resolved with ${JSON.stringify(value)}`);
-      },
-      (error) => {
-        assert.strictEqual(error.code, 'UNAVAILABLE');
-        assert.strictEqual(error.message, 'Unavailable');
-        assert.strictEqual(error.retryable, true);
-        assert.ok(!JSON.stringify(error).includes(CANARY));
-        return true;
-      }
+    const listed = await withDeadline(
+      ctx.supervisor.dispatch('account.list', {}),
+      SETTLE_MS,
+      'account.list did not settle'
     );
+    assert.deepStrictEqual(listed, []);
+    assert.ok(!JSON.stringify(listed).includes(CANARY));
 
     ctx.supervisor.quit();
     await waitForChildSettled(ctx.child, SETTLE_MS, 'supervisor quit did not reap the child');
@@ -599,10 +800,12 @@ test('supervisor: real compiled child binds, degraded snapshot, status.get, acco
     assert.strictEqual(values[2].kind, 'res');
     assert.deepStrictEqual(values[2].result, DEGRADED_WIRE);
     assert.strictEqual(values[2].seq, values[1].seq + 1);
-    assert.strictEqual(values[3].kind, 'error');
-    assert.deepStrictEqual(values[3].error, ERROR_UNAVAILABLE);
+    assert.strictEqual(values[3].kind, 'res');
+    assert.deepStrictEqual(values[3].result, []);
     assert.strictEqual(values[3].seq, values[2].seq + 1);
-    assertEmptyCwd(ctx.dataDir);
+    assertNoPathOrCanary(ctx.stdout, ctx.dataDir, 'supervisor stdout');
+    assertNoPathOrCanary(ctx.stderr, ctx.dataDir, 'supervisor stderr');
+    assertPrivateCwd(ctx.dataDir);
   });
 });
 
@@ -614,7 +817,7 @@ test('direct: hello uses exact v1 keys, actual PID, and a fresh nonce on each st
     ctx.child.kill('SIGKILL');
     await waitForChildSettled(ctx.child, EXIT_MS, 'first hello child did not exit');
     assertDrainedTranscript(ctx, 1, 'first hello');
-    assertEmptyCwd(ctx.dataDir);
+    assertPrivateCwd(ctx.dataDir);
     return hello.child_nonce;
   });
   const second = await withDirectChild(async (ctx) => {
@@ -656,7 +859,7 @@ test('direct: split ack and coalesced status requests return exact IDs, degraded
     assertResponse(values[1], first.id, 1, session, DEGRADED_WIRE);
     assertResponse(values[2], second.id, 2, session, DEGRADED_WIRE);
     assertResponse(values[3], requestId(3), 3, session, DEGRADED_WIRE);
-    assertEmptyCwd(ctx.dataDir);
+    assertPrivateCwd(ctx.dataDir);
   });
 });
 
@@ -837,7 +1040,7 @@ test('direct: partial-frame EOF after a valid session exits', async () => {
     const values = await assertPromptProtocolFailure(ctx, EXIT_MS, 'partial-header EOF', 2);
     assertHello(values[0], ctx.child.pid);
     assertResponse(values[1], request.id, 1, session, DEGRADED_WIRE);
-    assertEmptyCwd(ctx.dataDir);
+    assertPrivateCwd(ctx.dataDir);
   });
   await withDirectChild(async (ctx) => {
     const { session } = await handshake(ctx, PARENT_NONCE, ACK_PARENT_PID, false);
@@ -851,11 +1054,11 @@ test('direct: partial-frame EOF after a valid session exits', async () => {
     const values = await assertPromptProtocolFailure(ctx, EXIT_MS, 'incomplete-body EOF', 2);
     assertHello(values[0], ctx.child.pid);
     assertResponse(values[1], request.id, 1, session, DEGRADED_WIRE);
-    assertEmptyCwd(ctx.dataDir);
+    assertPrivateCwd(ctx.dataDir);
   });
 });
 
-test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the wire, and cwd stays empty', async () => {
+test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the wire, and cwd stays private', async () => {
   await withDirectChild(async (ctx) => {
     const { session } = await handshake(ctx, PARENT_NONCE, ACK_PARENT_PID, false);
     const status = makeRequest(requestId(1), 1, 'status.get', {}, session, Date.now() + 10000);
@@ -896,8 +1099,9 @@ test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the
       encodeFrame(fresh), encodeFrame(cancel), encodeFrame(subscribe),
     ]));
     const replies = await waitNewFrames(ctx, 2, 10, SETTLE_MS, 'fixed method errors did not complete');
-    assertErrorEnvelope(replies[0], listed.id, 2, session, ERROR_UNAVAILABLE);
-    assertErrorEnvelope(replies[1], lock.id, 3, session, ERROR_UNAVAILABLE);
+    assertResponse(replies[0], listed.id, 2, session, []);
+    // Intentional schema tightening: extra secret on account.lock is SCHEMA, not UNAVAILABLE.
+    assertErrorEnvelope(replies[1], lock.id, 3, session, ERROR_SCHEMA);
     assertErrorEnvelope(replies[2], begin.id, 4, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(replies[3], unlock.id, 5, session, ERROR_SCHEMA);
     assertErrorEnvelope(replies[4], broadcast.id, 6, session, ERROR_SCHEMA);
@@ -906,7 +1110,8 @@ test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the
     assertErrorEnvelope(replies[7], fresh.id, 9, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(replies[8], cancel.id, 10, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(replies[9], subscribe.id, 11, session, ERROR_SCHEMA);
-    assert.ok(!replies.some((value) => value.kind === 'res' && Array.isArray(value.result && value.result.accounts)));
+    assert.ok(Array.isArray(replies[0].result));
+    assert.ok(!replies.some((value) => value.kind === 'res' && value.result && value.result.broker === 'ready'));
     ctx.child.stdin.end();
     await waitForChildSettled(ctx.child, EXIT_MS, 'clean EOF after error replies did not exit');
     assert.strictEqual(ctx.child.exitCode, 0);
@@ -914,8 +1119,8 @@ test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the
     const values = assertDrainedTranscript(ctx, 12, 'method-error');
     assertHello(values[0], ctx.child.pid);
     assertResponse(values[1], status.id, 1, session, DEGRADED_WIRE);
-    assertErrorEnvelope(values[2], listed.id, 2, session, ERROR_UNAVAILABLE);
-    assertErrorEnvelope(values[3], lock.id, 3, session, ERROR_UNAVAILABLE);
+    assertResponse(values[2], listed.id, 2, session, []);
+    assertErrorEnvelope(values[3], lock.id, 3, session, ERROR_SCHEMA);
     assertErrorEnvelope(values[4], begin.id, 4, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(values[5], unlock.id, 5, session, ERROR_SCHEMA);
     assertErrorEnvelope(values[6], broadcast.id, 6, session, ERROR_SCHEMA);
@@ -924,7 +1129,144 @@ test('direct: SCHEMA, TIMEOUT, and UNAVAILABLE stay fixed, canaries stay off the
     assertErrorEnvelope(values[9], fresh.id, 9, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(values[10], cancel.id, 10, session, ERROR_UNAVAILABLE);
     assertErrorEnvelope(values[11], subscribe.id, 11, session, ERROR_SCHEMA);
-    assertEmptyCwd(ctx.dataDir);
+    assertNoPathOrCanary(ctx.stdout, ctx.dataDir, 'method-error stdout');
+    assertPrivateCwd(ctx.dataDir);
+  });
+});
+
+test('supervisor and direct child list persisted locked vault fixtures, lock {}, and fail closed on hostile catalog', async () => {
+  const accountA = '00112233445566778899aabbccddeeff';
+  const accountB = 'ffeeddccbbaa99887766554433221100';
+  const expected = [accountSummary(accountA), accountSummary(accountB)];
+  const secretMethods = [
+    'account.unlock',
+    'account.createSoftware',
+    'account.exportBackup',
+    'account.restore',
+    'account.prepareRestore',
+    'account.confirmRestore',
+  ];
+
+  await withObservedSupervisors(async (ctx) => {
+    const summaries = writeLockedAccounts(ctx, [accountB, accountA]);
+    assert.deepStrictEqual(summaries, expected);
+    const first = ctx.makeSupervisor();
+    const started = first.start();
+    assert.strictEqual(started.ok, true, 'compiled broker did not start');
+    await waitUntil(() => {
+      throwIfSpawnFailed(ctx.current().child);
+      return first.bound === true;
+    }, READY_MS, 'compiled broker did not bind', ctx.current().child);
+
+    const listed = await withDeadline(first.dispatch('account.list', {}), SETTLE_MS, 'persisted list did not settle');
+    assert.deepStrictEqual(listed, expected);
+    const status = await withDeadline(first.dispatch('status.get', {}), SETTLE_MS, 'persisted status did not settle');
+    assert.strictEqual(status.broker, 'degraded');
+    assert.deepStrictEqual(status.accounts.map((account) => account.account_id), [accountA, accountB]);
+    assert.ok(status.accounts.every((account) => account.kind === 'software'));
+    const locked = await withDeadline(
+      first.dispatch('account.lock', { account_id: accountA }),
+      SETTLE_MS,
+      'persisted lock did not settle'
+    );
+    assert.deepStrictEqual(locked, {});
+    assert.throws(
+      () => first.dispatch('account.lock', { account_id: accountA, secret: CANARY }),
+      (error) => error.code === 'SCHEMA'
+    );
+    assert.throws(
+      () => first.dispatch('account.lock', { account_id: CANARY }),
+      (error) => error.code === 'SCHEMA'
+    );
+    assert.throws(
+      () => first.dispatch('account.list', { extra: true }),
+      (error) => error.code === 'SCHEMA'
+    );
+    const unavailableManage = first.dispatch('account.manage', {});
+    assert.ok(
+      unavailableManage && typeof unavailableManage.then === 'function',
+      'account.manage did not reach the asynchronous broker reply'
+    );
+    await assert.rejects(
+      unavailableManage,
+      (error) => {
+        assert.strictEqual(error.code, 'UNAVAILABLE');
+        assert.ok(!JSON.stringify(error).includes(CANARY));
+        assert.ok(!JSON.stringify(error).includes(ctx.dataDir));
+        return true;
+      }
+    );
+    for (const method of secretMethods) {
+      assert.throws(() => first.dispatch(method, { secret: CANARY }), (error) => error.code === 'SCHEMA');
+    }
+    assertNoPathOrCanary(ctx.current().stdout, ctx.dataDir, 'persisted first stdout');
+    assertNoPathOrCanary(ctx.current().stderr, ctx.dataDir, 'persisted first stderr');
+
+    first.quit();
+    await waitForChildSettled(ctx.current().child, SETTLE_MS, 'first persisted child did not reap');
+
+    const second = ctx.makeSupervisor();
+    const restarted = second.start();
+    assert.strictEqual(restarted.ok, true, 'restart did not start');
+    await waitUntil(() => {
+      throwIfSpawnFailed(ctx.current().child);
+      return second.bound === true;
+    }, READY_MS, 'restarted broker did not bind', ctx.current().child);
+    const relisted = await withDeadline(second.dispatch('account.list', {}), SETTLE_MS, 'restart list did not settle');
+    assert.deepStrictEqual(relisted, expected);
+    assert.ok(relisted.every((account) => account.locked === true));
+    second.quit();
+    await waitForChildSettled(ctx.current().child, SETTLE_MS, 'restarted child did not reap');
+    assertPrivateCwd(ctx.dataDir, { vaultIds: [accountA, accountB] });
+  });
+
+  await withDirectChild((ctx) => {
+    writeLockedAccounts(ctx, [accountB, accountA]);
+  }, async (ctx) => {
+    const { session } = await handshake(ctx, PARENT_NONCE, ACK_PARENT_PID, false);
+    const listReq = makeRequest(requestId(1), 1, 'account.list', {}, session, Date.now() + 10000);
+    const statusReq = makeRequest(requestId(2), 2, 'status.get', {}, session, Date.now() + 10000);
+    const lockReq = makeRequest(
+      requestId(3), 3, 'account.lock', { account_id: accountB }, session, Date.now() + 10000
+    );
+    const manageReq = makeRequest(requestId(4), 4, 'account.manage', {}, session, Date.now() + 10000);
+    ctx.child.stdin.write(Buffer.concat([
+      encodeFrame(listReq), encodeFrame(statusReq), encodeFrame(lockReq), encodeFrame(manageReq),
+    ]));
+    const replies = await waitNewFrames(ctx, 1, 4, SETTLE_MS, 'direct persisted methods did not complete');
+    assertResponse(replies[0], listReq.id, 1, session, expected);
+    assert.strictEqual(replies[1].kind, 'res');
+    assert.strictEqual(replies[1].result.broker, 'degraded');
+    assert.deepStrictEqual(replies[1].result.accounts, expected);
+    assertResponse(replies[2], lockReq.id, 3, session, {});
+    assertErrorEnvelope(replies[3], manageReq.id, 4, session, ERROR_UNAVAILABLE);
+    assertNoPathOrCanary(ctx.stdout, ctx.dataDir, 'direct persisted stdout');
+    ctx.child.stdin.end();
+    await waitForChildSettled(ctx.child, EXIT_MS, 'direct persisted child did not exit');
+    assertPrivateCwd(ctx.dataDir, { vaultIds: [accountA, accountB] });
+  });
+
+  await withDirectChild((ctx) => {
+    writeLockedAccounts(ctx, [accountA]);
+    const hostilePath = ctx.registerAccountFile('not-a-vault');
+    fs.writeFileSync(hostilePath, Buffer.from('hostile'));
+    fs.chmodSync(hostilePath, 0o600);
+  }, async (ctx) => {
+    const { session } = await handshake(ctx, PARENT_NONCE, ACK_PARENT_PID, false);
+    const listReq = makeRequest(requestId(1), 1, 'account.list', {}, session, Date.now() + 10000);
+    const statusReq = makeRequest(requestId(2), 2, 'status.get', {}, session, Date.now() + 10000);
+    ctx.child.stdin.write(Buffer.concat([encodeFrame(listReq), encodeFrame(statusReq)]));
+    const replies = await waitNewFrames(ctx, 1, 2, SETTLE_MS, 'hostile catalog replies did not complete');
+    assertErrorEnvelope(replies[0], listReq.id, 1, session, ERROR_UNAVAILABLE);
+    assertErrorEnvelope(replies[1], statusReq.id, 2, session, ERROR_UNAVAILABLE);
+    assertNoPathOrCanary(ctx.stdout, ctx.dataDir, 'hostile stdout');
+    assertNoPathOrCanary(ctx.stderr, ctx.dataDir, 'hostile stderr');
+    ctx.child.stdin.end();
+    await waitForChildSettled(ctx.child, EXIT_MS, 'hostile catalog child did not exit');
+    assertPrivateCwd(ctx.dataDir, {
+      vaultIds: [accountA],
+      accountFiles: ['not-a-vault'],
+    });
   });
 });
 

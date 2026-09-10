@@ -286,7 +286,7 @@ test('handshake: PID, session, diagnostics, timeout, and early exit failures nev
 
 test('dispatch: exact supervisor methods and closed parameter schemas are enforced after binding', () => {
   assert.deepStrictEqual(BROKER_METHODS, [
-    'status.get', 'account.list', 'account.lock', 'receiver.fresh',
+    'status.get', 'account.list', 'account.lock', 'account.manage', 'receiver.fresh',
     'intent.begin', 'intent.cancel', 'sync.subscribe',
   ]);
   const calls = [];
@@ -296,6 +296,7 @@ test('dispatch: exact supervisor methods and closed parameter schemas are enforc
     ['account.list', {}],
     ['sync.subscribe', {}],
     ['account.lock', { account_id: '00112233445566778899aabbccddeeff' }],
+    ['account.manage', {}],
     ['receiver.fresh', {
       account_id: '00112233445566778899aabbccddeeff', asset: 'ZEC',
       network: 'zec-testnet', request_id: 'ffeeddccbbaa99887766554433221100',
@@ -327,6 +328,7 @@ test('dispatch: exact supervisor methods and closed parameter schemas are enforc
     ['status.get', { extra: true }], ['account.list', []], ['sync.subscribe', null],
     ['account.lock', {}], ['account.lock', { account_id: '0'.repeat(31) }],
     ['account.lock', { account_id: '0'.repeat(32), extra: true }],
+    ['account.manage', { extra: true }],
     ['receiver.fresh', {}],
     ['receiver.fresh', { account_id: '0'.repeat(32), asset: 'ZEC', network: 'zec-testnet' }],
     ['receiver.fresh', { account_id: '0'.repeat(32), asset: 'ZEC', network: 'zec-testnet', request_id: '1'.repeat(32), extra: true }],
