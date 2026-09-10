@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE CORRECTION 01 RUNNING
+State: RUST EXECUTABLE SOURCE ACCEPTED — FOCUSED VALIDATION AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High, runtime.rs compile/warning correction only
-Authorized execution actor: none; Hermes expected-red task closed
+Authorized source actor: none; Grok closed
+Authorized execution actor: Hermes, exact executable validation handoff only
 Authorized integration actors: none
-Protected parent: reviewer publication after 5485ffac; one CURRENT-only launch allowed
+Protected parent: reviewer publication after 5118d7a6; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md), AGENTS.md and TESTING.md.
+[active task](HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md), AGENTS.md and TESTING.md.
 Transport acceptance: [collected acceptance](HERMES_BBD_WAL_011_TRANSPORT_GREEN_01.md#collected-acceptance-and-actor-incident--2026-09-09).
 Transport integrated/pushed at 5aada7eff5df4568232cd284dadd097c713a9c23. All 77 groups
 passed and response-settlement falsification worked. Preserve these results; no rerun.
@@ -28,21 +28,22 @@ loaded or enable custody/send operations. Preserve pending npm/policy changes an
 WAL-009 evidence. MapLibre work stays stopped. No Rust proof replay or release claim.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_RED_01.md,
-docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_EXECUTABLE_PRODUCTION_01.md,
+docs/handoff/HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md.
 Hermes outer 42355 collected on owner done, exit 0. Actual runtime session
 20260909_164019_e64925, nous / poolside/laguna-s-2.1:free. Saved tool result proves
 test exit 1, zero ok and nine missing-executable failures. Expected red accepted;
 no repeat. Its reporting and metadata-discovery deviations are corrected in the
 collected review of the red handoff; the draft evidence remains unintegrated and
 requires correction during later Hermes integration, not a report-only rerun.
-Grok outer 4288 collected on owner done, exit 0, with main.rs (7 lines) and runtime.rs
-(692 lines). Source review rejects the drop for a missing return lifetime on field()
-and unread parser payloads. Grok may correct only runtime.rs under the active
-handoff's Source Correction 01. Main, tests and all six prior inputs remain frozen.
-No tests, builds or integration authorized. Launch once in the same session
-a6f2c27a-175b-4f44-a414-6698acefa08b; collect on owner done/Continue. No actor polling.
-Source Correction 01 launched once from d04d579a; outer 12636, same session.
+Source Correction 01 outer 12636 collected on owner done, exit 0. Corrected runtime
+c579bf54af9e17abc2eb49b42c9a944cd6ec2b6be1e5d900963564f27ecd86e9 (692 lines)
+and frozen main are accepted for focused execution. No runtime success is claimed.
+Hermes may perform the exact formatting/build/lint/session-falsification/green
+sequence, preserve machine-readable output and write one validation evidence record.
+No integration or other source edits. Resume known Hermes session
+20260909_164019_e64925; metadata queries use that literal ID only, no rediscovery.
+Launch once; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

@@ -151,3 +151,24 @@ hash and line-count commands only. No history, directory discovery, tests/builds
 formatter/syntax/lint, network/dependencies, docs/evidence or Git mutation. Main and
 tests remain frozen. Report the runtime hash/lines and bounded changes, then stop.
 Hermes execution/integration remains closed pending source acceptance.
+
+### Source Correction 01 acceptance — 2026-09-09
+
+Accept the corrected source for focused execution. Outer 12636 collected on owner
+done, exit 0; exact-ID export of a6f2c27a-175b-4f44-a414-6698acefa08b shows four
+bounded runtime edits and read/search/identity commands, no tests/builds or Git
+mutations. Runtime is 692 lines, SHA-256
+c579bf54af9e17abc2eb49b42c9a944cd6ec2b6be1e5d900963564f27ecd86e9.
+Main remains 7 lines at 19b1651d88d85e5d968597eb26eeb62f76a11af56eaa311d60a55d3ef282736d.
+All six named frozen input hashes match at reviewer collection.
+
+field() now explicitly borrows its result from object. Boolean/array type tags no
+longer retain unread payloads; the array visitor still traverses every child via
+the depth-incremented seed and propagates errors. Duplicate/depth checks remain.
+No test, compiler, syntax or formatter was run by the reviewer. Runtime correctness
+and warnings remain for actual validation. The existing target directory is ext4.
+
+Hermes may run the exact executable-green handoff, including pinned formatter
+normalization of these two files and temporary restored session-check falsification.
+These are bounded execution mutations, not authority for source repair. Grok is
+closed. Integration follows reviewer collection of the actual results.
