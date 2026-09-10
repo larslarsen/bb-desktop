@@ -1,24 +1,27 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: STARTUP PREREQUISITE — AWAITABLE SHUTDOWN TEST SOURCE AUTHORIZED
+State: SHUTDOWN TEST DROP REJECTED — BOUNDED CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; two new test paths only
+Authorized source actor: Grok Build, grok-4.6 High; shutdown test correction only
 Authorized execution actor: none
 Authorized integration actor: none
-Protected parent: reviewer publication following a9b92048; one CURRENT-only launch allowed
+Protected parent: reviewer publication following a12e2b6d; one CURRENT-only launch allowed
 
 Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
 and [active shutdown test contract](GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
-Only writes: test/walletSupervisorShutdown.node.js and
-test/fixtures/wallet-broker/shutdown-child.js. No production or other test edits.
+Only write: test/walletSupervisorShutdown.node.js. Initial hash f4531ced, 886 lines.
+The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8. No production edits.
 
 Reviewer found quit() returns before child closure. Before Electron can await
 cleanup during normal quit, the supervisor needs a shared shutdown Promise with
 close-event completion and a fixed 1500 ms failure deadline. Existing cancellation,
 250 ms kill escalation and synchronous quit semantics remain. See the active
 contract for lifecycle ordering, injected-clock and real-child assertions.
-Grok authors tests first and stops. No tests, builds, evidence or Git mutations.
+Initial drop rejected: early SIGTERM races handler setup, asynchronous event
+assertions bypass cleanup, close-wait timeout leaks a listener and teardown can
+leave promises unsettled. Correct only the four findings in the handoff review.
+No tests, builds, evidence or Git mutations; missing-API red is not yet authorized.
 
 Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
 reversal falsification and restored green. Rust executable at 31a6e540 retains
@@ -36,9 +39,9 @@ tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
-One Grok invocation; collect on owner done/Continue. No actor polling.
-Grok launched once from a45b0290; outer 20254, session
-6d0b7d41-29c1-4ed8-bda9-7225b190f34b, requested grok-4.6 High, no subagents.
+Grok outer 20254 collected on owner done, exit 0; session
+6d0b7d41-29c1-4ed8-bda9-7225b190f34b. Source review rejects this drop for execution.
+One correction invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

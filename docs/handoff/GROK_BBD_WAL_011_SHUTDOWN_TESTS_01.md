@@ -150,3 +150,73 @@ targeted green. Reviewer will fix exact mutation/commands after source review.
 No dependency, build input, renderer privilege, endpoint or release-content change
 is authorized. Existing security-policy failures remain separate and unwaived.
 Final application/release security gates remain required at that later stage.
+
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Decision: reject the initial drop for execution; authorize bounded test-source
+correction only. Outer 20254 collected on owner done with exit 0. The exact-ID
+Markdown export of 6d0b7d41-29c1-4ed8-bda9-7225b190f34b shows writes only to the
+two authorized new files, named source reads/searches and read-only status/identity
+commands. Two existence-check commands used a shell separator/echo despite the
+separate-command instruction. Exported read ranges were shifted by one line.
+No tests, syntax/build execution, production edits or Git mutations appear. This
+is a summarized tool inventory, not a raw result audit or execution acceptance.
+
+Measured test/walletSupervisorShutdown.node.js: 886 lines, six Linux groups,
+SHA-256 f4531ced2c6851a7dac480519b5ec696e407b2c8aa63838eba4492272bcffac8.
+Measured shutdown-child.js: eight lines, SHA-256
+0d8fbfa8179338a8fc05e6c41f4cbbf0ef652c4ccadd73db8876591a51f96dcb.
+All four baseline production/transport identities remain unchanged. Independent
+review confirms the intent ID is valid (32 hex characters). No suite was executed.
+
+The fake-clock boundary cases, cancellation ordering, shared-Promise expectations,
+late-close outcome and empty-only cwd cleanup are retained. The six groups/ten
+subcases are authored coverage, not passed tests. Missing-API red would skip the
+following defects, so repair them before authorizing that red.
+
+1. The spawn wrapper sends SIGTERM immediately after childProcess.spawn, before
+   the child has run shutdown-child.js. The ignored-SIGTERM group enables it with
+   sigtermBeforeAttach:true (original lines 406 and 863). That can terminate the
+   process under the default signal disposition before its handler is installed.
+   Remove the option and this early kill entirely, including now-unused options
+   plumbing and misleading assertion text. Use successful handshake as the
+   readiness barrier: the frozen wrapper installs the handler before producing
+   hello. Then let supervisor.shutdown() send SIGTERM normally and require actual
+   close with SIGKILL. Do not add a sleep or a second probe signal.
+2. Real-child close callbacks at original lines 783–803 and 845–847 throw assertions
+   from asynchronous EventEmitter callbacks. Such throws bypass the async test's
+   try/finally and may terminate the runner before cleanup. Callbacks must only
+   capture event-time facts (including pending-request/shutdown state and signal)
+   or settle an already-observed event Promise; put assertions in the awaited test
+   flow. Preserve the event-time ordering checks and bounded cleanup on failure.
+   After shutdown fulfillment, assert actual captured child/stdin/stdout/stderr
+   close facts; remove the permissive `closed || stream.destroyed` substitutions.
+   Do not substitute a post-cleanup close for closure observed at fulfillment.
+3. waitForMarkedClose (original lines 343–364) leaves its close listener registered
+   after a timeout. Use one settle/cleanup path that always clears its timer and
+   removes only its own listener on close, timeout and the already-closed race.
+   Keep rejection on timeout, and preserve unrelated listeners. No suppression of
+   failure or unbounded waits.
+4. Complete teardown of tracked resources: fake-harness finally blocks currently
+   only call quit(), leaving any newly created shutdown Promise pending if an
+   assertion fails before simulated close. In teardown, signal fake close and
+   flush observed Promise settlement without altering the assertions being proved.
+   Real harness cleanup must also observe outstanding public/shutdown Promises and
+   clear any test-owned event observers/timers on failure. Track them as needed;
+   bound any wait. Preserve the original assertion alongside cleanup errors and
+   do not report a timeout, failed reaping or unobserved closure as success.
+
+Correction actor: Grok Build, grok-4.6 High, no subagents. Protected parent is the
+reviewer publication following a12e2b6d, plus one CURRENT-only launch commit.
+Only write test/walletSupervisorShutdown.node.js. The eight-line shutdown-child.js
+is now frozen; no fixture/protocol/production semantics change or new case matrix.
+Keep six Linux groups and the existing Windows skip behavior. Bounded helper
+refactoring for the four findings is permitted; no unrelated cleanup.
+
+Read CURRENT lines 1–40 only, this final review, AGENTS.md/TESTING.md if needed,
+the affected test and frozen shutdown-child.js. Named baseline hashes and separate
+read-only HEAD/status/count commands are allowed; no history, broader source reads,
+command chains, Node/test/syntax/build execution, network, credential/config/home
+discovery, docs/evidence edits or Git mutations. Report resulting hash, lines,
+groups and corrections, then stop. Hermes execution/integration remains closed.
