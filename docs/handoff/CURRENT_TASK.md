@@ -3,8 +3,9 @@
 Ticket: BBD-WAL-013
 State: NATIVE ACCOUNT MANAGEMENT — SERVICE AND WINDOW TESTS AUTHORIZED
 Reviewer: Codex
-Authorized source: Grok grok-4.6 High, no subagents
-Authorized execution/integration: none until source review
+Authorized source: Grok runtime tests; Sol native-window test correction, no subagents
+Authorized execution: Hermes service expected-red under HERMES_BBD_WAL_013_ACCOUNTS_RED_01.md
+Integration: none
 
 Owner explicitly selected account management after WAL-011 startup completion.
 Active contract: GROK_BBD_WAL_013_ACCOUNTS_01.md.
