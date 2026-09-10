@@ -1,18 +1,14 @@
 # Current Task
 
-BBD-WAL-013 — native account management, FINAL VERIFICATION
-Reviewer Codex. Owner requested complete usable native Zcash TESTNET create/list/
-unlock/manual+idlelock/encryptedexport/confirmedrestore. Paymentsdisabled.
-Allsourceactors collectedclosed. No sourceauthoring authorized.
-Functional evidence accepted:103Rusttests +104JSgroups, actualstagednativewindow
-open/hide/reopen/close and appstartup; menu, EOF, origin, deadline, confirmation
-falsifications detected/restored. NativeClippy andno-defaultbincheckgreen.
-Activeexecution only HERMES_BBD_WAL_013_FINAL_WINDOW_SECURITY_01.md: actualwindow
-falsification/restoredbuild, advisorychecks, policybaseline, pinnedsecret scans.
-Allinputs pinned/frozen exceptexacttemporarymutation/restoration. No integration yet.
-Afterreview, Hermesexactsource/test/evidence integration+commit+push, reviewerclosure.
-Preserveunrelatednpm/policypaths and twohistoricaldrafts. Sixinheritedpolicyfailures
-and Rustinventory releaseblocker remain explicit. No installer/package detour.
-No ownerdone relay; collectactualexecution andcompletework withstatus<=60sec.
-Full execution/source history in handoffs/ticket/Git; latestnativefinish raw
-wallet-broker/target/wal013-native-ui-green-finish-01.json.
+BBD-WAL-013 native account management — final window/security verification.
+Reviewer Codex; continued documented Sol escalation for source, Hermes execution.
+Account service/UI/runtime implemented. Accepted 103 Rust tests and 104 JS groups;
+menu/origin/deadline/restore-confirmation/EOF falsifications detected and restored.
+Actual native startup/open/hide/reopen/EOF passes. Framework first blank-frame mapping
+made initial snapshot race; corrected readiness requires one real unmapped window
+stable 250ms. Final opening suppression and security checks:
+HERMES_BBD_WAL_013_FINAL_WINDOW_SECURITY_03.md, after source actor collected closed.
+All production frozen, exact temporary mutation/restoration only. No source authoring.
+Then reviewer acceptance, Hermes exact source/test/evidence integration and commit/push.
+Preserve unrelated npm/policy files and historical drafts. Inherited six policy failures
+and Rust inventory release blocker stay explicit; no installer detour or owner relay.
