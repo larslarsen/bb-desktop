@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE CORRECTION 01 AUTHORIZED
+State: EXECUTABLE EXPECTED RED ACCEPTED — RUST SOURCE CORRECTION 01 RUNNING
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High, runtime.rs compile/warning correction only
 Authorized execution actor: none; Hermes expected-red task closed
@@ -42,6 +42,7 @@ and unread parser payloads. Grok may correct only runtime.rs under the active
 handoff's Source Correction 01. Main, tests and all six prior inputs remain frozen.
 No tests, builds or integration authorized. Launch once in the same session
 a6f2c27a-175b-4f44-a414-6698acefa08b; collect on owner done/Continue. No actor polling.
+Source Correction 01 launched once from d04d579a; outer 12636, same session.
 
 ## Historical record (superseded by the active state above)
 
