@@ -1,29 +1,31 @@
 # Current Task
 
-BBD-WAL-014 native Zcash Receive and explicit unsynced balance status are COMPLETE.
-Source aad0bdd003af823dd6cbfa55994e4692555b3d43 and integration evidence
-648050628bf2916ca7f192e7585ce169e3a76833 are pushed to origin/master.
+WAL-015 native live Zcash TESTNET balance synchronization is COMPLETE.
+Source edda35308913d59683a08be58052dc7c2d95dbaf and integration evidence
+105a2e36af03d26dbc15a3d052901d836b2a63b5 are pushed to origin/master.
+No implementation or background actor work remains authorized by this ticket.
 
-Owner reconfirmed the original architecture includes a basic Zcash wallet inside the
-broker. Wallet → Manage accounts → select/unlock → Receive now produces a durable,
-account-bound Zcash TESTNET Orchard-only Unified Address and offers Copy address.
-Balance displays “Balance unavailable — not synced”; live chain synchronization is
-not connected. Existing encrypted accounts/vault format are compatible. No user
-profile was read or changed by tests. Quit and reopen BitBook to load the rebuilt broker.
+Restart BitBook, then Wallet -> Manage accounts -> select/unlock -> Sync balance ->
+Sync. The server is editable; default https://testnet.zec.rocks:443 uses direct TLS.
+The native screen shows connection disclosure, progress, cancellation and confirmed/
+pending received shielded funds. First sync covers history from testnet NU5; restart
+resumes committed progress. Receive/Copy and existing account custody remain intact.
+No user profile was read or modified. Mainnet and payments remain disabled.
 
-Accepted 82 Rust tests and 28 distinct JS groups, including actual-manager native UI
-pointer/copy/persistence proof and native window smoke on virtual plus actual desktop.
-Both high-value falsifications detected and exact source restored. Production Clippy
-and pinned directory/committed Gitleaks passed. Reviewer checked both host screenshots,
-all ten integrated source/test/execution blobs and all pins. All actors exited.
-No background work or further source authoring is authorized.
+Accepted111distinctRusttests,28appJSgroups,33manifestpolicygroups; productionClippy;
+real crash/journal recovery falsification and exactrestore; native UI pointer proof;
+Xvfb and actualdesktopwindowproof; dependency audit with no newvulnerabilities.
+Final staged Linux x64 broker SHA256:
+6c2880cef4eafc5b36e09f47428d4f9ace98deed0f62703c7bab6fd3a7c909f7
+552181016bytes. All37integratedblobs independentlyverified. All executionCLIactors exited.
 
-Final staged Linux x64 binary SHA256:
-5ed35fe09b1172b2639faa6170621fca60fe99825636398b78fe1bd382509ae4.
-WAL013 X11/XWayland and fixed Mesa software GLX rendering settings remain intact.
-The account window is initially hidden and opens through Wallet → Manage accounts.
+Six inheritedsecurity-policy failures and7oldtest-helperlintwarnings remain release
+blockers. Gitleaks exits1 for verified publicfilechecksums in WAL015generatedrecords:
+184directory/32committedfindings in integration, zero actualsecretfindings after exact
+captured-value comparison to4recomputedpublicfilechecksums. Rules/config/ignore unchanged;
+never describe that scan as exit0. See ticket exception and integration evidence.
+No installer or release-ready claim. Original npm/policyworkingedits and2historical
+untracked evidence drafts preserved; only5WAL015policychanges staged on originalHEAD.
 
-See tickets/BBD-WAL-014.md and docs/testing/BBD-WAL-014-RECEIVE-GREEN-03.md / INTEGRATION-01.md.
-Six inherited security-policy failures remain release blockers; seven pre-existing
-test-helper Clippy warnings are also recorded. No installer/mainnet/payment/live-balance
-claim. Four unrelated npm/policy edits and two historical evidence drafts are preserved.
+See tickets/BBD-WAL-015.md and docs/testing/BBD-WAL-015-LIVE-INTEGRATION-01.md.
+All earlier WAL015handoff authorizations and failures are historical execution records.

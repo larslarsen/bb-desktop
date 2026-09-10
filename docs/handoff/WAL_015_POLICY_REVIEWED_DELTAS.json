@@ -1,0 +1,26 @@
+{
+  "scripts/security-policy.js": [
+    [
+      "    'zcash_client_backend = { version = \"=0.24.0\", default-features = false, features = [\"pczt\"] }',",
+      "    'zcash_client_backend = { version = \"=0.24.0\", default-features = false, features = [\"lightwalletd-tonic\", \"pczt\"] }',"
+    ],
+    [
+      "    'unicode-normalization = { version = \"=0.1.25\", default-features = false, features = [\"std\"] }',\n  ];",
+      "    'unicode-normalization = { version = \"=0.1.25\", default-features = false, features = [\"std\"] }',\n    'tonic = { version = \"=0.14.6\", default-features = false, features = [\"channel\", \"tls-ring\", \"tls-webpki-roots\"] }',\n    'tokio = { version = \"=1.52.3\", default-features = false, features = [\"rt\", \"net\", \"time\", \"macros\"] }',\n    'prost = { version = \"=0.14.4\", default-features = false, features = [\"std\"] }',\n    'incrementalmerkletree = { version = \"=0.8.2\", default-features = false, features = [\"legacy-api\"] }',\n  ];"
+    ],
+    [
+      "  if (/\\bgit\\s*=|\\*\"|reqwest|tokio|keyring|monero|openssl/i.test(manifestText)) {\n    throw new PolicyError('wallet Rust manifest contains forbidden dependency authority');\n  }",
+      "  const forbiddenDependencyText = manifestText.replace(\n    'tokio = { version = \"=1.52.3\", default-features = false, features = [\"rt\", \"net\", \"time\", \"macros\"] }\\n',\n    ''\n  );\n  if (/\\bgit\\s*=|\\*\"|reqwest|tokio|keyring|monero|openssl/i.test(forbiddenDependencyText)) {\n    throw new PolicyError('wallet Rust manifest contains forbidden dependency authority');\n  }"
+    ]
+  ],
+  "test/securityPolicy.node.js": [
+    [
+      "    ['features = [\"pczt\"]', 'features = [\"pczt\", \"sync\"]'],",
+      "    [\n      'features = [\"lightwalletd-tonic\", \"pczt\"]',\n      'features = [\"lightwalletd-tonic\", \"pczt\", \"sync\"]',\n    ],"
+    ],
+    [
+      "  assert.deepStrictEqual(xmrAuthorityDependencies, [WAL007_DIRECT_DEPENDENCY]);",
+      "  assert.deepStrictEqual(xmrAuthorityDependencies, [\n    WAL007_DIRECT_DEPENDENCY,\n    'tokio = { version = \"=1.52.3\", default-features = false, features = [\"rt\", \"net\", \"time\", \"macros\"] }',\n  ]);"
+    ]
+  ]
+}

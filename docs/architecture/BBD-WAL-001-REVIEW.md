@@ -2142,12 +2142,14 @@ the broker manage its authenticated loopback lifecycle. Support normal and porta
 installations. Do not bundle/download it in v1 and do not require the user to start wallet
 RPC. Node (`monerod`) remains user-controlled and local-only.
 
-**Q2. Built-in ZEC light endpoint.** Leave lightwalletd URL empty until the
-user sets one; ship a configurable default list; or later bundle/run a local
-compact-block source. This review rejects a mandatory centralized default.
+**Q2. Built-in ZEC light endpoint — RESOLVED 2026-09-10.** The owner delegated
+this choice to engineering. WAL-015 provides an editable suggested testnet endpoint
+and Custom. Sync requires an explicit native action; no mandatory centralized
+endpoint or silent fallback. See BBD-WAL-015-LIVE-SYNC-REVIEW.md.
 
-**Q3. IP privacy for ZEC compact-block download.** Require Tor/proxy, offer
-it, or document the leak and defer.
+**Q3. IP privacy for ZEC compact-block download — RESOLVED 2026-09-10.** Under
+the same owner delegation, WAL-015 uses direct TLS and explains in the native sync
+screen that the selected server sees the connection IP. Tor/proxy support is deferred.
 
 **Q4. Unbound payment requests.** v1 recommendation is payer-bound requests
 only (empty `payer_peer_id` is `SCHEMA`). Owner may allow "anyone may pay
