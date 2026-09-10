@@ -1,21 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUNTIME PACKAGE SOURCE ACCEPTED — GREEN AND LINUX PACKAGE PROOF AUTHORIZED
+State: RUNTIME PACKAGE VALIDATION ACCEPTED — SEVEN-PATH INTEGRATION AUTHORIZED
 Reviewer: Codex
 Authorized source actor: none
-Authorized execution actor: Hermes, exact green/package-proof driver once
-Authorized integration actor: none
+Authorized execution actor: none
+Authorized integration actor: Hermes, exact integration driver once
 
-Read [runtime package validation](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_GREEN_01.md).
-Helper 97d04b44 and three reviewed packagers frozen; test 5d8a8bf2 frozen.
-Seven package + nine resolver + 30 Electron groups, falsification, policy/scans,
-then preserved-old-artifact Linux package/extraction proof. No native broker start.
-Hermes outer 18673 launched against ce95e12e; reviewer collects directly.
+Read [runtime package integration](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_INTEGRATION_01.md).
+Seven package + nine resolver + 30 Electron groups, falsification/restoration green.
+Audit and both Gitleaks scans pass. Actual Linux package inventory and sandbox pass.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Six inherited policy failures and Rust-inventory checker failure remain blockers.
-Reviewer publication: CURRENT_TASK.md, runtime-package production/green handoffs,
-and ticket only. Preserve unrelated pending files; no recursive cleanup.
+Reviewer publication: CURRENT_TASK.md, runtime-package green/integration handoffs,
+and ticket only. Preserve unrelated pending files and all retained artifacts.
 Whole WAL-011 incomplete; native pins/startup follow. No release acceptance.
 
 ## Historical record (superseded by the active state above)

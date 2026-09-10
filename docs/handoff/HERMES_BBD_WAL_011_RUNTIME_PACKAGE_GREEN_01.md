@@ -199,3 +199,34 @@ finally:
 sys.exit(0 if record['component_green'] else 1)
 
 ```
+
+## Component validation accepted — 2026-09-10
+
+Outer 18673 completed exit 0. Accept seven package groups/44 cases, nine resolver
+groups, 30 Electron groups, both Bash syntax checks; removing preload produced
+the expected exact-inventory assertion, source restored and all seven passed again.
+Both policy commands have byte-identical output/exits to red baseline. Six policy
+groups and Rust-inventory checker remain release blockers; release_green=false.
+npm audit found zero vulnerabilities. Pinned Gitleaks 8.30.1 Git and directory
+scans found no leaks (5261 commits and approximately 1.83 GB directory content).
+
+Actual Linux x64 .deb build/extraction passed, five packaged hashes/modes match
+source, nested imports resolve, chrome-sandbox is root/root mode 4755 in archive.
+New package dist/bitbook_0.1.0_amd64.deb: 95,946,046 bytes, SHA-256
+544127be43fa4474eaf6903f660131d64f840b64fd3f7cb8562ea8dfae924672.
+Old package preserved at dist/bitbook_0.1.0_amd64.pre-wal011-runtime-package-01.deb,
+SHA-256 67f074224711c249767fd86112cd2f84007d275dbd74283baa917c4f1bfff8f2.
+Retained staging dist/bitbook-deb.umbyu6; extraction
+wallet-broker/target/wal011-runtime-package-extract-01. No artifact deleted.
+
+All 23 frozen inputs still match. Reviewer verified raw/evidence normalized JSON
+equality and both artifact hashes. Raw 325 lines, SHA-256
+85e704fd61c64f0b01db2990cbbbd75ae651def3ff0a8b747672b2e9dc668d9e.
+Evidence 331 lines, SHA-256
+e56fcc0ef2bbb27c5557800a8b5b44b2c185afa8760d5798c90c51cdc9718d29.
+Session 20260910_080216_f2307a, nous / poolside/laguna-s-2.1:free; actual Hermes
+v0.18.2 (2026.7.7.2), upstream 67764dc0/local 10b6d1a9, Python 3.11.15.
+HEAD fbaf8045. Messages 80438–80445 show handoff read, exact driver launcher
+with workdir, one wait and report. No extra commands or mutations. Reviewer ran
+no acceptance commands. Hermes closed; only seven-path integration is authorized.
+This accepts the inventory component, not release/native-wallet readiness.
