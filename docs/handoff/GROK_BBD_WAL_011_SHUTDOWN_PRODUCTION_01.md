@@ -82,3 +82,32 @@ Electron suites are not replayed. Falsification will resolve shutdown at initiat
 before child close; the held-close case must fail, then exact source restoration
 and focused green must pass. Reviewer will specify the exact mutation and driver
 after inspecting the drop. No execution or integration is authorized for Grok.
+
+
+## Collected source acceptance — 2026-09-09
+
+Accept source for focused validation, not runtime completion. Outer 79618 collected
+on owner done with exit 0. wallet-broker/supervisor.js is 631 lines, SHA-256
+c1410bfc5cd4c205ad014a42154c9d9d9714794b134a5acab7ed499934cad51a;
+diff is 57 insertions/10 deletions. All frozen test/fixture/protocol hashes match.
+
+Review confirms one stored non-async Promise, state initialized before quit,
+separate childClosed observation, fixed TIMEOUT at 1500 ms, deadline cleanup and
+unchanged terminal rejection after late close. The existing quit body was moved
+into a local helper unchanged, shared by public quit and shutdown. The post-SIGTERM
+childClosed guard prevents installing a kill timer after synchronous close. There
+are no per-call listeners or main/startup/packaging changes. Close notification
+queues fulfillment one microtask later; that is still close-driven completion and
+does not add a new timer. It is not yet evidence of any passed runtime assertion.
+
+Exact-ID Markdown export of 526aece7-e036-410b-a903-090c6f680174 shows named source
+reads/searches, separate read-only baseline/status/hash/count commands and edits
+only to supervisor.js. A read-only path-scoped diff-stat command was also used.
+No tests, syntax/build commands, docs/evidence edits or Git mutations appear. The
+actor's phrase “no Git” means no Git mutations; read-only Git is present. The
+export is a tool summary, not a raw result audit. Reviewer ran no acceptance command.
+
+Grok is closed. Only the linked
+[Hermes focused validation driver](HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md) is
+now authorized. No integration or source repair is authorized. Existing test
+failures, if any, require reviewer interpretation; tests must not be weakened.

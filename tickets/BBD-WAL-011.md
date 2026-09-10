@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Shutdown expected red accepted; bounded supervisor production authorized.
+Status: Shutdown production source accepted; focused validation authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -87,12 +87,15 @@ Promise/timer cleanup. Test source is frozen at 69eb8bcb (983 lines, six Linux
 groups); the wrapper stays at 0d8fbfa8.
 [Observed expected red](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_RED_01.md#collected-expected-red-acceptance--2026-09-09)
 is accepted: zero ok/six absent-API failures, Node exit 1, unchanged inputs.
-Only the [Grok supervisor production contract](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md)
-is authorized; execution, test edits and integration are frozen.
+The [Grok supervisor source](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTION_01.md#collected-source-acceptance--2026-09-09)
+is accepted at c1410bfc (631 lines). Only the
+[Hermes focused validation driver](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md)
+is authorized; tests and integration are frozen. Exact automatic falsification and
+restoration are the only permitted production mutation during validation.
 Future shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or
 absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
-supervisor edits are now authorized within the linked contract; no integration is authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
+source is accepted under the linked contract; no integration is authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
 affected lifecycle regressions and early-completion falsification.
 
 Startup pin provenance remains as specified in architecture section 4.2: reviewed
