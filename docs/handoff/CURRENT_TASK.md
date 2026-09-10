@@ -1,27 +1,29 @@
 # Current Task
 
-BBD-WAL-014 is IN PROGRESS. Focused red accepted: only missing receive APIs.
-Sol gpt-5.6-sol High owns production under SOL_BBD_WAL_014_RECEIVE_PRODUCTION_01.md
-(four production files and two narrow cleanup-helper refinements). No execution/Git.
-Owner reconfirmed the original broker-with-built-in-Zcash
-architecture and authorized continuing receive/balance work. Grok may author ONLY
-the two test paths in GROK_BBD_WAL_014_RECEIVE_TESTS_01.md. Production is frozen
-until reviewed red. Native receive uses existing adapter; balance remains explicitly
-unavailable until live sync exists. See tickets/BBD-WAL-014.md. No user profile access.
+BBD-WAL-014 native Zcash Receive and explicit unsynced balance status are COMPLETE.
+Source aad0bdd003af823dd6cbfa55994e4692555b3d43 and integration evidence
+648050628bf2916ca7f192e7585ce169e3a76833 are pushed to origin/master.
 
-Previous completed task:
+Owner reconfirmed the original architecture includes a basic Zcash wallet inside the
+broker. Wallet → Manage accounts → select/unlock → Receive now produces a durable,
+account-bound Zcash TESTNET Orchard-only Unified Address and offers Copy address.
+Balance displays “Balance unavailable — not synced”; live chain synchronization is
+not connected. Existing encrypted accounts/vault format are compatible. No user
+profile was read or changed by tests. Quit and reopen BitBook to load the rebuilt broker.
 
-BBD-WAL-013 native account management and actual-desktop empty-window correction
-are COMPLETE. Correction source 25113d5dbf9bc72c058c9f22e9398afde1576f24 and evidence
-f2973f0931c978eb47f3985a16dc606b0bb0e120 are pushed to origin/master.
-Owner confirmed opening the window through Wallet → Manage accounts.
+Accepted 82 Rust tests and 28 distinct JS groups, including actual-manager native UI
+pointer/copy/persistence proof and native window smoke on virtual plus actual desktop.
+Both high-value falsifications detected and exact source restored. Production Clippy
+and pinned directory/committed Gitleaks passed. Reviewer checked both host screenshots,
+all ten integrated source/test/execution blobs and all pins. All actors exited.
+No background work or further source authoring is authorized.
 
-Broker uses X11/XWayland plus fixed Mesa software GLX on Linux. Actual host and
-Xvfb rendered controls, hide/reopen/normal EOF and process cleanup passed; reviewer
-inspected both host PNGs. Blank-render and renderer-setting falsifications passed.
-Reviewer independently checked the exact 12 correction commit blobs and input pins.
-All actors exited. No background work or further source authoring is authorized.
+Final staged Linux x64 binary SHA256:
+5ed35fe09b1172b2639faa6170621fca60fe99825636398b78fe1bd382509ae4.
+WAL013 X11/XWayland and fixed Mesa software GLX rendering settings remain intact.
+The account window is initially hidden and opens through Wallet → Manage accounts.
 
-See tickets/BBD-WAL-013.md and the BLANK-WINDOW-GREEN-02 / INTEGRATION-01 evidence.
-Six inherited policy failures remain release blockers. Four unrelated npm/policy
-edits and two historical evidence drafts are preserved. No installer/driver changes.
+See tickets/BBD-WAL-014.md and docs/testing/BBD-WAL-014-RECEIVE-GREEN-03.md / INTEGRATION-01.md.
+Six inherited security-policy failures remain release blockers; seven pre-existing
+test-helper Clippy warnings are also recorded. No installer/mainnet/payment/live-balance
+claim. Four unrelated npm/policy edits and two historical evidence drafts are preserved.
