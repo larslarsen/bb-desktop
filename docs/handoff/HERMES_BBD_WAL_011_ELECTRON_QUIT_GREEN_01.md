@@ -145,3 +145,41 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+## Collected validation acceptance — 2026-09-09
+
+Accept focused validation and falsification; no replay. Outer 77990 collected on
+owner done, exit 0. Exact stages in the saved record:
+
+| Stage | Exit | Result |
+| --- | --- | --- |
+| Electron green | 0 | 30 ok/zero not ok |
+| Preload green | 0 | six ok/zero not ok |
+| Selected early-quit falsification | 1 | ERR_ASSERTION, actual 1/expected 0 at test line 1419 |
+| Restored Electron green | 0 | 30 ok/zero not ok |
+
+Full green completes all seven new quit groups/eight authored cases, including
+both rejection rows. The mutant 12896f8c was restored in finally to main c7687b52;
+all nine accepted inputs match before/after and at collection. No timeout,
+cleanup failure or unrelated failing assertion appears. This proves controlled
+main callback/preload behavior, not real Electron-to-Rust startup or release gates.
+
+Actual session 20260909_212608_cf8d10, nous / poolside/laguna-s-2.1:free.
+Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15.
+Observed HEAD 743552a0c163ac8fcb8da9e240ccb6b5c96d0a21. Exact-session tool inventory
+80368–80376 shows bounded document reads, one exact extraction launcher, one wait
+and final report. No unrequested commands, repairs or Git mutations appear.
+The final report incorrectly described 30 lines as including six preload checks;
+the raw stage outputs establish 30 plus six distinct groups, followed by a repeat
+of the 30 Electron groups. Evidence already records this correctly; no rewrite.
+
+Reviewer verified exact normalized evidence/raw JSON equality:
+
+- wallet-broker/target/wal011-electron-quit-green-01.json: 126 lines,
+  SHA-256 d242b83d099d0bc006705aa4c2593a8843cf9470168273c900c282f56da8fceb.
+- docs/testing/BBD-WAL-011-ELECTRON-QUIT-GREEN-01.md: 132 lines,
+  SHA-256 6bbe4e88de9980f3856b7ffea53df210fe8650ac935618fe3ddfbe5f5e6d8b0e.
+
+Validation is closed. Only the [four-path integration handoff](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md)
+is authorized. No source repair, evidence rewrite or further execution is needed.
+Reviewer ran no tests or acceptance commands.

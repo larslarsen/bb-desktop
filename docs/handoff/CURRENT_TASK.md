@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT VALIDATION ACTOR LAUNCHED — AWAITING COLLECTION
+State: ELECTRON QUIT VALIDATION ACCEPTED — INTEGRATION AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: none
-Authorized execution actor: Hermes, exact focused driver only
-Authorized integration actor: none
+Authorized execution actor: none
+Authorized integration actor: Hermes, exact four-path driver only
 Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
 Read this active prefix (lines 1–40) and
-[Hermes quit focused validation](HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md).
-Only its exact extraction launcher, once, with repository workdir is authorized.
-No independent commands, repairs, source/test edits or integration.
-Hermes outer 77990 launched once against 8cf47129; actual session is driver-recorded.
-Collect on owner done/Continue. No actor polling or additional launch.
+[Hermes quit integration](HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md).
+Only its exact extraction launcher once, with repository workdir, is authorized.
+No independent commands, repair, evidence rewriting, tests or validation replay.
+Validation outer 77990 collected exit 0. Integration launch pending publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
-Accepted main c7687b52 (205 lines) awaits one shutdown Promise inside the failure
-catch; no non-Promise approval fallback. Test source stays 7f759f81 (30 groups).
-All frozen source/test hashes and accepted red evidence match. Grok is closed.
-Execute 30 Electron groups, six preload groups, selected early-quit falsification,
-restore exact source, then 30-group Electron green. Full details in driver only.
-Expected mutation rejection: initial quit count 1 versus 0 at test line 1419.
-Temporary mutant/restoration is the only source mutation authorized to Hermes.
-A failure stops the driver after restoration; no repair or rerun. No green yet.
+Accepted validation: 30 Electron groups, six preload groups; selected early-quit
+falsification failed at line 1419 (actual 1/expected 0), exact main restoration,
+then restored Electron green passed all 30. Nine input identities match.
+Main c7687b52 (205 lines), test 7f759f81 (2026 lines/30 groups) are frozen.
+Red evidence 229c1a97 and green evidence 6bbe4e88 match their exact raw records.
+Only these four source/test/evidence files may be staged, committed and pushed.
+Actual validation session: 20260909_212608_cf8d10, nous/poolside/laguna-s-2.1:free.
+Validation is closed; no result correction or source change is needed.
 
-Accepted expected red: 23 prior groups passed/seven absent-handler failures.
+The gate waits for shutdown, allows approved re-entry and blocks failure with one
+fixed error box. Startup and native wallet availability remain incomplete.
 Shutdown, transport, degraded Rust executable and async IPC acceptance is retained.
-Whole WAL-011 remains incomplete: pinned startup and native account flows remain.
 No startup, self-pinning, package expansion or release acceptance is authorized.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md,
-docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md.
-Preserve four pending npm/policy files, WAL-009 evidence, current quit test/evidence
-and rejected EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
+tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_GREEN_01.md,
+docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md.
+Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
+EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 stays parked.
 No credential/config discovery. Future CURRENT reads specify lines 1–40.
 Hermes metadata uses the exact session key and row only, without fallback.
-The raw record directory wallet-broker/target was verified ext4 this turn.
+The raw record directory wallet-broker/target is ext4; raw artifacts stay untracked.
 
 ## Historical record (superseded by the active state above)
 

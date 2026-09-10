@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron quit production correction accepted; focused validation authorized.
+Status: Electron quit validation accepted; four-path integration authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -145,6 +145,11 @@ subscription shares the failure guard. Grok is closed. Only the
 authorizes 30 Electron groups, six preload groups, selected premature-quit
 falsification and exact restoration followed by 30-group Electron green.
 No production repair or integration is authorized before collected acceptance.
+Collected validation is now accepted: 30 Electron and six preload groups passed,
+selected early-quit falsification failed at the intended assertion, exact main
+restoration was verified, and restored Electron green passed all 30 again.
+Only the [four-path Hermes integration](../docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_INTEGRATION_01.md)
+is authorized next, without source/evidence rewrite or validation replay.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
