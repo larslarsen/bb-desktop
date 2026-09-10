@@ -8,6 +8,10 @@ Authorized execution/integration actor: none until source review
 
 Active contract: [startup](GROK_BBD_WAL_011_STARTUP_01.md).
 Only tests and minimal existing Electron mock compatibility authorized.
+Independent smoke source authorized by GROK_BBD_WAL_011_STARTUP_SMOKE_01.md.
+Live source: Grok startup session 09da707c-f25b-4330-a3e0-d73d48e60c10 (outer 45126);
+Grok smoke session 185841d2-76a1-4232-a9b0-973ad3168268 (outer 6373).
+Disjoint test paths; no production or test execution. Reviewer collecting both.
 Owner priority: finish local app-to-broker startup, no further installer detour.
 Reviewer stays with actors and collects/reviews/routes in the same turn.
 Provide meaningful status at least every 60 seconds; no repeated done required.
