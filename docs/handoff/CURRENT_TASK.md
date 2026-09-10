@@ -48,3 +48,8 @@ finish collectedexit0,92distinctJSgroups green, menu+EOFfalsifications detected 
 restored with7groupgreen aftereach. Exact finalhashes reviewed separately.
 Only pending sourceauthorization is SOL_BBD_WAL_013_NATIVE_UI_CORRECTION_01.md,
 account_ui.rs findings2and4. Allruntime/menu/tests frozen. Combinednative green follows.
+
+
+Current execution: HERMES_BBD_WAL_013_NATIVE_UI_GREEN_01.md; allsourceactors collected,
+no sourceauthor active. UI743095e4 corrected and reviewed; explicit3fileformatter,
+9widget+10regression tests, restorefalsification, Clippy. Runtime/nativebuild later.
