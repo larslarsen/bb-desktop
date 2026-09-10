@@ -105,3 +105,32 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+## Collected expected-red acceptance — 2026-09-09
+
+Accept observed expected red; no replay. Outer 82063 collected on owner done,
+exit 0. Node exited 1 with zero ok/five not ok, each at the explicit
+`packaged broker launch resolver is missing` assertion. All five registered groups
+are present in order; no cleanup, timeout, module-loading or unrelated error is
+reported. Production is absent before/after and at collection. The 58 fixture rows
+remain unexecuted; this establishes absence only, not configuration behavior.
+
+Actual session 20260909_221756_f0f9b6, nous / poolside/laguna-s-2.1:free.
+Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local 10b6d1a9, Python 3.11.15.
+Observed HEAD 118e6120f5d17f5702d2636cc772bf3663947553. All five input hashes
+match before/after and at reviewer collection. Exact-session tool inventory
+80386–80394 shows bounded CURRENT/handoff reads, one exact extraction launcher,
+one wait and final report. No extra command, source edit, repair or Git mutation
+appears. The report incorrectly called status clean at ab45d59c and said no tests
+were performed; raw metadata shows the actual HEAD, preserved pending files and
+the one authorized Node run. Evidence is already accurate; no rewriting needed.
+
+Reviewer verified exact normalized evidence/raw JSON equality:
+
+- wallet-broker/target/wal011-launch-config-red-01.json: 67 lines,
+  SHA-256 7b5201b7083d8bb2cb09cc3279baa221900a0c921d3e7b208f5553160d2d31bf.
+- docs/testing/BBD-WAL-011-LAUNCH-CONFIG-RED-01.md: 73 lines,
+  SHA-256 1c98fde59cd882a406b6e73082f5fd5a1d8b7328cadc2a71e3d46941a3ae5485.
+
+Hermes execution is closed. Only the [Grok production handoff](GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md)
+is authorized. No integration or further validation yet; reviewer ran no tests.

@@ -1,28 +1,28 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH-CONFIGURATION EXPECTED-RED ACTOR LAUNCHED — AWAITING COLLECTION
+State: LAUNCH-CONFIGURATION EXPECTED RED ACCEPTED — RESOLVER PRODUCTION AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none
-Authorized execution actor: Hermes, one expected-red driver only
+Authorized source actor: Grok Build, grok-4.6 High; no subagents
+Authorized execution actor: none
 Authorized integration actor: none
 Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
 Read this active prefix (lines 1–40) and
-[Hermes launch-config expected red](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md).
-Only its exact extraction launcher once, with repository workdir, is authorized.
-No independent commands, repairs, source/test edits, stubs or Git mutation.
-Hermes outer 82063 launched once against ab45d59c; actual session is driver-recorded.
-Collect on owner done/Continue. No actor polling or additional launch.
+[Grok resolver production](GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md).
+Only new wallet-broker/launch-config.js may be written; verify absence first.
+No tests, syntax checks, builds, docs/evidence edits or Git mutation by Grok.
+Grok launch pending reviewer publication. Hermes outer 82063 collected and closed.
+Launch once; collect on owner done/Continue. No actor polling or additional launch.
 
-Accepted test 1b6a7d8c: 851 lines, five groups/58 authored rows. Symlink target is
-valid JSON; unsupported option identities agree with their manifests. Both now
-isolate the intended rejection. Four frozen source hashes match; Grok is closed.
-Production wallet-broker/launch-config.js remains absent, with no stub authorized.
-Expected Node exit 1, zero ok/five explicit packaged-resolver-missing assertions.
-All 58 fixture case bodies remain unexecuted on that baseline. No green claimed.
-Evidence/raw writes only as specified in the driver; target is ext4.
-The unexpected home skill read in Grok's export is recorded, not authorized anew.
+Accepted red: Node exit 1, zero ok/five explicit missing-resolver assertions.
+Session 20260909_221756_f0f9b6; frozen inputs unchanged; production absent.
+Accepted test 1b6a7d8c: 851 lines, five groups/58 authored rows.
+The 58 fixture rows remain unexecuted. No configuration green is claimed.
+Evidence 1c98fde5 and raw 7b5201b7 agree; report inaccuracies are recorded in
+[expected-red acceptance](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md).
+Tests, evidence, main, supervisor and protocol are frozen for source review.
+No home skills/config discovery or historical fixture searches are authorized.
 
 Runtime format is fixed: build-generated manifest, fixed binary names, six target
 identities. Existing supervisor retains byte verification before spawn.
@@ -31,12 +31,12 @@ main startup/status/quit composition follows later. Whole WAL-011 is incomplete.
 Quit/shutdown/IPC/degraded Rust/transport acceptance is retained without replay.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md,
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md,
 docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
-No credential/config discovery. Future CURRENT reads specify lines 1–40.
-Hermes metadata uses exact session key and row only, without fallback.
+Future CURRENT reads specify lines 1–40; named bounded reads only.
+Later Hermes green/falsification/restoration requires separate authorization.
 
 ## Historical record (superseded by the active state above)
 

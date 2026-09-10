@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Launch-configuration test correction accepted; one expected-red run authorized.
+Status: Launch-configuration expected red accepted; resolver production authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -179,6 +179,11 @@ is otherwise valid and unsupported target identities agree with their manifests.
 Grok is closed. Only the [Hermes expected-red handoff](../docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md)
 authorizes one new suite run, expecting five explicit absent-resolver assertions.
 No production stub, broader execution or integration is authorized.
+Observed expected red is accepted: zero ok/five missing-resolver assertions,
+Node exit 1, unchanged inputs and production still absent. Hermes is closed.
+Only the [Grok resolver production handoff](../docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md)
+authorizes new wallet-broker/launch-config.js. The module remains disconnected
+from main and packaging until later contracts; tests/evidence stay frozen.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,
