@@ -1,21 +1,22 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUNTIME PACKAGE EXPECTED RED ACCEPTED — PRODUCTION AUTHORIZED
+State: RUNTIME PACKAGE SOURCE ACCEPTED — GREEN AND LINUX PACKAGE PROOF AUTHORIZED
 Reviewer: Codex
-Authorized source actor: Grok Build, grok-4.6 High; four production paths only
-Authorized execution actor: none
+Authorized source actor: none
+Authorized execution actor: Hermes, exact green/package-proof driver once
 Authorized integration actor: none
 
-Read [runtime package production](GROK_BBD_WAL_011_RUNTIME_PACKAGE_PRODUCTION_01.md).
-New staging helper plus three packager call sites; Linux disk-backed retained staging.
-Test 5d8a8bf2 frozen; seven missing-helper assertions accepted. No green yet.
-Grok outer 55564, session dd016621-0865-4810-b1ae-13b2176aa9e3 launched.
+Read [runtime package validation](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_GREEN_01.md).
+Helper 97d04b44 and three reviewed packagers frozen; test 5d8a8bf2 frozen.
+Seven package + nine resolver + 30 Electron groups, falsification, policy/scans,
+then preserved-old-artifact Linux package/extraction proof. No native broker start.
+Hermes launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Six inherited policy failures and Rust-inventory checker failure remain blockers.
-Reviewer publication paths: CURRENT_TASK.md, runtime-package red/production handoffs,
-and tickets/BBD-WAL-011.md only. Preserve all unrelated pending files.
-Resolver accepted at 05a0ffda. Whole WAL-011 incomplete; native pins/startup follow.
+Reviewer publication: CURRENT_TASK.md, runtime-package production/green handoffs,
+and ticket only. Preserve unrelated pending files; no recursive cleanup.
+Whole WAL-011 incomplete; native pins/startup follow. No release acceptance.
 
 ## Historical record (superseded by the active state above)
 

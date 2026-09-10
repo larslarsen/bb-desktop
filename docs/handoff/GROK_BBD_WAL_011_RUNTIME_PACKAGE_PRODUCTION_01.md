@@ -57,3 +57,22 @@ Preserve the existing .deb under an exact no-overwrite backup path first. Linux
 dist is verified ext4 with sufficient space; existing Electron 44.0.0 is installed.
 No native wallet startup, Cargo build, macOS/Windows native execution, release
 publication or policy repair is part of this source contract.
+
+## Source acceptance — 2026-09-10
+
+Outer 55564 completed exit 0, session dd016621-0865-4810-b1ae-13b2176aa9e3.
+Accept four paths:
+- scripts/stage-wallet-runtime.js: 97d04b4434e498bf4a2dd70d1ec69881221d8466664656e87fbffdd1c0694a70, 113 lines.
+- scripts/build-deb.sh: 6ccaeed5fe31c487ed15d1d6424de1d9f2ef82f3b9ef79f90e4c4329e5142aa8, 75 lines.
+- scripts/build-macos.sh: 29e6ede69b2db49e780599af5a6a51cc4d263d3083683e6ea13c24321811f171, 75 lines.
+- scripts/build-windows.ps1: 8ce8faaff9e9a772540e63165122be9e30f78186f035570bbc63f6dd366d16c1, 47 lines.
+
+All source/destination checks precede writes. The fixed five-file inventory uses
+exclusive copies and 0644 modes; CLI rejects arity/errors. Diffs add one helper
+call per packager, guard PowerShell failure, move Linux staging to retained dist
+and remove its recursive trap. Existing archive/signing/sandbox logic stays intact.
+All other red-baseline inputs match, including test 5d8a8bf2 and pending files.
+Exact export shows only four source-path edits and read-only checks. It read
+lines 2–81 of the named red handoff rather than the acceptance section; no execution,
+Git mutation, chained command or home/config discovery appears. Grok closed.
+Only the green/package-proof driver is authorized; reviewer AST-parsed it only.
