@@ -92,6 +92,8 @@ function createElectronMock(options = {}) {
     supervisorCalls: [],
     supervisorResults: [],
     supervisorSubscribers: [],
+    supervisorStartCalls: [],
+    resolverCalls: [],
     rendererMessages: [],
     sanitizerCalls: [],
     shutdownCalls: [],
@@ -222,6 +224,13 @@ function createElectronMock(options = {}) {
     enableSandbox() {
       state.enableSandboxCalls += 1;
     },
+    getPath(name) {
+      if (name !== 'userData') {
+        throw new Error(`unexpected app.getPath(${String(name)})`);
+      }
+      return options.userDataPath || path.resolve('/bb-electron-security-user-data');
+    },
+    isPackaged: options.isPackaged === true,
     on(event, handler) {
       if (!state.appHandlers[event]) {
         state.appHandlers[event] = [];
@@ -320,11 +329,34 @@ function loadMaintainedMain(options = {}) {
     if (request === 'electron') {
       return mock.electron;
     }
+    if (/(?:^|\/)wallet-broker\/launch-config$/.test(request)) {
+      return {
+        resolveWalletBrokerLaunch(value) {
+          mock.state.resolverCalls.push(value);
+          if (typeof options.resolveWalletBrokerLaunch === 'function') {
+            return options.resolveWalletBrokerLaunch(value);
+          }
+          return Object.freeze({
+            brokerPath: path.resolve('/bb-electron-security-broker'),
+            expectedSha256: 'a'.repeat(64),
+            dataDir: path.resolve('/bb-electron-security-user-data', 'wallet-broker'),
+          });
+        },
+      };
+    }
     if (/(?:^|\/)wallet-broker\/supervisor$/.test(request)) {
       return {
         sanitizeSnapshot: trackedSanitizer,
         createWalletSupervisor() {
           return {
+            get bound() {
+              return true;
+            },
+            start() {
+              mock.state.supervisorStartCalls.push({});
+              if (typeof options.start === 'function') return options.start();
+              return { ok: true, snapshot: { v: 1, broker: 'down', accounts: [] } };
+            },
             dispatch(method, params) {
               mock.state.supervisorCalls.push([method, params]);
               const result = typeof options.dispatch === 'function'

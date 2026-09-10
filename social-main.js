@@ -2,6 +2,7 @@
 
 const path = require('path');
 const { app, BrowserWindow, Menu, ipcMain, session, dialog } = require('electron');
+const { resolveWalletBrokerLaunch } = require('./wallet-broker/launch-config');
 const { createWalletSupervisor } = require('./wallet-broker/supervisor');
 const { sanitizeWalletSnapshot } = require('./wallet-pay/model');
 
@@ -9,7 +10,8 @@ app.enableSandbox();
 
 let window;
 let quitState = 'idle';
-const walletSupervisor = createWalletSupervisor();
+let walletSupervisor = createWalletSupervisor();
+let walletStartupAttempted = false;
 const ID = /^[0-9a-f]{32}$/;
 
 function dataDescriptors(value) {
@@ -52,6 +54,8 @@ function cloneBoundary(value) {
   }
   return result;
 }
+
+let cachedWalletStatus = cloneBoundary(sanitizeWalletSnapshot({ v: 1, broker: 'down', accounts: [] }));
 
 function requireFrame(event) {
   if (!window || !event || event.senderFrame !== window.webContents.mainFrame ||
@@ -104,6 +108,9 @@ function walletHandler(channel, method) {
   return (event, value) => {
     requireFrame(event);
     const params = closedParams(channel, value);
+    if (channel === 'wallet:snapshot:get' && !walletSupervisor.bound) {
+      return Promise.resolve(cloneBoundary(cachedWalletStatus));
+    }
     const result = params === undefined
       ? walletSupervisor.dispatch(method)
       : walletSupervisor.dispatch(method, params);
@@ -145,6 +152,33 @@ app.on('before-quit', (event) => {
   }
 });
 
+function startWalletBroker() {
+  if (quitState !== 'idle') return;
+  try {
+    const launch = resolveWalletBrokerLaunch({
+      resourcesPath: app.isPackaged === true
+        ? process.resourcesPath
+        : path.join(__dirname, 'wallet-broker', 'target', 'app-resources'),
+      userDataPath: app.getPath('userData'),
+      platform: process.platform,
+      arch: process.arch,
+    });
+    const configured = createWalletSupervisor({
+      brokerPath: launch.brokerPath,
+      expectedSha256: launch.expectedSha256,
+      dataDir: launch.dataDir,
+    });
+    if (quitState !== 'idle') return;
+    walletSupervisor = configured;
+    configured.subscribeSnapshot((value) => {
+      cachedWalletStatus = cloneBoundary(sanitizeWalletSnapshot(value));
+      if (!window) return;
+      window.webContents.send('wallet:snapshot:subscribe', cloneBoundary(cachedWalletStatus));
+    });
+    configured.start();
+  } catch (_) {}
+}
+
 function createWindow() {
   window = new BrowserWindow({
     width: 1180,
@@ -179,17 +213,15 @@ app.on('ready', () => {
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   session.defaultSession.setPermissionCheckHandler(() => false);
   Menu.setApplicationMenu(null);
+  if (quitState !== 'idle' || walletStartupAttempted) return;
+  walletStartupAttempted = true;
   createWindow();
   ipcMain.handle('wallet:snapshot:get', walletHandler('wallet:snapshot:get', 'status.get'));
   ipcMain.handle('wallet:accounts:list', walletHandler('wallet:accounts:list', 'account.list'));
   ipcMain.handle('wallet:intent:begin', walletHandler('wallet:intent:begin', 'intent.begin'));
   ipcMain.handle('wallet:intent:cancel', walletHandler('wallet:intent:cancel', 'intent.cancel'));
   ipcMain.handle('wallet:payee-request:get', walletHandler('wallet:payee-request:get', 'receiver.fresh'));
-  walletSupervisor.subscribeSnapshot((value) => {
-    if (!window) return;
-    const snapshot = cloneBoundary(sanitizeWalletSnapshot(value));
-    window.webContents.send('wallet:snapshot:subscribe', snapshot);
-  });
+  startWalletBroker();
 });
 
 app.on('window-all-closed', () => {
@@ -199,6 +231,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
+  if (quitState !== 'idle') return;
   if (window === null) {
     createWindow();
   }
