@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Packaged JavaScript inventory integrated and accepted; native build pins and startup remain.
+Status: Finishing local application startup under [bounded contract](../docs/handoff/GROK_BBD_WAL_011_STARTUP_01.md).
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 

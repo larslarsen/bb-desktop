@@ -1,6 +1,23 @@
 # Current Task
 
 Ticket: BBD-WAL-011
+State: FINISH APPLICATION STARTUP — TEST SOURCE AUTHORIZED
+Reviewer: Codex
+Authorized source actor: Grok Build grok-4.6 High; no subagents
+Authorized execution/integration actor: none until source review
+
+Active contract: [startup](GROK_BBD_WAL_011_STARTUP_01.md).
+Only tests and minimal existing Electron mock compatibility authorized.
+Owner priority: finish local app-to-broker startup, no further installer detour.
+Reviewer stays with actors and collects/reviews/routes in the same turn.
+Provide meaningful status at least every 60 seconds; no repeated done required.
+Inherited policy failures remain release blockers. No native-wallet completion claim.
+
+--- Previous closed state ---
+
+# Current Task
+
+Ticket: BBD-WAL-011
 State: PACKAGED JAVASCRIPT INVENTORY INTEGRATED AND ACCEPTED
 Reviewer: Codex
 Authorized source actor: none
