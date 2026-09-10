@@ -91,3 +91,38 @@ the source. Do not implement or execute falsification in this test-only drop.
 Startup with a reviewed external binary pin, app shutdown, real Electron-to-Rust
 composition and native/account flows are separate later tasks. This suite proves
 the registered main handler's async boundary with a controlled supervisor fixture.
+
+
+## Collected source acceptance — 2026-09-09
+
+Accept the test-only drop for initial expected-red execution; no green behavior
+is claimed. Outer 58847 collected on owner done with exit 0. Exact-ID Markdown
+export of e1f08576-2e17-4f42-9001-f544249bcab3 shows four edits to the authorized
+test path, source reads/searches and read-only identity/status commands; no tests,
+syntax checks, builds, production edits or Git mutations appear. The export is a
+tool summary, not a raw tool-result audit. Read-scope deviations: CURRENT lines
+1–200 included historical text; additional transport/preload test files were read,
+search scope was broader than the named files, and two identity command lines
+chained commands despite the separate-command instruction. Those deviations are
+recorded without expanding future authorization.
+
+Measured test/electronSecurity.node.js: 1223 lines, 23 top-level groups, SHA-256
+df0aab1686f872fbc2e77ab106f0003ad1fbe76f7c74bda9c00756f53bc0e4a3.
+Diff: 352 insertions, two deletions. The three frozen production hashes match the
+contract. Existing twenty groups retain their assertions. New source defines five
+successful delayed-reply rows, two rejected-reply rows and one synchronous throw
+case in three groups. These are authored cases, not eight executed/passed results.
+
+Source review confirms the actual registered handlers are invoked, isolated module
+loads restore the loader/cache, outcomes use independent plain-data literals,
+resolved results and inputs have mutation-isolation assertions, deferred operations
+are observed/settled in finally and settlement guards clear their timers. The
+existing synchronous authorization and payload rejection tests remain intact.
+The baseline should fail the first row of each delayed group at the explicit
+thenable assertion. Later rows in those groups will not execute on that baseline;
+green must complete them all. Expected totals: 21 ok, two not ok, exit 1.
+
+Grok is closed. Only the linked
+[Hermes expected-red driver](HERMES_BBD_WAL_011_ASYNC_IPC_RED_01.md) is authorized.
+Production, integration, additional tests and replay remain closed. The reviewer
+ran no acceptance command.
