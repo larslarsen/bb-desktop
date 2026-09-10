@@ -3,7 +3,7 @@
 Ticket: BBD-WAL-013
 State: NATIVE ACCOUNT MANAGEMENT — SERVICE AND WINDOW TESTS AUTHORIZED
 Reviewer: Codex
-Authorized source: Grok account service production and runtime tests; Sol UI test correction
+Authorized source: Grok account service production; Sol UI and runtime test corrections
 Execution: service expected-red accepted/closed; none currently active
 Integration: none
 
