@@ -1,5 +1,8 @@
 # WAL-011 packaged broker launch configuration tests 01
 
+Active amendment: the collected review/Correction 01 below supersedes the initial
+absent-test baseline. No execution or production source is authorized.
+
 Actor: Grok Build, grok-4.6 High; test source only, no subagents.
 Protected parent: reviewer publication following 4ade8904a284bc414da0fb1dd9bac0b0367abd66,
 plus one CURRENT-only launch record. Read CURRENT lines 1–40, this handoff,
@@ -173,3 +176,59 @@ are authorized. Later packager/main integration must include this module in poli
 inventory and required security checks; pending npm/policy work stays untouched.
 Existing package/security failures are not waived. Final package gates, artifact
 provenance and actual app startup remain separate requirements.
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Hold test-source acceptance for two fixture corrections. Outer 99831 collected
+on owner done, exit 0. Measured new test/walletBrokerLaunchConfig.node.js:
+SHA-256 32409f6a156708311f4bdab7578e023d94c6f01e4eebce41cd77f030ee807b2c,
+752 lines, five groups/58 authored rows (6 + 20 + 22 + 3 + 7). The four frozen
+source hashes match; production launch-config.js remains absent. No execution
+result is claimed. Source uses real small fixtures, a pin distinct from artifact
+bytes, explicit missing-module assertions and owned unlink/rmdir cleanup.
+
+Exact-session export 07b5d5dd-89e9-4e93-a8a5-b045a6e9157c shows only the test
+path edited and no tests, builds or Git mutation. CURRENT was read correctly via
+sed. Read-scope deviations: multiple chained identity/status commands, publication
+history/hash queries, reads of seven additional existing test files and the old
+executable test handoff exceeded the named scope. Search summaries omit paths.
+This is a tool summary, not a raw result audit. None of these deviations widens
+the correction; no further fixture/history discovery is needed.
+
+The two rejection tests currently have competing failure reasons:
+
+1. Reviewed lines 645–647 append a non-JSON SENTINEL after the manifest JSON in
+   the symlink target. A resolver that follows the symlink can still reject the
+   malformed JSON and pass the symlink row without enforcing that boundary.
+2. The unsupported-platform/arch option rows change the option to freebsd/amd64
+   while leaving the manifest linux/x64. A resolver missing the supported-pair
+   allowlist can still reject the mismatch and pass both rows. The fixtures must
+   agree on the unsupported identity to isolate allowlist enforcement.
+
+Only Grok Build, grok-4.6 High without subagents may correct the same test path:
+
+- Verify editable SHA-256 32409f6a above, all four original frozen identities and
+  continued absence of wallet-broker/launch-config.js. Protected parent: reviewer
+  publication following 52eefca5, plus one CURRENT-only launch record. Read the
+  required governance files and CURRENT through sed -n '1,40p'; only the test being
+  corrected and original four source paths are allowed source reads.
+- Make the manifest symlink target an otherwise valid matching four-field JSON
+  object with a valid literal pin and byte length within the accepted limit.
+  Independently assert its parsed literal contents before calling the resolver.
+  Move the sentinel to a separate owned file if retained; keep both the target
+  byte/mode preservation assertion and the no-data-dir-mutation assertion. A
+  followed symlink must have no malformed-JSON reason to reject.
+- Give each existing unsupported-platform/arch row its own otherwise valid layout
+  whose manifest exactly matches that unsupported pair (freebsd/x64 and
+  linux/amd64). Include an inert regular file at the non-Windows fixed basename.
+  Assert option/manifest identity agreement and valid version/pin before invoking
+  the resolver. Use that row's paths for unchanged-file/data-dir checks and error
+  sanitization. Do not substitute a supported-pair mismatch for these cases.
+- Preserve the five groups/58 rows, including separate platform/arch mismatch
+  manifest rows. No new generic harness, broader cases or production stub. Existing
+  fixture ownership and nonrecursive cleanup must cover the added files.
+
+No tests, syntax checks, Node/Cargo/npm, builds, network, actor tools, docs/evidence
+edits, Git mutations, history or credential/config discovery. Use separate named
+read-only HEAD/status/hash/count/existence checks; do not chain commands. Report
+path/hash/lines/counts and the corrections, then stop for source review.

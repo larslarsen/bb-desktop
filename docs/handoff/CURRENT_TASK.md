@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST ACTOR LAUNCHED — AWAITING COLLECTION
+State: PACKAGED BROKER LAUNCH-CONFIGURATION TEST CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; new test file only
 Authorized execution actor: none
@@ -10,16 +10,16 @@ Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
 Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
 [Grok launch-configuration tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_TESTS_01.md).
-Only new test/walletBrokerLaunchConfig.node.js is writable by Grok.
+Only test/walletBrokerLaunchConfig.node.js is writable under appended Correction 01.
 No production stubs, tests, syntax checks, builds, evidence or Git mutation.
-Grok outer 99831; session 07b5d5dd-89e9-4e93-a8a5-b045a6e9157c.
-One launch against 39a01ee5; collect on owner done/Continue. No actor polling.
+Initial Grok outer 99831 collected exit 0. Correction launch pending publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
 Reviewer fixed a build-generated four-field manifest in resources/wallet-broker,
 fixed executable basenames and six platform/arch identities. The future resolver
 reads the pin and returns exact supervisor options; no runtime self-pinning,
-process start or data-dir mutation. Five filesystem fixture groups cover valid
-configuration, bad options/manifests, size limits and missing/symlink inventory.
+process start or data-dir mutation. Initial 32409f6a test drop (five groups/58 rows)
+needs valid symlink JSON and matching unsupported identities to isolate rejection.
 Existing supervisor keeps executable-byte verification before spawn.
 All three packagers currently omit runtime JS now imported by main and lack a
 broker manifest/artifact. Later contracts must repair inventory/generate pins,
