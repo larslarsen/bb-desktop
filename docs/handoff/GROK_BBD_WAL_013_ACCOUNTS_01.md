@@ -141,3 +141,22 @@ Full runtime/UI execution proof is a following contract, still within owner's ta
 - wallet-broker/src/store.rs: 611d837641069a98d05b9e68c14bf11a37a5076de58bf6516188870eeab19236
 - wallet-broker/src/session.rs: 42e4f335bb4080ad530d93dcc04d824b4ab54835be7f6c7cd68feba3f20ee227
 - wallet-broker/src/native.rs: a0ccb0b11e3e636cc28f9576ec0cf6da2d8c2ef5344370e5a7a2a9a9b5cc32e5
+
+## Reviewer concurrency refinement (before production)
+
+A service manager must hold a nonblocking OS exclusive advisory lock on the opened
+broker-root DIRECTORY File for its lifetime. No separate lock file and no new
+dependency: std::fs::File::try_lock is stable since Rust1.89 (reviewed official Rust
+File docs). Open root with Linux O_DIRECTORY|O_NOFOLLOW, validate opened metadata
+real directory0700, try_lock; failure => UNAVAILABLE. Keep owned File (no cloned
+handle) in AccountManager. Drop locks/wipes sessions before releasing root guard.
+This serializes cooperating broker/service instances so create/restore catalog checks
+and existing store atomic replacement cannot race across two running BitBook instances.
+Advisory locking does not defend against a same-user process deliberately bypassing
+it or replacing a whole directory (existing custody threat residual unchanged).
+Add one focused test: second independently opened manager for same root rejected while
+first lives, unrelated root works, drop first then reopen succeeds with locked state.
+No additional production path. Restart tests must drop first manager before reopen.
+Original test actor receives this refinement in correction routing after its first
+source drop; do not alter a live actor's file concurrently. Test-first red remains
+missing accounts API. Source https://doc.rust-lang.org/std/fs/struct.File.html#method.try_lock.
