@@ -1,53 +1,47 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: SHUTDOWN VALIDATION ACCEPTED — FIVE-PATH INTEGRATION AUTHORIZED
+State: AWAITABLE SHUTDOWN INTEGRATED AND ACCEPTED — ELECTRON COMPOSITION REVIEW NEXT
 Reviewer: Codex; High is sufficient
-Authorized source actor: none; Grok closed
-Authorized execution actor: none; validation closed
-Authorized integration actor: Hermes, exact five-path integration driver only
-Protected parent: reviewer publication following 4ec2cf35; one CURRENT-only launch allowed
+Authorized source actor: none
+Authorized execution actor: none
+Authorized integration actor: none
+Accepted implementation HEAD: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
-Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
-and [active integration contract](HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md).
-Test source frozen: test/walletSupervisorShutdown.node.js at 69eb8bcb, 983 lines.
-The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8.
-Production frozen: wallet-broker/supervisor.js at c1410bfc, 631 lines.
+Read this active prefix, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
+and [collected shutdown acceptance](HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
+No implementation is authorized. No actor is running and no result is pending.
+Next work is reviewer scoping of Electron startup and normal quit composition.
 
-Reviewer found quit() returns before child closure. Before Electron can await
-cleanup during normal quit, the supervisor needs a shared shutdown Promise with
-close-event completion and a fixed 1500 ms failure deadline. Existing cancellation,
-250 ms kill escalation and synchronous quit semantics remain. See the active
-contract for lifecycle ordering, injected-clock and real-child assertions.
-Observed expected red is accepted: Node exit 1, zero ok/six not ok through absent
-shutdown API. Green is now accepted: six shutdown, seven transport and 13
-supervisor groups passed. Premature-completion falsification failed correctly,
-and restored shutdown green passed all six again. Eight input hashes match.
-Only exact five-path integration is authorized; no tests/builds or source edits.
+Shutdown accepted/pushed at 1e45d6d2: shared Promise, actual close completion,
+1500 ms TIMEOUT, preserved cancellation and 250 ms escalation. All six shutdown,
+seven transport and 13 supervisor groups passed; premature-completion falsification
+failed as intended and restored shutdown green passed all six again. Five committed
+source/test/evidence hashes match. Hermes outer 68128 collected on owner done,
+exit 0; actual session 20260909_200042_2359ec, nous / poolside/laguna-s-2.1:free.
+The integration is complete; no evidence correction or validation replay is needed.
 
-Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
-reversal falsification and restored green. Rust executable at 31a6e540 retains
-nine runtime groups, build/Clippy and session falsification. Transport at 5aada7ef
-retains 77 groups and response-settlement falsification. No replay by source actor.
-Affected transport/supervisor regression execution follows later source review.
+Async IPC remains accepted at 3aa5e3d8 with 23 Electron/six preload groups and
+falsification/restoration. Rust executable remains accepted at 31a6e540 with nine
+runtime groups, build/Clippy and session falsification. Live transport at 5aada7ef
+is retained, with its affected lifecycle regressions passed again for shutdown.
+Do not replay accepted suites without a newly authorized affected change.
 
-Startup pins still require the reviewed packaging provenance specified in the
-architecture; no runtime self-pinning, environment-selected executable or package
-expansion is authorized. App startup/before-quit wiring and native account flows
-follow this prerequisite in later contracts. No wallet/release completion claim.
+BBD-WAL-011 is still incomplete. Main does not start the supervisor with a reviewed
+binary pin/private directory or invoke its new shutdown completion API. Next
+contracts must fix startup pin provenance/platform inventory, normal-quit ordering
+and failure behavior, and the real application-boundary test route. Architecture
+still requires packaging-derived pins independent of runtime artifact selection;
+no self-pinning, arbitrary environment-selected executable or package expansion is
+currently authorized. Native account flows and release acceptance remain future work.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md,
-docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md.
+tickets/BBD-WAL-011.md,
+docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
-No credential/config discovery. Use only named reads and separate read-only commands.
-Hermes outer 1099 collected on owner done, exit 0; actual session
-20260909_195724_724f82, nous / poolside/laguna-s-2.1:free. Validation and normalized
-evidence accepted in the green handoff's final review. No replay is needed.
-One fresh integration invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 000da7cc; outer 68128, requested nous /
-poolside/laguna-s-2.1:free. Actual session and commit/push are recorded by the driver.
+No credential/config discovery. Future CURRENT reads must specify the active range.
+Future Hermes metadata must use the exact session key and row only.
 
 ## Historical record (superseded by the active state above)
 

@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Shutdown lifecycle validation accepted; five-path integration authorized.
+Status: Awaitable shutdown integrated and accepted; Electron composition review next.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -91,20 +91,23 @@ The [Grok supervisor source](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_PRODUCTIO
 is accepted at c1410bfc (631 lines).
 [Focused validation](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_GREEN_01.md#collected-validation-acceptance--2026-09-09)
 passed six shutdown, seven transport and 13 supervisor groups, premature-completion
-falsification and restored six-group shutdown green. Only the
-[Hermes five-path integration driver](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md)
-is authorized; source/test edits and validation replay are closed.
-Future shutdown() returns one shared Promise, preserves
+falsification and restored six-group shutdown green.
+[Five-path integration](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09)
+is accepted and pushed at 1e45d6d2bf78df6b998cc2062604f23dd1252061. All actors
+are closed; no implementation, execution or further integration is authorized.
+The integrated shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or
 absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
-source and validation are accepted; only the linked integration is authorized. The handoff fixes fake-clock and real-process tests, targeted commands,
+source, validation and integration are accepted. The handoff fixes fake-clock and real-process tests, targeted commands,
 affected lifecycle regressions and early-completion falsification.
 
 Startup pin provenance remains as specified in architecture section 4.2: reviewed
 packaging creates the pin before runtime, without runtime self-pinning or arbitrary
 environment-selected executables. Private storage is a wallet-broker child directory
-under Electron userData. Platform artifact inventory and app startup/before-quit
-composition require subsequent bounded contracts; this shutdown task adds no package
+under Electron userData. Platform artifact inventory, app startup/before-quit ordering, shutdown-failure
+behavior and application-boundary tests require the next reviewer contracts.
+The main process does not yet invoke shutdown() or start a pinned broker.
+This completed shutdown prerequisite adds no package
 content or runtime configuration. Tests use a Node child fixture, not a coin binary.
 The whole ticket remains incomplete; no app startup or release acceptance is claimed.
 
