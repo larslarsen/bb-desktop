@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RESOLVER SOURCE REVIEW HELD — REFLECTION REGRESSION TESTS AUTHORIZED
+State: REFLECTION REGRESSION TEST ACTOR LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; test source only, no subagents
 Authorized execution actor: none
@@ -13,7 +13,7 @@ Read this active prefix (lines 1–40) and
 Only test/walletBrokerLaunchConfig.node.js may change by the specified insertion.
 Production launch-config.js remains frozen at 4a639b16, 132 lines.
 Grok production outer 20952 completed exit 0 and is collected/closed.
-Regression-test launch pending reviewer publication.
+Grok regression-test outer 32296 launched once against 70e46786.
 Launch once; collect on owner done/Continue or explicit status check.
 
 Source finding: revoked Proxy and throwing reflection traps escape as raw errors
@@ -35,7 +35,7 @@ docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md.
 Preserve pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
 No home skills/config/history discovery or chained commands.
-Named reads only; CURRENT reads lines 1–40.
+Grok session e8ddbd20-50d2-4fb2-a152-2225ff0b95f8; CURRENT reads lines 1–40.
 Later Hermes focused red requires separate reviewer authorization.
 
 ## Historical record (superseded by the active state above)
