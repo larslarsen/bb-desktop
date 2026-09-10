@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [runtime inventory tests](GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md).
 Only new test/walletRuntimePackage.node.js may be written. Helper stays absent.
 Seven groups: exact five-file inventory, preflight, CLI and packager wiring.
-Grok launch pending publication. Reviewer stays with actor and collects directly.
+Grok outer 1422, session c2c18a7d-5fe2-41e4-ba81-09db6360dc31 launched.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, runtime-package tests handoff,
