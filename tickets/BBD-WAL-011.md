@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Awaitable shutdown integrated and accepted; Electron composition review next.
+Status: Awaitable shutdown accepted; Electron normal-quit test source authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -93,8 +93,8 @@ is accepted at c1410bfc (631 lines).
 passed six shutdown, seven transport and 13 supervisor groups, premature-completion
 falsification and restored six-group shutdown green.
 [Five-path integration](../docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09)
-is accepted and pushed at 1e45d6d2bf78df6b998cc2062604f23dd1252061. All actors
-are closed; no implementation, execution or further integration is authorized.
+is accepted and pushed at 1e45d6d2bf78df6b998cc2062604f23dd1252061. Its actors
+are closed; no shutdown implementation or validation replay is authorized.
 The integrated shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or
 absence, and rejects TIMEOUT at 1500 ms if closure remains unconfirmed. Production
@@ -104,12 +104,26 @@ affected lifecycle regressions and early-completion falsification.
 Startup pin provenance remains as specified in architecture section 4.2: reviewed
 packaging creates the pin before runtime, without runtime self-pinning or arbitrary
 environment-selected executables. Private storage is a wallet-broker child directory
-under Electron userData. Platform artifact inventory, app startup/before-quit ordering, shutdown-failure
-behavior and application-boundary tests require the next reviewer contracts.
+under Electron userData. Platform artifact inventory and startup composition
+require a later reviewer contract.
 The main process does not yet invoke shutdown() or start a pinned broker.
 This completed shutdown prerequisite adds no package
 content or runtime configuration. Tests use a Node child fixture, not a coin binary.
 The whole ticket remains incomplete; no app startup or release acceptance is claimed.
+
+The active [Electron normal-quit test contract](../docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md)
+authorizes Grok High to edit only test/electronSecurity.node.js. Seven new groups
+must exercise the real registered before-quit handler: synchronous prevention,
+one awaited shutdown, repeated/reentrant requests, completion before resumed quit,
+pre-ready no-child completion, shutdown failure and throwing error-dialog cleanup.
+Failure keeps normal quit blocked and attempts one fixed native error notification;
+later quit events neither retry the permanently rejected Promise nor repeat the box.
+Existing window-all-closed platform behavior and all 23 security/IPC groups remain.
+Expected red and targeted green: node test/electronSecurity.node.js. Affected
+regression: node test/walletPreload.node.js. Falsify by resuming app.quit before
+shutdown settles, then restore and repeat targeted green. All execution awaits
+separate source acceptance/Hermes authorization. Later production is social-main.js
+only; broker startup, packaging and native flows remain outside this test contract.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

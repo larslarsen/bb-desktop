@@ -1,46 +1,41 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: AWAITABLE SHUTDOWN INTEGRATED AND ACCEPTED — ELECTRON COMPOSITION REVIEW NEXT
+State: ELECTRON NORMAL-QUIT TEST SOURCE AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: none
+Authorized source actor: Grok Build, grok-4.6 High; test source only
 Authorized execution actor: none
 Authorized integration actor: none
-Accepted implementation HEAD: 1e45d6d2bf78df6b998cc2062604f23dd1252061
+Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
-Read this active prefix, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
-and [collected shutdown acceptance](HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md#collected-integration-acceptance--2026-09-09).
-No implementation is authorized. No actor is running and no result is pending.
-Next work is reviewer scoping of Electron startup and normal quit composition.
+Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, the ticket and
+[Grok quit test contract](GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md).
+Only Grok may edit test/electronSecurity.node.js under that exact contract.
+No production edits, tests, syntax checks, builds, evidence or integration.
+Launch: pending reviewer publication. Launch once; collect on owner done/Continue.
+Do not poll an actor or start another while its result is pending.
 
-Shutdown accepted/pushed at 1e45d6d2: shared Promise, actual close completion,
-1500 ms TIMEOUT, preserved cancellation and 250 ms escalation. All six shutdown,
-seven transport and 13 supervisor groups passed; premature-completion falsification
-failed as intended and restored shutdown green passed all six again. Five committed
-source/test/evidence hashes match. Hermes outer 68128 collected on owner done,
-exit 0; actual session 20260909_200042_2359ec, nous / poolside/laguna-s-2.1:free.
-The integration is complete; no evidence correction or validation replay is needed.
+Normal quit must synchronously hold termination, invoke shutdown once and resume
+app.quit only after completion, allowing the reentrant event to proceed. Pending
+and failed repeat requests remain prevented. Failure attempts one fixed native
+error box and leaves the app running; dialog failure is contained. Seven new
+fixture groups cover actual main callbacks, re-entry, pre-ready completion,
+failures and preserved window-all-closed behavior. Existing 23 groups are retained.
+Expected-red execution follows source review; no green behavior is claimed now.
 
-Async IPC remains accepted at 3aa5e3d8 with 23 Electron/six preload groups and
-falsification/restoration. Rust executable remains accepted at 31a6e540 with nine
-runtime groups, build/Clippy and session falsification. Live transport at 5aada7ef
-is retained, with its affected lifecycle regressions passed again for shutdown.
-Do not replay accepted suites without a newly authorized affected change.
-
-BBD-WAL-011 is still incomplete. Main does not start the supervisor with a reviewed
-binary pin/private directory or invoke its new shutdown completion API. Next
-contracts must fix startup pin provenance/platform inventory, normal-quit ordering
-and failure behavior, and the real application-boundary test route. Architecture
-still requires packaging-derived pins independent of runtime artifact selection;
-no self-pinning, arbitrary environment-selected executable or package expansion is
-currently authorized. Native account flows and release acceptance remain future work.
+Shutdown at 1e45d6d2 retains 26 passing lifecycle groups and falsification/restoration.
+Async IPC at 3aa5e3d8 retains 23 Electron/six preload groups; Rust at 31a6e540
+retains nine runtime groups/build/Clippy; transport at 5aada7ef remains accepted.
+No replay of closed validation. No prior actor is running or awaiting collection.
+Whole WAL-011 remains incomplete: main still lacks pinned broker startup and quit
+wiring. Packaging-derived pin provenance, platform inventory and application
+startup tests require a later contract. No runtime self-pinning or package expansion.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md,
-docs/handoff/HERMES_BBD_WAL_011_SHUTDOWN_INTEGRATION_01.md.
+tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
-No credential/config discovery. Future CURRENT reads must specify the active range.
+No credential/config discovery. Future CURRENT reads must specify lines 1–40.
 Future Hermes metadata must use the exact session key and row only.
 
 ## Historical record (superseded by the active state above)
