@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Awaitable shutdown accepted; Electron quit test-source Correction 01 authorized.
+Status: Electron quit test-source correction accepted; one expected-red run authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -124,10 +124,14 @@ regression: node test/walletPreload.node.js. Falsify by resuming app.quit before
 shutdown settles, then restore and repeat targeted green. All execution awaits
 separate source acceptance/Hermes authorization. Later production is social-main.js
 only; broker startup, packaging and native flows remain outside this test contract.
-The first quit test drop (a8ca18c7, 1977 lines, 30 groups) is held for Correction 01:
+The first quit test drop (a8ca18c7, 1977 lines, 30 groups) required Correction 01:
 the compound dialog callback can swallow its own nested-event assertion, and test
 hooks are restored before asynchronous cleanup finishes. The active handoff fixes
-both corrections in the same test path. No expected-red execution is authorized yet.
+both corrections in the same test path. Corrected source is accepted at 7f759f81,
+2026 lines/30 groups. Only the [Hermes expected-red handoff](../docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md)
+now authorizes one Electron suite run: expected 23 existing passes/seven missing
+before-quit-handler failures. No production or integration authorization follows
+until the observed red is accepted. Source actors are closed.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

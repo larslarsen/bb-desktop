@@ -1,7 +1,7 @@
 # WAL-011 Electron normal quit tests 01
 
-Active amendment: Correction 01 at the end of this document supersedes the initial
-editable-file baseline. The initial actor is collected; no execution is authorized.
+Active amendment: Correction 01 is accepted at the end of this document. Source
+actors are closed; only the linked Hermes expected-red handoff authorizes execution.
 
 Actor: Grok Build, grok-4.6 High; test source only, no subagents.
 Protected parent: reviewer publication following 371379d09c35443239a2e2f28d9a1e722bc637b5,
@@ -233,3 +233,37 @@ network, actor tools or discovery outside the original read scope. Separate name
 read-only HEAD/status/hash/count commands remain allowed. No history inspection is
 needed. Report exact changed path/hash/lines/group count and correction summary;
 then stop. Hermes expected-red authorization follows corrected source acceptance.
+
+## Correction 01 source acceptance — 2026-09-09
+
+Accept corrected test source for one expected-red run; no green result is claimed.
+Outer 43867 collected on owner done, exit 0. Exact-session Markdown export
+042cee10-a065-465f-861f-2a4045762779 reports nine edits only to the authorized test,
+named reads, separate read-only identity/status/hash/count commands and final stop.
+No tests, syntax checks, production edits or Git mutations appear. The export is
+a tool summary. CURRENT was again read as 2–41 rather than 1–40; its extra line
+was the historical heading. Search summaries omit paths, so their exact scope is
+not independently established. No expanded read authorization follows.
+
+Measured test/electronSecurity.node.js: SHA-256
+`7f759f810762ccdfa5e29d69dc3bf2fa1b1502d2c416ca2b324442b2544ad18c`,
+2026 lines, 30 groups; net 807 insertions/four deletions from committed baseline.
+The original 23 groups remain, with seven new quit groups/eight authored cases.
+All four frozen production/preload identities match the initial contract.
+
+The compound callback now records its returned nested event and a marker before
+throwing one stable fixture Error. Independent outer assertions check prevention,
+event count/provenance and exactly one intended throw before the later repeat.
+The shared cleanupQuitHooks settles/observes deferreds, drains an event-loop turn,
+checks captured rejections/forbidden calls and restores both hooks in finally.
+All seven groups use it. An absent before-quit callback fails each group's explicit
+registration assertion; cleanup settles unused fixture promises without spawning
+children, altering production or introducing a success sentinel.
+
+Expected result from source inspection: 23 ok/seven not ok, each new group at
+`before-quit handler is missing`, Node exit 1 and complete seven-failure footer.
+The new lifecycle bodies and second rejection row remain unexecuted on that
+baseline. Actual output must be collected and accepted before production work.
+Only [Hermes expected red](HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md) is authorized.
+Grok, source changes, integration, broader tests and replay are closed. The reviewer
+ran no tests or acceptance commands.
