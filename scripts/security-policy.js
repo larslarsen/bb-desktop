@@ -2061,7 +2061,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'serde_json = { version = "=1.0.151", default-features = false, features = ["alloc"] }',
     'sha2 = { version = "=0.10.9", default-features = false }',
     'zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }',
-    'zcash_client_backend = { version = "=0.24.0", default-features = false, features = ["pczt"] }',
+    'zcash_client_backend = { version = "=0.24.0", default-features = false, features = ["lightwalletd-tonic", "pczt"] }',
     'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "serde", "test-dependencies", "transparent-inputs"] }',
     'pczt = { version = "=0.9.3", default-features = false }',
     'zcash_primitives = { version = "=0.30.1", default-features = false }',
@@ -2070,6 +2070,10 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'rand_core = { version = "=0.6.4", default-features = false, features = ["std"] }',
     'rusqlite = { version = "=0.37.0", default-features = false }',
     'unicode-normalization = { version = "=0.1.25", default-features = false, features = ["std"] }',
+    'tonic = { version = "=0.14.6", default-features = false, features = ["channel", "tls-ring", "tls-webpki-roots"] }',
+    'tokio = { version = "=1.52.3", default-features = false, features = ["rt", "net", "time", "macros"] }',
+    'prost = { version = "=0.14.4", default-features = false, features = ["std"] }',
+    'incrementalmerkletree = { version = "=0.8.2", default-features = false, features = ["legacy-api"] }',
   ];
   const dependencyBlock = manifestText.split('[dependencies]\n')[1];
   if (!dependencyBlock) {
@@ -2126,7 +2130,11 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
   if (options.requireLibrary && !manifestText.includes('license = "MIT"')) {
     throw new PolicyError('wallet Rust production manifest is incomplete');
   }
-  if (/\bgit\s*=|\*"|reqwest|tokio|keyring|monero|openssl/i.test(manifestText)) {
+  const forbiddenDependencyText = manifestText.replace(
+    'tokio = { version = "=1.52.3", default-features = false, features = ["rt", "net", "time", "macros"] }\n',
+    ''
+  );
+  if (/\bgit\s*=|\*"|reqwest|tokio|keyring|monero|openssl/i.test(forbiddenDependencyText)) {
     throw new PolicyError('wallet Rust manifest contains forbidden dependency authority');
   }
 }

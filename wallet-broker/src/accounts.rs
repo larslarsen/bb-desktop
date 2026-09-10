@@ -2,6 +2,8 @@ use core::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+use std::thread::JoinHandle;
 use std::time::Instant;
 
 use serde::Serialize;
@@ -148,6 +150,17 @@ pub struct AccountManager<C: MonotonicClock, E: EntropyPort, W: WipeObserver> {
     sessions: SessionManager<C, SilentWipes>,
     entropy: E,
     wipes: W,
+    live_job: Option<LiveJob>,
+    last_live_snapshot: Option<crate::zec::LiveSyncSnapshot>,
+    next_live_job: u64,
+}
+
+struct LiveJob {
+    account_id: String,
+    id: crate::zec::LiveSyncJobId,
+    cancellation: crate::zec::LiveCancellation,
+    snapshot: Arc<Mutex<crate::zec::LiveSyncSnapshot>>,
+    worker: JoinHandle<()>,
 }
 
 pub type LocalAccountManager = AccountManager<SystemClock, OsEntropy, SilentWipes>;
@@ -177,6 +190,9 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
             sessions: SessionManager::new(clock, SilentWipes),
             entropy,
             wipes,
+            live_job: None,
+            last_live_snapshot: None,
+            next_live_job: 1,
         })
     }
 
@@ -184,6 +200,7 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
         self.sessions
             .check_deadlines()
             .map_err(|_| AccountError::unavailable())?;
+        self.cancel_live_if_locked();
         let ids = self.load_catalog()?;
         Ok(ids
             .into_iter()
@@ -321,19 +338,265 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
         if !catalog.iter().any(|existing| existing == account_id) {
             return Err(AccountError::unavailable());
         }
+        self.cancel_live_for(account_id);
+        self.redact_last_live_for(account_id);
         self.sessions
             .handle(account_id, SessionEvent::ManualLock)
             .map_err(|_| AccountError::unavailable())
     }
 
     pub fn lock_all(&mut self) {
+        self.cancel_any_live();
         let _ = self.sessions.handle("", SessionEvent::BrokerQuit);
+        if let Some(account_id) = self
+            .last_live_snapshot
+            .as_ref()
+            .map(|snapshot| snapshot.account_id.as_str().to_owned())
+        {
+            self.redact_last_live_for(&account_id);
+        }
     }
 
     pub fn tick(&mut self) -> Result<(), AccountError> {
         self.sessions
             .check_deadlines()
-            .map_err(|_| AccountError::unavailable())
+            .map_err(|_| AccountError::unavailable())?;
+        self.cancel_live_if_locked();
+        Ok(())
+    }
+
+    pub fn start_live_sync(
+        &mut self,
+        origin: ActionOrigin,
+        account_id: &str,
+        endpoint: crate::zec::LiveEndpoint,
+    ) -> Result<crate::zec::LiveSyncJobId, AccountError> {
+        self.start_live_sync_factory(origin, account_id, move |cancel| {
+            crate::zec::TonicLiveSource::connect(&endpoint, cancel)
+        })
+    }
+
+    #[doc(hidden)]
+    pub fn start_live_sync_with_source_for_test(
+        &mut self,
+        origin: ActionOrigin,
+        account_id: &str,
+        _endpoint: crate::zec::LiveEndpoint,
+        source: crate::zec::test_support::RecordedLiveSource,
+    ) -> Result<crate::zec::LiveSyncJobId, AccountError> {
+        let mut source = Some(source);
+        self.start_live_sync_factory(origin, account_id, move |_| {
+            Ok(source.take().expect("one live source"))
+        })
+    }
+
+    fn start_live_sync_factory<S: crate::zec::LiveSource>(
+        &mut self,
+        origin: ActionOrigin,
+        account_id: &str,
+        make: impl FnOnce(&crate::zec::LiveCancellation) -> Result<S, crate::zec::ZecError>
+        + Send
+        + 'static,
+    ) -> Result<crate::zec::LiveSyncJobId, AccountError> {
+        self.require_native(origin)?;
+        if !valid_account_id(account_id) {
+            return Err(AccountError::schema());
+        }
+        self.tick()?;
+        if !self.sessions.is_unlocked(account_id) {
+            return Err(AccountError::locked());
+        }
+        self.reap_finished_live();
+        if self.live_job.is_some() {
+            return Err(AccountError::unavailable());
+        }
+        self.read_active_account(account_id)
+            .map_err(|_| AccountError::unavailable())?;
+        let prepared = {
+            let root = &self.broker_root;
+            let wipes = &mut self.wipes;
+            self.sessions
+                .with_spend_material(account_id, |seed| {
+                    crate::zec::prepare_live_account(root, account_id, seed, wipes)
+                })
+                .map_err(|_| AccountError::locked())?
+                .map_err(map_receive)?
+        };
+        let id = crate::zec::LiveSyncJobId(self.next_live_job);
+        self.next_live_job = self
+            .next_live_job
+            .checked_add(1)
+            .ok_or_else(AccountError::unavailable)?;
+        let cancellation = crate::zec::LiveCancellation::new();
+        let snapshot = Arc::new(Mutex::new(crate::zec::LiveSyncSnapshot {
+            account_id: prepared.account_id.clone(),
+            network: prepared.network,
+            job_id: Some(id),
+            phase: crate::zec::LiveSyncPhase::Syncing,
+            scanned_height: None,
+            target_height: None,
+            confirmed_received_zat: None,
+            pending_received_zat: None,
+        }));
+        let output = Arc::clone(&snapshot);
+        let progress = Arc::clone(&snapshot);
+        let worker_cancel = cancellation.clone();
+        let worker = std::thread::Builder::new()
+            .name("zec-live-sync".to_owned())
+            .spawn(move || {
+                let result = make(&worker_cancel).and_then(|mut source| {
+                    let mut hooks = crate::zec::LiveEngineHooks {
+                        on_commit: Some(Box::new(move |snapshot| match progress.lock() {
+                            Ok(mut state) => *state = snapshot,
+                            Err(poisoned) => *poisoned.into_inner() = snapshot,
+                        })),
+                        ..Default::default()
+                    };
+                    crate::zec::run_live_sync_with_hooks(
+                        &prepared,
+                        &mut source,
+                        &worker_cancel,
+                        crate::zec::LiveSyncOptions::default(),
+                        Some(id),
+                        &mut hooks,
+                    )
+                });
+                let mut state = match output.lock() {
+                    Ok(value) => value,
+                    Err(poisoned) => poisoned.into_inner(),
+                };
+                match result {
+                    Ok(done) => *state = done,
+                    Err(error) => {
+                        state.phase = match error.code() {
+                            "CANCELLED" => crate::zec::LiveSyncPhase::Cancelled,
+                            "RESCAN_REQUIRED" => crate::zec::LiveSyncPhase::RescanRequired,
+                            _ => crate::zec::LiveSyncPhase::Failed,
+                        }
+                    }
+                }
+            })
+            .map_err(|_| AccountError::unavailable())?;
+        self.live_job = Some(LiveJob {
+            account_id: account_id.to_owned(),
+            id,
+            cancellation,
+            snapshot,
+            worker,
+        });
+        Ok(id)
+    }
+
+    pub fn live_sync_status(
+        &mut self,
+        account_id: &str,
+    ) -> Result<crate::zec::LiveSyncSnapshot, AccountError> {
+        if !valid_account_id(account_id) {
+            return Err(AccountError::schema());
+        }
+        self.tick()?;
+        self.reap_finished_live();
+        if let Some(job) = self.live_job.as_ref() {
+            if job.account_id != account_id {
+                return Err(AccountError::unavailable());
+            }
+            return Ok(match job.snapshot.lock() {
+                Ok(value) => value.clone(),
+                Err(poisoned) => poisoned.into_inner().clone(),
+            });
+        }
+        self.last_live_snapshot
+            .clone()
+            .filter(|snapshot| snapshot.account_id.as_str() == account_id)
+            .ok_or_else(AccountError::unavailable)
+    }
+
+    pub fn cancel_live_sync(
+        &mut self,
+        origin: ActionOrigin,
+        account_id: &str,
+        id: crate::zec::LiveSyncJobId,
+    ) -> Result<(), AccountError> {
+        self.require_native(origin)?;
+        if !self
+            .live_job
+            .as_ref()
+            .is_some_and(|job| job.account_id == account_id && job.id == id)
+        {
+            return Err(AccountError::unavailable());
+        }
+        self.cancel_any_live();
+        Ok(())
+    }
+
+    fn cancel_live_for(&mut self, account_id: &str) {
+        if self
+            .live_job
+            .as_ref()
+            .is_some_and(|job| job.account_id == account_id)
+        {
+            self.cancel_any_live();
+        }
+    }
+    fn redact_last_live_for(&mut self, account_id: &str) {
+        if let Some(snapshot) = self
+            .last_live_snapshot
+            .as_mut()
+            .filter(|snapshot| snapshot.account_id.as_str() == account_id)
+        {
+            snapshot.phase = crate::zec::LiveSyncPhase::Cancelled;
+            snapshot.scanned_height = None;
+            snapshot.target_height = None;
+            snapshot.confirmed_received_zat = None;
+            snapshot.pending_received_zat = None;
+        }
+    }
+    fn cancel_live_if_locked(&mut self) {
+        if self
+            .live_job
+            .as_ref()
+            .is_some_and(|job| !self.sessions.is_unlocked(&job.account_id))
+        {
+            self.cancel_any_live();
+        }
+        if let Some(account_id) = self
+            .last_live_snapshot
+            .as_ref()
+            .filter(|snapshot| !self.sessions.is_unlocked(snapshot.account_id.as_str()))
+            .map(|snapshot| snapshot.account_id.as_str().to_owned())
+        {
+            self.redact_last_live_for(&account_id);
+        }
+    }
+    fn reap_finished_live(&mut self) {
+        if self
+            .live_job
+            .as_ref()
+            .is_some_and(|job| job.worker.is_finished())
+            && let Some(job) = self.live_job.take()
+        {
+            let _ = job.worker.join();
+            self.last_live_snapshot = Some(match job.snapshot.lock() {
+                Ok(value) => value.clone(),
+                Err(poisoned) => poisoned.into_inner().clone(),
+            });
+        }
+    }
+    fn cancel_any_live(&mut self) {
+        if let Some(job) = self.live_job.take() {
+            job.cancellation.cancel();
+            let _ = job.worker.join();
+            let mut snapshot = match job.snapshot.lock() {
+                Ok(value) => value.clone(),
+                Err(poisoned) => poisoned.into_inner().clone(),
+            };
+            snapshot.phase = crate::zec::LiveSyncPhase::Cancelled;
+            snapshot.scanned_height = None;
+            snapshot.target_height = None;
+            snapshot.confirmed_received_zat = None;
+            snapshot.pending_received_zat = None;
+            self.last_live_snapshot = Some(snapshot);
+        }
     }
 
     pub fn fresh_receiver(

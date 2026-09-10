@@ -2373,7 +2373,10 @@ test('WAL-006 manifest requires six exact defaults-off pins and the minimum dire
     ['version = "=0.30.1"', 'version = "0.30"'],
     ['version = "=0.10.5"', 'version = "0.10"'],
     ['version = "=0.16.1"', 'version = "0.16"'],
-    ['features = ["pczt"]', 'features = ["pczt", "sync"]'],
+    [
+      'features = ["lightwalletd-tonic", "pczt"]',
+      'features = ["lightwalletd-tonic", "pczt", "sync"]',
+    ],
     [
       'features = ["orchard", "serde", "test-dependencies", "transparent-inputs"]',
       'features = ["orchard", "serde", "test-dependencies", "transparent-inputs", "zewif"]',
@@ -3165,7 +3168,10 @@ test('WAL-007 manifest freezes one MD5 interop dependency, empty local-gate feat
     (line) => /^\S+\s*=\s*\{/.test(line) &&
       /\b(?:md-5|monero|reqwest|tokio|url|openssl|rustls)\b/i.test(line)
   );
-  assert.deepStrictEqual(xmrAuthorityDependencies, [WAL007_DIRECT_DEPENDENCY]);
+  assert.deepStrictEqual(xmrAuthorityDependencies, [
+    WAL007_DIRECT_DEPENDENCY,
+    'tokio = { version = "=1.52.3", default-features = false, features = ["rt", "net", "time", "macros"] }',
+  ]);
   for (const target of WAL007_TEST_TARGETS) {
     assert.ok(manifestText.includes(`name = "${target}"`), `missing WAL-007 target ${target}`);
     assert.ok(manifestText.includes(`path = "tests/${target}.rs"`), `wrong WAL-007 path ${target}`);

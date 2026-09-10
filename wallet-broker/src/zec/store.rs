@@ -2450,7 +2450,7 @@ fn validate_sqlite_database(connection: &Connection) -> Result<(), ZecError> {
     }
 }
 
-fn validate_upstream_schema(connection: &Connection) -> Result<(), ZecError> {
+pub(crate) fn validate_upstream_schema(connection: &Connection) -> Result<(), ZecError> {
     for table in ["accounts", "addresses", "scan_queue", "schemer_migrations"] {
         let count = connection
             .query_row(

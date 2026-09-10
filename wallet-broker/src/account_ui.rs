@@ -11,7 +11,10 @@ use crate::accounts::{AccountManager, AccountSummary, PreparedRestore};
 use crate::native::ActionOrigin;
 use crate::session::MonotonicClock;
 use crate::vault::{EntropyPort, SecretBytes, WipeObserver};
-use crate::zec::{FreshReceiverV1, Network as ZecNetwork};
+use crate::zec::{
+    FreshReceiverV1, LiveEndpoint, LiveSyncJobId, LiveSyncPhase, LiveSyncSnapshot,
+    Network as ZecNetwork,
+};
 
 const MAX_PASSPHRASE_BYTES: usize = 1_024;
 const TITLE: &str = "BitBook accounts";
@@ -25,6 +28,15 @@ pub trait AccountUiPort {
     fn unlock(&mut self, id: &str, passphrase: SecretBytes) -> Result<(), &'static str>;
     fn lock(&mut self, id: &str) -> Result<(), &'static str>;
     fn receive(&mut self, _id: &str) -> Result<FreshReceiverV1, &'static str> {
+        Err(UNAVAILABLE)
+    }
+    fn start_sync(&mut self, _id: &str, _endpoint: &str) -> Result<LiveSyncJobId, &'static str> {
+        Err(UNAVAILABLE)
+    }
+    fn sync_status(&mut self, _id: &str) -> Result<LiveSyncSnapshot, &'static str> {
+        Err(UNAVAILABLE)
+    }
+    fn cancel_sync(&mut self, _id: &str, _job: LiveSyncJobId) -> Result<(), &'static str> {
         Err(UNAVAILABLE)
     }
     fn lock_all(&mut self);
@@ -89,6 +101,21 @@ impl<C: MonotonicClock + Send, E: EntropyPort + Send, W: WipeObserver + Send> Ac
 
     fn receive(&mut self, id: &str) -> Result<FreshReceiverV1, &'static str> {
         self.with_manager(|manager| manager.fresh_receiver(ActionOrigin::NativeSurface, id))
+    }
+
+    fn start_sync(&mut self, id: &str, endpoint: &str) -> Result<LiveSyncJobId, &'static str> {
+        let endpoint = LiveEndpoint::parse(endpoint).map_err(|error| error.code())?;
+        self.with_manager(|manager| {
+            manager.start_live_sync(ActionOrigin::NativeSurface, id, endpoint)
+        })
+    }
+
+    fn sync_status(&mut self, id: &str) -> Result<LiveSyncSnapshot, &'static str> {
+        self.with_manager(|manager| manager.live_sync_status(id))
+    }
+
+    fn cancel_sync(&mut self, id: &str, job: LiveSyncJobId) -> Result<(), &'static str> {
+        self.with_manager(|manager| manager.cancel_live_sync(ActionOrigin::NativeSurface, id, job))
     }
 
     fn lock_all(&mut self) {
@@ -440,6 +467,12 @@ enum Scene<R> {
     Receive {
         receiver: FreshReceiverV1,
     },
+    Sync {
+        account_id: String,
+        endpoint: String,
+        job: Option<LiveSyncJobId>,
+        snapshot: Option<LiveSyncSnapshot>,
+    },
     Create {
         passphrase: MaskedInput,
         confirmation: MaskedInput,
@@ -473,6 +506,14 @@ impl SafeMessage {
             Self::WalletUnavailable => "Wallet unavailable",
         }
     }
+}
+
+fn format_zec(label: &str, zatoshis: u64) -> String {
+    format!(
+        "{label}: {}.{:08} ZEC",
+        zatoshis / 100_000_000,
+        zatoshis % 100_000_000
+    )
 }
 
 pub struct AccountWindow<P: AccountUiPort, D: AccountDialogs> {
@@ -541,6 +582,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
         }
 
         self.refresh_accounts();
+        self.poll_sync();
         context.request_repaint_after(Duration::from_secs(1));
     }
 
@@ -558,6 +600,15 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                     }
                     _ => false,
                 };
+                let sync_stale = match &self.scene {
+                    Scene::Sync { account_id, .. } => {
+                        self.selected.as_deref() != Some(account_id.as_str())
+                            || !accounts
+                                .iter()
+                                .any(|a| a.account_id == *account_id && !a.locked)
+                    }
+                    _ => false,
+                };
                 self.accounts = accounts;
                 if self.selected.as_ref().is_some_and(|selected| {
                     !self
@@ -567,7 +618,8 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 }) {
                     self.selected = None;
                 }
-                if receive_stale {
+                if receive_stale || sync_stale {
+                    self.cancel_current_sync();
                     self.scene = Scene::List;
                 }
                 if self.list_failed {
@@ -576,7 +628,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 }
             }
             Err(_) => {
-                self.clear_receive_scene();
+                self.clear_account_scene();
                 self.accounts.clear();
                 self.selected = None;
                 self.message = Some(SafeMessage::WalletUnavailable);
@@ -586,7 +638,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
     }
 
     fn port_error(&mut self, code: &'static str) {
-        self.clear_receive_scene();
+        self.clear_account_scene();
         self.accounts.clear();
         self.selected = None;
         self.message = Some(if code == "LOCKED" {
@@ -598,13 +650,57 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
     }
 
     fn clear_private_state(&mut self) {
+        self.cancel_current_sync();
         self.scene = Scene::List;
         self.selected = None;
         self.message = None;
     }
 
-    fn clear_receive_scene(&mut self) {
-        if matches!(&self.scene, Scene::Receive { .. }) {
+    fn cancel_current_sync(&mut self) {
+        if let Scene::Sync {
+            account_id,
+            job: Some(job),
+            ..
+        } = &self.scene
+        {
+            let _ = self.port.cancel_sync(account_id, *job);
+        }
+    }
+
+    fn poll_sync(&mut self) {
+        let (account_id, job) = match &self.scene {
+            Scene::Sync {
+                account_id,
+                job: Some(job),
+                ..
+            } => (account_id.clone(), *job),
+            _ => return,
+        };
+        match self.port.sync_status(&account_id) {
+            Ok(snapshot)
+                if snapshot.account_id.as_str() == account_id
+                    && snapshot.network == ZecNetwork::Testnet
+                    && snapshot.job_id == Some(job) =>
+            {
+                if let Scene::Sync {
+                    snapshot: current, ..
+                } = &mut self.scene
+                {
+                    *current = Some(snapshot);
+                }
+            }
+            Err(_) => {
+                if let Scene::Sync { snapshot, .. } = &mut self.scene {
+                    *snapshot = None;
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn clear_account_scene(&mut self) {
+        self.cancel_current_sync();
+        if matches!(&self.scene, Scene::Receive { .. } | Scene::Sync { .. }) {
             self.scene = Scene::List;
         }
     }
@@ -675,6 +771,23 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
         if ui
             .add_enabled(
                 selected.as_ref().is_some_and(|(_, locked)| !*locked),
+                egui::Button::new("Sync balance"),
+            )
+            .clicked()
+            && let Some((account_id, _)) = selected.as_ref()
+        {
+            self.message = None;
+            self.scene = Scene::Sync {
+                account_id: account_id.clone(),
+                endpoint: "https://testnet.zec.rocks:443".to_owned(),
+                job: None,
+                snapshot: None,
+            };
+            return;
+        }
+        if ui
+            .add_enabled(
+                selected.as_ref().is_some_and(|(_, locked)| !*locked),
                 egui::Button::new("Lock"),
             )
             .clicked()
@@ -732,6 +845,91 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             ui.ctx().copy_text(receiver.receiver);
         }
         if ui.button("Back").clicked() {
+            self.scene = Scene::List;
+            self.message = None;
+        }
+    }
+
+    fn show_sync(&mut self, ui: &mut egui::Ui) {
+        ui.heading("Sync Zcash balance");
+        ui.label("Server");
+        if let Scene::Sync { endpoint, .. } = &mut self.scene {
+            ui.text_edit_singleline(endpoint);
+        }
+        ui.label("The selected server can see your connection IP address.");
+        let (account_id, job, snapshot) = match &self.scene {
+            Scene::Sync {
+                account_id,
+                job,
+                snapshot,
+                ..
+            } => (account_id.clone(), *job, snapshot.clone()),
+            _ => return,
+        };
+        let running = job.is_some()
+            && snapshot
+                .as_ref()
+                .is_none_or(|value| value.phase == LiveSyncPhase::Syncing);
+        if let Some(snapshot) = snapshot {
+            if let (Some(scanned), Some(target)) = (snapshot.scanned_height, snapshot.target_height)
+            {
+                ui.label(format!("Scanned {scanned} of {target}"));
+            }
+            if snapshot.phase == LiveSyncPhase::Current {
+                ui.label("Received shielded funds");
+                if let Some(value) = snapshot.confirmed_received_zat {
+                    ui.label(format_zec("Confirmed", value));
+                }
+                if let Some(value) = snapshot.pending_received_zat {
+                    ui.label(format_zec("Pending", value));
+                }
+            }
+            match snapshot.phase {
+                LiveSyncPhase::Syncing => {
+                    ui.label("Syncing");
+                }
+                LiveSyncPhase::Cancelled => {
+                    ui.label("Sync cancelled");
+                }
+                LiveSyncPhase::Failed => {
+                    ui.label("Sync failed");
+                }
+                LiveSyncPhase::RescanRequired => {
+                    ui.label("Rescan required");
+                }
+                LiveSyncPhase::Stale => {
+                    ui.label("Sync incomplete");
+                }
+                _ => {}
+            }
+        } else {
+            ui.label("Unsynced — no completed scan");
+        }
+        if !running && ui.button("Sync").clicked() {
+            let endpoint = match &self.scene {
+                Scene::Sync { endpoint, .. } => endpoint.clone(),
+                _ => return,
+            };
+            match self.port.start_sync(&account_id, &endpoint) {
+                Ok(id) => {
+                    if let Scene::Sync { job, snapshot, .. } = &mut self.scene {
+                        *job = Some(id);
+                        *snapshot = None
+                    }
+                    self.poll_sync()
+                }
+                Err(error) => self.port_error(error),
+            }
+        }
+        if running && ui.button("Cancel sync").clicked() {
+            self.cancel_current_sync();
+            if let Scene::Sync { job, snapshot, .. } = &mut self.scene {
+                *job = None;
+                *snapshot = None;
+            }
+        }
+        if ui.button("Back").clicked() {
+            self.cancel_current_sync();
             self.scene = Scene::List;
             self.message = None;
         }
@@ -983,6 +1181,8 @@ impl<P: AccountUiPort, D: AccountDialogs> eframe::App for AccountWindow<P, D> {
                 self.show_list(ui);
             } else if matches!(&self.scene, Scene::Receive { .. }) {
                 self.show_receive(ui);
+            } else if matches!(&self.scene, Scene::Sync { .. }) {
+                self.show_sync(ui);
             } else if matches!(&self.scene, Scene::Create { .. }) {
                 self.show_create(ui);
             } else if matches!(&self.scene, Scene::Unlock { .. }) {

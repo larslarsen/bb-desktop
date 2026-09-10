@@ -810,7 +810,7 @@ fn validate_intended_fixture(
     Ok(())
 }
 
-fn derive_chain_states<P: Parameters + Send + 'static>(
+pub(crate) fn derive_chain_states<P: Parameters + Send + 'static>(
     params: &P,
     checkpoint_height: u32,
     blocks: &[CompactBlock],
@@ -1281,13 +1281,13 @@ struct OfficialBalanceObservation {
 }
 
 #[derive(Clone, Copy)]
-struct OrphanProjection {
+pub(crate) struct OrphanProjection {
     sapling: u64,
-    orchard: u64,
-    ironwood: u64,
+    pub(crate) orchard: u64,
+    pub(crate) ironwood: u64,
 }
 
-fn orphan_projection(
+pub(crate) fn orphan_projection(
     connection: &Connection,
     account: AccountUuid,
     target_height: u32,

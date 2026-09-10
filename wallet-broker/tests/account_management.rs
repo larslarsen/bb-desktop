@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 
 use bitbook_wallet_broker::accounts::{AccountError, AccountManager, AccountSummary};
 use bitbook_wallet_broker::native::ActionOrigin;
@@ -15,8 +16,12 @@ use bitbook_wallet_broker::vault::{
     Asset, EntropyPort, MAX_ENVELOPE_BYTES, Network, SecretBytes, VaultError, VaultMetadata,
     VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes, parse_vault, seal_vault,
 };
-use bitbook_wallet_broker::zec::test_support::decode_unified_address;
-use bitbook_wallet_broker::zec::{FreshReceiverV1, Network as ZecNetwork};
+use bitbook_wallet_broker::zec::test_support::{
+    RecordedLiveSource, decode_unified_address, live_job_id, replace_live_ufvk_for_test,
+};
+use bitbook_wallet_broker::zec::{
+    FreshReceiverV1, LiveEndpoint, LiveSyncPhase, Network as ZecNetwork,
+};
 use rusqlite::{Connection, params};
 use zcash_keys::keys::{UnifiedAddressRequest, UnifiedSpendingKey};
 use zcash_protocol::consensus::Network::TestNetwork;
@@ -40,6 +45,7 @@ const FORBIDDEN: [ActionOrigin; 3] = [
     ActionOrigin::BrokerProtocol,
     ActionOrigin::Http,
 ];
+const LIVE_ENDPOINT: &str = "https://testnet.zec.rocks:443";
 
 struct Scratch {
     root: PathBuf,
@@ -139,6 +145,10 @@ fn unlink_zec_account(network: &Path, account_id: &str) -> Result<(), String> {
         "compact.sqlite3-journal",
         "compact.sqlite3-wal",
         "compact.sqlite3-shm",
+        "live.sqlite3",
+        "live.sqlite3-journal",
+        "live.sqlite3-wal",
+        "live.sqlite3-shm",
     ] {
         unlink_any(&directory.join(name))?;
     }
@@ -664,6 +674,15 @@ fn unlocked(
         .find(|summary| summary.account_id == account_id)
         .map(|summary| !summary.locked)
         .unwrap_or(false)
+}
+
+fn blocked_live_source() -> (
+    RecordedLiveSource,
+    bitbook_wallet_broker::zec::test_support::LiveSourceProbe,
+) {
+    let source = RecordedLiveSource::blocking_testnet_metadata();
+    let probe = source.probe();
+    (source, probe)
 }
 
 #[test]
@@ -1898,4 +1917,284 @@ fn wal014_foreign_ufvk_binding_refuses_without_advancing_issuance() {
     assert!(harness.wipes.labeled_wipe("zec-seed", SEED_A.len()));
     let connection = Connection::open(&wallet_db).unwrap();
     assert_eq!(read_state(&connection), before);
+}
+
+#[test]
+fn wal015_sync_is_native_unlocked_bound_and_gated_before_source_access() {
+    let harness = Harness::new("wal015-sync-gates");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xe1, 0xe2, 0x21);
+    let account_id = id_hex(&ID_A);
+    let endpoint = LiveEndpoint::parse(LIVE_ENDPOINT).unwrap();
+    let zec_network = harness.scratch.root.join("zec-testnet");
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+
+    for origin in FORBIDDEN {
+        let (source, probe) = blocked_live_source();
+        assert_public_error(
+            &manager
+                .start_live_sync_with_source_for_test(origin, &account_id, endpoint.clone(), source)
+                .unwrap_err(),
+            "UNAUTH",
+        );
+        assert!(probe.observation().rpc_methods.is_empty());
+        assert!(!zec_network.exists());
+    }
+
+    let (source, probe) = blocked_live_source();
+    assert_public_error(
+        &manager
+            .start_live_sync_with_source_for_test(
+                ActionOrigin::NativeSurface,
+                "../not-an-account",
+                endpoint.clone(),
+                source,
+            )
+            .unwrap_err(),
+        "SCHEMA",
+    );
+    assert!(probe.observation().rpc_methods.is_empty());
+
+    let (source, probe) = blocked_live_source();
+    assert_public_error(
+        &manager
+            .start_live_sync_with_source_for_test(
+                ActionOrigin::NativeSurface,
+                &account_id,
+                endpoint.clone(),
+                source,
+            )
+            .unwrap_err(),
+        "LOCKED",
+    );
+    assert!(probe.observation().rpc_methods.is_empty());
+    assert!(!zec_network.exists());
+
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let (source, probe) = blocked_live_source();
+    let job = manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint,
+            source,
+        )
+        .unwrap();
+    assert!(probe.wait_until_blocked(Duration::from_secs(2)));
+    let status = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(status.job_id, Some(job));
+    assert_eq!(status.account_id.as_str(), account_id);
+    assert_eq!(status.network, ZecNetwork::Testnet);
+    assert_eq!(status.phase, LiveSyncPhase::Syncing);
+    assert_eq!(status.confirmed_received_zat, None);
+    assert_eq!(status.pending_received_zat, None);
+
+    let wallet_db = zec_network.join(&account_id).join("wallet.sqlite3");
+    let receiver_state: (Option<i64>, i64) = Connection::open(&wallet_db)
+        .unwrap()
+        .query_row(
+            "SELECT last_diversifier_index, issued_at_sequence
+             FROM ext_bitbook_receiver_state
+             JOIN ext_bitbook_sequence_state USING (account_id)
+             WHERE account_id = ?1",
+            [&account_id],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .unwrap();
+    assert_eq!(
+        receiver_state,
+        (None, 0),
+        "sync preparation issued an address"
+    );
+
+    manager
+        .cancel_live_sync(ActionOrigin::NativeSurface, &account_id, job)
+        .unwrap();
+    assert!(probe.wait_for_exit(Duration::from_secs(2)));
+}
+
+#[test]
+fn wal015_one_worker_lock_expiry_and_drop_cancel_and_join_without_holding_manager() {
+    let harness = Harness::new("wal015-sync-lifecycle");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xe3, 0xe4, 0x22);
+    let account_id = id_hex(&ID_A);
+    let endpoint = LiveEndpoint::parse(LIVE_ENDPOINT).unwrap();
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+
+    let (source, first_probe) = blocked_live_source();
+    let first_job = manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint.clone(),
+            source,
+        )
+        .unwrap();
+    assert!(first_probe.wait_until_blocked(Duration::from_secs(2)));
+    assert_eq!(listed_ids(&mut manager), vec![account_id.clone()]);
+    let (second, second_probe) = blocked_live_source();
+    assert_public_error(
+        &manager
+            .start_live_sync_with_source_for_test(
+                ActionOrigin::NativeSurface,
+                &account_id,
+                endpoint.clone(),
+                second,
+            )
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert!(second_probe.observation().rpc_methods.is_empty());
+    assert_public_error(
+        &manager
+            .cancel_live_sync(ActionOrigin::NativeSurface, &account_id, live_job_id(0))
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert_eq!(
+        manager.live_sync_status(&account_id).unwrap().job_id,
+        Some(first_job)
+    );
+    assert!(!first_probe.has_exited());
+    manager.lock(&account_id).unwrap();
+    assert!(first_probe.wait_for_exit(Duration::from_secs(2)));
+    let cancelled = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(cancelled.job_id, Some(first_job));
+    assert_eq!(cancelled.phase, LiveSyncPhase::Cancelled);
+
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let (source, expiry_probe) = blocked_live_source();
+    manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint.clone(),
+            source,
+        )
+        .unwrap();
+    assert!(expiry_probe.wait_until_blocked(Duration::from_secs(2)));
+    harness.clock.set(1_000 + AUTHORIZATION_IDLE_MILLIS);
+    let listed = manager.list().unwrap();
+    assert!(listed.iter().all(|account| account.locked));
+    assert!(expiry_probe.wait_for_exit(Duration::from_secs(2)));
+    assert!(!unlocked(&mut manager, &account_id));
+
+    harness.clock.set(2_000 + AUTHORIZATION_IDLE_MILLIS);
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let (source, drop_probe) = blocked_live_source();
+    manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint,
+            source,
+        )
+        .unwrap();
+    assert!(drop_probe.wait_until_blocked(Duration::from_secs(2)));
+    drop(manager);
+    assert!(drop_probe.wait_for_exit(Duration::from_secs(2)));
+    let _reopened = harness.manager();
+}
+
+#[test]
+fn wal015_live_cache_binding_failure_preserves_vault_receive_state_and_receiver_continuity() {
+    let harness = Harness::new("wal015-sync-binding");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xe5, 0xe6, 0x23);
+    let account_id = id_hex(&ID_A);
+    let endpoint = LiveEndpoint::parse(LIVE_ENDPOINT).unwrap();
+    let vault_path = harness
+        .scratch
+        .accounts()
+        .join(format!("{account_id}.vault"));
+    let account_dir = harness.scratch.root.join("zec-testnet").join(&account_id);
+    let wallet_path = account_dir.join("wallet.sqlite3");
+    let compact_path = account_dir.join("compact.sqlite3");
+    let live_path = account_dir.join("live.sqlite3");
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    let vault_before = fs::read(&vault_path).unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let first = manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert_scripted_receiver(&first, &account_id, &SEED_A, 0, 1);
+    let wallet_before = fs::read(&wallet_path).unwrap();
+    let compact_before = fs::read(&compact_path).unwrap();
+
+    let (source, probe) = blocked_live_source();
+    let job = manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint.clone(),
+            source,
+        )
+        .unwrap();
+    assert!(probe.wait_until_blocked(Duration::from_secs(2)));
+    assert_eq!(mode(&account_dir), 0o700);
+    assert_eq!(mode(&live_path), 0o600);
+    manager
+        .cancel_live_sync(ActionOrigin::NativeSurface, &account_id, job)
+        .unwrap();
+    assert!(probe.wait_for_exit(Duration::from_secs(2)));
+    assert_eq!(fs::read(&vault_path).unwrap(), vault_before);
+    assert_eq!(fs::read(&wallet_path).unwrap(), wallet_before);
+    assert_eq!(fs::read(&compact_path).unwrap(), compact_before);
+
+    replace_live_ufvk_for_test(&live_path, &oracle_ufvk(&SEED_B)).unwrap();
+    let hostile_before = fs::read(&live_path).unwrap();
+    let (source, foreign_probe) = blocked_live_source();
+    assert_public_error(
+        &manager
+            .start_live_sync_with_source_for_test(
+                ActionOrigin::NativeSurface,
+                &account_id,
+                endpoint,
+                source,
+            )
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert!(foreign_probe.observation().rpc_methods.is_empty());
+    assert_eq!(fs::read(&live_path).unwrap(), hostile_before);
+    assert_eq!(fs::read(&vault_path).unwrap(), vault_before);
+
+    let second = manager
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert_scripted_receiver(&second, &account_id, &SEED_A, 1, 2);
+    drop(manager);
+    let mut reopened = harness.manager();
+    reopened
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let third = reopened
+        .fresh_receiver(ActionOrigin::NativeSurface, &account_id)
+        .unwrap();
+    assert_scripted_receiver(&third, &account_id, &SEED_A, 2, 3);
+    assert_eq!(fs::read(&vault_path).unwrap(), vault_before);
 }

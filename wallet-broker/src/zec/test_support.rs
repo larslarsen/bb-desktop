@@ -1,13 +1,21 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, OpenOptions};
+use std::os::linux::fs::MetadataExt as LinuxMetadataExt;
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt, PermissionsExt, symlink};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{Arc, Mutex, MutexGuard};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::{Arc, Condvar, Mutex, MutexGuard};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use incrementalmerkletree::frontier::CommitmentTree;
+use prost::Message;
+use rusqlite::Connection;
 use sha2::{Digest, Sha256};
+use zcash_client_backend::data_api::chain::ChainState;
+use zcash_client_backend::proto::compact_formats::CompactBlock;
+use zcash_client_backend::proto::service::{BlockId, LightdInfo, TreeState};
 use zcash_keys::address::Address;
+use zcash_primitives::merkle_tree::write_commitment_tree;
 use zcash_protocol::consensus::{BlockHeight, BranchId};
 
 use crate::native::{
@@ -4763,3 +4771,744 @@ pub(crate) fn verification_context_test_root(label: &str) -> StateRoot {
 
 #[cfg(test)]
 pub(crate) mod cleanup_lifecycle_tests;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LiveSourceFault {
+    WrongNetwork,
+    ProtocolBeforeNu5,
+    TipHeightOverflow,
+    TipHashWrongLength,
+    TreeStateNetwork,
+    TreeStateHeight,
+    TreeStateHash,
+    TreeStateOversized,
+    MissingBlock,
+    DuplicateBlock,
+    ExtraBlock,
+    WrongPreviousHash,
+    BlockOversized,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LiveEngineFault {
+    ScanWrite,
+    CheckpointWrite,
+    Commit,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LiveStoreEntryKind {
+    Symlink,
+    HardLink,
+    WrongMode,
+    WrongOwner,
+    HostileJournal,
+    HostileWal,
+    HostileShm,
+    CorruptDatabase,
+    PartialSchema,
+    ForeignUfvk,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct LiveSourceObservation {
+    pub rpc_methods: Vec<String>,
+    pub requested_ranges: Vec<(u32, u32)>,
+    pub requested_tree_heights: Vec<u32>,
+    pub returned_counts: Vec<usize>,
+    pub returned_bytes: Vec<usize>,
+    pub transport_wait_interrupted: bool,
+    pub mutated_response_count: usize,
+    pub reported_ancestor_depth: Option<usize>,
+    pub tree_states_returned: usize,
+}
+struct ProbeState {
+    observation: LiveSourceObservation,
+    blocked: bool,
+    exited: bool,
+}
+#[derive(Clone)]
+pub struct LiveSourceProbe(Arc<(Mutex<ProbeState>, Condvar)>);
+impl LiveSourceProbe {
+    pub fn observation(&self) -> LiveSourceObservation {
+        mutex_lock(&(self.0).0).observation.clone()
+    }
+    pub fn wait_until_blocked(&self, d: Duration) -> bool {
+        let (g, _) = self
+            .0
+            .1
+            .wait_timeout_while(mutex_lock(&(self.0).0), d, |s| !s.blocked)
+            .unwrap_or_else(|p| p.into_inner());
+        g.blocked
+    }
+    pub fn wait_for_exit(&self, d: Duration) -> bool {
+        let (g, _) = self
+            .0
+            .1
+            .wait_timeout_while(mutex_lock(&(self.0).0), d, |s| !s.exited)
+            .unwrap_or_else(|p| p.into_inner());
+        g.exited
+    }
+    pub fn has_exited(&self) -> bool {
+        mutex_lock(&(self.0).0).exited
+    }
+}
+
+pub struct RecordedLiveSource {
+    network: Network,
+    blocks: Vec<CompactBlock>,
+    states: BTreeMap<u32, ChainState>,
+    tip: u32,
+    fault: Option<LiveSourceFault>,
+    probe: LiveSourceProbe,
+    blocking: bool,
+    cancel_on_range: Option<(usize, super::LiveCancellation)>,
+    range_calls: usize,
+    deep: Option<usize>,
+}
+impl RecordedLiveSource {
+    pub fn canonical(f: &FrozenFixture) -> Result<Self, ZecError> {
+        Self::from_fixture(f, false)
+    }
+    pub fn one_block_reorg(f: &FrozenFixture) -> Result<Self, ZecError> {
+        Self::from_fixture(f, true)
+    }
+    fn from_fixture(f: &FrozenFixture, reorg: bool) -> Result<Self, ZecError> {
+        let v = f.inner.validate_complete()?;
+        let n = super::LocalNetwork::new(
+            v.manifest.network.birthday_height,
+            v.manifest.network.nu6_3,
+            v.manifest.expected.confirmation_height,
+        )?;
+        let final_height = v
+            .manifest
+            .scenarios
+            .canonical
+            .last()
+            .ok_or_else(ZecError::state_corrupt)
+            .and_then(|name| v.file(name))?
+            .height_hint
+            .ok_or_else(ZecError::state_corrupt)?;
+        let mut raw = v.canonical_through(final_height)?;
+        if reorg {
+            *raw.last_mut().ok_or_else(ZecError::state_corrupt)? =
+                v.scenario_file("one-block-reorg")?;
+        }
+        let blocks = raw
+            .into_iter()
+            .map(|b| {
+                CompactBlock::decode(b.bytes.as_slice())
+                    .map_err(|_| ZecError::protocol_incompatible())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let states = super::scan::derive_chain_states(
+            &n.upstream(),
+            v.manifest.network.checkpoint_height,
+            &blocks,
+        )?;
+        let tip = blocks
+            .last()
+            .and_then(|b| u32::try_from(b.height).ok())
+            .ok_or_else(ZecError::state_corrupt)?;
+        Ok(Self {
+            network: Network::Local(n),
+            blocks,
+            states,
+            tip,
+            fault: None,
+            probe: new_probe(),
+            blocking: false,
+            cancel_on_range: None,
+            range_calls: 0,
+            deep: None,
+        })
+    }
+    pub fn blocking_testnet_metadata() -> Self {
+        Self {
+            network: Network::Testnet,
+            blocks: Vec::new(),
+            states: BTreeMap::new(),
+            tip: 0,
+            fault: None,
+            probe: new_probe(),
+            blocking: true,
+            cancel_on_range: None,
+            range_calls: 0,
+            deep: None,
+        }
+    }
+    pub fn fork_beyond_retained_checkpoint(depth: usize) -> Self {
+        let fixture = FrozenFixture::open("tests/fixtures/zec").expect("frozen live fixture");
+        let mut source = Self::canonical(&fixture).expect("canonical live source");
+        source.deep = Some(depth);
+        source
+    }
+    pub fn probe(&self) -> LiveSourceProbe {
+        self.probe.clone()
+    }
+    pub fn observation(&self) -> LiveSourceObservation {
+        self.probe.observation()
+    }
+    pub fn arm_fault(&mut self, f: LiveSourceFault) {
+        self.fault = Some(f)
+    }
+    pub fn cancel_before_range_request(&mut self, n: usize, c: super::LiveCancellation) {
+        self.cancel_on_range = Some((n, c))
+    }
+    fn observe(&self, name: &str) {
+        mutex_lock(&(self.probe.0).0)
+            .observation
+            .rpc_methods
+            .push(name.to_owned())
+    }
+    fn mutated(&self) {
+        mutex_lock(&(self.probe.0).0)
+            .observation
+            .mutated_response_count += 1
+    }
+}
+fn new_probe() -> LiveSourceProbe {
+    LiveSourceProbe(Arc::new((
+        Mutex::new(ProbeState {
+            observation: LiveSourceObservation::default(),
+            blocked: false,
+            exited: false,
+        }),
+        Condvar::new(),
+    )))
+}
+impl Drop for RecordedLiveSource {
+    fn drop(&mut self) {
+        let mut s = mutex_lock(&(self.probe.0).0);
+        s.exited = true;
+        (self.probe.0).1.notify_all()
+    }
+}
+impl super::LiveSource for RecordedLiveSource {
+    fn metadata(
+        &mut self,
+        _: Network,
+        c: &super::LiveCancellation,
+    ) -> Result<super::live::SourceMetadata, ZecError> {
+        self.observe("GetLightdInfo");
+        if self.blocking {
+            let mut s = mutex_lock(&(self.probe.0).0);
+            s.blocked = true;
+            (self.probe.0).1.notify_all();
+            while !c.is_cancelled() {
+                let (g, _) = self
+                    .probe
+                    .0
+                    .1
+                    .wait_timeout(s, Duration::from_millis(20))
+                    .unwrap_or_else(|p| p.into_inner());
+                s = g
+            }
+            s.observation.transport_wait_interrupted = true;
+            return Err(ZecError::cancelled());
+        }
+        self.observe("GetLatestBlock");
+        let mut chain = if matches!(self.network, Network::Testnet) {
+            "test"
+        } else {
+            "local"
+        }
+        .to_owned();
+        if self.fault == Some(LiveSourceFault::WrongNetwork) {
+            chain = "main".into();
+            self.mutated()
+        }
+        let mut height = u64::from(self.tip);
+        if self.fault == Some(LiveSourceFault::TipHeightOverflow) {
+            height = u64::MAX;
+            self.mutated()
+        }
+        let mut hash = self
+            .blocks
+            .iter()
+            .find(|block| block.height == u64::from(self.tip))
+            .map(|block| block.hash.clone())
+            .unwrap_or_else(|| vec![0; 32]);
+        if self.deep.is_some() {
+            hash = vec![0xff; 32]
+        }
+        if self.fault == Some(LiveSourceFault::TipHashWrongLength) {
+            hash.pop();
+            self.mutated()
+        }
+        let mut branch = match self.network {
+            Network::Testnet => format!(
+                "{:08x}",
+                u32::from(BranchId::for_height(
+                    &zcash_protocol::consensus::Network::TestNetwork,
+                    BlockHeight::from_u32(self.tip)
+                ))
+            ),
+            Network::Local(network) => format!(
+                "{:08x}",
+                u32::from(BranchId::for_height(
+                    &network.upstream(),
+                    BlockHeight::from_u32(self.tip)
+                ))
+            ),
+        };
+        if self.fault == Some(LiveSourceFault::ProtocolBeforeNu5) {
+            self.mutated();
+            branch = "00000000".to_owned()
+        }
+        let sapling_activation_height = match self.network {
+            Network::Testnet => 1_842_420,
+            Network::Local(network) => u64::from(network.birthday_height()),
+        };
+        Ok(super::live::SourceMetadata {
+            info: LightdInfo {
+                chain_name: chain,
+                consensus_branch_id: branch,
+                block_height: height,
+                estimated_height: height,
+                sapling_activation_height,
+                ..Default::default()
+            },
+            tip: BlockId { height, hash },
+        })
+    }
+    fn tree_state(&mut self, h: u32, _: &super::LiveCancellation) -> Result<TreeState, ZecError> {
+        self.observe("GetTreeState");
+        {
+            let mut state = mutex_lock(&(self.probe.0).0);
+            state.observation.tree_states_returned += 1;
+            state.observation.requested_tree_heights.push(h);
+        }
+        let state = self
+            .states
+            .get(&h)
+            .ok_or_else(ZecError::protocol_incompatible)?;
+        let mut raw = raw_tree_state(
+            state,
+            if matches!(self.network, Network::Testnet) {
+                "test"
+            } else {
+                "local"
+            },
+        )?;
+        if let Some(depth) = self.deep {
+            raw.hash = "ff".repeat(32);
+            mutex_lock(&(self.probe.0).0)
+                .observation
+                .reported_ancestor_depth = Some(depth);
+            self.mutated();
+            return Ok(raw);
+        }
+        match self.fault {
+            Some(LiveSourceFault::TreeStateNetwork) => raw.network = "main".into(),
+            Some(LiveSourceFault::TreeStateHeight) => raw.height = raw.height.saturating_add(1),
+            Some(LiveSourceFault::TreeStateHash) => {
+                let replacement = if raw.hash.starts_with('0') { "1" } else { "0" };
+                raw.hash.replace_range(..1, replacement);
+            }
+            Some(LiveSourceFault::TreeStateOversized) => {
+                raw.sapling_tree = "00".repeat(super::MAX_COMPACT_BLOCK_BYTES + 1)
+            }
+            _ => return Ok(raw),
+        }
+        self.mutated();
+        Ok(raw)
+    }
+    fn blocks(
+        &mut self,
+        from: u32,
+        through: u32,
+        _: &super::LiveCancellation,
+    ) -> Result<Vec<CompactBlock>, ZecError> {
+        self.observe("GetBlockRange");
+        self.range_calls += 1;
+        if let Some((n, c)) = &self.cancel_on_range
+            && *n == self.range_calls
+        {
+            c.cancel();
+            mutex_lock(&(self.probe.0).0)
+                .observation
+                .transport_wait_interrupted = true;
+            return Err(ZecError::cancelled());
+        }
+        let mut out = self
+            .blocks
+            .iter()
+            .filter(|b| b.height >= u64::from(from) && b.height <= u64::from(through))
+            .cloned()
+            .collect::<Vec<_>>();
+        match self.fault {
+            Some(LiveSourceFault::MissingBlock) => {
+                out.pop();
+                self.mutated()
+            }
+            Some(LiveSourceFault::DuplicateBlock) => {
+                if let Some(b) = out.first().cloned() {
+                    out.insert(0, b)
+                }
+                self.mutated()
+            }
+            Some(LiveSourceFault::ExtraBlock) => {
+                if let Some(b) = out.last().cloned() {
+                    out.push(b)
+                }
+                self.mutated()
+            }
+            Some(LiveSourceFault::WrongPreviousHash) => {
+                if let Some(b) = out.get_mut(1) {
+                    b.prev_hash = vec![9; 32]
+                }
+                self.mutated()
+            }
+            Some(LiveSourceFault::BlockOversized) => {
+                if let Some(block) = out.first_mut() {
+                    block.header = vec![0; super::MAX_COMPACT_BLOCK_BYTES + 1]
+                }
+                self.mutated()
+            }
+            _ => {}
+        }
+        let bytes = out.iter().map(Message::encoded_len).sum();
+        let mut s = mutex_lock(&(self.probe.0).0);
+        s.observation.requested_ranges.push((from, through));
+        s.observation.returned_counts.push(out.len());
+        s.observation.returned_bytes.push(bytes);
+        Ok(out)
+    }
+}
+
+fn raw_tree_state(state: &ChainState, network: &str) -> Result<TreeState, ZecError> {
+    fn encoded<
+        N: zcash_primitives::merkle_tree::HashSer + incrementalmerkletree::Hashable + Clone,
+        const D: u8,
+    >(
+        frontier: &incrementalmerkletree::frontier::Frontier<N, D>,
+    ) -> Result<String, ZecError> {
+        let tree = CommitmentTree::from_frontier(frontier);
+        let mut bytes = Vec::new();
+        write_commitment_tree(&tree, &mut bytes).map_err(|_| ZecError::state_corrupt())?;
+        Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
+    }
+    let mut hash = state.block_hash().0.to_vec();
+    hash.reverse();
+    Ok(TreeState {
+        network: network.to_owned(),
+        height: u64::from(u32::from(state.block_height())),
+        hash: hash.iter().map(|b| format!("{b:02x}")).collect(),
+        time: 0,
+        sapling_tree: encoded(state.final_sapling_tree())?,
+        orchard_tree: encoded(state.final_orchard_tree())?,
+        ironwood_tree: encoded(state.final_ironwood_tree())?,
+    })
+}
+
+pub fn validate_live_batch_shape_for_test(
+    sizes: &[usize],
+    expected: usize,
+) -> Result<(), ZecError> {
+    super::live::validate_batch_shape(sizes, expected)
+}
+pub fn validate_live_batch_for_test(
+    blocks: &[CompactBlock],
+    from: u32,
+    through: u32,
+) -> Result<(), ZecError> {
+    super::live::validate_batch(blocks, from, through)
+}
+
+#[derive(Debug)]
+pub struct LiveTransportProbe {
+    pub tip_height: u32,
+    pub block_count: usize,
+}
+
+pub fn probe_live_transport_for_test(
+    endpoint: &str,
+    ca_pem: Option<&[u8]>,
+    cancellation: super::LiveCancellation,
+    deadline: Duration,
+) -> Result<LiveTransportProbe, ZecError> {
+    super::live_transport::probe_live_transport(endpoint, ca_pem, cancellation, deadline).map(
+        |probe| LiveTransportProbe {
+            tip_height: probe.tip_height,
+            block_count: probe.block_count,
+        },
+    )
+}
+pub fn live_job_id(value: u64) -> super::LiveSyncJobId {
+    super::LiveSyncJobId(value)
+}
+pub fn replace_live_ufvk_for_test(path: &std::path::Path, ufvk: &str) -> Result<(), ZecError> {
+    Connection::open(path)
+        .map_err(|_| ZecError::state_corrupt())?
+        .execute(
+            "UPDATE ext_bitbook_live_state SET ufvk=?1 WHERE singleton=1",
+            [ufvk],
+        )
+        .map_err(|_| ZecError::state_corrupt())?;
+    Ok(())
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LiveEngineObservation {
+    pub wallet_db_transactions: usize,
+    pub scan_cached_blocks_calls: usize,
+    pub decoded_recorded_blocks: usize,
+    pub imported_viewing_accounts: usize,
+    pub upstream_truncations: usize,
+}
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LiveInspection {
+    pub committed_height: Option<u32>,
+    pub provisional_height: Option<u32>,
+    pub phase: super::LiveSyncPhase,
+    pub tip_hash: Vec<u8>,
+}
+pub struct LiveRestart {
+    prepared: super::LivePrepared,
+    receive_wallet: PathBuf,
+    fixture_cache: PathBuf,
+    account_directory: PathBuf,
+    receiver: super::store::ReceiverState,
+}
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LiveReceiveState {
+    pub last_diversifier_index: Option<u64>,
+    pub issued_at_sequence: u64,
+}
+pub struct LiveSyncHarness {
+    prepared: super::LivePrepared,
+    receive_wallet: PathBuf,
+    fixture_cache: PathBuf,
+    account_directory: PathBuf,
+    receiver: super::store::ReceiverState,
+    metrics: LiveEngineObservation,
+    fault: Option<LiveEngineFault>,
+    hostile_marker: Option<Vec<u8>>,
+}
+impl LiveSyncHarness {
+    pub fn bootstrap_from_fixture(
+        label: &str,
+        id: AccountId,
+        f: &FrozenFixture,
+    ) -> Result<Self, ZecError> {
+        let root = TestStateRoot::fresh(label);
+        let account = TestAccount::bootstrap_from_fixture(root.clone(), id.clone(), f)?;
+        let paths = account.inner.inspect_paths();
+        let receiver = account.inner.inspect_state()?;
+        let ufvk = account.inner.viewing_key_binding()?;
+        let prepared =
+            super::live::prepare_live_path(root.inner.path(), &id, account.inner.network(), &ufvk)?;
+        Ok(Self {
+            prepared,
+            receive_wallet: paths.wallet_db,
+            fixture_cache: paths.compact_cache,
+            account_directory: paths.account_directory,
+            receiver,
+            metrics: LiveEngineObservation {
+                wallet_db_transactions: 0,
+                scan_cached_blocks_calls: 0,
+                decoded_recorded_blocks: 0,
+                imported_viewing_accounts: 0,
+                upstream_truncations: 0,
+            },
+            fault: None,
+            hostile_marker: None,
+        })
+    }
+    pub fn sync(
+        &mut self,
+        s: &mut RecordedLiveSource,
+        c: &super::LiveCancellation,
+        o: super::LiveSyncOptions,
+    ) -> Result<super::LiveSyncSnapshot, ZecError> {
+        self.sync_inner(s, c, o, None)
+    }
+    pub fn sync_through(
+        &mut self,
+        s: &mut RecordedLiveSource,
+        h: u32,
+        c: &super::LiveCancellation,
+        o: super::LiveSyncOptions,
+    ) -> Result<super::LiveSyncSnapshot, ZecError> {
+        self.sync_inner(s, c, o, Some(h))
+    }
+    fn sync_inner(
+        &mut self,
+        s: &mut RecordedLiveSource,
+        c: &super::LiveCancellation,
+        o: super::LiveSyncOptions,
+        through: Option<u32>,
+    ) -> Result<super::LiveSyncSnapshot, ZecError> {
+        if let Some(h) = through {
+            s.tip = h
+        }
+        let mut hooks = super::live::LiveEngineHooks {
+            fault: self.fault.take().map(|fault| match fault {
+                LiveEngineFault::ScanWrite => super::live::LiveEngineFault::ScanWrite,
+                LiveEngineFault::CheckpointWrite => super::live::LiveEngineFault::CheckpointWrite,
+                LiveEngineFault::Commit => super::live::LiveEngineFault::Commit,
+            }),
+            ..Default::default()
+        };
+        let result =
+            super::live::run_live_sync_with_hooks(&self.prepared, s, c, o, None, &mut hooks);
+        self.metrics.wallet_db_transactions += hooks.observation.wallet_db_transactions;
+        self.metrics.scan_cached_blocks_calls += hooks.observation.scan_cached_blocks_calls;
+        self.metrics.decoded_recorded_blocks += hooks.observation.decoded_recorded_blocks;
+        self.metrics.imported_viewing_accounts += hooks.observation.imported_viewing_accounts;
+        self.metrics.upstream_truncations += hooks.observation.upstream_truncations;
+        result
+    }
+    pub fn inspect(&self) -> Result<LiveInspection, ZecError> {
+        let stored = super::live::inspect_live(&self.prepared)?;
+        Ok(LiveInspection {
+            committed_height: stored.committed_height,
+            provisional_height: stored.provisional_height,
+            phase: stored.phase,
+            tip_hash: stored.tip_hash,
+        })
+    }
+    pub fn engine_observation(&self) -> LiveEngineObservation {
+        self.metrics.clone()
+    }
+    pub fn arm_engine_fault(&mut self, f: LiveEngineFault) {
+        self.fault = Some(f)
+    }
+    pub fn receive_wallet_path(&self) -> &std::path::Path {
+        &self.receive_wallet
+    }
+    pub fn fixture_cache_path(&self) -> &std::path::Path {
+        &self.fixture_cache
+    }
+    pub fn live_cache_path(&self) -> &std::path::Path {
+        &self.prepared.path
+    }
+    pub fn account_directory(&self) -> &std::path::Path {
+        &self.account_directory
+    }
+    pub fn receive_state(&self) -> Result<LiveReceiveState, ZecError> {
+        let connection = Connection::open_with_flags(
+            &self.receive_wallet,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        )
+        .map_err(|_| ZecError::state_corrupt())?;
+        connection.query_row("SELECT last_diversifier_index,issued_at_sequence FROM ext_bitbook_receiver_state JOIN ext_bitbook_sequence_state USING(account_id) WHERE account_id=?1",[self.prepared.account_id.as_str()],|row|Ok(LiveReceiveState{last_diversifier_index:row.get(0)?,issued_at_sequence:row.get(1)?})).map_err(|_|ZecError::state_corrupt())
+    }
+    pub fn close(self) -> Result<LiveRestart, ZecError> {
+        Ok(LiveRestart {
+            prepared: self.prepared,
+            receive_wallet: self.receive_wallet,
+            fixture_cache: self.fixture_cache,
+            account_directory: self.account_directory,
+            receiver: self.receiver,
+        })
+    }
+    pub fn reopen(r: LiveRestart, _: &FrozenFixture) -> Result<Self, ZecError> {
+        super::live::inspect_live(&r.prepared)?;
+        Ok(Self {
+            prepared: r.prepared,
+            receive_wallet: r.receive_wallet,
+            fixture_cache: r.fixture_cache,
+            account_directory: r.account_directory,
+            receiver: r.receiver,
+            metrics: LiveEngineObservation {
+                wallet_db_transactions: 0,
+                scan_cached_blocks_calls: 0,
+                decoded_recorded_blocks: 0,
+                imported_viewing_accounts: 0,
+                upstream_truncations: 0,
+            },
+            fault: None,
+            hostile_marker: None,
+        })
+    }
+    pub fn reopen_via_preparation(
+        r: LiveRestart,
+        fixture: &FrozenFixture,
+    ) -> Result<Self, ZecError> {
+        let root = r
+            .account_directory
+            .parent()
+            .and_then(std::path::Path::parent)
+            .ok_or_else(ZecError::state_corrupt)?;
+        let prepared = super::live::prepare_live_path(
+            root,
+            &r.prepared.account_id,
+            r.prepared.network,
+            &r.prepared.ufvk,
+        )?;
+        Self::reopen(
+            LiveRestart {
+                prepared,
+                receive_wallet: r.receive_wallet,
+                fixture_cache: r.fixture_cache,
+                account_directory: r.account_directory,
+                receiver: r.receiver,
+            },
+            fixture,
+        )
+    }
+    pub fn with_hostile_live_entry(
+        label: &str,
+        id: AccountId,
+        f: &FrozenFixture,
+        kind: LiveStoreEntryKind,
+    ) -> Self {
+        let mut h = Self::bootstrap_from_fixture(label, id, f).expect("hostile live bootstrap");
+        let p = h.prepared.path.clone();
+        match kind {
+            LiveStoreEntryKind::WrongMode => {
+                fs::set_permissions(&p, fs::Permissions::from_mode(0o640)).unwrap()
+            }
+            LiveStoreEntryKind::ForeignUfvk => {
+                let _ = replace_live_ufvk_for_test(&p, "foreign");
+            }
+            LiveStoreEntryKind::CorruptDatabase => fs::write(&p, b"corrupt").unwrap(),
+            LiveStoreEntryKind::PartialSchema => {
+                let _ = Connection::open(&p)
+                    .unwrap()
+                    .execute("DROP TABLE ext_bitbook_live_state", []);
+            }
+            LiveStoreEntryKind::HostileJournal => {
+                create_test_file(&h.account_directory.join("live.sqlite3-journal"), 0o600)
+            }
+            LiveStoreEntryKind::HostileWal => {
+                create_test_file(&h.account_directory.join("live.sqlite3-wal"), 0o600)
+            }
+            LiveStoreEntryKind::HostileShm => {
+                create_test_file(&h.account_directory.join("live.sqlite3-shm"), 0o600)
+            }
+            LiveStoreEntryKind::Symlink => {
+                fs::remove_file(&p).unwrap();
+                symlink("missing", &p).unwrap()
+            }
+            LiveStoreEntryKind::HardLink => {
+                let q = h.account_directory.join("hostile-link");
+                fs::hard_link(&p, &q).unwrap()
+            }
+            LiveStoreEntryKind::WrongOwner => {
+                h.prepared.expected_owner = h.prepared.expected_owner.wrapping_add(1)
+            }
+        }
+        h.hostile_marker = Some(marker(&p));
+        h
+    }
+    pub fn hostile_entry_marker(&self) -> Vec<u8> {
+        marker(&self.prepared.path)
+    }
+}
+fn marker(p: &std::path::Path) -> Vec<u8> {
+    let mut h = Sha256::new();
+    match fs::symlink_metadata(p) {
+        Ok(m) => {
+            h.update(m.st_mode().to_le_bytes());
+            h.update(m.st_nlink().to_le_bytes());
+            if let Ok(b) = fs::read(p) {
+                h.update(b)
+            }
+        }
+        Err(_) => h.update(b"missing"),
+    };
+    h.finalize().to_vec()
+}

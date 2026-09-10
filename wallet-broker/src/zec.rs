@@ -9,6 +9,8 @@ use crate::vault::{SecretBytes, WipeObserver};
 mod address;
 mod fixture;
 mod hardware;
+mod live;
+mod live_transport;
 mod prepare;
 mod scan;
 mod spend;
@@ -21,10 +23,20 @@ pub const MAX_DIVERSIFIER_INDEX: u64 = i64::MAX as u64;
 pub const MAX_ISSUANCE_SEQUENCE: u64 = i64::MAX as u64;
 pub const MAX_FIXTURE_MANIFEST_BYTES: usize = 256 * 1024;
 pub const MAX_COMPACT_BLOCK_BYTES: usize = 2 * 1024 * 1024;
+pub const MAX_LIVE_BATCH_BLOCKS: usize = 100;
+pub const MAX_LIVE_BATCH_BYTES: usize = 32 * 1024 * 1024;
+pub const MAX_LIVE_ENDPOINT_BYTES: usize = 2048;
 pub const MAX_MEMO_BYTES: usize = 512;
 pub const MAX_PREPARED_HANDLES: usize = 64;
 pub const MAX_DIAGNOSTIC_BYTES: usize = 4096;
 
+pub use live::{
+    LiveCancellation, LiveEndpoint, LiveSyncJobId, LiveSyncOptions, LiveSyncPhase, LiveSyncSnapshot,
+};
+pub(crate) use live::{
+    LiveEngineHooks, LivePrepared, LiveSource, prepare_live_account, run_live_sync_with_hooks,
+};
+pub(crate) use live_transport::TonicLiveSource;
 pub use prepare::{HandleBinding, HandleInvalidation, PrepareZecV1, PreparedZecV1};
 
 pub type ScanError = ZecError;
@@ -37,6 +49,18 @@ pub(crate) fn fresh_receiver_for_account(
 ) -> Result<FreshReceiverV1, ZecError> {
     let account_id = AccountId::parse(account_id)?;
     let network = Network::Testnet;
+    let account =
+        prepare_viewing_account(broker_root, &account_id, network, session_seed, observer)?;
+    account.fresh_receiver(0)
+}
+
+pub(crate) fn prepare_viewing_account(
+    broker_root: &Path,
+    account_id: &AccountId,
+    network: Network,
+    session_seed: &SecretBytes,
+    observer: &mut dyn WipeObserver,
+) -> Result<store::AddressAccount, ZecError> {
     let root = store::StateRoot::new(broker_root.to_path_buf(), Arc::new(Mutex::new(Vec::new())));
     let network_directory = broker_root.join(network.as_str());
     let account_directory = network_directory.join(account_id.as_str());
@@ -57,11 +81,11 @@ pub(crate) fn fresh_receiver_for_account(
     let mut expected_seed = copy_session_seed(session_seed)?;
     let expected_ufvk = address::derive_ufvk(network, &mut expected_seed, observer)?;
     let account = if account_present {
-        store::AddressAccount::open_viewing_with_network(root, account_id, network)?
+        store::AddressAccount::open_viewing_with_network(root, account_id.clone(), network)?
     } else {
         store::AddressAccount::bootstrap(
             root,
-            account_id,
+            account_id.clone(),
             network,
             copy_session_seed(session_seed)?,
             observer,
@@ -70,10 +94,10 @@ pub(crate) fn fresh_receiver_for_account(
     if account.viewing_key_binding()? != expected_ufvk {
         return Err(ZecError::state_corrupt());
     }
-    account.fresh_receiver(0)
+    Ok(account)
 }
 
-fn copy_session_seed(seed: &SecretBytes) -> Result<SecretBytes, ZecError> {
+pub(crate) fn copy_session_seed(seed: &SecretBytes) -> Result<SecretBytes, ZecError> {
     seed.expose(|bytes| SecretBytes::new(bytes.to_vec()).map_err(|_| ZecError::internal()))
 }
 
@@ -239,6 +263,10 @@ impl ZecError {
         Self::new("NETWORK_DISABLED", "Zcash network is disabled")
     }
 
+    pub(crate) fn unavailable() -> Self {
+        Self::new("UNAVAILABLE", "Zcash service is unavailable")
+    }
+
     pub(crate) fn transparent_downgrade() -> Self {
         Self::new(
             "TRANSPARENT_DOWNGRADE",
@@ -295,6 +323,10 @@ impl ZecError {
 
     pub(crate) fn cancelled() -> Self {
         Self::new("CANCELLED", "Zcash request was cancelled")
+    }
+
+    pub(crate) fn rescan_required() -> Self {
+        Self::new("RESCAN_REQUIRED", "Zcash rescan is required")
     }
 
     pub(crate) fn account_busy() -> Self {

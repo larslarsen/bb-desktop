@@ -18,8 +18,11 @@ use bitbook_wallet_broker::vault::{
     SecretBytes, VaultError, VaultWorkObserver, WipeEvent, WipeObserver, open_vault_bytes,
     parse_vault,
 };
-use bitbook_wallet_broker::zec::test_support::decode_unified_address;
-use bitbook_wallet_broker::zec::{AccountId, FreshReceiverV1, Network as ZecNetwork};
+use bitbook_wallet_broker::zec::test_support::{decode_unified_address, live_job_id};
+use bitbook_wallet_broker::zec::{
+    AccountId, FreshReceiverV1, LiveSyncJobId, LiveSyncPhase, LiveSyncSnapshot,
+    Network as ZecNetwork,
+};
 use eframe::egui;
 use rusqlite::Connection;
 use zcash_keys::keys::{UnifiedAddressRequest, UnifiedSpendingKey};
@@ -67,6 +70,19 @@ const RECEIVE_NETWORK: &str = "Zcash testnet";
 const BALANCE_UNAVAILABLE: &str = "Balance unavailable — not synced";
 const COPY_ADDRESS: &str = "Copy address";
 const BACK: &str = "Back";
+const SYNC_BALANCE: &str = "Sync balance";
+const SYNC_TITLE: &str = "Sync Zcash balance";
+const SERVER: &str = "Server";
+const SYNC: &str = "Sync";
+const CANCEL_SYNC: &str = "Cancel sync";
+const SUGGESTED_ENDPOINT: &str = "https://testnet.zec.rocks:443";
+const CUSTOM_ENDPOINT: &str = "https://127.0.0.1:9443";
+const CONNECTION_DISCLOSURE: &str = "The selected server can see your connection IP address.";
+const UNSYNCED: &str = "Unsynced — no completed scan";
+const RECEIVED_FUNDS: &str = "Received shielded funds";
+const CONFIRMED_BALANCE: &str = "Confirmed: 1.90000000 ZEC";
+const PENDING_BALANCE: &str = "Pending: 0.30000000 ZEC";
+const PROGRESS: &str = "Scanned 103 of 107";
 const UI_SEED_A: [u8; 32] = [0x71; 32];
 const UI_SEED_B: [u8; 32] = [0x92; 32];
 
@@ -120,6 +136,13 @@ struct PortState {
     confirm_calls: usize,
     receive_calls: Vec<String>,
     receive_results: VecDeque<Result<FreshReceiverV1, &'static str>>,
+    sync_start_calls: Vec<(String, String)>,
+    sync_start_results: VecDeque<Result<LiveSyncJobId, &'static str>>,
+    sync_status_calls: Vec<String>,
+    sync_status: Option<LiveSyncSnapshot>,
+    sync_status_error: Option<&'static str>,
+    sync_cancel_calls: Vec<(String, LiveSyncJobId)>,
+    sync_cancel_error: Option<&'static str>,
 }
 
 struct FakePort {
@@ -431,6 +454,13 @@ impl Default for PortState {
             confirm_calls: 0,
             receive_calls: Vec::new(),
             receive_results: VecDeque::new(),
+            sync_start_calls: Vec::new(),
+            sync_start_results: VecDeque::new(),
+            sync_status_calls: Vec::new(),
+            sync_status: None,
+            sync_status_error: None,
+            sync_cancel_calls: Vec::new(),
+            sync_cancel_error: None,
         }
     }
 }
@@ -515,6 +545,38 @@ impl AccountUiPort for FakePort {
             .receive_results
             .pop_front()
             .unwrap_or(Err("UNAVAILABLE"))
+    }
+
+    fn start_sync(&mut self, id: &str, endpoint: &str) -> Result<LiveSyncJobId, &'static str> {
+        let mut state = self.inner.borrow_mut();
+        state
+            .sync_start_calls
+            .push((id.to_owned(), endpoint.to_owned()));
+        state
+            .sync_start_results
+            .pop_front()
+            .unwrap_or(Err("UNAVAILABLE"))
+    }
+
+    fn sync_status(&mut self, id: &str) -> Result<LiveSyncSnapshot, &'static str> {
+        let mut state = self.inner.borrow_mut();
+        state.sync_status_calls.push(id.to_owned());
+        if let Some(error) = state.sync_status_error {
+            return Err(error);
+        }
+        Ok(state
+            .sync_status
+            .clone()
+            .unwrap_or_else(|| sync_snapshot(id, None, LiveSyncPhase::Unsynced, None, None)))
+    }
+
+    fn cancel_sync(&mut self, id: &str, job: LiveSyncJobId) -> Result<(), &'static str> {
+        let mut state = self.inner.borrow_mut();
+        state.sync_cancel_calls.push((id.to_owned(), job));
+        match state.sync_cancel_error {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
     }
 
     fn export(&mut self, id: &str, path: &Path) -> Result<(), &'static str> {
@@ -682,6 +744,10 @@ fn unlink_zec_account(network: &Path, account_id: &str) -> Result<(), String> {
         "compact.sqlite3-journal",
         "compact.sqlite3-wal",
         "compact.sqlite3-shm",
+        "live.sqlite3",
+        "live.sqlite3-journal",
+        "live.sqlite3-wal",
+        "live.sqlite3-shm",
     ] {
         unlink_any(&directory.join(name))?;
     }
@@ -707,6 +773,25 @@ fn summary(account_id: &str, locked: bool) -> AccountSummary {
         network: "zec-testnet",
         kind: "software",
         locked,
+    }
+}
+
+fn sync_snapshot(
+    account_id: &str,
+    job: Option<u64>,
+    phase: LiveSyncPhase,
+    heights: Option<(u32, u32)>,
+    balances: Option<(u64, u64)>,
+) -> LiveSyncSnapshot {
+    LiveSyncSnapshot {
+        account_id: AccountId::parse(account_id).unwrap(),
+        network: ZecNetwork::Testnet,
+        job_id: job.map(live_job_id),
+        phase,
+        scanned_height: heights.map(|value| value.0),
+        target_height: heights.map(|value| value.1),
+        confirmed_received_zat: balances.map(|value| value.0),
+        pending_received_zat: balances.map(|value| value.1),
     }
 }
 
@@ -1867,4 +1952,187 @@ fn shared_port_and_local_manager_create_unlock_lock_and_restart() {
             "passphrase leaked into persisted bytes"
         );
     }
+}
+
+#[test]
+fn wal015_sync_pointer_flow_is_explicit_editable_and_paints_progress_then_received_funds() {
+    let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    scene.assert_usable(SYNC_TITLE);
+    scene.assert_usable(SERVER);
+    scene.assert_usable(SUGGESTED_ENDPOINT);
+    scene.assert_usable(CONNECTION_DISCLOSURE);
+    scene.assert_usable(UNSYNCED);
+    scene.assert_usable(SYNC);
+    scene.assert_usable(BACK);
+    assert!(records.borrow().sync_start_calls.is_empty());
+    assert!(!scene.paints(CONFIRMED_BALANCE));
+    assert!(!scene.paints(PENDING_BALANCE));
+
+    let _ = focus_field(&mut ui, &mut app, SERVER);
+    let _ = ui.run(
+        &mut app,
+        vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+        false,
+    );
+    let edited = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+    edited.assert_usable(CUSTOM_ENDPOINT);
+    let job = live_job_id(7);
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(job));
+        state.sync_status = Some(sync_snapshot(
+            UNLOCKED_ID,
+            Some(7),
+            LiveSyncPhase::Syncing,
+            Some((103, 107)),
+            None,
+        ));
+    }
+    let running = click_label(&mut ui, &mut app, SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned())]
+    );
+    assert!(!records.borrow().sync_status_calls.is_empty());
+    running.assert_usable(PROGRESS);
+    running.assert_usable(CANCEL_SYNC);
+    assert!(!running.paints(CONFIRMED_BALANCE));
+    assert!(!running.paints(PENDING_BALANCE));
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        UNLOCKED_ID,
+        Some(7),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((190_000_000, 30_000_000)),
+    ));
+    let complete = ui.run(&mut app, Vec::new(), false);
+    complete.assert_usable(RECEIVED_FUNDS);
+    complete.assert_usable("Scanned 107 of 107");
+    complete.assert_usable(CONFIRMED_BALANCE);
+    complete.assert_usable(PENDING_BALANCE);
+    assert!(!complete.painted.iter().any(|(text, _, _)| {
+        text.contains("Total") || text.contains("Spendable") || text.contains("sendable")
+    }));
+}
+
+#[test]
+fn wal015_cancel_stale_job_lock_back_and_hide_invalidate_sync_results() {
+    let (mut app, records, _) =
+        open_window(vec![summary(LOCKED_ID, false), summary(UNLOCKED_ID, false)]);
+    let control = app.control();
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(9)));
+        state.sync_status = Some(sync_snapshot(
+            LOCKED_ID,
+            Some(9),
+            LiveSyncPhase::Syncing,
+            Some((103, 107)),
+            None,
+        ));
+    }
+    let running = click_label(&mut ui, &mut app, SYNC);
+    running.assert_usable(PROGRESS);
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        UNLOCKED_ID,
+        Some(9),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((190_000_000, 30_000_000)),
+    ));
+    let foreign = ui.run(&mut app, Vec::new(), false);
+    assert!(!foreign.paints(CONFIRMED_BALANCE));
+    assert!(!foreign.paints(PENDING_BALANCE));
+    foreign.assert_usable(CANCEL_SYNC);
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        LOCKED_ID,
+        Some(8),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((777, 888)),
+    ));
+    let stale = ui.run(&mut app, Vec::new(), false);
+    assert!(!stale.paints("Confirmed: 0.00000777 ZEC"));
+    assert!(!stale.paints("Pending: 0.00000888 ZEC"));
+    stale.assert_usable(CANCEL_SYNC);
+    let cancelled = click_label(&mut ui, &mut app, CANCEL_SYNC);
+    assert_eq!(
+        records.borrow().sync_cancel_calls,
+        [(LOCKED_ID.to_owned(), live_job_id(9))]
+    );
+    assert!(!cancelled.paints("Confirmed: 0.00000777 ZEC"));
+
+    let _ = click_label(&mut ui, &mut app, BACK);
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(10)));
+        state.sync_status = Some(sync_snapshot(
+            LOCKED_ID,
+            Some(10),
+            LiveSyncPhase::Syncing,
+            Some((100, 107)),
+            None,
+        ));
+    }
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    records
+        .borrow_mut()
+        .accounts
+        .iter_mut()
+        .find(|account| account.account_id == LOCKED_ID)
+        .unwrap()
+        .locked = true;
+    let locked = ui.run(&mut app, Vec::new(), false);
+    assert!(!locked.paints(SYNC_TITLE));
+    assert_eq!(
+        records.borrow().sync_cancel_calls.last(),
+        Some(&(LOCKED_ID.to_owned(), live_job_id(10)))
+    );
+
+    records
+        .borrow_mut()
+        .accounts
+        .iter_mut()
+        .find(|account| account.account_id == LOCKED_ID)
+        .unwrap()
+        .locked = false;
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(11)));
+        state.sync_status = Some(sync_snapshot(
+            UNLOCKED_ID,
+            Some(11),
+            LiveSyncPhase::Syncing,
+            Some((101, 107)),
+            None,
+        ));
+    }
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    let hidden = ui.run(&mut app, vec![escape()], false);
+    assert!(hidden.visible.contains(&false));
+    assert!(!hidden.paints(SYNC_TITLE));
+    assert_eq!(
+        records.borrow().sync_cancel_calls.last(),
+        Some(&(UNLOCKED_ID.to_owned(), live_job_id(11)))
+    );
+    assert!(control.request_open());
+    let reopened = ui.run(&mut app, Vec::new(), false);
+    assert!(reopened.paints(CREATE_ACCOUNT));
+    assert!(!reopened.paints(PROGRESS));
+    assert!(!reopened.paints(CONFIRMED_BALANCE));
 }
