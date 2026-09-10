@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [runtime package production](GROK_BBD_WAL_011_RUNTIME_PACKAGE_PRODUCTION_01.md).
 New staging helper plus three packager call sites; Linux disk-backed retained staging.
 Test 5d8a8bf2 frozen; seven missing-helper assertions accepted. No green yet.
-Grok launch pending publication. Reviewer stays with actor and collects directly.
+Grok outer 55564, session dd016621-0865-4810-b1ae-13b2176aa9e3 launched.
 Owner need not send done; status updates at least every 60 seconds during work.
 Six inherited policy failures and Rust-inventory checker failure remain blockers.
 Reviewer publication paths: CURRENT_TASK.md, runtime-package red/production handoffs,
