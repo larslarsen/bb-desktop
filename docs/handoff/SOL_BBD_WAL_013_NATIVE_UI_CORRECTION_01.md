@@ -36,3 +36,14 @@ Only remaining findings2and4 require edits: exactallocation transfer and eventcl
 Use a zero-filled boxed slice of exact length BEFORE copying secret, then into_vec
 (capacity==len), wipe original fullcapacity, hand to SecretBytes (no shrinkneeded).
 Do not repeat broad selfreview or fullfileoutput. Two small corrections only.
+
+
+## One-line finish authorization
+
+Sol47428 collectedexit0, account_ui.rs7970abf1be88127fb8eae31aec8f396ca6869acc77cfccec7427612698cb462c,949lines.
+Transfer/scrubbing accepted except a new hidden-branch earlyreturn violates original
+hidden tick/repaint contract. Sol High source-only may REMOVE ONLY the `return;`
+immediately after `scrub_secret_events(context);` in the `if !self.control.visible()`
+branch inside service (around539). Keep scrubbing and fall through to refresh_accounts
+and request_repaint_after, including hidden passes. All other returns/source unchanged.
+No broader reads, tests, formatter or Git. Reporthash/count and stop.
