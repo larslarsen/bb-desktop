@@ -5,8 +5,8 @@ only. Python helper accepted source review; do not edit it. No tests/checks/form
 Git, evidence or other actors. Existing native UI/runtime actors own disjoint source.
 Do not reread broad history; correct these bounded reviewer findings and stop.
 
-1. requireRegularFile('/usr/bin/python3') rejects this system interpreter because it
-is a symlink to /usr/bin/python3.14 (reviewer inspected filesystem). Resolve the fixed
+1. Prior draft rejected /usr/bin/python3 because it is a symlink; actor removed that
+check in final drop. Reviewer confirms OS target /usr/bin/python3.14. Resolve the fixed
 system interpreter through fs.realpathSync, validate resulting regular nonsymlink
 executable, and spawn that resolved path. Broker/helper strict nonsymlink checks remain.
 No PATH/environment-discovered interpreter or dependency change.
@@ -23,3 +23,5 @@ failure. Cleanup has its own bounded allowance and must not be suppressed by dea
 Do not expand source scope or weaken checks. Both helper AND broker close must be
 confirmed before deleting owned cwd; current helpersClosed guard retained.
 Stop with final one-file hash/count. No implementation execution.
+
+Collected baseline Node bc08e5362d2bfb4b093175dd34b08091b90fa2c2f7b23b28397ab52c3750c600 (596lines), Python 040d8214487216e6b91ec514c9473e95cd66811c26306792f5ca7b081696b5d4 (269lines).
