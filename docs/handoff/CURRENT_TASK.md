@@ -1,13 +1,14 @@
 # Current Task
 
 Ticket: BBD-WAL-013
-State: SERVICE ACCEPTED / NATIVE UI PRODUCTION / RUNTIME EXPECTED RED
+State: SERVICE ACCEPTED / NATIVE UI PRODUCTION / RUNTIME PRODUCTION
 Owner requests complete usable native account management; reviewer Codex.
 84 service tests and both falsifications accepted, all restored source hashes match.
 Native UI expected red E0432 understood. Sol source authorized only account_ui.rs/lib
 under SOL_BBD_WAL_013_NATIVE_UI_PRODUCTION_01.md. Recorded Grok escalation continues.
 Sol20822 native-window test source active under GROK_BBD_WAL_013_NATIVE_SMOKE_01.md.
-Hermes runtime JS expected red authorized under HERMES_BBD_WAL_013_RUNTIME_JS_RED_01.md.
+Hermes runtime JS expected red accepted/closed; Sol runtime production authorized under
+SOL_BBD_WAL_013_RUNTIME_PRODUCTION_01.md, exact four production files.
 Sol97914 corrections and Hermes66085 execution collected, closed and reviewed.
 No source integration yet. Continue menu/runtime/native build/proof/integration.
 Preserve unrelated npm/policy paths and historical drafts. No installer detour.
