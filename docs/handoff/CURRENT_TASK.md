@@ -37,6 +37,8 @@ waiver is authorized. No credential/config discovery. Future Hermes metadata mus
 use the exact session key and row only; the earlier discovery incident is retained
 in the transport acceptance record and must not recur.
 One source invocation; collect on owner done/Continue. No actor polling.
+Grok launched once from ad1f549c; outer 58847, session
+e1f08576-2e17-4f42-9001-f544249bcab3, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
