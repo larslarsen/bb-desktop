@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [runtime package red](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_RED_01.md).
 Test 5d8a8bf2, 794 lines, seven groups/44 cases. Helper absent; all source frozen.
 Expected seven helper-missing assertions; then capture two policy commands once.
-Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Hermes outer 71146 launched against f8bb6622; reviewer collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, runtime-package tests/red handoffs,
