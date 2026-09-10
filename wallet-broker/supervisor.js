@@ -36,8 +36,8 @@ const PIN = /^[0-9a-f]{64}$/;
 const SAFE_ENV = Object.freeze([
   'LANG',
   'PATH',
+  // Require X11/XWayland because winit's Wayland backend cannot hide windows.
   'DISPLAY',
-  'WAYLAND_DISPLAY',
   'XDG_RUNTIME_DIR',
   'XAUTHORITY',
   'DBUS_SESSION_BUS_ADDRESS',
@@ -181,6 +181,11 @@ function cleanEnvironment(source) {
         Buffer.byteLength(descriptor.value, 'utf8') <= ENV_VALUE_LIMIT) {
       result[name] = descriptor.value;
     }
+  }
+  if (process.platform === 'linux' && result.DISPLAY) {
+    // The small native wallet UI uses Mesa software rendering to avoid host GLX failures.
+    result.LIBGL_ALWAYS_SOFTWARE = '1';
+    result.__GLX_VENDOR_LIBRARY_NAME = 'mesa';
   }
   return result;
 }

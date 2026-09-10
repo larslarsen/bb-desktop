@@ -26,10 +26,17 @@ const ALLOWED_ENV = Object.freeze([
   'LANG',
   'PATH',
   'DISPLAY',
-  'WAYLAND_DISPLAY',
   'XDG_RUNTIME_DIR',
   'XAUTHORITY',
   'DBUS_SESSION_BUS_ADDRESS',
+]);
+const FIXED_LINUX_RENDERER_ENV = Object.freeze({
+  LIBGL_ALWAYS_SOFTWARE: '1',
+  __GLX_VENDOR_LIBRARY_NAME: 'mesa',
+});
+const SUPERVISOR_ALLOWED_ENV = Object.freeze([
+  ...ALLOWED_ENV,
+  ...Object.keys(FIXED_LINUX_RENDERER_ENV),
 ]);
 const PRELOAD_METHODS = Object.freeze([
   'beginIntent',
@@ -193,12 +200,12 @@ function invokeClick(item) {
   return item.click();
 }
 
-function assertAllowlistedEnvCopy(env, source, label) {
+function assertAllowlistedEnvCopy(env, source, label, allowed = ALLOWED_ENV) {
   assert.ok(env && typeof env === 'object' && !Array.isArray(env), `${label} env missing`);
   if (source) assert.notStrictEqual(env, source, `${label} passed process.env identity`);
   const descriptors = Object.getOwnPropertyDescriptors(env);
   for (const key of Object.keys(descriptors)) {
-    assert.ok(ALLOWED_ENV.includes(key), `${label} unexpected env ${key}`);
+    assert.ok(allowed.includes(key), `${label} unexpected env ${key}`);
     const descriptor = descriptors[key];
     assert.ok(
       Object.prototype.hasOwnProperty.call(descriptor, 'value'),
@@ -765,7 +772,7 @@ test('quit and repeated ready cannot open the account window', async () => {
   });
 });
 
-test('supervisor spawn env is an own-data allowlist copy of the seven GUI strings', async () => {
+test('supervisor spawn env adds fixed Linux renderer settings only with sanitized DISPLAY', async () => {
   const exactLimit = 'z'.repeat(4096);
   const env = {
     LANG: 'C.UTF-8',
@@ -780,6 +787,8 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
     DYLD_INSERT_LIBRARIES: CANARY,
     LD_PRELOAD: CANARY,
     SECRET_TOKEN: CANARY,
+    LIBGL_ALWAYS_SOFTWARE: '0',
+    __GLX_VENDOR_LIBRARY_NAME: 'nvidia',
     NUMBER: 1,
     FLAG: true,
   };
@@ -791,11 +800,11 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
     LANG: 'C.UTF-8',
     PATH: exactLimit,
     DISPLAY: ':0',
-    WAYLAND_DISPLAY: 'wayland-0',
     XDG_RUNTIME_DIR: '/run/user/1000',
     XAUTHORITY: '/home/user/.Xauthority',
     DBUS_SESSION_BUS_ADDRESS: 'unix:path=/run/user/1000/bus',
   };
+  if (process.platform === 'linux') Object.assign(allowedExact, FIXED_LINUX_RENDERER_ENV);
 
   await withFakeHarness({ env, stdinEnd: false }, async (ctx) => {
     const started = ctx.supervisor.start();
@@ -809,8 +818,12 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
     assert.deepStrictEqual(spawn[3].stdio, ['pipe', 'pipe', 'pipe']);
     assert.notStrictEqual(spawn[3].env, env);
     assert.notStrictEqual(spawn[3].env, process.env);
-    assertAllowlistedEnvCopy(spawn[3].env, env, 'spawn');
+    assertAllowlistedEnvCopy(spawn[3].env, env, 'spawn', SUPERVISOR_ALLOWED_ENV);
     assert.deepStrictEqual(spawn[3].env, allowedExact);
+    assert.strictEqual(env.LIBGL_ALWAYS_SOFTWARE, '0', 'source software renderer setting changed');
+    assert.strictEqual(env.__GLX_VENDOR_LIBRARY_NAME, 'nvidia', 'source GLX vendor setting changed');
+    assert.strictEqual(env.WAYLAND_DISPLAY, 'wayland-0', 'source WAYLAND_DISPLAY changed');
+    assert.ok(!Object.prototype.hasOwnProperty.call(spawn[3].env, 'WAYLAND_DISPLAY'));
     assertNoCanary(spawn, 'spawn request');
   });
 
@@ -848,6 +861,7 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
     { label: 'nonstring', value: 13, expected: undefined },
     { label: 'embedded NUL', value: `:0\0${CANARY}`, expected: undefined },
     { label: '4097 ASCII bytes', value: 'x'.repeat(4097), expected: undefined },
+    { label: 'empty', value: '', expected: '' },
     { label: '4096 ASCII bytes', value: 'x'.repeat(4096), expected: 'x'.repeat(4096) },
     { label: '4096 Unicode bytes', value: unicodeAtLimit, expected: unicodeAtLimit },
     { label: '4097 Unicode bytes', value: `${unicodeAtLimit}x`, expected: undefined },
@@ -859,6 +873,9 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
       const spawn = ctx.calls.find((call) => call[0] === 'spawn');
       const expected = { PATH: '/usr/bin' };
       if (entry.expected !== undefined) expected.DISPLAY = entry.expected;
+      if (process.platform === 'linux' && entry.expected) {
+        Object.assign(expected, FIXED_LINUX_RENDERER_ENV);
+      }
       assert.deepStrictEqual(spawn[3].env, expected, entry.label);
     });
   }
@@ -878,9 +895,54 @@ test('supervisor spawn env is an own-data allowlist copy of the seven GUI string
     assert.deepStrictEqual(spawn[3].env, { PATH: '/usr/bin' });
     assert.strictEqual(displayGetterCalls, 0, 'allowlisted DISPLAY getter was invoked');
   });
+
+  let rendererGetterCalls = 0;
+  const rendererAccessorSource = { PATH: '/usr/bin', DISPLAY: ':1' };
+  for (const name of Object.keys(FIXED_LINUX_RENDERER_ENV)) {
+    Object.defineProperty(rendererAccessorSource, name, {
+      enumerable: true,
+      get() {
+        rendererGetterCalls += 1;
+        return CANARY;
+      },
+    });
+  }
+  await withFakeHarness({ env: rendererAccessorSource, stdinEnd: false }, async (ctx) => {
+    assert.strictEqual(ctx.supervisor.start().ok, true, 'renderer accessor start');
+    const spawn = ctx.calls.find((call) => call[0] === 'spawn');
+    const expected = { PATH: '/usr/bin', DISPLAY: ':1' };
+    if (process.platform === 'linux') Object.assign(expected, FIXED_LINUX_RENDERER_ENV);
+    assert.deepStrictEqual(spawn[3].env, expected);
+    assert.strictEqual(rendererGetterCalls, 0, 'renderer environment getter was invoked');
+    assertNoCanary(spawn, 'renderer accessor spawn env');
+  });
+
+  const waylandOnly = { PATH: '/usr/bin', WAYLAND_DISPLAY: 'wayland-only-0' };
+  await withFakeHarness({ env: waylandOnly, stdinEnd: false }, async (ctx) => {
+    assert.strictEqual(ctx.supervisor.start().ok, true, 'Wayland-only start');
+    const spawn = ctx.calls.find((call) => call[0] === 'spawn');
+    assert.deepStrictEqual(spawn[3].env, { PATH: '/usr/bin' });
+    assert.strictEqual(waylandOnly.WAYLAND_DISPLAY, 'wayland-only-0');
+  });
+
+  let waylandGetterCalls = 0;
+  const waylandAccessorSource = { PATH: '/usr/bin' };
+  Object.defineProperty(waylandAccessorSource, 'WAYLAND_DISPLAY', {
+    enumerable: true,
+    get() {
+      waylandGetterCalls += 1;
+      return CANARY;
+    },
+  });
+  await withFakeHarness({ env: waylandAccessorSource, stdinEnd: false }, async (ctx) => {
+    assert.strictEqual(ctx.supervisor.start().ok, true, 'Wayland accessor start');
+    const spawn = ctx.calls.find((call) => call[0] === 'spawn');
+    assert.deepStrictEqual(spawn[3].env, { PATH: '/usr/bin' });
+    assert.strictEqual(waylandGetterCalls, 0, 'WAYLAND_DISPLAY getter was invoked');
+  });
 });
 
-test('main copies the seven allowlisted process.env strings and never passes process.env identity', async () => {
+test('main copies the six allowlisted process.env strings and omits WAYLAND_DISPLAY', async () => {
   const injected = {
     LANG: 'C.WAL013',
     PATH: '/usr/bin/wal013',
@@ -890,15 +952,25 @@ test('main copies the seven allowlisted process.env strings and never passes pro
     XAUTHORITY: '/tmp/wal013-xauth',
     DBUS_SESSION_BUS_ADDRESS: 'unix:path=/run/user/13/bus',
   };
+  const expected = {
+    LANG: injected.LANG,
+    PATH: injected.PATH,
+    DISPLAY: injected.DISPLAY,
+    XDG_RUNTIME_DIR: injected.XDG_RUNTIME_DIR,
+    XAUTHORITY: injected.XAUTHORITY,
+    DBUS_SESSION_BUS_ADDRESS: injected.DBUS_SESSION_BUS_ADDRESS,
+  };
   const extras = {
     HOME: CANARY_PATH,
     NODE_OPTIONS: `--require ${CANARY}`,
     SECRET_TOKEN: CANARY,
     DYLD_INSERT_LIBRARIES: CANARY,
     LD_PRELOAD: CANARY,
+    LIBGL_ALWAYS_SOFTWARE: '0',
+    __GLX_VENDOR_LIBRARY_NAME: 'nvidia',
   };
   const previous = {};
-  for (const key of [...ALLOWED_ENV, ...Object.keys(extras)]) {
+  for (const key of [...ALLOWED_ENV, 'WAYLAND_DISPLAY', ...Object.keys(extras)]) {
     previous[key] = Object.prototype.hasOwnProperty.call(process.env, key)
       ? process.env[key]
       : undefined;
@@ -912,7 +984,9 @@ test('main copies the seven allowlisted process.env strings and never passes pro
       assert.ok(factoryOptions.env, 'main did not supply supervisor env');
       assert.notStrictEqual(factoryOptions.env, process.env);
       assertAllowlistedEnvCopy(factoryOptions.env, process.env, 'main factory');
-      assert.deepStrictEqual(factoryOptions.env, injected);
+      assert.deepStrictEqual(factoryOptions.env, expected);
+      assert.strictEqual(process.env.WAYLAND_DISPLAY, injected.WAYLAND_DISPLAY);
+      assert.ok(!Object.prototype.hasOwnProperty.call(factoryOptions.env, 'WAYLAND_DISPLAY'));
     });
   } finally {
     for (const [key, value] of Object.entries(previous)) {

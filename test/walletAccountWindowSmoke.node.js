@@ -17,7 +17,15 @@ const X11_HELPER = path.join(__dirname, 'fixtures', 'wallet-broker', 'x11-window
 const PYTHON = '/usr/bin/python3.14';
 const WINDOW_TITLE = 'BitBook accounts';
 const CANARY = 'BBD_WAL_013_NATIVE_WINDOW_CANARY';
+const BOGUS_WAYLAND_DISPLAY = 'wal013-bogus-wayland-0';
+const VISIBLE_ARTIFACT = path.join(TARGET_ROOT, 'wal013-account-window-visible.png');
+const REOPENED_ARTIFACT = path.join(TARGET_ROOT, 'wal013-account-window-reopened.png');
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const CAPTURE_LIMIT = 1024 * 1024;
+const MAX_CAPTURE_DIMENSION = 2048;
+const CAPTURE_MARGIN = 8;
+const MIN_COLORS = 16;
+const MIN_NON_DOMINANT_PIXELS = 1000;
 const TEST_TIMEOUT_MS = 45000;
 const TEST_TIMEOUT_MESSAGE = 'native account window test exceeded 45 seconds';
 const BOUND_MS = 5000;
@@ -124,6 +132,7 @@ function requireInputs() {
 
   const env = {
     DISPLAY: safeEnvironmentValue('DISPLAY'),
+    WAYLAND_DISPLAY: BOGUS_WAYLAND_DISPLAY,
     XAUTHORITY: safeEnvironmentValue('XAUTHORITY'),
     LANG: 'C.UTF-8',
     PATH: '/usr/bin',
@@ -327,7 +336,11 @@ async function runHelper(context, args, milliseconds = HELPER_MS) {
   const globalRemaining = globalDeadlineRemaining(context);
   const timeout = Math.min(milliseconds, globalRemaining);
   const timeoutMessage = timeout === globalRemaining ? TEST_TIMEOUT_MESSAGE : 'X11 helper timed out';
-  const child = childProcess.spawn(context.pythonPath, [X11_HELPER, ...args], {
+  const brokerPid = context.brokerRecord && context.brokerRecord.child.pid;
+  if (!Number.isInteger(brokerPid) || brokerPid <= 0 || brokerPid > 0x7fffffff) {
+    throw new Error('native broker PID is unavailable');
+  }
+  const child = childProcess.spawn(context.pythonPath, [X11_HELPER, ...args, String(brokerPid)], {
     cwd: context.owned.root,
     env: context.env,
     shell: false,
@@ -373,6 +386,88 @@ async function inspectWindows(context, milliseconds = HELPER_MS) {
 async function closeWindow(context, windowId) {
   const result = await runHelper(context, ['close', String(windowId)]);
   assert.ok(exactKeys(result, ['closed']) && result.closed === windowId, 'X11 close was not acknowledged');
+}
+
+function validatedCapture(result) {
+  assert.ok(exactKeys(result, [
+    'width', 'height', 'color_count', 'non_dominant_pixels', 'png_base64',
+  ]), 'invalid X11 capture result');
+  assert.ok(Number.isSafeInteger(result.width) && result.width > CAPTURE_MARGIN * 2 &&
+    result.width <= MAX_CAPTURE_DIMENSION, 'invalid X11 capture width');
+  assert.ok(Number.isSafeInteger(result.height) && result.height > CAPTURE_MARGIN * 2 &&
+    result.height <= MAX_CAPTURE_DIMENSION, 'invalid X11 capture height');
+  const sampledPixels = (result.width - CAPTURE_MARGIN * 2) *
+    (result.height - CAPTURE_MARGIN * 2);
+  assert.ok(Number.isSafeInteger(result.color_count) && result.color_count >= 1 &&
+    result.color_count <= sampledPixels, 'invalid X11 capture color count');
+  assert.ok(Number.isSafeInteger(result.non_dominant_pixels) &&
+    result.non_dominant_pixels >= 0 && result.non_dominant_pixels < sampledPixels,
+    'invalid X11 capture non-dominant count');
+  assert.ok(typeof result.png_base64 === 'string' && result.png_base64.length > 0 &&
+    result.png_base64.length <= CAPTURE_LIMIT && result.png_base64.length % 4 === 0 &&
+    /^[A-Za-z0-9+/]+={0,2}$/.test(result.png_base64), 'invalid X11 capture base64');
+  const png = Buffer.from(result.png_base64, 'base64');
+  assert.ok(png.length > 24 && png.length <= CAPTURE_LIMIT &&
+    png.toString('base64') === result.png_base64, 'invalid X11 capture PNG encoding');
+  assert.ok(png.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE),
+    'invalid X11 capture PNG signature');
+  assert.strictEqual(png.subarray(12, 16).toString('ascii'), 'IHDR',
+    'invalid X11 capture PNG header');
+  assert.strictEqual(png.readUInt32BE(16), result.width, 'X11 capture PNG width mismatch');
+  assert.strictEqual(png.readUInt32BE(20), result.height, 'X11 capture PNG height mismatch');
+  return png;
+}
+
+async function waitForRenderedWindow(context, windowId) {
+  const deadline = Date.now() + WINDOW_MS;
+  let observedBlank = false;
+  while (true) {
+    globalDeadlineRemaining(context);
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) throw new Error('native account window remained blank');
+    let result;
+    try {
+      result = await runHelper(
+        context,
+        ['capture', String(windowId)],
+        Math.min(HELPER_MS, remaining)
+      );
+    } catch (error) {
+      if (observedBlank && Date.now() >= deadline &&
+          error && error.message === 'X11 helper timed out') {
+        throw new Error('native account window remained blank');
+      }
+      throw error;
+    }
+    const png = validatedCapture(result);
+    if (result.color_count >= MIN_COLORS &&
+        result.non_dominant_pixels >= MIN_NON_DOMINANT_PIXELS) {
+      return png;
+    }
+    observedBlank = true;
+    if (Date.now() >= deadline) throw new Error('native account window remained blank');
+    await delay(Math.min(
+      100,
+      Math.max(1, deadline - Date.now()),
+      globalDeadlineRemaining(context)
+    ));
+  }
+}
+
+function writeQaArtifact(file, png) {
+  const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_NOFOLLOW;
+  let descriptor;
+  try {
+    descriptor = fs.openSync(file, flags, 0o600);
+    const stat = fs.fstatSync(descriptor);
+    assert.ok(stat.isFile() && stat.nlink === 1 && stat.uid === process.getuid(),
+      'QA artifact is not an owned regular file');
+    fs.fchmodSync(descriptor, 0o600);
+    fs.ftruncateSync(descriptor, 0);
+    fs.writeFileSync(descriptor, png);
+  } finally {
+    if (descriptor !== undefined) fs.closeSync(descriptor);
+  }
 }
 
 async function waitForVisibleWindows(context, expected, milliseconds, message) {
@@ -477,13 +572,19 @@ function assertSpawn(context, inputs) {
     Array.isArray(call.options.stdio) && call.options.stdio.join(',') === 'pipe,pipe,pipe',
     'broker stdio was not three pipes'
   );
-  const names = Object.keys(call.options.env || {}).sort();
-  assert.ok(
-    names.join(',') === 'DISPLAY,LANG,PATH,XAUTHORITY' &&
-      names.every((name) => call.options.env[name] === inputs.env[name]) &&
-      call.options.env !== inputs.env,
-    'broker environment was not the fixed isolated Xvfb environment'
-  );
+  assert.notStrictEqual(call.options.env, inputs.env, 'broker reused the supervisor input env');
+  assert.deepStrictEqual(call.options.env, {
+    LANG: inputs.env.LANG,
+    PATH: inputs.env.PATH,
+    DISPLAY: inputs.env.DISPLAY,
+    XAUTHORITY: inputs.env.XAUTHORITY,
+    LIBGL_ALWAYS_SOFTWARE: '1',
+    __GLX_VENDOR_LIBRARY_NAME: 'mesa',
+  }, 'broker environment was not the fixed isolated X11 software-renderer environment');
+  assert.strictEqual(inputs.env.WAYLAND_DISPLAY, BOGUS_WAYLAND_DISPLAY,
+    'supervisor input WAYLAND_DISPLAY changed');
+  assert.ok(!Object.prototype.hasOwnProperty.call(call.options.env, 'WAYLAND_DISPLAY'),
+    'broker inherited WAYLAND_DISPLAY');
   assert.ok(!Object.prototype.hasOwnProperty.call(call.options.env, 'DBUS_SESSION_BUS_ADDRESS'),
     'broker inherited a host bus');
 }
@@ -606,7 +707,8 @@ test('actual supervisor opens, hides, reopens, and gracefully closes the native 
     assert.ok(context.brokerRecord, 'native broker was not observed');
     assertSpawn(context, inputs);
     const brokerPid = context.brokerRecord.child.pid;
-    assert.ok(Number.isInteger(brokerPid) && brokerPid > 0, 'native broker PID is invalid');
+    assert.ok(Number.isInteger(brokerPid) && brokerPid > 0 && brokerPid <= 0x7fffffff,
+      'native broker PID is invalid');
     await waitUntil(
       () => context.supervisor.bound === true,
       BOUND_MS,
@@ -637,6 +739,7 @@ test('actual supervisor opens, hides, reopens, and gracefully closes the native 
       context, 1, WINDOW_MS, 'native account window did not become visible'
     );
     assert.strictEqual(firstVisible.length, 1, `exactly one ${WINDOW_TITLE} window was required`);
+    const firstCapture = await waitForRenderedWindow(context, firstVisible[0].id);
     await closeWindow(context, firstVisible[0].id);
     await waitForVisibleWindows(context, 0, WINDOW_MS, 'native account window did not hide');
 
@@ -658,7 +761,12 @@ test('actual supervisor opens, hides, reopens, and gracefully closes the native 
       'reopen account.manage did not settle'
     );
     assert.ok(exactKeys(reopen, []), 'reopen account.manage returned an invalid result');
-    await waitForVisibleWindows(context, 1, WINDOW_MS, 'native account window did not reopen');
+    const reopenedVisible = await waitForVisibleWindows(
+      context, 1, WINDOW_MS, 'native account window did not reopen'
+    );
+    const reopenedCapture = await waitForRenderedWindow(context, reopenedVisible[0].id);
+    writeQaArtifact(VISIBLE_ARTIFACT, firstCapture);
+    writeQaArtifact(REOPENED_ARTIFACT, reopenedCapture);
     assert.strictEqual(context.spawnCalls.length, 1, 'reopen respawned the native broker');
     assert.strictEqual(context.brokerRecord.child.pid, brokerPid, 'reopen changed the native broker PID');
 

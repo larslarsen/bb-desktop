@@ -16,8 +16,8 @@ const ID = /^[0-9a-f]{32}$/;
 const WALLET_ENV = Object.freeze([
   'LANG',
   'PATH',
+  // Require X11/XWayland because winit's Wayland backend cannot hide windows.
   'DISPLAY',
-  'WAYLAND_DISPLAY',
   'XDG_RUNTIME_DIR',
   'XAUTHORITY',
   'DBUS_SESSION_BUS_ADDRESS',

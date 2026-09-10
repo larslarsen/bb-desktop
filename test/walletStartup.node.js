@@ -338,7 +338,7 @@ function assertConfiguredFactory(factoryOptions, launch) {
     const env = factoryOptions.env;
     assert.ok(env && typeof env === 'object' && !Array.isArray(env));
     const allowed = new Set([
-      'LANG', 'PATH', 'DISPLAY', 'WAYLAND_DISPLAY',
+      'LANG', 'PATH', 'DISPLAY',
       'XDG_RUNTIME_DIR', 'XAUTHORITY', 'DBUS_SESSION_BUS_ADDRESS',
     ]);
     for (const key of Object.keys(env)) {
