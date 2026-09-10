@@ -37,6 +37,8 @@ Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
 One Grok invocation; collect on owner done/Continue. No actor polling.
+Grok launched once from a45b0290; outer 20254, session
+6d0b7d41-29c1-4ed8-bda9-7225b190f34b, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
