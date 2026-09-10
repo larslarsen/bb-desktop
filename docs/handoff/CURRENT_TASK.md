@@ -1,42 +1,42 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: LAUNCH-CONFIGURATION RESOLVER PRODUCTION ACTOR LAUNCHED — AWAITING COLLECTION
+State: RESOLVER SOURCE REVIEW HELD — REFLECTION REGRESSION TESTS AUTHORIZED
 Reviewer: Codex; High is sufficient
-Authorized source actor: Grok Build, grok-4.6 High; no subagents
+Authorized source actor: Grok Build, grok-4.6 High; test source only, no subagents
 Authorized execution actor: none
 Authorized integration actor: none
 Accepted quit implementation: 21e2e4d546adb06321e820ea77a52147fa47a71a
 
 Read this active prefix (lines 1–40) and
-[Grok resolver production](GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md).
-Only new wallet-broker/launch-config.js may be written; verify absence first.
-No tests, syntax checks, builds, docs/evidence edits or Git mutation by Grok.
-Grok outer 20952 launched once against 08d31eeb; Hermes outer 82063 is closed.
-Launch once; collect on owner done/Continue. No actor polling or additional launch.
+[reflection regression tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md).
+Only test/walletBrokerLaunchConfig.node.js may change by the specified insertion.
+Production launch-config.js remains frozen at 4a639b16, 132 lines.
+Grok production outer 20952 completed exit 0 and is collected/closed.
+Regression-test launch pending reviewer publication.
+Launch once; collect on owner done/Continue or explicit status check.
 
-Accepted red: Node exit 1, zero ok/five explicit missing-resolver assertions.
-Session 20260909_221756_f0f9b6; frozen inputs unchanged; production absent.
-Accepted test 1b6a7d8c: 851 lines, five groups/58 authored rows.
-The 58 fixture rows remain unexecuted. No configuration green is claimed.
-Evidence 1c98fde5 and raw 7b5201b7 agree; report inaccuracies are recorded in
-[expected-red acceptance](HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md).
-Tests, evidence, main, supervisor and protocol are frozen for source review.
-No home skills/config discovery or historical fixture searches are authorized.
+Source finding: revoked Proxy and throwing reflection traps escape as raw errors
+without the fixed UNAVAILABLE code/message. This violates the error contract.
+It is not a claim of renderer reachability or a demonstrated exploit.
+Four independently registered regression groups are authorized before correction.
+Existing five groups/58 rows and all helpers remain unchanged.
+No test, syntax/build execution, production correction or Git mutation by Grok.
+Reviewer source review is recorded in the production handoff.
 
-Runtime format is fixed: build-generated manifest, fixed binary names, six target
-identities. Existing supervisor retains byte verification before spawn.
 Packaging still needs runtime JS inventory repair and build-time artifact pins;
 main startup/status/quit composition follows later. Whole WAL-011 is incomplete.
 Quit/shutdown/IPC/degraded Rust/transport acceptance is retained without replay.
+Expected missing-resolver red is retained; no configuration green is claimed.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_PRODUCTION_01.md,
-docs/handoff/HERMES_BBD_WAL_011_LAUNCH_CONFIG_RED_01.md.
-Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
+docs/handoff/GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md.
+Preserve pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
-Grok session bd2da903-141e-486a-92a8-403ec942dbfb; CURRENT reads lines 1–40.
-Later Hermes green/falsification/restoration requires separate authorization.
+No home skills/config/history discovery or chained commands.
+Named reads only; CURRENT reads lines 1–40.
+Later Hermes focused red requires separate reviewer authorization.
 
 ## Historical record (superseded by the active state above)
 

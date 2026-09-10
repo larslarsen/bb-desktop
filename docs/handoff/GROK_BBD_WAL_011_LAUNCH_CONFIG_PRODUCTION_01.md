@@ -84,3 +84,30 @@ manifest assertion to fail, restore exact production and repeat targeted green.
 No other suite replay or integration is authorized now. Packaging inventory repair,
 build-time pin creation and main startup/status/quit composition remain later steps;
 existing security failures are not waived and whole-ticket completion is not claimed.
+
+## Collected source review — 2026-09-09
+
+Outer 20952 completed exit 0, collected after the owner asked about the background
+session. Grok session bd2da903-141e-486a-92a8-403ec942dbfb produced only
+wallet-broker/launch-config.js: 132 lines, SHA-256
+4a639b1644ff0ea618fc53fd525cbd5c0fde84fbea5905f3f3eb56a5520dc01a.
+All six frozen input hashes match at collection. No tests were run by reviewer.
+
+Source review holds acceptance: closedData at lines 24–30 performs Array.isArray,
+Object.getPrototypeOf, Reflect.ownKeys and Object.getOwnPropertyDescriptors without
+a containing normalization catch. A revoked Proxy throws TypeError, and reflection
+traps can throw an arbitrary Error with raw diagnostics. resolveWalletBrokerLaunch
+line 88 lets those escape without the required UNAVAILABLE code and fixed message.
+This violates contract item 6; it is not a claim of renderer reachability or exploit.
+Ordinary options, inventory, size, digest, target match and immutable output paths
+otherwise follow the fixed contract. Keep this production drop frozen for a focused
+regression red before correcting the public error boundary.
+
+The export shows named reads, hash/count/status checks and one source edit. It also
+shows one prohibited chained existence check (test -e followed by echo), and an
+extra read of the named frozen evidence contents. No execution, Git mutation,
+home-skill discovery or unrelated source write appears. Do not repeat those scope
+deviations. The final report's “no Git operations” means no mutations; read-only
+Git checks are visible. Grok production authorization is closed. Only the
+[reflection regression tests](GROK_BBD_WAL_011_LAUNCH_CONFIG_REFLECTION_TESTS_01.md)
+are now authorized.
