@@ -42,6 +42,8 @@ Grok outer 58847 collected on owner done, exit 0; session
 e1f08576-2e17-4f42-9001-f544249bcab3. Source accepted with read-scope deviations
 recorded in the final source-handoff review. No production changes.
 One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
+Hermes launched once from 5686d7c5; outer 85066, requested nous /
+poolside/laguna-s-2.1:free. The driver records its actual session metadata.
 
 ## Historical record (superseded by the active state above)
 
