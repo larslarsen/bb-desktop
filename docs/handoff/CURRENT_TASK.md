@@ -19,13 +19,18 @@ Final staged Linux x64 broker SHA256:
 6c2880cef4eafc5b36e09f47428d4f9ace98deed0f62703c7bab6fd3a7c909f7
 552181016bytes. All37integratedblobs independentlyverified. All executionCLIactors exited.
 
-Six inheritedsecurity-policy failures and7oldtest-helperlintwarnings remain release
-blockers. Gitleaks exits1 for verified publicfilechecksums in WAL015generatedrecords:
+Six inheritedsecurity-policy failures remain releaseblockers;7oldtest-helperlint
+warnings remain recorded. Gitleaks exits1 for verified publicfilechecksums in WAL015generatedrecords:
 184directory/32committedfindings in integration, zero actualsecretfindings after exact
-captured-value comparison to4recomputedpublicfilechecksums. Rules/config/ignore unchanged;
+captured-value comparison to4recomputedpublicfilechecksums at integration. Rules/config/ignore unchanged;
 never describe that scan as exit0. See ticket exception and integration evidence.
 No installer or release-ready claim. Original npm/policyworkingedits and2historical
 untracked evidence drafts preserved; only5WAL015policychanges staged on originalHEAD.
 
 See tickets/BBD-WAL-015.md and docs/testing/BBD-WAL-015-LIVE-INTEGRATION-01.md.
 All earlier WAL015handoff authorizations and failures are historical execution records.
+
+Finalgovernance scanner:82public-checksum findings,0actualcredentials after reviewer
+verified the fifth referenced publicfile. See
+docs/architecture/BBD-WAL-015-FINAL-SCAN-REVIEW.md for exactclassification, final
+review and runnertermination. No active/background implementation remains.

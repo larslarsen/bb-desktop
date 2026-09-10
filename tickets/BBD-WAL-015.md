@@ -181,3 +181,9 @@ partialpolicy staging, and pushedsource/evidence. Exactpublic-checksum triage pr
 zero actualsecrets despite nonzeroGitleaksexit. See CURRENT_TASK finalbinarypin and
 BBD-WAL-015-LIVE-INTEGRATION-01.md for rawcommands/counts/hashes/actormetadata.
 Owner can restart and use Sync balance after unlocking. No userprofilemodified.
+
+Finalgovernance scan found two additional copies of the public diagnostic-handoff
+Markdown checksum. Reviewer independently verified both and accepted82totalpublic
+checksum matches,0actualcredentials. Fifth exactpublicfile and removalconditions are
+recorded in docs/architecture/BBD-WAL-015-FINAL-SCAN-REVIEW.md. No scanner rule/config/
+ignore changes and no blanket path exception. All actors stopped; ticketcomplete.
