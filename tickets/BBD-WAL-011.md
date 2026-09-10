@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Awaitable shutdown accepted; Electron normal-quit test source authorized.
+Status: Awaitable shutdown accepted; Electron quit test-source Correction 01 authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -124,6 +124,10 @@ regression: node test/walletPreload.node.js. Falsify by resuming app.quit before
 shutdown settles, then restore and repeat targeted green. All execution awaits
 separate source acceptance/Hermes authorization. Later production is social-main.js
 only; broker startup, packaging and native flows remain outside this test contract.
+The first quit test drop (a8ca18c7, 1977 lines, 30 groups) is held for Correction 01:
+the compound dialog callback can swallow its own nested-event assertion, and test
+hooks are restored before asynchronous cleanup finishes. The active handoff fixes
+both corrections in the same test path. No expected-red execution is authorized yet.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

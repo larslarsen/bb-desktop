@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON NORMAL-QUIT TEST SOURCE ACTOR LAUNCHED — AWAITING COLLECTION
+State: ELECTRON QUIT TEST-SOURCE CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; test source only
 Authorized execution actor: none
@@ -10,18 +10,18 @@ Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
 Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, the ticket and
 [Grok quit test contract](GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md).
-Only Grok may edit test/electronSecurity.node.js under that exact contract.
+Only Grok may edit test/electronSecurity.node.js under Correction 01 at its end.
 No production edits, tests, syntax checks, builds, evidence or integration.
-Launch: outer 59284; Grok session 9030ad8c-83ac-4a78-a4c6-d135e2470109.
-One launch against 4a0bdbc5; collect on owner done/Continue. No actor polling.
+Initial outer 59284 collected, exit 0. Correction launch pending publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
 Normal quit must synchronously hold termination, invoke shutdown once and resume
 app.quit only after completion, allowing the reentrant event to proceed. Pending
 and failed repeat requests remain prevented. Failure attempts one fixed native
-error box and leaves the app running; dialog failure is contained. Seven new
-fixture groups cover actual main callbacks, re-entry, pre-ready completion,
-failures and preserved window-all-closed behavior. Existing 23 groups are retained.
-Expected-red execution follows source review; no green behavior is claimed now.
+error box and leaves the app running; dialog failure is contained. Initial drop
+a8ca18c7 (1977 lines, 30 groups) is held: move the compound nested-event assertion
+outside production's catch and retain test hooks until async cleanup has drained.
+Expected-red execution awaits corrected source acceptance. No tests run this turn.
 
 Shutdown at 1e45d6d2 retains 26 passing lifecycle groups and falsification/restoration.
 Async IPC at 3aa5e3d8 retains 23 Electron/six preload groups; Rust at 31a6e540

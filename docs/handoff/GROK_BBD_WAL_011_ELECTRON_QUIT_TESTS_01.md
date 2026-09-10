@@ -1,5 +1,8 @@
 # WAL-011 Electron normal quit tests 01
 
+Active amendment: Correction 01 at the end of this document supersedes the initial
+editable-file baseline. The initial actor is collected; no execution is authorized.
+
 Actor: Grok Build, grok-4.6 High; test source only, no subagents.
 Protected parent: reviewer publication following 371379d09c35443239a2e2f28d9a1e722bc637b5,
 plus one CURRENT-only launch record. Read CURRENT lines 1–40, this handoff,
@@ -160,3 +163,73 @@ No falsification code or execution is part of this test-only drop.
 This proves callbacks registered by the real main module with controlled Electron
 and supervisor fixtures. Actual Electron-to-Rust startup, package pins, native
 account flows and whole-ticket/release completion are not claimed.
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Hold source acceptance; authorize only a bounded test-source correction by Grok
+Build, grok-4.6 High, without subagents. Outer 59284 collected on owner done,
+exit 0. Exact-session export 9030ad8c-83ac-4a78-a4c6-d135e2470109 reports edits
+only to the authorized test file, named source reads and read-only Git/hash/line
+commands. No test execution, production edit or Git mutation appears. The export
+is a tool summary, not a raw result audit. Read-scope deviations: CURRENT was read
+as lines 2–41 and architecture as 439–470, each one line beyond its authorized
+range; parent/last-commit inspection exceeded the explicitly named HEAD/status
+commands. Search entries omit paths, so their scope cannot be independently
+confirmed from this summary. These observations do not widen this correction.
+
+Measured drop: test/electronSecurity.node.js SHA-256
+`a8ca18c77b17b75a6e361640640ca6c16526fb93010fc08e2706f3499393d861`,
+1977 lines, 30 top-level groups (23 retained, seven added), eight authored new
+cases including two rejection rows. Diff is 758 insertions/four deletions. All four
+frozen production/preload identities in the initial table still match. These are
+source observations, not executed results. The reviewer ran no acceptance command.
+
+The fixture invokes actual registered main callbacks, enforces nonempty handlers,
+records lifecycle events and observes deferred outcomes. Existing test assertions
+are preserved. Two defects prevent acceptance:
+
+1. At reviewed lines 1790–1794 the injected showErrorBox asserts that its nested
+   quit was prevented, then throws its intended fixture error. Production must
+   catch dialog errors, so it can also swallow this AssertionError. The outer
+   assertions only check that the callback was entered and never independently
+   check that nested event. A handler that wrongly allows the dialog's nested
+   quit can pass this group. Nor is the intended throw proven to have been reached.
+2. Every new group's finally restores process.exit and removes its rejection
+   observer before settling deferred shutdown and draining continuations (for
+   example reviewed lines 1838–1846). An early failed assertion can leave production
+   cleanup executing after the real exit function is restored. The fixture must
+   contain the code under test until cleanup ends, and report cleanup-time errors
+   before removing its observer; otherwise a broken path can exit the test runner
+   instead of producing the required failure evidence.
+
+Correction authorization, only test/electronSecurity.node.js:
+
+- Verify the editable baseline a8ca18c7 above and the four unchanged identities
+  from the original table before editing. Protected parent is reviewer publication
+  following 2908e3e640d42683873e3549923fe5bd3b36c645, plus one CURRENT-only launch
+  commit. Read CURRENT lines 1–40 (use the tool's correct line/offset convention),
+  this handoff, ticket, AGENTS.md and TESTING.md. Keep original source-read limits.
+- In the compound case, record the nested event/observation without asserting
+  inside showErrorBox, and record a marker immediately before throwing one stable
+  fixture Error object. After settlement, outside production's catch, assert that
+  the nested call returned, its event was prevented, the intended throw marker was
+  reached exactly once, and no extra app.quit/shutdown/dialog occurred. Assert
+  nested record counts/provenance as appropriate. Keep the later repeat assertion.
+- Keep process.exit interception and rejection observation active throughout each
+  new group's finally cleanup, including a bounded event-loop drain after settling
+  all deferreds and observing their continuations. Check captured rejections and
+  forbidden force paths after that drain. Restore both hooks in an outer finally
+  that runs even if settlement, draining or assertions fail. A small shared cleanup
+  helper is appropriate; avoid seven more copies of cleanup plumbing. Preserve an
+  earlier assertion failure when cleanup succeeds; never convert cleanup failure
+  or captured rejection into success. Do not add a swallowing global handler.
+- Attach observers promptly to any Promise derived by the new fixture so cleanup
+  does not create unobserved rejections of its own. Preserve all 30 groups and the
+  actual application-callback boundary; do not rewrite unrelated security tests or
+  broaden scenarios. Keep the existing pending/ordering and fixed-message checks.
+
+No production, tests/syntax execution, builds, evidence, integration, Git mutations,
+network, actor tools or discovery outside the original read scope. Separate named
+read-only HEAD/status/hash/count commands remain allowed. No history inspection is
+needed. Report exact changed path/hash/lines/group count and correction summary;
+then stop. Hermes expected-red authorization follows corrected source acceptance.
