@@ -42,6 +42,8 @@ No credential/config discovery. Use only named reads and separate read-only comm
 Correction 01 outer 4709 collected on owner done, exit 0; Grok session
 24b53eb0-f83e-4541-8078-c85178825b9a. Retain repaired source, but no execution yet.
 One Correction 02 invocation; collect on owner done/Continue. No actor polling.
+Correction 02 launched once from 3ba077ce; outer 9196, Grok session
+08cd1c44-d2b1-43c5-bd84-c4d16e250f8d, requested grok-4.6 High, no subagents.
 
 ## Historical record (superseded by the active state above)
 
