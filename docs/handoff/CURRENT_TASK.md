@@ -1,5 +1,24 @@
 # Current Task
 
+Ticket: BBD-WAL-013
+State: NATIVE ACCOUNT MANAGEMENT — ACCOUNT SERVICE TESTS AUTHORIZED
+Reviewer: Codex
+Authorized source: Grok grok-4.6 High, no subagents
+Authorized execution/integration: none until source review
+
+Owner explicitly selected account management after WAL-011 startup completion.
+Active contract: GROK_BBD_WAL_013_ACCOUNTS_01.md.
+Only account_management.rs test and one Cargo test-target registration writable.
+Production follows understood red. Reviewer is fixing native window/runtime scope
+while service test source is authored. Continue through usable native flow, not
+merely a library milestone. No package-policy or installer detour.
+Preserve unrelated pending npm/policy changes and two older evidence drafts.
+Keep user informed <=60 seconds; collect and route all actors without owner done.
+
+--- Previous completed task ---
+
+# Current Task
+
 Ticket: BBD-WAL-011
 State: LOCAL APP-TO-BROKER STARTUP COMPLETE — INTEGRATED AND ACCEPTED
 Reviewer: Codex
