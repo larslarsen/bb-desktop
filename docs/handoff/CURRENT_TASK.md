@@ -1,16 +1,16 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: SHUTDOWN TEST DROP REJECTED — BOUNDED CORRECTION 01 AUTHORIZED
+State: SHUTDOWN TEST CLEANUP INCOMPLETE — CORRECTION 02 AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; shutdown test correction only
 Authorized execution actor: none
 Authorized integration actor: none
-Protected parent: reviewer publication following a12e2b6d; one CURRENT-only launch allowed
+Protected parent: reviewer publication following 19441e46; one CURRENT-only launch allowed
 
 Read CURRENT lines 1–40 only, AGENTS.md, TESTING.md, [ticket](../../tickets/BBD-WAL-011.md)
 and [active shutdown test contract](GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
-Only write: test/walletSupervisorShutdown.node.js. Initial hash f4531ced, 886 lines.
+Only write: test/walletSupervisorShutdown.node.js. Current hash 1524a1cc, 949 lines.
 The eight-line shutdown-child.js fixture is frozen at 0d8fbfa8. No production edits.
 
 Reviewer found quit() returns before child closure. Before Electron can await
@@ -18,9 +18,9 @@ cleanup during normal quit, the supervisor needs a shared shutdown Promise with
 close-event completion and a fixed 1500 ms failure deadline. Existing cancellation,
 250 ms kill escalation and synchronous quit semantics remain. See the active
 contract for lifecycle ordering, injected-clock and real-child assertions.
-Initial drop rejected: early SIGTERM races handler setup, asynchronous event
-assertions bypass cleanup, close-wait timeout leaks a listener and teardown can
-leave promises unsettled. Correct only the four findings in the handoff review.
+Correction 01 fixed early SIGTERM, callback assertions and close-wait cleanup.
+Two teardown defects remain: cwd removal after failed reaping and unchecked fake
+Promise/timer settlement. Correct only the final Correction 02 findings.
 No tests, builds, evidence or Git mutations; missing-API red is not yet authorized.
 
 Async IPC is accepted/pushed at 3aa5e3d8: 23 Electron and six preload groups,
@@ -39,11 +39,9 @@ tickets/BBD-WAL-011.md, docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
 No credential/config discovery. Use only named reads and separate read-only commands.
-Grok outer 20254 collected on owner done, exit 0; session
-6d0b7d41-29c1-4ed8-bda9-7225b190f34b. Source review rejects this drop for execution.
-One correction invocation; collect on owner done/Continue. No actor polling.
-Correction 01 launched once from f18fb308; outer 4709, Grok session
-24b53eb0-f83e-4541-8078-c85178825b9a, requested grok-4.6 High, no subagents.
+Correction 01 outer 4709 collected on owner done, exit 0; Grok session
+24b53eb0-f83e-4541-8078-c85178825b9a. Retain repaired source, but no execution yet.
+One Correction 02 invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 

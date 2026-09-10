@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Initial shutdown tests rejected; bounded Grok correction authorized.
+Status: Shutdown harness partly corrected; bounded cleanup Correction 02 authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -81,9 +81,10 @@ validation and integration actors are closed.
 The next bounded prerequisite is
 [awaitable supervisor shutdown](../docs/handoff/GROK_BBD_WAL_011_SHUTDOWN_TESTS_01.md).
 Existing quit() returns before child closure, so main cannot yet wait for cleanup.
-The initial six-group test drop is rejected for a pre-handler SIGTERM race,
-assertions escaping asynchronous callbacks, a timeout listener leak and incomplete
-teardown. The handoff's Correction 01 authorizes edits only to
+Correction 01 repaired the pre-handler SIGTERM race, callback assertions and
+close-wait listener cleanup. Two defects remain: removing the cwd after failed
+reaping and unchecked fake Promise/timer settlement. Correction 02 permits only
+those teardown repairs in
 test/walletSupervisorShutdown.node.js; shutdown-child.js is frozen.
 Future shutdown() returns one shared Promise, preserves
 existing quit/cancellation/250 ms escalation, resolves on observed child close or

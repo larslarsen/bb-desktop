@@ -220,3 +220,58 @@ read-only HEAD/status/count commands are allowed; no history, broader source rea
 command chains, Node/test/syntax/build execution, network, credential/config/home
 discovery, docs/evidence edits or Git mutations. Report resulting hash, lines,
 groups and corrections, then stop. Hermes execution/integration remains closed.
+
+
+## Correction 01 review and Correction 02 — 2026-09-09
+
+Decision: retain the completed repairs but reject the drop for two remaining
+teardown defects. Outer 4709 collected on owner done with exit 0. Measured
+test/walletSupervisorShutdown.node.js: 949 lines, six Linux groups, SHA-256
+1524a1ccc474dd75a49b6b9c352dd9451a70e33edfd2ac2a91166cf510327a61.
+The eight-line shutdown-child.js stays exactly 0d8fbfa8; the four frozen
+production/transport identities also match. Reviewer ran no tests or syntax checks.
+
+Exact-ID Markdown export of 24b53eb0-f83e-4541-8078-c85178825b9a shows named reads,
+separate identity/status commands and edits to the authorized test only. No tests,
+builds, production edits or Git mutations appear. The actor read the full source
+handoff rather than just its final review; record the read-scope deviation. No raw
+tool-result audit is claimed.
+
+Accepted repairs: the spawn-time SIGTERM and option are gone; successful handshake
+now gates shutdown. Close callbacks only record event-time facts; assertions are
+in the awaited test flow with actual close flags. waitForMarkedClose removes its
+own listener and clears its timer through one settlement path. Real tracked
+Promises have bounded observation; callback observers are explicitly removed.
+
+Remaining findings (line numbers refer to this 949-line drop):
+
+1. withRealChild catches reaping/stream-close failure at lines 501–503, but still
+   unconditionally calls removeEmptyCwd at lines 515–519. Preserve the directory
+   when the child or any of its three streams has not been confirmed closed.
+   Gate empty-directory inspection/removal on child absence or successfully
+   observed child plus all stream closes. On incomplete reaping, report the
+   preserved path alongside the original and cleanup failures. Do not delete even
+   an empty directory while the child could still use it. Other teardown steps
+   (bounded Promise observation and removal of owned listeners) must still run.
+2. createFakeHarness tracks observed Promises at lines 272–277, but teardown at
+   278–282 never inspects or awaits that collection. Emit fake close, invoke quit,
+   flush Promise observers, then fail if any tracked state remains pending. Do not
+   wait indefinitely on fake-clock Promises or invent a resolution. Verify no
+   unfired/uncleared fake timer remains after close. Preserve a primary test failure
+   if teardown also fails, rather than overwriting it with a finally exception.
+   A small withFakeHarness wrapper around existing case bodies is permitted to
+   retain both errors, or equivalent explicit error collection. Preserve all case
+   assertions and the six-group structure; do not weaken settlement expectations.
+
+Correction 02 actor: Grok Build, grok-4.6 High, no subagents. Protected parent:
+reviewer publication following 19441e46, with one CURRENT-only launch commit.
+Only write test/walletSupervisorShutdown.node.js. Freeze the fixture and all
+production/other tests. Only the two teardown corrections and necessary call-site
+plumbing are authorized. No new coverage matrix or unrelated refactoring.
+
+Read CURRENT lines 1–40, this final section, the affected test, and AGENTS.md/
+TESTING.md if needed. Named hash/count and separate read-only HEAD/status commands
+are allowed. No full handoff/history reload, broader searches, command chains,
+execution of tests/syntax/builds, network, config/home/credential discovery, docs/
+evidence edits or Git mutations. Report hash, lines, groups and corrections; stop.
+Hermes expected-red execution and integration remain closed.
