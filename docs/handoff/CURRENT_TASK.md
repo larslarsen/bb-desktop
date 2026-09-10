@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT TEST-SOURCE CORRECTION 01 AUTHORIZED
+State: ELECTRON QUIT TEST-SOURCE CORRECTION 01 LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; test source only
 Authorized execution actor: none
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, the ticket and
 [Grok quit test contract](GROK_BBD_WAL_011_ELECTRON_QUIT_TESTS_01.md).
 Only Grok may edit test/electronSecurity.node.js under Correction 01 at its end.
 No production edits, tests, syntax checks, builds, evidence or integration.
-Initial outer 59284 collected, exit 0. Correction launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Correction outer 43867; Grok session 042cee10-a065-465f-861f-2a4045762779.
+One launch against 6d0d2b7c; collect on owner done/Continue. No actor polling.
 
 Normal quit must synchronously hold termination, invoke shutdown once and resume
 app.quit only after completion, allowing the reentrant event to proceed. Pending
