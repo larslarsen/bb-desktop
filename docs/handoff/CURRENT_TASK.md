@@ -10,7 +10,7 @@ Authorized integration actor: none
 Read [green and falsification](HERMES_BBD_WAL_011_LAUNCH_CONFIG_GREEN_01.md).
 Source 68adf92e, 140 lines; test 90acd32c, 949 lines. Frozen for execution.
 Nine resolver + 13 supervisor groups, two falsifications, restore and nine green.
-Hermes launch pending publication. Reviewer stays with actor and collects directly.
+Hermes green outer 73046 launched against a3995d1b; reviewer collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, reflection-correction handoff,
