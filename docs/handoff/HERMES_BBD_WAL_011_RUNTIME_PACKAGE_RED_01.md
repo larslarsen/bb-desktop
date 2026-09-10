@@ -98,3 +98,24 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['expected_red'] else 1)
 ```
+
+## Expected-red and baseline acceptance — 2026-09-10
+
+Outer 71146 completed exit 0. Seven explicit helper-missing assertions, zero ok,
+Node exit 1; helper absent and all 17 frozen inputs unchanged. All 44 fixture
+cases remain unexecuted. Raw/evidence JSON equality independently verified.
+Session 20260910_075229_d32803, nous / poolside/laguna-s-2.1:free, Hermes
+v0.18.2 (2026.7.7.2), upstream cfdbbb6e/local 10b6d1a9, Python 3.11.15.
+HEAD 93fef8a4. Exact-session messages 80430–80437 show handoff read, exact
+launcher with repository workdir, wait and report; no extra commands or mutations.
+Raw 125 lines, SHA-256 5608cd092ae81d83e658aa9231e2751378f5f15fbde3a60c2b9dc176d5a370bd.
+Evidence 131 lines, SHA-256 d6c1d5f642b23fa31c13ae933bb661359b123932c6d0541f53b66a9d6b6fa791.
+
+Policy baseline is NOT green: node test/securityPolicy.node.js exits 1 with six
+failed groups (committed workflows; strict nine-line Gitleaks ratchet; WAL-004
+closed Rust inventory; WAL-008/WAL-009 fourteen-path ZEC inventory; production and
+fixture TransactionExtractor authority checks). node scripts/security-policy.js
+exits 1: wallet Rust source inventory is missing or extra. These failures precede
+packaging production and remain release blockers. The green execution must show
+no additional failures or changed checker diagnosis, not silently waive them.
+Hermes closed. Only the runtime-package production handoff is authorized.

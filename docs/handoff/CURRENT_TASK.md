@@ -1,20 +1,20 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUNTIME PACKAGE TESTS ACCEPTED — EXPECTED RED AND POLICY BASELINE AUTHORIZED
+State: RUNTIME PACKAGE EXPECTED RED ACCEPTED — PRODUCTION AUTHORIZED
 Reviewer: Codex
-Authorized source actor: none
-Authorized execution actor: Hermes, exact red/baseline driver once
+Authorized source actor: Grok Build, grok-4.6 High; four production paths only
+Authorized execution actor: none
 Authorized integration actor: none
 
-Read [runtime package red](HERMES_BBD_WAL_011_RUNTIME_PACKAGE_RED_01.md).
-Test 5d8a8bf2, 794 lines, seven groups/44 cases. Helper absent; all source frozen.
-Expected seven helper-missing assertions; then capture two policy commands once.
-Hermes outer 71146 launched against f8bb6622; reviewer collects directly.
+Read [runtime package production](GROK_BBD_WAL_011_RUNTIME_PACKAGE_PRODUCTION_01.md).
+New staging helper plus three packager call sites; Linux disk-backed retained staging.
+Test 5d8a8bf2 frozen; seven missing-helper assertions accepted. No green yet.
+Grok launch pending publication. Reviewer stays with actor and collects directly.
 Owner need not send done; status updates at least every 60 seconds during work.
-Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
-Reviewer publication paths: CURRENT_TASK.md, runtime-package tests/red handoffs,
-and tickets/BBD-WAL-011.md only.
+Six inherited policy failures and Rust-inventory checker failure remain blockers.
+Reviewer publication paths: CURRENT_TASK.md, runtime-package red/production handoffs,
+and tickets/BBD-WAL-011.md only. Preserve all unrelated pending files.
 Resolver accepted at 05a0ffda. Whole WAL-011 incomplete; native pins/startup follow.
 
 ## Historical record (superseded by the active state above)
