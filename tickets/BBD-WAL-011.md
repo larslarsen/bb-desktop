@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Async Electron IPC one-line source fix accepted; focused validation authorized.
+Status: Async Electron IPC validation accepted; four-path integration authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -71,9 +71,11 @@ registered by social-main.js. The
 is accepted: 21 passing groups, two missing-thenable failures, Node exit 1.
 The [one-line Grok production change](../docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md#collected-source-acceptance--2026-09-09)
 is accepted: resolved replies are cloned; synchronous validation remains intact.
-Only the [Hermes focused validation driver](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md)
-is authorized. Source/test edits and integration remain frozen except for the
-exact automatically restored falsification.
+[Focused validation](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md#collected-validation-acceptance--2026-09-09)
+passed all 23 Electron and six preload groups. One-line reversal produced exactly
+the expected failures, then restored Electron green passed all 23. Only the
+[Hermes four-path integration driver](../docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md)
+is authorized. Source/test edits and validation replay are closed.
 Startup/pinning/shutdown are a later bounded stage.
 
 Existing package-policy failures and pending npm edits are recorded separate work;

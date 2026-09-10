@@ -132,3 +132,45 @@ finally:
     print('EVIDENCE='+str(evidence_path), flush=True)
 sys.exit(0 if record['success'] else 1)
 ```
+
+
+## Collected validation acceptance — 2026-09-09
+
+Accept focused validation and falsification; no rerun. Outer 51172 collected on
+owner done with exit 0. Actual session 20260909_181901_686e38, provider nous, model
+poolside/laguna-s-2.1:free. Hermes v0.18.2 (2026.7.7.2), upstream 8e85b276/local
+10b6d1a9, Python 3.11.15. Observed HEAD d5096342fb923bded8a3de8565b82c1a83cb1725.
+
+The saved driver record confirms these exact stages:
+
+| Stage | Exit | ok / not ok |
+| --- | --- | --- |
+| Electron green | 0 | 23 / 0 |
+| Preload green | 0 | 6 / 0 |
+| One-line settlement reversal | 1 | 21 / 2 |
+| Restored Electron green | 0 | 23 / 0 |
+
+Falsification failed only the two delayed groups at their missing-thenable
+assertions. The restored main hash is
+2449b0b190a9ad079639e4d4aca628470d93749bdf92200cc796a1ed33fa1aa4;
+all nine frozen input hashes match before, after and at reviewer collection.
+Green completes all authored rows in the delayed groups. It does not claim real
+Electron-to-Rust startup, renderer error serialization or native wallet completion.
+
+The exact-session tool inventory (messages 80315–80322) shows bounded CURRENT
+read, handoff read, one extraction launcher, one process wait and final report.
+No additional execution, discovery, edits or Git mutations appear. The actor's
+final numbered summary placed final hashing before restored green; the raw record
+and driver establish the correct order: restored green, then final hashes.
+
+Reviewer compared embedded evidence JSON to normalized raw JSON; exact match.
+Raw wallet-broker/target/wal011-async-ipc-green-01.json has SHA-256
+8dc3afd9d917e5e3896cd9a6eca32f493252dbb473b62083c8906dc3e4e864fb.
+Evidence docs/testing/BBD-WAL-011-ASYNC-IPC-GREEN-01.md is 123 lines, SHA-256
+ab7b047a83bf38c7935cf95e5bd5dc2e70bcc1a66fba77f736b79d2ee37ee6d6.
+Both async IPC evidence records remain untracked for Hermes integration. Unrelated
+npm/policy files and other evidence are preserved. Reviewer ran no tests/builds.
+
+Validation execution is closed. Only the linked
+[four-path integration driver](HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md)
+is authorized. No source repair or validation replay is needed.

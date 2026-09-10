@@ -1,15 +1,15 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ASYNC IPC PRODUCTION SOURCE ACCEPTED — FOCUSED VALIDATION AUTHORIZED
+State: ASYNC IPC VALIDATION ACCEPTED — FOUR-PATH INTEGRATION AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
-Authorized execution actor: Hermes, exact async IPC green/falsification driver only
-Authorized integration actor: none
-Protected parent: reviewer publication following 24d5662b; one CURRENT-only launch allowed
+Authorized execution actor: none; validation closed
+Authorized integration actor: Hermes, exact four-path driver only
+Protected parent: reviewer publication following d5096342; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
-[active task](HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md), AGENTS.md and TESTING.md.
+[active task](HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md), AGENTS.md and TESTING.md.
 Read only this active prefix of CURRENT; historical records below are superseded.
 
 The real Rust executable is accepted and pushed at
@@ -26,26 +26,26 @@ cloning them and propagates rejections. Its present synchronous clone converts a
 Promise to an empty object. The accepted test drop is frozen at df0aab16, 1223
 lines and 23 groups. Expected red is accepted: 21 ok, two not ok, Node exit 1.
 Both delayed groups failed at the missing thenable assertion. The one-line source
-fix is accepted at 2449b0b1, 174 lines, every other byte unchanged. Hermes may run
-the exact four-stage validation/falsification driver. Startup/pinning/shutdown
-follow separately. No integration or additional execution is authorized.
+fix is accepted at 2449b0b1, 174 lines, every other byte unchanged. All 23 Electron
+and six preload groups passed. Reversal produced the two expected failures and
+restored Electron green passed all 23. Evidence and nine input hashes match.
+Hermes may integrate only the four linked paths. Startup/pinning/shutdown follow
+separately. No validation replay or source changes.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
 tickets/BBD-WAL-011.md,
 docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_GREEN_01.md,
-docs/handoff/GROK_BBD_WAL_011_ASYNC_IPC_PRODUCTION_01.md.
+docs/handoff/HERMES_BBD_WAL_011_ASYNC_IPC_INTEGRATION_01.md.
 Preserve the four pending npm/policy files, WAL-009 evidence and rejected untracked
 EXECUTABLE-GREEN-01 draft. MapLibre stays stopped; WAL-007 remains parked.
-No test edits or integration, extra execution, package/release claim or
+No source/test edits, extra execution, package/release claim or
 security waiver is authorized. No credential/config discovery. Future Hermes metadata must
 use the exact session key and row only; the earlier discovery incident is retained
 in the transport acceptance record and must not recur.
-Grok outer 59353 collected on owner done, exit 0; session
-7c3d38bd-4d47-4620-bb76-4b6ce045eb62. Source accepted in its handoff's final review.
-Hermes uses one exact session-key/row metadata query via the embedded driver.
-One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
-Hermes launched once from 8ffe14b0; outer 51172, requested nous /
-poolside/laguna-s-2.1:free. Actual session metadata is recorded by the driver.
+Hermes outer 51172 collected on owner done, exit 0; session
+20260909_181901_686e38, nous / poolside/laguna-s-2.1:free. Exact normalized evidence
+is accepted in the green handoff's final review. Source and execution are closed.
+One fresh integration invocation; collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 
