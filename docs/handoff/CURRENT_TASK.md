@@ -1,12 +1,12 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: RUST EXECUTABLE SOURCE ACCEPTED — FOCUSED VALIDATION RUNNING
+State: RUST EXECUTABLE SOURCE ACCEPTED — VALIDATION RESUME 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: none; Grok closed
 Authorized execution actor: Hermes, exact executable validation handoff only
 Authorized integration actors: none
-Protected parent: reviewer publication after 5118d7a6; one CURRENT-only launch allowed
+Protected parent: reviewer publication after 5122eee0; one CURRENT-only launch allowed
 
 Read [ticket](../../tickets/BBD-WAL-011.md),
 [active task](HERMES_BBD_WAL_011_EXECUTABLE_GREEN_01.md), AGENTS.md and TESTING.md.
@@ -39,13 +39,16 @@ requires correction during later Hermes integration, not a report-only rerun.
 Source Correction 01 outer 12636 collected on owner done, exit 0. Corrected runtime
 c579bf54af9e17abc2eb49b42c9a944cd6ec2b6be1e5d900963564f27ecd86e9 (692 lines)
 and frozen main are accepted for focused execution. No runtime success is claimed.
-Hermes may perform the exact formatting/build/lint/session-falsification/green
-sequence, preserve machine-readable output and write one validation evidence record.
-No integration or other source edits. Resume known Hermes session
-20260909_164019_e64925; metadata queries use that literal ID only, no rediscovery.
-Launch once; collect on owner done/Continue. No actor polling.
-Hermes validation launched once from 3b82df5a; outer 99713, resumed session
-20260909_164019_e64925, requested nous / poolside/laguna-s-2.1:free.
+Hermes outer 99713 collected on owner done, exit 0. Actual session was
+20260909_172157_d12849; resume did not preserve the previous session ID. The gate
+stopped before any stage because Hermes mistyped the lockfile pin when copying it.
+All eight source identities still match. Reject the execution/evidence compliance
+claims; preserve the zero-stage raw stop. No format/build/test has run.
+Resume 01 loads the pinned gate directly from the handoff and generates metadata,
+raw JSON and evidence automatically. Only the exact current HERMES_SESSION_ID key
+may be read by that driver; no broad environment or metadata discovery.
+Fresh Hermes invocation; one driver launch only. No integration or source repair.
+Collect on owner done/Continue. No actor polling.
 
 ## Historical record (superseded by the active state above)
 
