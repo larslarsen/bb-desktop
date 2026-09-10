@@ -63,6 +63,7 @@ sed -e "s/@VERSION@/$VERSION/g" packaging/runtime-package.json.in > "$APP_SOURCE
 install -m 0644 social-main.js "$APP_SOURCE/social-main.js"
 cp -R social "$APP_SOURCE/social"
 install -m 0644 imgs/icon.png "$APP_SOURCE/imgs/icon.png"
+node scripts/stage-wallet-runtime.js "$APP_SOURCE"
 
 # Ad-hoc signing lets CI verify bundle integrity and run this private-test app.
 # Public releases must replace it with a Developer ID hardened-runtime signature,

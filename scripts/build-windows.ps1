@@ -40,6 +40,8 @@ $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 Copy-Item social-main.js (Join-Path $AppSource 'social-main.js')
 Copy-Item social (Join-Path $AppSource 'social') -Recurse
 Copy-Item imgs/icon.png (Join-Path $AppSource 'imgs/icon.png')
+& node scripts/stage-wallet-runtime.js $AppSource
+if ($LASTEXITCODE -ne 0) { throw 'Staging wallet runtime failed.' }
 
 Compress-Archive -LiteralPath $BundleDir -DestinationPath $ZipPath -CompressionLevel Optimal
 Write-Output "Built $ZipPath"

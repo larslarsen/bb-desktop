@@ -23,8 +23,8 @@ case "$(uname -m)" in
 esac
 
 VERSION="$(node -p "require('./package.json').version")"
-BUILD_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/bitbook-deb.XXXXXX")"
-trap 'rm -rf -- "$BUILD_ROOT"' EXIT
+install -d "$PROJECT_ROOT/dist"
+BUILD_ROOT="$(mktemp -d "$PROJECT_ROOT/dist/bitbook-deb.XXXXXX")"
 
 PACKAGE_ROOT="$BUILD_ROOT/root"
 APP_DIR="$PACKAGE_ROOT/usr/lib/bitbook"
@@ -46,6 +46,7 @@ sed -e "s/@VERSION@/$VERSION/g" packaging/runtime-package.json.in > "$APP_SOURCE
 install -m 0644 social-main.js "$APP_SOURCE/social-main.js"
 cp -a social/. "$APP_SOURCE/social/"
 install -m 0644 imgs/icon.png "$APP_SOURCE/imgs/icon.png"
+node scripts/stage-wallet-runtime.js "$APP_SOURCE"
 install -m 0644 LICENSE "$PACKAGE_ROOT/usr/share/doc/bitbook/copyright"
 install -m 0644 packaging/linux/bitbook.desktop "$PACKAGE_ROOT/usr/share/applications/bitbook.desktop"
 install -m 0644 imgs/icon-512.png "$PACKAGE_ROOT/usr/share/icons/hicolor/512x512/apps/bitbook.png"
@@ -67,8 +68,8 @@ sed \
   packaging/linux/control.in > "$PACKAGE_ROOT/DEBIAN/control"
 chmod 0644 "$PACKAGE_ROOT/DEBIAN/control"
 
-install -d "$PROJECT_ROOT/dist"
 OUTPUT="$PROJECT_ROOT/dist/bitbook_${VERSION}_${DEB_ARCH}.deb"
 dpkg-deb --build --root-owner-group "$PACKAGE_ROOT" "$OUTPUT"
 
 echo "Built $OUTPUT"
+echo "Staging retained at $BUILD_ROOT"
