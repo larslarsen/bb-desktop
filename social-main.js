@@ -1,13 +1,14 @@
 'use strict';
 
 const path = require('path');
-const { app, BrowserWindow, Menu, ipcMain, session } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, session, dialog } = require('electron');
 const { createWalletSupervisor } = require('./wallet-broker/supervisor');
 const { sanitizeWalletSnapshot } = require('./wallet-pay/model');
 
 app.enableSandbox();
 
 let window;
+let quitState = 'idle';
 const walletSupervisor = createWalletSupervisor();
 const ID = /^[0-9a-f]{32}$/;
 
@@ -113,6 +114,36 @@ function walletHandler(channel, method) {
 function denyNavigation(event) {
   event.preventDefault();
 }
+
+function approveNormalQuit() {
+  if (quitState !== 'pending') return;
+  quitState = 'approved';
+  app.quit();
+}
+
+function failNormalQuit() {
+  if (quitState !== 'pending') return;
+  quitState = 'failed';
+  try {
+    dialog.showErrorBox(
+      'Unable to close BitBook',
+      'Wallet shutdown could not be confirmed. BitBook will keep running.'
+    );
+  } catch (_) {}
+}
+
+app.on('before-quit', (event) => {
+  if (quitState === 'approved') return;
+  event.preventDefault();
+  if (quitState !== 'idle') return;
+  quitState = 'pending';
+  try {
+    walletSupervisor.shutdown().then(approveNormalQuit, failNormalQuit).then(() => {}, () => {});
+  } catch (_) {
+    failNormalQuit();
+    return;
+  }
+});
 
 function createWindow() {
   window = new BrowserWindow({

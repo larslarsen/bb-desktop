@@ -72,7 +72,12 @@ class PolicyError extends Error {
   }
 }
 
-function createElectronMock() {
+const MAX_BEFORE_QUIT_REENTRY = 8;
+const MAX_BEFORE_QUIT_EVENTS = 12;
+const QUIT_ERROR_TITLE = 'Unable to close BitBook';
+const QUIT_ERROR_CONTENT = 'Wallet shutdown could not be confirmed. BitBook will keep running.';
+
+function createElectronMock(options = {}) {
   const accessed = new Set();
   const state = {
     enableSandboxCalls: 0,
@@ -89,6 +94,16 @@ function createElectronMock() {
     supervisorSubscribers: [],
     rendererMessages: [],
     sanitizerCalls: [],
+    shutdownCalls: [],
+    supervisorQuitCalls: 0,
+    supervisorCloseCalls: 0,
+    supervisorKillCalls: 0,
+    errorBoxes: [],
+    beforeQuitEvents: [],
+    lifecycleTrace: [],
+    forceExitCalls: [],
+    beforeQuitDepth: 0,
+    readyEmitted: false,
   };
 
   class WebContents {
@@ -157,6 +172,52 @@ function createElectronMock() {
     },
   };
 
+  function emitRegisteredBeforeQuit(viaAppQuit) {
+    const handlers = state.appHandlers['before-quit'];
+    assert.ok(Array.isArray(handlers) && handlers.length > 0, 'before-quit handler is missing');
+    assert.ok(
+      state.beforeQuitEvents.length < MAX_BEFORE_QUIT_EVENTS,
+      'too many before-quit events'
+    );
+    assert.ok(
+      state.beforeQuitDepth < MAX_BEFORE_QUIT_REENTRY,
+      'before-quit re-entered too many times'
+    );
+    state.beforeQuitDepth += 1;
+    const event = {
+      defaultPrevented: false,
+      preventDefault() {
+        this.defaultPrevented = true;
+      },
+    };
+    const record = {
+      defaultPrevented: false,
+      returned: undefined,
+      depth: state.beforeQuitDepth,
+      viaAppQuit: viaAppQuit === true,
+    };
+    state.beforeQuitEvents.push(record);
+    state.lifecycleTrace.push({
+      type: 'before-quit',
+      depth: state.beforeQuitDepth,
+      viaAppQuit: record.viaAppQuit,
+    });
+    try {
+      for (const handler of handlers) {
+        record.returned = handler(event);
+      }
+    } finally {
+      record.defaultPrevented = event.defaultPrevented;
+      state.lifecycleTrace.push({
+        type: event.defaultPrevented ? 'before-quit-prevented' : 'before-quit-allowed',
+        depth: state.beforeQuitDepth,
+        viaAppQuit: record.viaAppQuit,
+      });
+      state.beforeQuitDepth -= 1;
+    }
+    return event;
+  }
+
   const app = {
     enableSandbox() {
       state.enableSandboxCalls += 1;
@@ -169,6 +230,14 @@ function createElectronMock() {
     },
     quit() {
       state.quitCalls += 1;
+      state.lifecycleTrace.push({ type: 'app.quit' });
+      emitRegisteredBeforeQuit(true);
+    },
+    exit(code) {
+      state.forceExitCalls.push({ api: 'app.exit', code });
+    },
+    relaunch(opts) {
+      state.forceExitCalls.push({ api: 'app.relaunch', opts });
     },
   };
 
@@ -194,7 +263,18 @@ function createElectronMock() {
     },
   };
 
-  const target = { app, BrowserWindow, Menu, session, shell, ipcMain };
+  const dialog = {
+    showErrorBox(title, content) {
+      state.errorBoxes.push({ title, content });
+      state.lifecycleTrace.push({ type: 'showErrorBox', title, content });
+      if (typeof options.showErrorBox === 'function') {
+        return options.showErrorBox(title, content);
+      }
+      return undefined;
+    },
+  };
+
+  const target = { app, BrowserWindow, Menu, session, shell, ipcMain, dialog };
 
   const electron = new Proxy(target, {
     get(receiver, prop) {
@@ -219,6 +299,9 @@ function createElectronMock() {
         handler(...args);
       }
     },
+    emitBeforeQuit() {
+      return emitRegisteredBeforeQuit(false);
+    },
   };
 }
 
@@ -226,7 +309,7 @@ let runtime;
 
 function loadMaintainedMain(options = {}) {
   assert.ok(fs.existsSync(mainPath), 'maintained Electron entry social-main.js is missing');
-  const mock = createElectronMock();
+  const mock = createElectronMock(options);
   const originalLoad = Module._load;
   const previousMain = require.cache[mainPath];
   const trackedSanitizer = (value) => {
@@ -254,6 +337,39 @@ function loadMaintainedMain(options = {}) {
               mock.state.supervisorSubscribers.push(callback);
               return () => true;
             },
+            shutdown() {
+              mock.state.shutdownCalls.push({});
+              mock.state.lifecycleTrace.push({ type: 'shutdown' });
+              let result;
+              if (typeof options.shutdown === 'function') {
+                result = options.shutdown();
+              } else {
+                result = Promise.resolve();
+              }
+              if (result && typeof result.then === 'function') {
+                result.then(
+                  () => {
+                    mock.state.lifecycleTrace.push({ type: 'shutdown-fulfilled' });
+                  },
+                  () => {
+                    mock.state.lifecycleTrace.push({ type: 'shutdown-rejected' });
+                  }
+                );
+              }
+              return result;
+            },
+            quit() {
+              mock.state.supervisorQuitCalls += 1;
+              mock.state.lifecycleTrace.push({ type: 'supervisor.quit' });
+            },
+            close() {
+              mock.state.supervisorCloseCalls += 1;
+              mock.state.lifecycleTrace.push({ type: 'supervisor.close' });
+            },
+            kill() {
+              mock.state.supervisorKillCalls += 1;
+              mock.state.lifecycleTrace.push({ type: 'supervisor.kill' });
+            },
           };
         },
       };
@@ -273,7 +389,10 @@ function loadMaintainedMain(options = {}) {
       else delete require.cache[mainPath];
     }
   }
-  mock.emitApp('ready');
+  if (options.emitReady !== false) {
+    mock.state.readyEmitted = true;
+    mock.emitApp('ready');
+  }
   return mock;
 }
 
@@ -370,6 +489,80 @@ async function settleDeferreds(deferreds, observed, currentDeferred, message) {
     deferreds.map((deferred) => deferred.promise).concat(observed),
     message
   );
+}
+
+function watchForceExits(state) {
+  const originalExit = process.exit;
+  process.exit = function patchedProcessExit(code) {
+    state.forceExitCalls.push({ api: 'process.exit', code });
+  };
+  return function restoreForceExits() {
+    process.exit = originalExit;
+  };
+}
+
+function watchUnhandledRejections() {
+  const seen = [];
+  function onUnhandled(reason) {
+    seen.push(reason);
+  }
+  process.on('unhandledRejection', onUnhandled);
+  return {
+    seen,
+    restore() {
+      process.removeListener('unhandledRejection', onUnhandled);
+    },
+  };
+}
+
+function requireAppHandlers(ctx, eventName) {
+  const handlers = ctx.state.appHandlers[eventName];
+  assert.ok(Array.isArray(handlers) && handlers.length > 0, `${eventName} handler is missing`);
+  return handlers;
+}
+
+function assertUnusedForcePaths(ctx) {
+  assert.strictEqual(ctx.state.supervisorQuitCalls, 0, 'supervisor.quit must stay unused');
+  assert.strictEqual(ctx.state.supervisorCloseCalls, 0, 'supervisor.close must stay unused');
+  assert.strictEqual(ctx.state.supervisorKillCalls, 0, 'supervisor.kill must stay unused');
+  assert.strictEqual(ctx.state.forceExitCalls.length, 0, 'force-exit was used');
+  assert.deepStrictEqual(ctx.state.supervisorCalls, []);
+}
+
+async function cleanupQuitHooks(options) {
+  const deferreds = options.deferreds || [];
+  const observed = options.observed || [];
+  const currentDeferred = options.currentDeferred || null;
+  try {
+    await settleDeferreds(deferreds, observed, currentDeferred, options.message);
+    await withSettlementTimeout(waitEventLoopTurn(), `${options.message} cleanup drain timed out`);
+    assert.strictEqual(
+      options.unhandled.seen.length,
+      0,
+      `unhandled rejection during ${options.message} cleanup`
+    );
+    assertUnusedForcePaths(options.ctx);
+  } finally {
+    options.restoreExit();
+    options.unhandled.restore();
+  }
+}
+
+function assertFixedQuitErrorBox(box) {
+  assert.strictEqual(box.title, QUIT_ERROR_TITLE);
+  assert.strictEqual(box.content, QUIT_ERROR_CONTENT);
+}
+
+function assertNoPrivateQuitCanary(ctx, canary) {
+  const payloads = JSON.stringify({
+    errorBoxes: ctx.state.errorBoxes,
+    rendererMessages: ctx.state.rendererMessages,
+  });
+  assert.ok(!payloads.includes(canary), `private canary leaked into dialog/renderer payloads: ${canary}`);
+}
+
+function lifecycleTypes(ctx) {
+  return ctx.state.lifecycleTrace.map((entry) => entry.type);
 }
 
 function windowUnderTest() {
@@ -1190,6 +1383,616 @@ test('wallet reference contract is maintained source and retains an offline iner
       () => assertWalletImportAllowlist(source, 'wallet-contract/synthetic.js'),
       PolicyError
     );
+  }
+});
+
+test('after ready, initial before-quit is prevented until deferred shutdown fulfills and resumes quit', async () => {
+  const deferred = createDeferred();
+  const deferreds = [deferred];
+  const observed = [];
+  const shutdownState = { status: 'pending' };
+  const shutdownObserved = deferred.promise.then(
+    (value) => {
+      shutdownState.status = 'fulfilled';
+      shutdownState.value = value;
+      return value;
+    },
+    (reason) => {
+      shutdownState.status = 'rejected';
+      shutdownState.reason = reason;
+      throw reason;
+    }
+  );
+  observed.push(shutdownObserved);
+  const ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      return deferred.promise;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    requireAppHandlers(ctx, 'before-quit');
+    const first = ctx.emitBeforeQuit();
+    assert.strictEqual(first.defaultPrevented, true, 'initial before-quit was not prevented');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+
+    const repeat = ctx.emitBeforeQuit();
+    assert.strictEqual(repeat.defaultPrevented, true, 'repeat before-quit was not prevented');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+
+    await withSettlementTimeout(waitEventLoopTurn(), 'pending quit event-loop turn timed out');
+    assert.strictEqual(deferred.settled, false);
+    assert.strictEqual(shutdownState.status, 'pending');
+    assert.strictEqual(ctx.state.quitCalls, 0, 'application quit occurred while shutdown was pending');
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+    assert.strictEqual(ctx.state.forceExitCalls.length, 0);
+
+    deferred.resolve();
+    await withSettlementTimeout(shutdownObserved, 'shutdown did not fulfill');
+    await withSettlementTimeout(waitEventLoopTurn(), 'resumed quit event-loop turn timed out');
+    assert.strictEqual(shutdownState.status, 'fulfilled');
+
+    const types = lifecycleTypes(ctx);
+    const fulfilledAt = types.indexOf('shutdown-fulfilled');
+    const quitAt = types.indexOf('app.quit');
+    assert.ok(fulfilledAt !== -1, 'shutdown fulfillment was not recorded');
+    assert.ok(quitAt !== -1, 'resumed app.quit was not recorded');
+    assert.ok(fulfilledAt < quitAt, 'resumed app.quit preceded shutdown fulfillment');
+
+    assert.strictEqual(ctx.state.quitCalls, 1);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 3);
+    assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[2].defaultPrevented, false);
+    assert.strictEqual(ctx.state.beforeQuitEvents[2].viaAppQuit, true);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      deferreds,
+      observed,
+      currentDeferred: deferred,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled after-ready quit shutdown fixture',
+    });
+  }
+});
+
+test('before ready, fulfilled no-child shutdown allows one resumed quit without windows', async () => {
+  const observed = [];
+  const shutdownState = { status: 'pending' };
+  const ctx = loadIsolatedMaintainedMain({
+    emitReady: false,
+    shutdown() {
+      const promise = Promise.resolve();
+      const shutdownObserved = promise.then(
+        (value) => {
+          shutdownState.status = 'fulfilled';
+          shutdownState.value = value;
+          return value;
+        },
+        (reason) => {
+          shutdownState.status = 'rejected';
+          shutdownState.reason = reason;
+          throw reason;
+        }
+      );
+      observed.push(shutdownObserved);
+      return promise;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    assert.strictEqual(ctx.state.readyEmitted, false);
+    assert.strictEqual(ctx.state.windows.length, 0);
+    assert.deepStrictEqual(Object.keys(ctx.state.ipcHandlers), []);
+    assert.strictEqual(ctx.state.permissionRequestHandler, null);
+    requireAppHandlers(ctx, 'before-quit');
+
+    const first = ctx.emitBeforeQuit();
+    assert.strictEqual(first.defaultPrevented, true, 'initial before-quit was not prevented');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.windows.length, 0);
+    assert.strictEqual(ctx.state.readyEmitted, false);
+
+    await withSettlementTimeout(Promise.all(observed), 'no-child shutdown did not settle');
+    await withSettlementTimeout(waitEventLoopTurn(), 'no-child resumed quit event-loop turn timed out');
+    assert.strictEqual(shutdownState.status, 'fulfilled');
+    assert.strictEqual(ctx.state.quitCalls, 1);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 2);
+    assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].defaultPrevented, false);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].viaAppQuit, true);
+    assert.strictEqual(ctx.state.windows.length, 0);
+    assert.strictEqual(ctx.state.readyEmitted, false);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      observed,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled before-ready quit shutdown fixture',
+    });
+  }
+});
+
+test('shutdown-emitted nested before-quit stays prevented until the original shutdown fulfills', async () => {
+  const deferred = createDeferred();
+  const deferreds = [deferred];
+  const observed = [];
+  const shutdownState = { status: 'pending' };
+  const shutdownObserved = deferred.promise.then(
+    (value) => {
+      shutdownState.status = 'fulfilled';
+      shutdownState.value = value;
+      return value;
+    },
+    (reason) => {
+      shutdownState.status = 'rejected';
+      shutdownState.reason = reason;
+      throw reason;
+    }
+  );
+  observed.push(shutdownObserved);
+  let nestedEmitted = false;
+  let ctx;
+  ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      nestedEmitted = true;
+      const nested = ctx.emitBeforeQuit();
+      assert.strictEqual(nested.defaultPrevented, true, 'nested before-quit was not prevented');
+      return deferred.promise;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    requireAppHandlers(ctx, 'before-quit');
+    const first = ctx.emitBeforeQuit();
+    assert.strictEqual(nestedEmitted, true, 'fixture did not emit nested before-quit');
+    assert.strictEqual(first.defaultPrevented, true, 'initial before-quit was not prevented');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 2);
+    assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].viaAppQuit, false);
+
+    await withSettlementTimeout(waitEventLoopTurn(), 'nested quit event-loop turn timed out');
+    assert.strictEqual(deferred.settled, false);
+    assert.strictEqual(shutdownState.status, 'pending');
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+
+    deferred.resolve();
+    await withSettlementTimeout(shutdownObserved, 'nested-quit shutdown did not fulfill');
+    await withSettlementTimeout(waitEventLoopTurn(), 'nested resumed quit event-loop turn timed out');
+    assert.strictEqual(shutdownState.status, 'fulfilled');
+    assert.strictEqual(ctx.state.quitCalls, 1);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 3);
+    assert.strictEqual(ctx.state.beforeQuitEvents[2].defaultPrevented, false);
+    assert.strictEqual(ctx.state.beforeQuitEvents[2].viaAppQuit, true);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      deferreds,
+      observed,
+      currentDeferred: deferred,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled nested before-quit shutdown fixture',
+    });
+  }
+});
+
+test('rejected shutdown keeps quit blocked and shows one fixed error box for TIMEOUT and UNAVAILABLE', async () => {
+  const rows = [
+    [
+      'TIMEOUT',
+      'WAL011_QUIT_CANARY_TIMEOUT_MSG /secret/wallet-broker.sock',
+      'WAL011_QUIT_CANARY_TIMEOUT_STACK',
+    ],
+    [
+      'UNAVAILABLE',
+      'WAL011_QUIT_CANARY_UNAVAILABLE_MSG /var/lib/bitbook/private',
+      'WAL011_QUIT_CANARY_UNAVAILABLE_STACK',
+    ],
+  ];
+  for (const [code, messageCanary, stackCanary] of rows) {
+    const deferred = createDeferred();
+    const deferreds = [deferred];
+    const observed = [];
+    const shutdownState = { status: 'pending' };
+    const shutdownObserved = deferred.promise.then(
+      (value) => {
+        shutdownState.status = 'fulfilled';
+        shutdownState.value = value;
+        return value;
+      },
+      (reason) => {
+        shutdownState.status = 'rejected';
+        shutdownState.reason = reason;
+        return reason;
+      }
+    );
+    observed.push(shutdownObserved);
+    const error = fixtureSupervisorError(code, messageCanary);
+    error.stack = `${stackCanary}\n${error.stack || ''}`;
+    const handlerReturnState = { status: 'absent' };
+    const ctx = loadIsolatedMaintainedMain({
+      shutdown() {
+        return deferred.promise;
+      },
+    });
+    const restoreExit = watchForceExits(ctx.state);
+    const unhandled = watchUnhandledRejections();
+    try {
+      requireAppHandlers(ctx, 'before-quit');
+      let thrown;
+      try {
+        ctx.emitBeforeQuit();
+      } catch (caught) {
+        thrown = caught;
+      }
+      assert.strictEqual(thrown, undefined, `${code} shutdown rejection escaped the before-quit handler`);
+      assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      assert.strictEqual(ctx.state.quitCalls, 0);
+      assert.strictEqual(ctx.state.errorBoxes.length, 0);
+      const returned = ctx.state.beforeQuitEvents[0].returned;
+      if (returned && typeof returned.then === 'function') {
+        handlerReturnState.status = 'pending';
+        observed.push(Promise.resolve(returned).then(
+          (value) => {
+            handlerReturnState.status = 'fulfilled';
+            return value;
+          },
+          (reason) => {
+            handlerReturnState.status = 'rejected';
+            return reason;
+          }
+        ));
+      }
+
+      await withSettlementTimeout(waitEventLoopTurn(), `${code} pending quit event-loop turn timed out`);
+      assert.strictEqual(deferred.settled, false);
+      assert.strictEqual(shutdownState.status, 'pending');
+      assert.strictEqual(ctx.state.quitCalls, 0);
+
+      deferred.reject(error);
+      await withSettlementTimeout(shutdownObserved, `${code} shutdown rejection did not settle`);
+      await withSettlementTimeout(waitEventLoopTurn(), `${code} rejected quit event-loop turn timed out`);
+      assert.strictEqual(shutdownState.status, 'rejected');
+      assert.strictEqual(shutdownState.reason, error);
+      assert.notStrictEqual(
+        handlerReturnState.status,
+        'rejected',
+        `${code} before-quit handler returned a rejected Promise`
+      );
+      assert.strictEqual(ctx.state.quitCalls, 0, `${code} resumed quit after shutdown rejection`);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      assert.strictEqual(ctx.state.errorBoxes.length, 1);
+      assertFixedQuitErrorBox(ctx.state.errorBoxes[0]);
+      assertNoPrivateQuitCanary(ctx, messageCanary);
+      assertNoPrivateQuitCanary(ctx, stackCanary);
+      assert.strictEqual(unhandled.seen.length, 0);
+
+      const repeat = ctx.emitBeforeQuit();
+      assert.strictEqual(repeat.defaultPrevented, true, `${code} repeat before-quit was not prevented`);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      assert.strictEqual(ctx.state.errorBoxes.length, 1);
+      assert.strictEqual(ctx.state.quitCalls, 0);
+      assert.strictEqual(unhandled.seen.length, 0);
+      assertUnusedForcePaths(ctx);
+    } finally {
+      await cleanupQuitHooks({
+        deferreds,
+        observed,
+        currentDeferred: deferred,
+        restoreExit,
+        unhandled,
+        ctx,
+        message: `unsettled ${code} quit shutdown fixture`,
+      });
+    }
+  }
+});
+
+test('synchronous shutdown throw is contained and keeps quit blocked with one fixed error box', async () => {
+  const observed = [];
+  const messageCanary = 'WAL011_QUIT_CANARY_THROW_MSG /tmp/bitbook-broker';
+  const stackCanary = 'WAL011_QUIT_CANARY_THROW_STACK';
+  const error = fixtureSupervisorError('UNAVAILABLE', messageCanary);
+  error.stack = `${stackCanary}\n${error.stack || ''}`;
+  const handlerReturnState = { status: 'absent' };
+  const ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      throw error;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    requireAppHandlers(ctx, 'before-quit');
+    let thrown;
+    try {
+      ctx.emitBeforeQuit();
+    } catch (caught) {
+      thrown = caught;
+    }
+    assert.strictEqual(thrown, undefined, 'synchronous shutdown throw escaped the before-quit handler');
+    assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    const returned = ctx.state.beforeQuitEvents[0].returned;
+    if (returned && typeof returned.then === 'function') {
+      handlerReturnState.status = 'pending';
+      observed.push(Promise.resolve(returned).then(
+        (value) => {
+          handlerReturnState.status = 'fulfilled';
+          return value;
+        },
+        (reason) => {
+          handlerReturnState.status = 'rejected';
+          return reason;
+        }
+      ));
+    }
+
+    await withSettlementTimeout(waitEventLoopTurn(), 'synchronous throw quit event-loop turn timed out');
+    assert.notStrictEqual(
+      handlerReturnState.status,
+      'rejected',
+      'before-quit handler returned a rejected Promise after a shutdown throw'
+    );
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 1);
+    assertFixedQuitErrorBox(ctx.state.errorBoxes[0]);
+    assertNoPrivateQuitCanary(ctx, messageCanary);
+    assertNoPrivateQuitCanary(ctx, stackCanary);
+    assert.strictEqual(unhandled.seen.length, 0);
+
+    const repeat = ctx.emitBeforeQuit();
+    assert.strictEqual(repeat.defaultPrevented, true, 'repeat before-quit was not prevented after throw');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      observed,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled synchronous shutdown throw fixture',
+    });
+  }
+});
+
+test('rejected shutdown plus throwing error box stays contained without resumed quit', async () => {
+  const deferred = createDeferred();
+  const deferreds = [deferred];
+  const observed = [];
+  const shutdownState = { status: 'pending' };
+  const shutdownObserved = deferred.promise.then(
+    (value) => {
+      shutdownState.status = 'fulfilled';
+      shutdownState.value = value;
+      return value;
+    },
+    (reason) => {
+      shutdownState.status = 'rejected';
+      shutdownState.reason = reason;
+      return reason;
+    }
+  );
+  observed.push(shutdownObserved);
+  const messageCanary = 'WAL011_QUIT_CANARY_COMPOUND_MSG child pid 4242';
+  const stackCanary = 'WAL011_QUIT_CANARY_COMPOUND_STACK';
+  const error = fixtureSupervisorError('TIMEOUT', messageCanary);
+  error.stack = `${stackCanary}\n${error.stack || ''}`;
+  const dialogError = new Error('fixture showErrorBox failure');
+  const dialogNested = {
+    returned: false,
+    defaultPrevented: null,
+    viaAppQuit: null,
+  };
+  let dialogThrowMarkerCount = 0;
+  let ctx;
+  ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      return deferred.promise;
+    },
+    showErrorBox() {
+      const nested = ctx.emitBeforeQuit();
+      const record = ctx.state.beforeQuitEvents[ctx.state.beforeQuitEvents.length - 1];
+      dialogNested.returned = true;
+      dialogNested.defaultPrevented = nested.defaultPrevented;
+      dialogNested.viaAppQuit = record ? record.viaAppQuit : null;
+      dialogThrowMarkerCount += 1;
+      throw dialogError;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    requireAppHandlers(ctx, 'before-quit');
+    let thrown;
+    try {
+      ctx.emitBeforeQuit();
+    } catch (caught) {
+      thrown = caught;
+    }
+    assert.strictEqual(thrown, undefined, 'compound quit failure escaped the before-quit handler');
+    assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.errorBoxes.length, 0);
+
+    await withSettlementTimeout(waitEventLoopTurn(), 'compound quit event-loop turn timed out');
+    assert.strictEqual(shutdownState.status, 'pending');
+    assert.strictEqual(ctx.state.quitCalls, 0);
+
+    deferred.reject(error);
+    await withSettlementTimeout(shutdownObserved, 'compound shutdown rejection did not settle');
+    await withSettlementTimeout(waitEventLoopTurn(), 'compound dialog event-loop turn timed out');
+    assert.strictEqual(dialogNested.returned, true, 'dialog nested before-quit did not return');
+    assert.strictEqual(dialogNested.defaultPrevented, true, 'failed-state nested before-quit was not prevented');
+    assert.strictEqual(dialogNested.viaAppQuit, false);
+    assert.strictEqual(dialogThrowMarkerCount, 1, 'intended dialog throw marker was not reached exactly once');
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 2);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].defaultPrevented, true);
+    assert.strictEqual(ctx.state.beforeQuitEvents[1].viaAppQuit, false);
+    assert.strictEqual(ctx.state.errorBoxes.length, 1);
+    assertFixedQuitErrorBox(ctx.state.errorBoxes[0]);
+    assertNoPrivateQuitCanary(ctx, messageCanary);
+    assertNoPrivateQuitCanary(ctx, stackCanary);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.forceExitCalls.length, 0);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assert.strictEqual(thrown, undefined);
+
+    const repeat = ctx.emitBeforeQuit();
+    assert.strictEqual(repeat.defaultPrevented, true, 'repeat before-quit was not prevented after compound failure');
+    assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+    assert.strictEqual(ctx.state.errorBoxes.length, 1);
+    assert.strictEqual(ctx.state.quitCalls, 0);
+    assert.strictEqual(ctx.state.beforeQuitEvents.length, 3);
+    assert.strictEqual(ctx.state.beforeQuitEvents[2].defaultPrevented, true);
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      deferreds,
+      observed,
+      currentDeferred: deferred,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled compound quit failure fixture',
+    });
+  }
+});
+
+test('window-all-closed uses the host platform branch and the same before-quit gate', async () => {
+  const deferred = createDeferred();
+  const deferreds = [deferred];
+  const observed = [];
+  const shutdownState = { status: 'pending' };
+  const shutdownObserved = deferred.promise.then(
+    (value) => {
+      shutdownState.status = 'fulfilled';
+      shutdownState.value = value;
+      return value;
+    },
+    (reason) => {
+      shutdownState.status = 'rejected';
+      shutdownState.reason = reason;
+      throw reason;
+    }
+  );
+  observed.push(shutdownObserved);
+  const ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      return deferred.promise;
+    },
+  });
+  const restoreExit = watchForceExits(ctx.state);
+  const unhandled = watchUnhandledRejections();
+  try {
+    requireAppHandlers(ctx, 'window-all-closed');
+    requireAppHandlers(ctx, 'before-quit');
+
+    if (process.platform === 'darwin') {
+      ctx.emitApp('window-all-closed');
+      await withSettlementTimeout(waitEventLoopTurn(), 'macOS window-all-closed event-loop turn timed out');
+      assert.strictEqual(ctx.state.quitCalls, 0, 'macOS window-all-closed quit the app');
+      assert.strictEqual(ctx.state.shutdownCalls.length, 0, 'macOS window-all-closed invoked shutdown');
+      assert.strictEqual(ctx.state.beforeQuitEvents.length, 0);
+
+      const first = ctx.emitBeforeQuit();
+      assert.strictEqual(first.defaultPrevented, true, 'explicit macOS before-quit was not prevented');
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      await withSettlementTimeout(waitEventLoopTurn(), 'macOS explicit quit event-loop turn timed out');
+      assert.strictEqual(deferred.settled, false);
+      assert.strictEqual(ctx.state.quitCalls, 0);
+
+      deferred.resolve();
+      await withSettlementTimeout(shutdownObserved, 'macOS explicit shutdown did not fulfill');
+      await withSettlementTimeout(waitEventLoopTurn(), 'macOS resumed quit event-loop turn timed out');
+      assert.strictEqual(shutdownState.status, 'fulfilled');
+      assert.strictEqual(ctx.state.quitCalls, 1);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      assert.strictEqual(ctx.state.errorBoxes.length, 0);
+      assert.strictEqual(ctx.state.beforeQuitEvents[ctx.state.beforeQuitEvents.length - 1].defaultPrevented, false);
+      assert.strictEqual(ctx.state.beforeQuitEvents[ctx.state.beforeQuitEvents.length - 1].viaAppQuit, true);
+    } else {
+      ctx.emitApp('window-all-closed');
+      assert.strictEqual(ctx.state.quitCalls, 1);
+      assert.strictEqual(ctx.state.beforeQuitEvents.length, 1);
+      assert.strictEqual(ctx.state.beforeQuitEvents[0].defaultPrevented, true);
+      assert.strictEqual(ctx.state.beforeQuitEvents[0].viaAppQuit, true);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+
+      await withSettlementTimeout(waitEventLoopTurn(), 'window-all-closed pending event-loop turn timed out');
+      assert.strictEqual(deferred.settled, false);
+      assert.strictEqual(shutdownState.status, 'pending');
+      assert.strictEqual(ctx.state.quitCalls, 1, 'additional quit occurred while shutdown was pending');
+
+      deferred.resolve();
+      await withSettlementTimeout(shutdownObserved, 'window-all-closed shutdown did not fulfill');
+      await withSettlementTimeout(waitEventLoopTurn(), 'window-all-closed resumed quit event-loop turn timed out');
+      assert.strictEqual(shutdownState.status, 'fulfilled');
+      assert.strictEqual(ctx.state.quitCalls, 2);
+      assert.strictEqual(ctx.state.shutdownCalls.length, 1);
+      assert.strictEqual(ctx.state.errorBoxes.length, 0);
+      assert.strictEqual(ctx.state.beforeQuitEvents.length, 2);
+      assert.strictEqual(ctx.state.beforeQuitEvents[1].defaultPrevented, false);
+      assert.strictEqual(ctx.state.beforeQuitEvents[1].viaAppQuit, true);
+
+      const types = lifecycleTypes(ctx);
+      const fulfilledAt = types.indexOf('shutdown-fulfilled');
+      const quitIndexes = [];
+      for (let index = 0; index < types.length; index += 1) {
+        if (types[index] === 'app.quit') quitIndexes.push(index);
+      }
+      assert.strictEqual(quitIndexes.length, 2);
+      assert.ok(fulfilledAt !== -1 && fulfilledAt > quitIndexes[0] && fulfilledAt < quitIndexes[1]);
+    }
+
+    assert.strictEqual(unhandled.seen.length, 0);
+    assertUnusedForcePaths(ctx);
+  } finally {
+    await cleanupQuitHooks({
+      deferreds,
+      observed,
+      currentDeferred: deferred,
+      restoreExit,
+      unhandled,
+      ctx,
+      message: 'unsettled window-all-closed quit fixture',
+    });
   }
 });
 
