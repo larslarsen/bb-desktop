@@ -43,6 +43,8 @@ No credential/config discovery. Use only named reads and separate read-only comm
 Correction 02 outer 9196 collected on owner done, exit 0; Grok session
 08cd1c44-d2b1-43c5-bd84-c4d16e250f8d. Source acceptance is in the final test review.
 One fresh Hermes invocation; collect on owner done/Continue. No actor polling.
+Hermes launched once from 859966c8; outer 98181, requested nous /
+poolside/laguna-s-2.1:free. Actual session metadata is recorded by the driver.
 
 ## Historical record (superseded by the active state above)
 
