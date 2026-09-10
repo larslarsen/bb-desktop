@@ -1,5 +1,8 @@
 # WAL-011 Electron normal quit production 01
 
+Active amendment: collected review/Correction 01 below supersedes the initial
+editable baseline. Only that source correction is authorized; no validation yet.
+
 Actor: Grok Build, grok-4.6 High, production source only, no subagents.
 Protected parent: reviewer publication following 384ba2398337540d4085e6a2a2a0b444c2d9f365,
 plus one CURRENT-only launch record. Read CURRENT lines 1–40, this handoff,
@@ -77,3 +80,49 @@ That driver, mutation, evidence and integration require separate authorization.
 Retain closed supervisor/transport/Rust validation; no replay here. Existing
 package-policy failures are not waived, and final application/release security
 gates still apply to their final inputs.
+
+## Collected source review and Correction 01 — 2026-09-09
+
+Hold acceptance for one small source correction. Outer 21766 collected on owner
+done, exit 0. Exact-ID export 9ca89e48-d26e-4f9f-8aef-9a58c53d6c22 reports two
+edits only to social-main.js and read-only commands; no tests, production/test
+integration or Git mutations appear. This is a tool summary. Read deviations:
+CURRENT again used 2–41, and extra publication hashes/blob/branch queries included
+a chained command beyond the separate HEAD/status/hash/count scope. Search entries
+omit paths. These do not expand this correction's read authority.
+
+Measured source: social-main.js, 211 lines, SHA-256
+fe116de535f3ee0796fddac94ee9f5178c467cc1102862368e64a5a18b4ef2c4.
+The four frozen test/supervisor/preload identities still match. Source adds dialog,
+four-state quit bookkeeping, module-load registration, pending before shutdown,
+approved before app.quit, failed before a fixed error box and contained dialog
+failure. Existing window and IPC behavior remains unchanged.
+
+One branch is outside the fixed contract: after checking for a thenable, main
+calls approveNormalQuit directly when the shutdown result is missing/non-thenable.
+That approves exit without observing shutdown completion. The accepted supervisor
+always returns a Promise, so this fallback is unnecessary; no current supervisor
+failure is claimed. Additionally, the then lookup/subscription sits outside the
+synchronous failure guard. Remove the unsupported branch rather than introducing
+another success contract or expanding the tests for it.
+
+Only Grok Build, grok-4.6 High without subagents may correct social-main.js:
+
+- Verify editable SHA-256 fe116de5 above and the four initial frozen identities.
+  Protected parent: reviewer publication following 792a38ed, plus one CURRENT-only
+  launch record. Read CURRENT lines 1–40 exactly, this handoff, ticket, AGENTS.md,
+  TESTING.md and only the original five named source paths. No history queries.
+- Subscribe directly to the accepted shutdown Promise inside the same try that
+  invokes shutdown. Remove the conditional thenable branch and direct synchronous
+  approveNormalQuit fallback. A missing/non-thenable result or subscription throw
+  must follow the existing failNormalQuit path through that try/catch; it must
+  never approve quit. Keep fulfillment/rejection callbacks and containment of their
+  returned Promise rejection. Preserve immediate pending state before invocation.
+- Change nothing else. The four-state logic, fixed strings, dialog containment,
+  window/IPC behavior and all test bytes remain frozen. This removes an unneeded
+  branch; no new API, test scenario or production design is authorized.
+
+No tests, syntax checks, execution, builds, evidence, docs edits, Git mutations,
+network, actor tools or config/credential discovery. Separate named read-only
+HEAD/status/hash/count and bounded reads/searches only. Report path/hash/lines and
+the correction, then stop. Reviewer source acceptance precedes Hermes validation.

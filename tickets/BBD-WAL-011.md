@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Electron quit expected red accepted; one-file production source authorized.
+Status: Electron quit expected red accepted; production Correction 01 authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -136,6 +136,9 @@ seven absent-handler failures, Node exit 1, unchanged inputs and matching eviden
 Hermes is closed. The [Grok production handoff](../docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md)
 authorizes only social-main.js to await shutdown through the fixed normal-quit gate.
 Tests, execution, evidence and integration stay frozen pending production review.
+Initial production fe116de5 (211 lines) needs one bounded correction: remove the
+non-Promise success fallback and keep subscription inside the synchronous failure
+guard. Only social-main.js is authorized under the appended production handoff.
 
 Existing package-policy failures and pending npm edits are recorded separate work;
 they are not green or waived release checks. This transport stage changes no graph,

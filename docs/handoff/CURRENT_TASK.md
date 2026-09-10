@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT PRODUCTION ACTOR LAUNCHED — AWAITING COLLECTION
+State: ELECTRON QUIT PRODUCTION CORRECTION 01 AUTHORIZED
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; social-main.js only
 Authorized execution actor: none
@@ -10,10 +10,10 @@ Accepted shutdown implementation: 1e45d6d2bf78df6b998cc2062604f23dd1252061
 
 Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
 [Grok quit production handoff](GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md).
-Only its one-file source change is authorized. Tests/evidence stay frozen.
+Only its appended one-file Correction 01 is authorized. Tests/evidence stay frozen.
 No tests, syntax checks, builds, source integration or Git mutation by Grok.
-Grok outer 21766; session 9ca89e48-d26e-4f9f-8aef-9a58c53d6c22.
-One launch against 03fa12c5; collect on owner done/Continue. No actor polling.
+Grok outer 21766 collected exit 0. Correction launch pending publication.
+Launch once; collect on owner done/Continue. No actor polling.
 
 Accepted observed red: Node exit 1, 23 existing groups passed/seven new groups
 failed at before-quit handler is missing with complete seven-failure footer.
@@ -21,8 +21,8 @@ Actual Hermes session 20260909_205604_2ac4dd, nous/poolside/laguna-s-2.1:free.
 Exact raw/evidence and five input hashes verified; no replay or repair needed.
 Test source frozen at 7f759f81 (2026 lines, 30 groups). New lifecycle bodies and
 second rejection row remain unexecuted until later green. Hermes is closed.
-The gate must await one shutdown, allow approved re-entry, and hold failures with
-one fixed error box; even dialog failure must not escape or permit termination.
+Initial source fe116de5 (211 lines) is held for removal of its non-Promise success
+fallback and moving Promise subscription inside the existing failure guard.
 
 Shutdown at 1e45d6d2 retains 26 passing lifecycle groups and falsification/restoration.
 Async IPC, degraded Rust executable and transport remain accepted without replay.
@@ -30,7 +30,7 @@ Whole WAL-011 remains incomplete: pinned startup and native account flows remain
 No startup, self-pinning, package expansion or release acceptance is authorized.
 
 Reviewer publication paths only: docs/handoff/CURRENT_TASK.md,
-tickets/BBD-WAL-011.md, docs/handoff/HERMES_BBD_WAL_011_ELECTRON_QUIT_RED_01.md,
+tickets/BBD-WAL-011.md,
 docs/handoff/GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md.
 Preserve four pending npm/policy files, WAL-009 evidence, current quit test/evidence
 and rejected EXECUTABLE-GREEN-01 draft. MapLibre stopped; WAL-007 parked.
