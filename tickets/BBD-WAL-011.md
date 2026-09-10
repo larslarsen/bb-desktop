@@ -1,6 +1,6 @@
 # BBD-WAL-011 — Connect the app to the native wallet broker
 
-Status: Packaged JavaScript inventory repair scoped; test source authorized.
+Status: Runtime package test source held; bounded Correction 01 authorized.
 Reviewer: Codex, High. Source: Grok Build, grok-4.6 High. Execution: Hermes only
 after reviewer authorization. Baseline: 8020a6d47201f804f5503abd3307092ae5a50c43.
 
@@ -210,3 +210,15 @@ space for actual package/extraction proof without prohibited recursive cleanup.
 This repairs currently missing main/preload dependencies; build-time native pins
 and Electron startup are subsequent work. Source actor initially writes only
 new test/walletRuntimePackage.node.js; production and execution remain closed.
+
+For this packaging change, release/security acceptance requires all of:
+`npm audit --audit-level=low`, `node test/electronSecurity.node.js`,
+`node test/securityPolicy.node.js`, `node scripts/security-policy.js`,
+`target/security-tools/gitleaks-v8.30.1/gitleaks git --redact=100 --no-banner .`,
+and `target/security-tools/gitleaks-v8.30.1/gitleaks dir --redact=100 --no-banner .`.
+Require zero vulnerability findings at low or above, no new boundary/policy
+failures, and zero secret leaks. Existing inherited policy failures remain release
+blockers, with no waiver; record exact current outcomes during the bounded Hermes
+validation contract. Rust inputs are unchanged and native proof is not replayed.
+The locally built package is for inventory proof, not release publication; exact
+package SBOM/scanning remains required before distributing a release.

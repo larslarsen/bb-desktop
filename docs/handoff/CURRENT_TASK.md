@@ -1,16 +1,16 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: PACKAGED RUNTIME INVENTORY TEST SOURCE AUTHORIZED
+State: RUNTIME PACKAGE TEST SOURCE HELD — CORRECTION 01 AUTHORIZED
 Reviewer: Codex
 Authorized source actor: Grok Build, grok-4.6 High; tests only
 Authorized execution actor: none
 Authorized integration actor: none
 
 Read [runtime inventory tests](GROK_BBD_WAL_011_RUNTIME_PACKAGE_TESTS_01.md).
-Only new test/walletRuntimePackage.node.js may be written. Helper stays absent.
+Only test/walletRuntimePackage.node.js may receive Correction 01. Helper absent.
 Seven groups: exact five-file inventory, preflight, CLI and packager wiring.
-Grok outer 1422, session c2c18a7d-5fe2-41e4-ba81-09db6360dc31 launched.
+Grok outer 1422 collected; correction launch pending publication.
 Owner need not send done; status updates at least every 60 seconds during work.
 Preserve unrelated pending policy/npm/evidence files. No extra commands or actors.
 Reviewer publication paths: CURRENT_TASK.md, runtime-package tests handoff,

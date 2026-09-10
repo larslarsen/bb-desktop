@@ -130,3 +130,42 @@ checks and named reads allowed. No tests, syntax checks, Node/npm/Cargo executio
 builds, evidence/docs edits, Git mutation, extra actors or unrelated discovery.
 Report new test hash/line count, group/case counts and stop. Reviewer stays with
 actor, reviews and routes directly; owner done messages are not required.
+
+## Source review and Correction 01
+
+Outer 1422 completed exit 0; session c2c18a7d-5fe2-41e4-ba81-09db6360dc31.
+Drop 67c371b1e70f5282a6c569fdfbb7a2b5106ce146e15188be1c9a263a62f30790,
+786 lines, seven groups/44 cases. Helper absent; no execution. Hold acceptance
+for exactly these bounded corrections in the SAME test path only:
+
+1. Group 7 indexOnce(deb, 'dpkg-deb') wrongly counts both the preserved explanatory
+   comment and actual build command; indexOnce(mac, 'codesign') wrongly rejects
+   the required signing PLUS verification commands. Match the complete existing
+   command lines instead: dpkg-deb --build --root-owner-group "$PACKAGE_ROOT" "$OUTPUT"
+   and codesign --force --deep --sign - "$APP_BUNDLE". Preserve verification and
+   comments. No production edits or test accommodations by deleting packager steps.
+2. Relative-root argument cases currently point to nonexistent cwd paths, so a
+   helper accepting relative paths can fail for missing roots instead. Set each
+   relative argument using path.relative(process.cwd(), the corresponding valid
+   owned source/app root). Assert it is nonempty and not absolute and resolves
+   back to the valid root before invocation. Remove the now-invalid assertions
+   that these relative paths resolve to absent directories. Existing source/app
+   snapshots must prove unchanged contents. Do not change cwd or write outside
+   the owned temporary root. Keep 16 argument cases and all seven groups.
+3. trackIfPresent currently lstats inventory children through parent symlinks and
+   schedules deletion through aliases after links have been unlinked; it also
+   misses unexpected copied files. Replace its inventory-only scan with symlink-
+   safe enumeration of the actual owned appRoot tree: lstat each entry, register
+   symlinks but never traverse them, register files, register real directories in
+   preorder and enumerate only those. No outside-root or arbitrary path discovery.
+   All fixture symlink targets are inside owned fixture trees, so enumerating their
+   real directory entries tracks unexpected writes by their canonical test paths.
+   Keep individual unlink/rmdir finally cleanup, no recursive deletion API.
+
+No helper/packager changes, execution, Git mutations or docs/evidence edits. Read
+only this correction section, the test, three packagers, AGENTS/TESTING/ticket and
+CURRENT via sed -n '1,18p'. Original ten frozen hashes remain required. Report
+corrected test hash/line count then stop; reviewer collects immediately. Initial
+export shows named reads/checks and only the test edits; CURRENT was read at
+2–31 rather than requested prefix. Use the exact sed command now. No home/config
+discovery, acceptance execution, chained commands or Git mutation appeared.
