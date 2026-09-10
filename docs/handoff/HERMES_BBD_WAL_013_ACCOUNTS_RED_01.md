@@ -86,3 +86,11 @@ finally:
     finish('WAL-013 account service expected red')
 sys.exit(0 if record['accepted'] else 1)
 ```
+
+## Collected acceptance (closed; do not replay)
+
+Hermes outer75692 exit0, session20260910_102416_3729dd, recorded nous/laguna/version.
+Rust1.98 returned101 solely E0432 missing accounts import;12test source, all12pins
+unchanged. Reviewer independently matched raw/evidence/currenthashes and exact session
+transcript (one read, one launcher, completion). Expected red accepted. Source production
+now follows GROK_BBD_WAL_013_ACCOUNTS_PRODUCTION_01.md; no integration authorized yet.

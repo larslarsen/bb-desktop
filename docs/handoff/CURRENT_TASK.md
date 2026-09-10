@@ -3,8 +3,8 @@
 Ticket: BBD-WAL-013
 State: NATIVE ACCOUNT MANAGEMENT — SERVICE AND WINDOW TESTS AUTHORIZED
 Reviewer: Codex
-Authorized source: Grok runtime tests; Sol native-window test correction, no subagents
-Authorized execution: Hermes service expected-red under HERMES_BBD_WAL_013_ACCOUNTS_RED_01.md
+Authorized source: Grok account service production and runtime tests; Sol UI test correction
+Execution: service expected-red accepted/closed; none currently active
 Integration: none
 
 Owner explicitly selected account management after WAL-011 startup completion.
@@ -13,7 +13,8 @@ Service: only account_management.rs and one Cargo test registration writable.
 Independent window tests: only account_native_ui.rs under GROK_BBD_WAL_013_NATIVE_UI_01.md.
 Runtime/menu test actor: only named JS tests under GROK_BBD_WAL_013_RUNTIME_01.md.
 No concurrent actor shares writable paths; production and execution still frozen.
-Production follows understood red. Reviewer is fixing native window/runtime scope
+Service production authorized only under GROK_BBD_WAL_013_ACCOUNTS_PRODUCTION_01.md.
+UI/runtime production frozen. Reviewer is fixing native window/runtime scope
 while service test source is authored. Continue through usable native flow, not
 merely a library milestone. No package-policy or installer detour.
 Preserve unrelated pending npm/policy changes and two older evidence drafts.

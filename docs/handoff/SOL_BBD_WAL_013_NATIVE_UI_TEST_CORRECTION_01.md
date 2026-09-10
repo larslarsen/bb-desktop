@@ -14,10 +14,10 @@ Required fixes:
 no uncontracted production reexports. first_list currently accepts only FakePort but
 real-composition test passes SharedAccountPort: make it generic over P/D like other
 helpers. Specify Vec<AccountSummary> for small-layout collected accounts.
-2 Pinned egui0.36.1 PlatformOutput.accesskit_update is cfg(accesskit); our existing
-native-ui features exclude it. Remove direct uncompiled field access and qualify
-claims: test WidgetInfo/platform event output; AccessKit isn't in the approved build.
-Don't change Cargo to enable it. Inspect installed output.rs/context.rs APIs if needed.
+2 CORRECTED REVIEWER FACT: pinned egui0.36.1 PlatformOutput.accesskit_update is
+UNCONDITIONAL (installed src/data/output.rs:176). Retain direct access and its canary
+assertions; inspect actual installed APIs as needed, no Cargo/feature changes. The
+initial reviewer claim that this field was cfg(accesskit) was mistaken and is withdrawn.
 3 Populated-list test locks UNLOCKED_ID then expects Unlock to staydisabled. Wrong:
 after Lock, reselect that nowlocked account and assert Unlock opens form; cancel.
 4 Restore test performs FOUR preparations (cancel,Escape,Xclose,success), expects3;
