@@ -1,17 +1,18 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: FINISH APPLICATION STARTUP — TEST SOURCE AUTHORIZED
+State: STARTUP MAIN RED EXECUTION; INDEPENDENT TEST CORRECTIONS
 Reviewer: Codex
 Authorized source actor: Grok Build grok-4.6 High; no subagents
-Authorized execution/integration actor: none until source review
+Authorized execution: Hermes under HERMES_BBD_WAL_011_STARTUP_MAIN_RED_01.md
+Authorized integration: none
 
 Active contract: [startup](GROK_BBD_WAL_011_STARTUP_01.md).
 Only tests and minimal existing Electron mock compatibility authorized.
 Independent smoke source authorized by GROK_BBD_WAL_011_STARTUP_SMOKE_01.md.
-Live source: Grok startup session 09da707c-f25b-4330-a3e0-d73d48e60c10 (outer 45126);
-Grok smoke session 185841d2-76a1-4232-a9b0-973ad3168268 (outer 6373).
-Disjoint test paths; no production or test execution. Reviewer collecting both.
+Initial source actors collected and closed.
+Live corrections: build d217c087 (outer 69646), smoke fd5c9c8c (outer 10281).
+Hermes may execute frozen startup test only; no conflicting path writes.
 Owner priority: finish local app-to-broker startup, no further installer detour.
 Reviewer stays with actors and collects/reviews/routes in the same turn.
 Provide meaningful status at least every 60 seconds; no repeated done required.
