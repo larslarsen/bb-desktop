@@ -1,7 +1,7 @@
 # Current Task
 
 Ticket: BBD-WAL-011
-State: ELECTRON QUIT PRODUCTION CORRECTION 01 AUTHORIZED
+State: ELECTRON QUIT PRODUCTION CORRECTION 01 LAUNCHED — AWAITING COLLECTION
 Reviewer: Codex; High is sufficient
 Authorized source actor: Grok Build, grok-4.6 High; social-main.js only
 Authorized execution actor: none
@@ -12,8 +12,8 @@ Read this active prefix (lines 1–40), AGENTS.md, TESTING.md, ticket and
 [Grok quit production handoff](GROK_BBD_WAL_011_ELECTRON_QUIT_PRODUCTION_01.md).
 Only its appended one-file Correction 01 is authorized. Tests/evidence stay frozen.
 No tests, syntax checks, builds, source integration or Git mutation by Grok.
-Grok outer 21766 collected exit 0. Correction launch pending publication.
-Launch once; collect on owner done/Continue. No actor polling.
+Grok correction outer 17320; session f2bc7d42-ab64-46be-adc0-0e470ec55489.
+One launch against 3ae724bd; collect on owner done/Continue. No actor polling.
 
 Accepted observed red: Node exit 1, 23 existing groups passed/seven new groups
 failed at before-quit handler is missing with complete seven-failure footer.
