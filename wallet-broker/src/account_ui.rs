@@ -799,7 +799,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             self.message = None;
             self.scene = Scene::Sync {
                 account_id: account_id.clone(),
-                endpoint: "https://testnet.zec.rocks:443".to_owned(),
+                endpoint: "https://zaino.testnet.unsafe.zec.rocks:443".to_owned(),
                 job: None,
                 snapshot: None,
                 passphrase: MaskedInput::new(),

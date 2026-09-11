@@ -1,0 +1,108 @@
+# WAL018 isolated scanner diagnosis 01
+
+```json
+{
+  "accepted": true,
+  "commands": [
+    {
+      "argv": [
+        "hermes",
+        "--version"
+      ],
+      "exit": 0,
+      "output": "Hermes Agent v0.18.2 (2026.7.7.2) \u00b7 upstream ad03f20d \u00b7 local 10b6d1a9 (+1 carried commit)\nInstall directory: <home>/.hermes/hermes-agent\nInstall method: git\nPython: 3.11.15\nOpenAI SDK: 2.24.0\n",
+      "timeout": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "output": "acf53cf26c41992f198bdb6a4cde5fb04ccffb8b\n",
+      "timeout": false
+    },
+    {
+      "argv": [
+        "python3",
+        "docs/handoff/WAL018_CLONE.py"
+      ],
+      "exit": 0,
+      "output": "{\"private_viewing_clone_created\": true, \"committed_height\": 4308219, \"source_opened_readonly\": true}\n",
+      "timeout": false
+    },
+    {
+      "argv": [
+        "<home>/.cargo/bin/rustup",
+        "run",
+        "1.98.0",
+        "cargo",
+        "run",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--example",
+        "wal018_diagnostic"
+      ],
+      "exit": 0,
+      "output": "   Compiling bitbook-wallet-broker v0.1.0 (<repo>/wallet-broker)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.01s\n     Running `wallet-broker/target/debug/examples/wal018_diagnostic`\nstage=decode_public ok\npublic_prior height=4308219 tree_sizes=400234/248768/173202 hash_matches_first_prev=true\npublic_first height=4308220 tree_sizes=400234/248768/173638 sizes_follow_prior=true\npublic_end height=4308319 tree_sizes=400234/248768/183228 hash_matches_last=true sizes_match_last=true\nstage=open_owned_copy ok\nstage=update_chain_tip ok\nstage=scan_cached_blocks ok\nstage=rollback ok\ndiagnostic_complete replay=success_rolled_back transport=ok tip_height=4339313 block_count=1\n",
+      "timeout": false
+    }
+  ],
+  "session": {
+    "id": "20260911_092120_05f805",
+    "model": "meituan/longcat-2.0:free",
+    "provider": "nous"
+  },
+  "version": "Hermes Agent v0.18.2 (2026.7.7.2) \u00b7 upstream ad03f20d \u00b7 local 10b6d1a9 (+1 carried commit)\nInstall directory: <home>/.hermes/hermes-agent\nInstall method: git\nPython: 3.11.15\nOpenAI SDK: 2.24.0",
+  "head": "acf53cf26c41992f198bdb6a4cde5fb04ccffb8b",
+  "input_hashes": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "67bf08a6eb809796349f225cb551f342e20be98b2a7eb95570dada6f5fa2ff44",
+    "wallet-broker/src/zec/test_support.rs": "de157d4a78c4c452e0e19122200997e6676c82099ddb25bfebe84781470f0791",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "f1f9c70dc89e330fca6f5d292cfbabd626ef0c760a8800f522b48c070e57ddf0",
+    "wallet-broker/tests/account_native_ui.rs": "a6719c17ca25e00f4a4fc217aadc97bcc49800b423b8a5b13e2e90598c393797",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c",
+    "wallet-broker/examples/wal018_diagnostic.rs": "23831b361d9160e13baf8aa62dc0f1e4c84aa21e2dcda9205843883e152e267a",
+    "docs/handoff/WAL018_CLONE.py": "b3794ccc65a8d64eb6d1773696e8fd7075696ffe2e41a364a53f24bd5efc7994",
+    "docs/handoff/WAL016_RUNNER.py": "ebc5ae611b596709eda801ed3087d808a50cf79bd8cda55520eb02ccf74656f0",
+    "wallet-broker/target/wal017-diagnostic-zaino/info.grpc": "e8fc6e50cbbe56ab83248285b2fa5d4e10e9810af56eb12acd81482f2cc88982",
+    "wallet-broker/target/wal017-diagnostic-zaino/prior.grpc": "c4af23a6ca6bb85916c8b2a49be902b6aa828fdb98a03fba5e4151882508c8fd",
+    "wallet-broker/target/wal017-diagnostic-zaino/end.grpc": "6cf6e4583f53cf1b2b6c3d02405482e7c9241501ed6ddcee4341d7f184be08f7",
+    "wallet-broker/target/wal017-diagnostic-zaino/next100.grpc": "1ff028dfb95d53b10ec6c129535233cc927c6daba4b988c9f27782c6cd564c0e"
+  },
+  "formatted": [],
+  "final_hashes": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "67bf08a6eb809796349f225cb551f342e20be98b2a7eb95570dada6f5fa2ff44",
+    "wallet-broker/src/zec/test_support.rs": "de157d4a78c4c452e0e19122200997e6676c82099ddb25bfebe84781470f0791",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "f1f9c70dc89e330fca6f5d292cfbabd626ef0c760a8800f522b48c070e57ddf0",
+    "wallet-broker/tests/account_native_ui.rs": "a6719c17ca25e00f4a4fc217aadc97bcc49800b423b8a5b13e2e90598c393797",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c",
+    "wallet-broker/examples/wal018_diagnostic.rs": "23831b361d9160e13baf8aa62dc0f1e4c84aa21e2dcda9205843883e152e267a",
+    "docs/handoff/WAL018_CLONE.py": "b3794ccc65a8d64eb6d1773696e8fd7075696ffe2e41a364a53f24bd5efc7994",
+    "docs/handoff/WAL016_RUNNER.py": "ebc5ae611b596709eda801ed3087d808a50cf79bd8cda55520eb02ccf74656f0",
+    "wallet-broker/target/wal017-diagnostic-zaino/info.grpc": "e8fc6e50cbbe56ab83248285b2fa5d4e10e9810af56eb12acd81482f2cc88982",
+    "wallet-broker/target/wal017-diagnostic-zaino/prior.grpc": "c4af23a6ca6bb85916c8b2a49be902b6aa828fdb98a03fba5e4151882508c8fd",
+    "wallet-broker/target/wal017-diagnostic-zaino/end.grpc": "6cf6e4583f53cf1b2b6c3d02405482e7c9241501ed6ddcee4341d7f184be08f7",
+    "wallet-broker/target/wal017-diagnostic-zaino/next100.grpc": "1ff028dfb95d53b10ec6c129535233cc927c6daba4b988c9f27782c6cd564c0e"
+  }
+}
+```

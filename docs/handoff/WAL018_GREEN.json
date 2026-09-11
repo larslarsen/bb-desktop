@@ -1,0 +1,193 @@
+{
+  "head": "acf53cf26c41992f198bdb6a4cde5fb04ccffb8b",
+  "title": "WAL018 cleanup, endpoint GREEN, falsification and rebuilt broker",
+  "pins": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "cbfaf77b02ea725422426f2b1276e738308e4a110654e56fa05f2008070b6e0e",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "f1f9c70dc89e330fca6f5d292cfbabd626ef0c760a8800f522b48c070e57ddf0",
+    "wallet-broker/tests/account_native_ui.rs": "67323f8889b789bcb9d01f9d26b4af8016da5bbf94d702bf8ae886ba5487ebb7",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c",
+    "docs/handoff/WAL018_QUIET.py": "fc58d8fc881f9c307b4fa688e69761fb1e6562a3319a41bbe09a18d22cd9fbaa",
+    "docs/handoff/WAL018_RESTORE.py": "6e699e9d0caecee6df35ba37cff326d879fe8e38a5ca8e2d6967df990482633c",
+    "docs/handoff/WAL018_CLEANUP.py": "1d5ad94fb001454544b0adf011e56ccd7af74a9ab89609af36a012c7015e0981",
+    "docs/handoff/WAL016_RUNNER.py": "ebc5ae611b596709eda801ed3087d808a50cf79bd8cda55520eb02ccf74656f0"
+  },
+  "raw": "wallet-broker/target/wal018-green-01.json",
+  "evidence": "docs/testing/BBD-WAL-018-GREEN-01.md",
+  "requires_records": [
+    "wallet-broker/target/wal018-diagnostic-run-02.json",
+    "wallet-broker/target/wal018-diagnostic-run-03.json"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "docs/handoff/WAL018_QUIET.py"
+      ],
+      "contains": [
+        "\"owned_diagnostic_processes\": 0"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "docs/handoff/WAL018_RESTORE.py"
+      ],
+      "contains": [
+        "temporary_helper_restored=true"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "docs/handoff/WAL018_CLEANUP.py"
+      ],
+      "contains": [
+        "\"private_clone_removed\": true"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_native_ui"
+      ],
+      "contains": [
+        "test result: ok. 16 passed"
+      ],
+      "timeout": 180
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_native_ui",
+        "wal018_default_server_survives_reentering_sync",
+        "--",
+        "--exact"
+      ],
+      "exit": 101,
+      "contains": [
+        "test result: FAILED. 0 passed; 1 failed"
+      ],
+      "absent": [
+        "could not compile"
+      ],
+      "falsify": {
+        "path": "wallet-broker/src/account_ui.rs",
+        "before": "https://zaino.testnet.unsafe.zec.rocks:443",
+        "after": "https://testnet.zec.rocks:443"
+      }
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_native_ui",
+        "wal018_default_server_survives_reentering_sync",
+        "--",
+        "--exact"
+      ],
+      "contains": [
+        "test result: ok. 1 passed"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--lib",
+        "--bin",
+        "bitbook-wallet-broker",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "timeout": 180
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/build-wallet-broker.js"
+      ],
+      "cargo_path": true,
+      "timeout": 300
+    },
+    {
+      "argv": [
+        "node",
+        "test/securityPolicy.node.js"
+      ],
+      "exit": 1,
+      "policy_baseline": "wallet-broker/target/wal013-final-window-security-04.json",
+      "timeout": 120
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/security-policy.js"
+      ],
+      "exit": 1,
+      "contains": [
+        "wallet Rust source inventory is missing or extra"
+      ]
+    }
+  ],
+  "artifacts": [
+    "wallet-broker/src/zec/test_support.rs",
+    "wallet-broker/target/app-resources/wallet-broker/bitbook-wallet-broker",
+    "wallet-broker/target/app-resources/wallet-broker/manifest.json"
+  ],
+  "scans": [
+    "dir"
+  ]
+}

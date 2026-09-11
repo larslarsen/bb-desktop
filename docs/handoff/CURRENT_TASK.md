@@ -1,5 +1,23 @@
 # Current Task
 
+WAL-018 default-server correction is reviewer accepted and rebuilt. Sync now opens
+with https://zaino.testnet.unsafe.zec.rocks:443, avoiding the original provider's
+inconsistent checkpoint. The user's selected endpoint in the reported retry was not
+confirmed. A private viewing-cache clone reached actual engine Current at4339325;
+original profile was opened readonly only. Temporary clone/helper/example are removed.
+
+All16native UI tests passed, restoring the old default caused the intended runtime
+regression failure, restored source passed, and production Clippy/build passed.
+Staged broker SHA25665972fcab1661872232bb435c1ffe0e479f93b4f74df62c3eaafadb7c6b082a1.
+Fully quit and restart BitBook, unlock the account and press Sync; saved progress resumes.
+
+The six inherited policy failures remain release blockers; directory secrets scan exit1
+contains352 classified public-checksum matches and zero credentials, unchanged baseline.
+See docs/architecture/BBD-WAL-018-REVIEW.md for the diagnostic executor restart caveat,
+docs/testing/BBD-WAL-018-GREEN-01.md for verification, and WAL018_INTEGRATE.json plus
+BBD-WAL-018-INTEGRATION-01.md for exact publication evidence. No further source work or
+user-profile mutation is authorized. Earlier entries below are historical.
+
 WAL-017 diagnosis is COMPLETE: the default testnet server returns inconsistent block
 and checkpoint hashes at4308319, reproducing both with separate and persistent HTTP2
 connections. The broker correctly rejects that batch before commit. User's checkpoint

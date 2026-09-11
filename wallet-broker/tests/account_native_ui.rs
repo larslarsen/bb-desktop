@@ -75,7 +75,7 @@ const SYNC_TITLE: &str = "Sync Zcash balance";
 const SERVER: &str = "Server";
 const SYNC: &str = "Sync";
 const CANCEL_SYNC: &str = "Cancel sync";
-const SUGGESTED_ENDPOINT: &str = "https://testnet.zec.rocks:443";
+const SUGGESTED_ENDPOINT: &str = "https://zaino.testnet.unsafe.zec.rocks:443";
 const CUSTOM_ENDPOINT: &str = "https://127.0.0.1:9443";
 const CONNECTION_DISCLOSURE: &str = "The selected server can see your connection IP address.";
 const UNSYNCED: &str = "Unsynced — no completed scan";
@@ -1953,6 +1953,65 @@ fn shared_port_and_local_manager_create_unlock_lock_and_restart() {
             "passphrase leaked into persisted bytes"
         );
     }
+}
+
+#[test]
+fn wal018_default_server_survives_reentering_sync() {
+    let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+
+    let first_scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    first_scene.assert_usable("https://zaino.testnet.unsafe.zec.rocks:443");
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(18)));
+        state.sync_status = Some(sync_snapshot(
+            UNLOCKED_ID,
+            Some(18),
+            LiveSyncPhase::Syncing,
+            Some((103, 107)),
+            None,
+        ));
+    }
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(
+            UNLOCKED_ID.to_owned(),
+            "https://zaino.testnet.unsafe.zec.rocks:443".to_owned(),
+        )]
+    );
+
+    let _ = click_label(&mut ui, &mut app, BACK);
+    let second_scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    second_scene.assert_usable("https://zaino.testnet.unsafe.zec.rocks:443");
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(19)));
+        state.sync_status = Some(sync_snapshot(
+            UNLOCKED_ID,
+            Some(19),
+            LiveSyncPhase::Syncing,
+            Some((103, 107)),
+            None,
+        ));
+    }
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [
+            (
+                UNLOCKED_ID.to_owned(),
+                "https://zaino.testnet.unsafe.zec.rocks:443".to_owned(),
+            ),
+            (
+                UNLOCKED_ID.to_owned(),
+                "https://zaino.testnet.unsafe.zec.rocks:443".to_owned(),
+            ),
+        ]
+    );
 }
 
 #[test]
