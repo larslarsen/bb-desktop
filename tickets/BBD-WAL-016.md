@@ -1,6 +1,6 @@
 # WAL-016 — Sync survives automatic wallet locking
 
-Status: REVIEW ACCEPTED; verified correction ready for exact integration. Baseline4cae91cb59635213ceecbae075c482ad8949aab2.
+Status: COMPLETE and reviewer accepted. Baseline4cae91cb59635213ceecbae075c482ad8949aab2.
 User reports every sync returns to locked account list before completion. Code confirms
 15-minute SessionManager deadline triggers manager cancellation and UI scene invalidation.
 Reviewer corrects the WAL015 coupling; owner need not select implementation details.
@@ -59,3 +59,9 @@ restore passed. Native rebuild and Xvfb/actual-display window checks passed. Six
 policy failures unchanged; pinned directory scanner exit1 classified352 exact public
 WAL015 checksum matches, no credentials. No user profile/dependency/policyWIP changes.
 Exact source/evidence publication is authorized by docs/handoff/WAL016_INTEGRATE.json.
+
+Closed: source d9cd7ac4253f5956ce58509cadbe56ad1a6c835a and evidence
+593ed713f04a39f9e29cef3a9fbfcc8271feca8c pushed and verified. All15integrated
+blobs match; tested inputs and unrelated working changes remain byte-identical.
+Committed pinned scan exit1 has82 previously classified public checksums, zero
+credentials. No implementation or background execution remains authorized.
