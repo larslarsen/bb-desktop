@@ -1,5 +1,22 @@
 # Current Task
 
+WAL-017 diagnosis is COMPLETE: the default testnet server returns inconsistent block
+and checkpoint hashes at4308319, reproducing both with separate and persistent HTTP2
+connections. The broker correctly rejects that batch before commit. User's checkpoint
+4308219/4338623 remains saved; no wallet data was modified or copied. No product code,
+dependencies, tests or binary changed. The unused temporary diagnostic example was
+removed without execution.
+
+Operator-advertised alternative https://zaino.testnet.unsafe.zec.rocks:443 returned the
+same prior checkpoint and block batch with a matching end checkpoint. User can set the
+native Sync screen Server field to this endpoint and Sync to resume. This establishes
+consistency for the failing100block batch, not full-wallet sync completion. Other
+probed alternatives: ZEC.PRO HTTP521; Nighthawk connection failed.
+
+Exact public comparison and publication are recorded by WAL017_INTEGRATE.json in
+docs/testing/BBD-WAL-017-INTEGRATION-01.md. No additional source work is authorized.
+Prior completed records below are historical; native binary remains the WAL016 build.
+
 WAL-016 sync interruption correction is COMPLETE and reviewer accepted.
 Ordinary 15-minute auto-lock still wipes spending keys; explicitly started viewing-only
 sync continues on the same screen through completion. Balances stay hidden until masked
