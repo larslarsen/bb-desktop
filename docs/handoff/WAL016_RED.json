@@ -1,0 +1,70 @@
+{
+  "head": "4cae91cb59635213ceecbae075c482ad8949aab2",
+  "title": "WAL016 tests-first RED",
+  "pins": {
+    "wallet-broker/src/accounts.rs": "f386f28f44c12bbdf1015713e4c736e81a86f8c0a27024f376b18a9eb8751d2f",
+    "wallet-broker/src/account_ui.rs": "ae8aa3b7bd14390244c5e73475195c33a1ba69079ac9ba6b0d86d869941fda75",
+    "wallet-broker/src/zec/test_support.rs": "7b4dad2fef0c505f610bdcfe7b87b9075bde0673c8713e34ed57b7714326ce57",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "cc5313884b8737939abcd4a01485ca6e2b45abcb34f23611078cc21a20c465ad",
+    "wallet-broker/tests/account_native_ui.rs": "f3524b8cbf1b8334510714cd601e653853dd4b6656873066fbb93d81ff282d5d",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c"
+  },
+  "raw": "wallet-broker/target/wal016-red-01.json",
+  "evidence": "docs/testing/BBD-WAL-016-RED-01.md",
+  "commands": [
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_management",
+        "wal016_"
+      ],
+      "exit": 101,
+      "contains": [
+        "controlled_empty_testnet",
+        "error[E0599]"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_native_ui",
+        "wal016_"
+      ],
+      "exit": 101,
+      "contains": [
+        "FAILED",
+        "wal016_idle_locked_sync_stays_visible_and_inline_unlock_reveals_the_same_completed_job"
+      ]
+    }
+  ]
+}

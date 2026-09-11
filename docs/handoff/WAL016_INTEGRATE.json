@@ -1,0 +1,61 @@
+{
+  "head": "4cae91cb59635213ceecbae075c482ad8949aab2",
+  "title": "WAL016 exact correction integration and committed scan",
+  "pins": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "67bf08a6eb809796349f225cb551f342e20be98b2a7eb95570dada6f5fa2ff44",
+    "wallet-broker/src/zec/test_support.rs": "de157d4a78c4c452e0e19122200997e6676c82099ddb25bfebe84781470f0791",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "f1f9c70dc89e330fca6f5d292cfbabd626ef0c760a8800f522b48c070e57ddf0",
+    "wallet-broker/tests/account_native_ui.rs": "a6719c17ca25e00f4a4fc217aadc97bcc49800b423b8a5b13e2e90598c393797",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c",
+    "docs/handoff/CURRENT_TASK.md": "8ae5744750791ea3d21fa4ea1ce2009ff9b962074150dbb829158e49713ace23",
+    "tickets/BBD-WAL-016.md": "10f4d897e6c1147690e91e43a1b316e04415e3cb59c45ac82a185bc7d9e920ef",
+    "docs/handoff/WAL016_RUNNER.py": "ebc5ae611b596709eda801ed3087d808a50cf79bd8cda55520eb02ccf74656f0",
+    "docs/handoff/WAL016_RED.json": "f97f147bd9aa288a1a6ef85f16e2ea7f6dcec36aef02eb98ac3e27ee39295346",
+    "docs/handoff/WAL016_GREEN.json": "8624d0afb29014cffd3854149672c2fda18e081c4b6fceb37fa6e2ac9ee993bd",
+    "docs/handoff/WAL016_FINAL.json": "0d0cdfe0206d3c45c54658d3b70c308000c52b6a8fc9b3186de303073ede4432",
+    "docs/testing/BBD-WAL-016-RED-01.md": "541fe0cf4939f02a7e6d659d4a5cbea86c853385f2786cfca21133be47a4ee11",
+    "docs/testing/BBD-WAL-016-GREEN-01.md": "9a3d975050fcabc9874af7a2823417b27b436ace9e91cff93e1287398efeb61a",
+    "docs/testing/BBD-WAL-016-FINAL-01.md": "e34ada82887d3f6c34d0b78bfcb09164ebb434bc54565cc5337dbad5de549743"
+  },
+  "raw": "wallet-broker/target/wal016-integration-01.json",
+  "evidence": "docs/testing/BBD-WAL-016-INTEGRATION-01.md",
+  "commands": [],
+  "requires_records": [
+    "wallet-broker/target/wal016-green-01.json",
+    "wallet-broker/target/wal016-final-01.json"
+  ],
+  "artifacts": [
+    "wallet-broker/target/app-resources/wallet-broker/bitbook-wallet-broker",
+    "wallet-broker/target/app-resources/wallet-broker/manifest.json",
+    "wallet-broker/target/wal013-account-window-visible.png",
+    "wallet-broker/target/wal013-account-window-reopened.png"
+  ],
+  "scans": [],
+  "integrate": {
+    "paths": [
+      "wallet-broker/src/accounts.rs",
+      "wallet-broker/src/account_ui.rs",
+      "wallet-broker/src/zec/test_support.rs",
+      "wallet-broker/tests/account_management.rs",
+      "wallet-broker/tests/account_native_ui.rs",
+      "docs/handoff/CURRENT_TASK.md",
+      "tickets/BBD-WAL-016.md",
+      "docs/handoff/WAL016_RUNNER.py",
+      "docs/handoff/WAL016_RED.json",
+      "docs/handoff/WAL016_GREEN.json",
+      "docs/handoff/WAL016_FINAL.json",
+      "docs/handoff/WAL016_INTEGRATE.json",
+      "docs/testing/BBD-WAL-016-RED-01.md",
+      "docs/testing/BBD-WAL-016-GREEN-01.md",
+      "docs/testing/BBD-WAL-016-FINAL-01.md"
+    ],
+    "message": "Keep native balance sync visible through automatic wallet locking"
+  }
+}

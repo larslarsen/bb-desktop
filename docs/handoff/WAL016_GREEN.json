@@ -1,0 +1,123 @@
+{
+  "head": "4cae91cb59635213ceecbae075c482ad8949aab2",
+  "title": "WAL016 manager, native UI, session and production lint verification",
+  "pins": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "40eb0d8946901bd69d1e71ad894cfdf361490210b9c4f476359acfbada25d413",
+    "wallet-broker/src/zec/test_support.rs": "088dba916fe6f91d9a543bf5c733f502394e15886029a1c4749444b1fbef9771",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "c3520f0ec10f9fffd2366c99de06f078edf9ffd11b9e1cee0b81ecafe652dd0e",
+    "wallet-broker/tests/account_native_ui.rs": "a6719c17ca25e00f4a4fc217aadc97bcc49800b423b8a5b13e2e90598c393797",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c"
+  },
+  "raw": "wallet-broker/target/wal016-green-01.json",
+  "evidence": "docs/testing/BBD-WAL-016-GREEN-01.md",
+  "commands": [
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_management"
+      ],
+      "contains": [
+        "test result: ok."
+      ],
+      "absent": [
+        "FAILED"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_native_ui"
+      ],
+      "contains": [
+        "test result: ok."
+      ],
+      "absent": [
+        "FAILED"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "vault_session"
+      ],
+      "contains": [
+        "test result: ok."
+      ],
+      "absent": [
+        "FAILED"
+      ]
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--lib",
+        "--bin",
+        "bitbook-wallet-broker",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    }
+  ],
+  "format": [
+    "wallet-broker/src/accounts.rs",
+    "wallet-broker/src/account_ui.rs",
+    "wallet-broker/src/zec/test_support.rs",
+    "wallet-broker/tests/account_management.rs",
+    "wallet-broker/tests/account_native_ui.rs"
+  ]
+}

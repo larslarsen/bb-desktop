@@ -2080,7 +2080,7 @@ fn wal015_one_worker_lock_expiry_and_drop_cancel_and_join_without_holding_manage
         .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
         .unwrap();
     let (source, expiry_probe) = blocked_live_source();
-    manager
+    let expiry_job = manager
         .start_live_sync_with_source_for_test(
             ActionOrigin::NativeSurface,
             &account_id,
@@ -2092,8 +2092,17 @@ fn wal015_one_worker_lock_expiry_and_drop_cancel_and_join_without_holding_manage
     harness.clock.set(1_000 + AUTHORIZATION_IDLE_MILLIS);
     let listed = manager.list().unwrap();
     assert!(listed.iter().all(|account| account.locked));
-    assert!(expiry_probe.wait_for_exit(Duration::from_secs(2)));
+    assert!(!expiry_probe.has_exited());
     assert!(!unlocked(&mut manager, &account_id));
+    let expired_status = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(expired_status.job_id, Some(expiry_job));
+    assert_eq!(expired_status.phase, LiveSyncPhase::Syncing);
+    assert_eq!(expired_status.confirmed_received_zat, None);
+    assert_eq!(expired_status.pending_received_zat, None);
+    manager
+        .cancel_live_sync(ActionOrigin::NativeSurface, &account_id, expiry_job)
+        .unwrap();
+    assert!(expiry_probe.wait_for_exit(Duration::from_secs(2)));
 
     harness.clock.set(2_000 + AUTHORIZATION_IDLE_MILLIS);
     manager
@@ -2112,6 +2121,135 @@ fn wal015_one_worker_lock_expiry_and_drop_cancel_and_join_without_holding_manage
     drop(manager);
     assert!(drop_probe.wait_for_exit(Duration::from_secs(2)));
     let _reopened = harness.manager();
+}
+
+#[test]
+fn wal016_idle_expiry_redacts_a_returned_copy_while_the_real_worker_finishes_and_unlock_reveals_it()
+{
+    let harness = Harness::new("wal016-idle-live-result");
+    harness
+        .entropy
+        .script_create(&ID_A, &SEED_A, 0xe7, 0xe8, 0x24);
+    let account_id = id_hex(&ID_A);
+    let endpoint = LiveEndpoint::parse(LIVE_ENDPOINT).unwrap();
+    let mut manager = harness.manager();
+    manager
+        .create_software(ActionOrigin::NativeSurface, passphrase())
+        .unwrap();
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+
+    let source = RecordedLiveSource::controlled_empty_testnet();
+    let probe = source.probe();
+    let job = manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint.clone(),
+            source,
+        )
+        .unwrap();
+    assert!(probe.wait_until_blocked(Duration::from_secs(2)));
+
+    harness.clock.set(1_000 + AUTHORIZATION_IDLE_MILLIS);
+    let listed = manager.list().unwrap();
+    assert!(listed.iter().all(|account| account.locked));
+    assert!(
+        !probe.has_exited(),
+        "idle expiration cancelled viewing work"
+    );
+    let locked_running = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(locked_running.job_id, Some(job));
+    assert_eq!(locked_running.phase, LiveSyncPhase::Syncing);
+    assert_eq!(locked_running.confirmed_received_zat, None);
+    assert_eq!(locked_running.pending_received_zat, None);
+
+    let (denied_source, denied_probe) = blocked_live_source();
+    assert_public_error(
+        &manager
+            .start_live_sync_with_source_for_test(
+                ActionOrigin::NativeSurface,
+                &account_id,
+                endpoint.clone(),
+                denied_source,
+            )
+            .unwrap_err(),
+        "LOCKED",
+    );
+    assert!(denied_probe.observation().rpc_methods.is_empty());
+    assert!(!probe.has_exited());
+
+    probe.release();
+    assert!(probe.wait_for_exit(Duration::from_secs(2)));
+    let completion_deadline = std::time::Instant::now() + Duration::from_secs(2);
+    let locked_complete = loop {
+        let status = manager.live_sync_status(&account_id).unwrap();
+        if status.phase == LiveSyncPhase::Current {
+            break status;
+        }
+        assert_eq!(status.phase, LiveSyncPhase::Syncing);
+        assert!(std::time::Instant::now() < completion_deadline);
+        std::thread::yield_now();
+    };
+    assert_eq!(locked_complete.job_id, Some(job));
+    assert_eq!(locked_complete.phase, LiveSyncPhase::Current);
+    assert_eq!(
+        locked_complete.scanned_height,
+        locked_complete.target_height
+    );
+    assert!(locked_complete.scanned_height.is_some());
+    assert_eq!(locked_complete.confirmed_received_zat, None);
+    assert_eq!(locked_complete.pending_received_zat, None);
+    let completed_rpc_methods = probe.observation().rpc_methods;
+
+    assert_public_error(
+        &manager
+            .unlock(
+                ActionOrigin::NativeSurface,
+                &account_id,
+                SecretBytes::new(WRONG_PASSPHRASE.to_vec()).unwrap(),
+            )
+            .unwrap_err(),
+        "LOCKED",
+    );
+    let still_redacted = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(still_redacted.job_id, Some(job));
+    assert_eq!(still_redacted.confirmed_received_zat, None);
+    assert_eq!(still_redacted.pending_received_zat, None);
+
+    manager
+        .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+        .unwrap();
+    let revealed = manager.live_sync_status(&account_id).unwrap();
+    assert_eq!(revealed.job_id, Some(job));
+    assert_eq!(revealed.phase, LiveSyncPhase::Current);
+    assert_eq!(revealed.scanned_height, locked_complete.scanned_height);
+    assert_eq!(revealed.target_height, locked_complete.target_height);
+    assert_eq!(revealed.confirmed_received_zat, Some(0));
+    assert_eq!(revealed.pending_received_zat, Some(0));
+    assert_eq!(probe.observation().rpc_methods, completed_rpc_methods);
+
+    let (clock_source, clock_probe) = blocked_live_source();
+    manager
+        .start_live_sync_with_source_for_test(
+            ActionOrigin::NativeSurface,
+            &account_id,
+            endpoint,
+            clock_source,
+        )
+        .unwrap();
+    assert!(clock_probe.wait_until_blocked(Duration::from_secs(2)));
+    harness.clock.fail();
+    assert_public_error(
+        &manager
+            .unlock(ActionOrigin::NativeSurface, &account_id, passphrase())
+            .unwrap_err(),
+        "UNAVAILABLE",
+    );
+    assert!(clock_probe.wait_for_exit(Duration::from_secs(2)));
+    harness.clock.resume();
+    assert!(!unlocked(&mut manager, &account_id));
 }
 
 #[test]

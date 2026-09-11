@@ -16,7 +16,7 @@ use zcash_client_backend::proto::compact_formats::CompactBlock;
 use zcash_client_backend::proto::service::{BlockId, LightdInfo, TreeState};
 use zcash_keys::address::Address;
 use zcash_primitives::merkle_tree::write_commitment_tree;
-use zcash_protocol::consensus::{BlockHeight, BranchId};
+use zcash_protocol::consensus::{BlockHeight, BranchId, NetworkUpgrade, Parameters};
 
 use crate::native::{
     ActionOrigin, ZecConfirmationCapability, ZecNativeReview, confirm_zec_review_from_method,
@@ -4825,6 +4825,7 @@ pub struct LiveSourceObservation {
 struct ProbeState {
     observation: LiveSourceObservation,
     blocked: bool,
+    released: bool,
     exited: bool,
 }
 #[derive(Clone)]
@@ -4852,6 +4853,10 @@ impl LiveSourceProbe {
     pub fn has_exited(&self) -> bool {
         mutex_lock(&(self.0).0).exited
     }
+    pub fn release(&self) {
+        mutex_lock(&(self.0).0).released = true;
+        (self.0).1.notify_all();
+    }
 }
 
 pub struct RecordedLiveSource {
@@ -4862,6 +4867,7 @@ pub struct RecordedLiveSource {
     fault: Option<LiveSourceFault>,
     probe: LiveSourceProbe,
     blocking: bool,
+    release_to_continue: bool,
     cancel_on_range: Option<(usize, super::LiveCancellation)>,
     range_calls: usize,
     deep: Option<usize>,
@@ -4918,6 +4924,7 @@ impl RecordedLiveSource {
             fault: None,
             probe: new_probe(),
             blocking: false,
+            release_to_continue: false,
             cancel_on_range: None,
             range_calls: 0,
             deep: None,
@@ -4932,6 +4939,44 @@ impl RecordedLiveSource {
             fault: None,
             probe: new_probe(),
             blocking: true,
+            release_to_continue: false,
+            cancel_on_range: None,
+            range_calls: 0,
+            deep: None,
+        }
+    }
+    pub fn controlled_empty_testnet() -> Self {
+        let parameters = zcash_protocol::consensus::Network::TestNetwork;
+        let tip = parameters
+            .activation_height(NetworkUpgrade::Nu5)
+            .map(u32::from)
+            .expect("testnet NU5 activation");
+        let block = CompactBlock {
+            height: u64::from(tip),
+            hash: vec![0x22; 32],
+            prev_hash: vec![0x11; 32],
+            time: 1_700_000_075,
+            header: Vec::new(),
+            vtx: Vec::new(),
+            chain_metadata: Some(Default::default()),
+        };
+        let blocks = vec![block];
+        let states = super::scan::derive_chain_states(
+            &parameters,
+            tip.checked_sub(1)
+                .expect("testnet NU5 follows a checkpoint"),
+            &blocks,
+        )
+        .expect("empty testnet source states");
+        Self {
+            network: Network::Testnet,
+            blocks,
+            states,
+            tip,
+            fault: None,
+            probe: new_probe(),
+            blocking: true,
+            release_to_continue: true,
             cancel_on_range: None,
             range_calls: 0,
             deep: None,
@@ -4972,6 +5017,7 @@ fn new_probe() -> LiveSourceProbe {
         Mutex::new(ProbeState {
             observation: LiveSourceObservation::default(),
             blocked: false,
+            released: false,
             exited: false,
         }),
         Condvar::new(),
@@ -4995,7 +5041,7 @@ impl super::LiveSource for RecordedLiveSource {
             let mut s = mutex_lock(&(self.probe.0).0);
             s.blocked = true;
             (self.probe.0).1.notify_all();
-            while !c.is_cancelled() {
+            while !c.is_cancelled() && (!self.release_to_continue || !s.released) {
                 let (g, _) = self
                     .probe
                     .0
@@ -5004,8 +5050,10 @@ impl super::LiveSource for RecordedLiveSource {
                     .unwrap_or_else(|p| p.into_inner());
                 s = g
             }
-            s.observation.transport_wait_interrupted = true;
-            return Err(ZecError::cancelled());
+            if c.is_cancelled() {
+                s.observation.transport_wait_interrupted = true;
+                return Err(ZecError::cancelled());
+            }
         }
         self.observe("GetLatestBlock");
         let mut chain = if matches!(self.network, Network::Testnet) {
@@ -5057,7 +5105,11 @@ impl super::LiveSource for RecordedLiveSource {
             branch = "00000000".to_owned()
         }
         let sapling_activation_height = match self.network {
-            Network::Testnet => 1_842_420,
+            Network::Testnet => zcash_protocol::consensus::Network::TestNetwork
+                .activation_height(NetworkUpgrade::Sapling)
+                .map(u32::from)
+                .map(u64::from)
+                .ok_or_else(ZecError::protocol_incompatible)?,
             Network::Local(network) => u64::from(network.birthday_height()),
         };
         Ok(super::live::SourceMetadata {

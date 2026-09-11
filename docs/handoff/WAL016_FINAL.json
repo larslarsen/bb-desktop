@@ -1,0 +1,131 @@
+{
+  "head": "4cae91cb59635213ceecbae075c482ad8949aab2",
+  "title": "WAL016 falsification, rebuilt native window and security ratchet",
+  "pins": {
+    "wallet-broker/src/accounts.rs": "8941884f837453bf71357f53341fae2c1334b8d10d017680053f9f8a44fb415d",
+    "wallet-broker/src/account_ui.rs": "67bf08a6eb809796349f225cb551f342e20be98b2a7eb95570dada6f5fa2ff44",
+    "wallet-broker/src/zec/test_support.rs": "de157d4a78c4c452e0e19122200997e6676c82099ddb25bfebe84781470f0791",
+    "wallet-broker/src/session.rs": "9f88b3b0eca91d341a1c025bc8394a25e456350be58e99d9ac9417e31eef21af",
+    "wallet-broker/Cargo.toml": "435907f00d7819bdf7dbe9ff9e367522f7f6eb8b6019dbde9e58212bbaea041b",
+    "wallet-broker/Cargo.lock": "a5d53b729433a06f60edcef51e608629c7365326d06fef2bbac8f2b23f048c2a",
+    "wallet-broker/tests/account_management.rs": "f1f9c70dc89e330fca6f5d292cfbabd626ef0c760a8800f522b48c070e57ddf0",
+    "wallet-broker/tests/account_native_ui.rs": "a6719c17ca25e00f4a4fc217aadc97bcc49800b423b8a5b13e2e90598c393797",
+    "package.json": "76e7201bf5a60b2ec9ce39f92757d9411e33808f7ad8bf6a6890366e33d108f5",
+    "package-lock.json": "0e32de43f3c1a31ae3d9e9c8b172d10cd37a03577dc7d1eaf4ac916967cfcdb8",
+    "scripts/security-policy.js": "414a5645d8621b5d81cdeba7bb7461ec25647a5a1e5532295d6f75e7b8762532",
+    "test/securityPolicy.node.js": "ff449a86e04570f8ff07bd280db6787c62f645f301d4235a65e825f3af7bbb9c"
+  },
+  "raw": "wallet-broker/target/wal016-final-01.json",
+  "evidence": "docs/testing/BBD-WAL-016-FINAL-01.md",
+  "commands": [
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_management",
+        "wal016_"
+      ],
+      "exit": 101,
+      "contains": [
+        "FAILED",
+        "assertion `left == right` failed",
+        "Some(0)"
+      ],
+      "falsify": {
+        "path": "wallet-broker/src/accounts.rs",
+        "before": "if !self.sessions.is_unlocked(snapshot.account_id.as_str()) {",
+        "after": "if false {"
+      }
+    },
+    {
+      "argv": [
+        "<rustup>",
+        "run",
+        "1.98.0",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "wallet-broker/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "native-ui",
+        "--test",
+        "account_management",
+        "wal016_"
+      ],
+      "contains": [
+        "test result: ok. 1 passed"
+      ]
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/build-wallet-broker.js"
+      ],
+      "cargo_path": true,
+      "timeout": 300
+    },
+    {
+      "argv": [
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1024x768x24",
+        "node",
+        "test/walletAccountWindowSmoke.node.js"
+      ],
+      "timeout": 120
+    },
+    {
+      "argv": [
+        "node",
+        "test/walletAccountWindowSmoke.node.js"
+      ],
+      "timeout": 120
+    },
+    {
+      "argv": [
+        "node",
+        "test/securityPolicy.node.js"
+      ],
+      "exit": 1,
+      "policy_baseline": "wallet-broker/target/wal013-final-window-security-04.json",
+      "timeout": 120
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/security-policy.js"
+      ],
+      "exit": 1,
+      "contains": [
+        "wallet Rust source inventory is missing or extra"
+      ]
+    }
+  ],
+  "requires_records": [
+    "wallet-broker/target/wal016-green-01.json"
+  ],
+  "artifacts": [
+    "wallet-broker/target/app-resources/wallet-broker/bitbook-wallet-broker",
+    "wallet-broker/target/app-resources/wallet-broker/manifest.json",
+    "wallet-broker/target/wal013-account-window-visible.png",
+    "wallet-broker/target/wal013-account-window-reopened.png"
+  ],
+  "scans": [
+    "dir"
+  ]
+}

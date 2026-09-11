@@ -472,6 +472,7 @@ enum Scene<R> {
         endpoint: String,
         job: Option<LiveSyncJobId>,
         snapshot: Option<LiveSyncSnapshot>,
+        passphrase: MaskedInput,
     },
     Create {
         passphrase: MaskedInput,
@@ -603,13 +604,24 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 let sync_stale = match &self.scene {
                     Scene::Sync { account_id, .. } => {
                         self.selected.as_deref() != Some(account_id.as_str())
-                            || !accounts
-                                .iter()
-                                .any(|a| a.account_id == *account_id && !a.locked)
+                            || !accounts.iter().any(|a| a.account_id == *account_id)
                     }
                     _ => false,
                 };
                 self.accounts = accounts;
+                if let Scene::Sync {
+                    account_id,
+                    snapshot: Some(snapshot),
+                    ..
+                } = &mut self.scene
+                    && self
+                        .accounts
+                        .iter()
+                        .any(|account| account.account_id == *account_id && account.locked)
+                {
+                    snapshot.confirmed_received_zat = None;
+                    snapshot.pending_received_zat = None;
+                }
                 if self.selected.as_ref().is_some_and(|selected| {
                     !self
                         .accounts
@@ -677,11 +689,19 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             _ => return,
         };
         match self.port.sync_status(&account_id) {
-            Ok(snapshot)
+            Ok(mut snapshot)
                 if snapshot.account_id.as_str() == account_id
                     && snapshot.network == ZecNetwork::Testnet
                     && snapshot.job_id == Some(job) =>
             {
+                if self
+                    .accounts
+                    .iter()
+                    .any(|account| account.account_id == account_id && account.locked)
+                {
+                    snapshot.confirmed_received_zat = None;
+                    snapshot.pending_received_zat = None;
+                }
                 if let Scene::Sync {
                     snapshot: current, ..
                 } = &mut self.scene
@@ -782,6 +802,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 endpoint: "https://testnet.zec.rocks:443".to_owned(),
                 job: None,
                 snapshot: None,
+                passphrase: MaskedInput::new(),
             };
             return;
         }
@@ -866,6 +887,11 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             } => (account_id.clone(), *job, snapshot.clone()),
             _ => return,
         };
+        let locked = self
+            .accounts
+            .iter()
+            .find(|account| account.account_id == account_id)
+            .is_none_or(|account| account.locked);
         let running = job.is_some()
             && snapshot
                 .as_ref()
@@ -875,7 +901,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             {
                 ui.label(format!("Scanned {scanned} of {target}"));
             }
-            if snapshot.phase == LiveSyncPhase::Current {
+            if snapshot.phase == LiveSyncPhase::Current && !locked {
                 ui.label("Received shielded funds");
                 if let Some(value) = snapshot.confirmed_received_zat {
                     ui.label(format_zec("Confirmed", value));
@@ -900,12 +926,15 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 LiveSyncPhase::Stale => {
                     ui.label("Sync incomplete");
                 }
+                LiveSyncPhase::Current => {
+                    ui.label("Sync complete");
+                }
                 _ => {}
             }
         } else {
             ui.label("Unsynced — no completed scan");
         }
-        if !running && ui.button("Sync").clicked() {
+        if !running && ui.add_enabled(!locked, egui::Button::new("Sync")).clicked() {
             let endpoint = match &self.scene {
                 Scene::Sync { endpoint, .. } => endpoint.clone(),
                 _ => return,
@@ -921,17 +950,63 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
                 Err(error) => self.port_error(error),
             }
         }
-        if running && ui.button("Cancel sync").clicked() {
+        if job.is_some() && ui.button("Cancel sync").clicked() {
             self.cancel_current_sync();
-            if let Scene::Sync { job, snapshot, .. } = &mut self.scene {
+            if let Scene::Sync {
+                job,
+                snapshot,
+                passphrase,
+                ..
+            } = &mut self.scene
+            {
                 *job = None;
                 *snapshot = None;
+                passphrase.clear();
+            }
+        }
+        if locked {
+            ui.label("Wallet locked");
+            if let Scene::Sync { passphrase, .. } = &mut self.scene {
+                ui.label("Passphrase");
+                passphrase.ui(ui, "sync-unlock-passphrase");
+            }
+            if ui.button("Unlock account").clicked() {
+                self.submit_sync_unlock();
             }
         }
         if ui.button("Back").clicked() {
             self.cancel_current_sync();
             self.scene = Scene::List;
             self.message = None;
+        }
+    }
+
+    fn submit_sync_unlock(&mut self) {
+        let (account_id, secret) = match &mut self.scene {
+            Scene::Sync {
+                account_id,
+                passphrase,
+                ..
+            } => (account_id.clone(), passphrase.take_secret()),
+            _ => return,
+        };
+        let Some(secret) = secret else {
+            self.message = Some(SafeMessage::WalletLocked);
+            return;
+        };
+        match self.port.unlock(&account_id, secret) {
+            Ok(()) => {
+                self.message = None;
+                self.refresh_accounts();
+                self.poll_sync();
+            }
+            Err(error) => {
+                self.message = Some(if error == "LOCKED" {
+                    SafeMessage::WalletLocked
+                } else {
+                    SafeMessage::WalletUnavailable
+                });
+            }
         }
     }
 

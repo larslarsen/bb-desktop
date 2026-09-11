@@ -197,10 +197,7 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
     }
 
     pub fn list(&mut self) -> Result<Vec<AccountSummary>, AccountError> {
-        self.sessions
-            .check_deadlines()
-            .map_err(|_| AccountError::unavailable())?;
-        self.cancel_live_if_locked();
+        self.check_session_deadlines()?;
         let ids = self.load_catalog()?;
         Ok(ids
             .into_iter()
@@ -325,9 +322,13 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
             plaintext.wipe_with("plaintext", &mut self.wipes);
             return Err(AccountError::locked());
         }
-        self.sessions
-            .unlock(account_id, plaintext)
-            .map_err(|_| AccountError::unavailable())
+        match self.sessions.unlock(account_id, plaintext) {
+            Ok(()) => Ok(()),
+            Err(_) => {
+                self.lock_all();
+                Err(AccountError::unavailable())
+            }
+        }
     }
 
     pub fn lock(&mut self, account_id: &str) -> Result<(), AccountError> {
@@ -358,11 +359,7 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
     }
 
     pub fn tick(&mut self) -> Result<(), AccountError> {
-        self.sessions
-            .check_deadlines()
-            .map_err(|_| AccountError::unavailable())?;
-        self.cancel_live_if_locked();
-        Ok(())
+        self.check_session_deadlines()
     }
 
     pub fn start_live_sync(
@@ -500,14 +497,16 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
             if job.account_id != account_id {
                 return Err(AccountError::unavailable());
             }
-            return Ok(match job.snapshot.lock() {
+            let snapshot = match job.snapshot.lock() {
                 Ok(value) => value.clone(),
                 Err(poisoned) => poisoned.into_inner().clone(),
-            });
+            };
+            return Ok(self.redact_live_copy_if_locked(snapshot));
         }
         self.last_live_snapshot
             .clone()
             .filter(|snapshot| snapshot.account_id.as_str() == account_id)
+            .map(|snapshot| self.redact_live_copy_if_locked(snapshot))
             .ok_or_else(AccountError::unavailable)
     }
 
@@ -518,15 +517,21 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
         id: crate::zec::LiveSyncJobId,
     ) -> Result<(), AccountError> {
         self.require_native(origin)?;
-        if !self
+        if self
             .live_job
             .as_ref()
             .is_some_and(|job| job.account_id == account_id && job.id == id)
         {
-            return Err(AccountError::unavailable());
+            self.cancel_any_live();
+            return Ok(());
         }
-        self.cancel_any_live();
-        Ok(())
+        if self.last_live_snapshot.as_ref().is_some_and(|snapshot| {
+            snapshot.account_id.as_str() == account_id && snapshot.job_id == Some(id)
+        }) {
+            self.redact_last_live_for(account_id);
+            return Ok(());
+        }
+        Err(AccountError::unavailable())
     }
 
     fn cancel_live_for(&mut self, account_id: &str) {
@@ -551,22 +556,29 @@ impl<C: MonotonicClock, E: EntropyPort, W: WipeObserver> AccountManager<C, E, W>
             snapshot.pending_received_zat = None;
         }
     }
-    fn cancel_live_if_locked(&mut self) {
-        if self
-            .live_job
-            .as_ref()
-            .is_some_and(|job| !self.sessions.is_unlocked(&job.account_id))
-        {
+    fn check_session_deadlines(&mut self) -> Result<(), AccountError> {
+        if self.sessions.check_deadlines().is_err() {
             self.cancel_any_live();
+            if let Some(account_id) = self
+                .last_live_snapshot
+                .as_ref()
+                .map(|snapshot| snapshot.account_id.as_str().to_owned())
+            {
+                self.redact_last_live_for(&account_id);
+            }
+            return Err(AccountError::unavailable());
         }
-        if let Some(account_id) = self
-            .last_live_snapshot
-            .as_ref()
-            .filter(|snapshot| !self.sessions.is_unlocked(snapshot.account_id.as_str()))
-            .map(|snapshot| snapshot.account_id.as_str().to_owned())
-        {
-            self.redact_last_live_for(&account_id);
+        Ok(())
+    }
+    fn redact_live_copy_if_locked(
+        &self,
+        mut snapshot: crate::zec::LiveSyncSnapshot,
+    ) -> crate::zec::LiveSyncSnapshot {
+        if !self.sessions.is_unlocked(snapshot.account_id.as_str()) {
+            snapshot.confirmed_received_zat = None;
+            snapshot.pending_received_zat = None;
         }
+        snapshot
     }
     fn reap_finished_live(&mut self) {
         if self

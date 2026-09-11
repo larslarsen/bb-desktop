@@ -1,5 +1,26 @@
 # Current Task
 
+WAL-016 sync interruption correction is REVIEW ACCEPTED.
+Ordinary 15-minute auto-lock still wipes spending keys; explicitly started viewing-only
+sync continues on the same screen through completion. Balances stay hidden until masked
+inline unlock reveals the same result without another sync. Explicit cancellation and
+manual lock/hide/drop still stop work and clear results. Session timeout is unchanged.
+
+Hermes verified 48 account/native-UI/session tests and production Clippy; a real-engine
+Testnet fixture finished after forced expiry. Removing returned-copy redaction caused
+the intended runtime failure; exact restoration passed. Native broker rebuilt and both
+Xvfb and actual desktop open/hide/reopen/close checks passed using empty test profiles.
+Staged broker SHA256 e805ff8b9ecb88f6bab4c0360572b5e1d1261187cdbb0ebd3a154c42f09ff9aa.
+No user profile or dependencies changed. The six inherited policy failures remain;
+pinned directory scan exit1 contains352 previously classified public-checksum matches,
+zero credential findings. See docs/testing/BBD-WAL-016-GREEN-01.md and FINAL-01.md.
+
+No source work remains authorized. Only exact Hermes integration described in
+WAL016_INTEGRATE.json remains; its resulting source/evidence commits and remote proof
+are recorded in docs/testing/BBD-WAL-016-INTEGRATION-01.md and the corresponding raw
+record. Fully quit and reopen BitBook to load the rebuilt broker.
+The completed WAL015 entry below is historical and its binary hash is superseded.
+
 WAL-015 native live Zcash TESTNET balance synchronization is COMPLETE.
 Source edda35308913d59683a08be58052dc7c2d95dbaf and integration evidence
 105a2e36af03d26dbc15a3d052901d836b2a63b5 are pushed to origin/master.

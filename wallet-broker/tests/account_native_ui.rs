@@ -80,6 +80,7 @@ const CUSTOM_ENDPOINT: &str = "https://127.0.0.1:9443";
 const CONNECTION_DISCLOSURE: &str = "The selected server can see your connection IP address.";
 const UNSYNCED: &str = "Unsynced — no completed scan";
 const RECEIVED_FUNDS: &str = "Received shielded funds";
+const SYNC_COMPLETE: &str = "Sync complete";
 const CONFIRMED_BALANCE: &str = "Confirmed: 1.90000000 ZEC";
 const PENDING_BALANCE: &str = "Pending: 0.30000000 ZEC";
 const PROGRESS: &str = "Scanned 103 of 107";
@@ -2096,11 +2097,70 @@ fn wal015_cancel_stale_job_lock_back_and_hide_invalidate_sync_results() {
         .unwrap()
         .locked = true;
     let locked = ui.run(&mut app, Vec::new(), false);
-    assert!(!locked.paints(SYNC_TITLE));
+    locked.assert_usable(SYNC_TITLE);
+    locked.assert_usable("Scanned 100 of 107");
+    locked.assert_usable(LOCKED_MESSAGE);
+    locked.assert_usable(CANCEL_SYNC);
+    locked.assert_usable(PASSPHRASE);
+    locked.assert_usable(UNLOCK_ACCOUNT);
+    assert!(!locked.paints(CONFIRMED_BALANCE));
+    assert!(!locked.paints(PENDING_BALANCE));
+    assert_eq!(
+        records.borrow().sync_cancel_calls.last(),
+        Some(&(LOCKED_ID.to_owned(), live_job_id(9)))
+    );
+    let _ = focus_field(&mut ui, &mut app, PASSPHRASE);
+    let typed = type_text(&mut ui, &mut app, SECRET_CANARY);
+    assert_eq!(typed.bullet_count(), SECRET_CANARY.chars().count());
+    typed.assert_no_substr(SECRET_CANARY);
+    let hidden = ui.run(&mut app, vec![escape()], false);
+    assert!(hidden.visible.contains(&false));
+    assert!(!hidden.paints(SYNC_TITLE));
+    hidden.assert_no_substr(SECRET_CANARY);
     assert_eq!(
         records.borrow().sync_cancel_calls.last(),
         Some(&(LOCKED_ID.to_owned(), live_job_id(10)))
     );
+    assert!(control.request_open());
+    let reopened = ui.run(&mut app, Vec::new(), false);
+    assert!(reopened.paints(CREATE_ACCOUNT));
+    assert!(!reopened.paints(PROGRESS));
+    assert!(!reopened.paints(CONFIRMED_BALANCE));
+    reopened.assert_no_substr(SECRET_CANARY);
+}
+
+#[test]
+fn wal016_idle_locked_sync_stays_visible_and_inline_unlock_reveals_the_same_completed_job() {
+    let (mut app, records, _) = open_window(vec![summary(LOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, LOCKED_ID);
+    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    {
+        let mut state = records.borrow_mut();
+        state.sync_start_results.push_back(Ok(live_job_id(12)));
+        state.sync_status = Some(sync_snapshot(
+            LOCKED_ID,
+            Some(12),
+            LiveSyncPhase::Syncing,
+            Some((103, 107)),
+            None,
+        ));
+    }
+    let running = click_label(&mut ui, &mut app, SYNC);
+    running.assert_usable(PROGRESS);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        LOCKED_ID,
+        Some(12),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((190_000_000, 30_000_000)),
+    ));
+    let cached_unlocked = ui.run(&mut app, Vec::new(), false);
+    cached_unlocked.assert_usable(CONFIRMED_BALANCE);
+    cached_unlocked.assert_usable(PENDING_BALANCE);
 
     records
         .borrow_mut()
@@ -2108,31 +2168,109 @@ fn wal015_cancel_stale_job_lock_back_and_hide_invalidate_sync_results() {
         .iter_mut()
         .find(|account| account.account_id == LOCKED_ID)
         .unwrap()
-        .locked = false;
-    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
-    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
-    {
-        let mut state = records.borrow_mut();
-        state.sync_start_results.push_back(Ok(live_job_id(11)));
-        state.sync_status = Some(sync_snapshot(
-            UNLOCKED_ID,
-            Some(11),
-            LiveSyncPhase::Syncing,
-            Some((101, 107)),
-            None,
-        ));
-    }
-    let _ = click_label(&mut ui, &mut app, SYNC);
-    let hidden = ui.run(&mut app, vec![escape()], false);
-    assert!(hidden.visible.contains(&false));
-    assert!(!hidden.paints(SYNC_TITLE));
+        .locked = true;
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        LOCKED_ID,
+        Some(99),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((777, 888)),
+    ));
+    let locked_cached = ui.run(&mut app, Vec::new(), false);
+    locked_cached.assert_usable(SYNC_TITLE);
+    locked_cached.assert_usable(SYNC_COMPLETE);
+    locked_cached.assert_usable("Scanned 107 of 107");
+    assert!(!locked_cached.paints(CONFIRMED_BALANCE));
+    assert!(!locked_cached.paints(PENDING_BALANCE));
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        LOCKED_ID,
+        Some(12),
+        LiveSyncPhase::Syncing,
+        Some((103, 107)),
+        None,
+    ));
+    let locked_running = ui.run(&mut app, Vec::new(), false);
+    locked_running.assert_usable(SYNC_TITLE);
+    locked_running.assert_usable(PROGRESS);
+    locked_running.assert_usable(LOCKED_MESSAGE);
+    locked_running.assert_usable(CANCEL_SYNC);
+    locked_running.assert_usable(PASSPHRASE);
+    locked_running.assert_usable(UNLOCK_ACCOUNT);
+    assert!(!locked_running.paints(CONFIRMED_BALANCE));
+    assert!(!locked_running.paints(PENDING_BALANCE));
+    assert!(records.borrow().sync_cancel_calls.is_empty());
+
+    let empty = click_label(&mut ui, &mut app, UNLOCK_ACCOUNT);
+    empty.assert_usable(SYNC_TITLE);
+    empty.assert_usable(LOCKED_MESSAGE);
+    assert!(records.borrow().unlock_calls.is_empty());
+    assert!(!empty.paints(CONFIRMED_BALANCE));
+
+    records.borrow_mut().sync_status = Some(sync_snapshot(
+        LOCKED_ID,
+        Some(12),
+        LiveSyncPhase::Current,
+        Some((107, 107)),
+        Some((190_000_000, 30_000_000)),
+    ));
+    let locked_complete = ui.run(&mut app, Vec::new(), false);
+    locked_complete.assert_usable(SYNC_TITLE);
+    locked_complete.assert_usable(SYNC_COMPLETE);
+    locked_complete.assert_usable("Scanned 107 of 107");
+    locked_complete.assert_usable(LOCKED_MESSAGE);
+    assert!(!locked_complete.paints(RECEIVED_FUNDS));
+    assert!(!locked_complete.paints(CONFIRMED_BALANCE));
+    assert!(!locked_complete.paints(PENDING_BALANCE));
+    let denied_retry = click_label(&mut ui, &mut app, SYNC);
+    denied_retry.assert_usable(SYNC_COMPLETE);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+
+    records.borrow_mut().unlock_failures = 1;
+    let _ = focus_field(&mut ui, &mut app, PASSPHRASE);
+    let wrong_typed = type_text(&mut ui, &mut app, WRONG_UNLOCK);
+    assert_eq!(wrong_typed.bullet_count(), WRONG_UNLOCK.chars().count());
+    wrong_typed.assert_no_substr(WRONG_UNLOCK);
+    let wrong = click_label(&mut ui, &mut app, UNLOCK_ACCOUNT);
+    wrong.assert_usable(SYNC_TITLE);
+    wrong.assert_usable(SYNC_COMPLETE);
+    wrong.assert_usable(LOCKED_MESSAGE);
+    wrong.assert_no_substr(WRONG_UNLOCK);
+    assert!(!wrong.paints(CONFIRMED_BALANCE));
     assert_eq!(
-        records.borrow().sync_cancel_calls.last(),
-        Some(&(UNLOCKED_ID.to_owned(), live_job_id(11)))
+        records.borrow().unlock_calls,
+        [(LOCKED_ID.to_owned(), WRONG_UNLOCK.as_bytes().to_vec())]
     );
-    assert!(control.request_open());
-    let reopened = ui.run(&mut app, Vec::new(), false);
-    assert!(reopened.paints(CREATE_ACCOUNT));
-    assert!(!reopened.paints(PROGRESS));
-    assert!(!reopened.paints(CONFIRMED_BALANCE));
+
+    let _ = focus_field(&mut ui, &mut app, PASSPHRASE);
+    let right_typed = type_text(&mut ui, &mut app, RIGHT_UNLOCK);
+    assert_eq!(right_typed.bullet_count(), RIGHT_UNLOCK.chars().count());
+    right_typed.assert_no_substr(RIGHT_UNLOCK);
+    let revealed = click_label(&mut ui, &mut app, UNLOCK_ACCOUNT);
+    revealed.assert_usable(SYNC_TITLE);
+    revealed.assert_usable(SYNC_COMPLETE);
+    revealed.assert_usable("Scanned 107 of 107");
+    revealed.assert_usable(RECEIVED_FUNDS);
+    revealed.assert_usable(CONFIRMED_BALANCE);
+    revealed.assert_usable(PENDING_BALANCE);
+    revealed.assert_no_substr(WRONG_UNLOCK);
+    revealed.assert_no_substr(RIGHT_UNLOCK);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+    assert!(records.borrow().sync_cancel_calls.is_empty());
+    assert_eq!(
+        records.borrow().unlock_calls,
+        [
+            (LOCKED_ID.to_owned(), WRONG_UNLOCK.as_bytes().to_vec()),
+            (LOCKED_ID.to_owned(), RIGHT_UNLOCK.as_bytes().to_vec()),
+        ]
+    );
+
+    let back = click_label(&mut ui, &mut app, BACK);
+    assert!(back.paints(CREATE_ACCOUNT));
+    back.assert_no_substr(WRONG_UNLOCK);
+    back.assert_no_substr(RIGHT_UNLOCK);
+    assert_eq!(
+        records.borrow().sync_cancel_calls,
+        [(LOCKED_ID.to_owned(), live_job_id(12))]
+    );
 }
