@@ -70,6 +70,7 @@ const RECEIVE_NETWORK: &str = "Zcash testnet";
 const BALANCE_UNAVAILABLE: &str = "Balance unavailable — not synced";
 const COPY_ADDRESS: &str = "Copy address";
 const BACK: &str = "Back";
+const BALANCE: &str = "Balance";
 const SYNC_BALANCE: &str = "Sync balance";
 const SYNC_TITLE: &str = "Sync Zcash balance";
 const SERVER: &str = "Server";
@@ -150,6 +151,7 @@ struct FakePort {
     inner: Rc<RefCell<PortState>>,
 }
 
+#[derive(Default)]
 struct DialogState {
     export_queue: Vec<Option<PathBuf>>,
     restore_queue: Vec<Option<PathBuf>>,
@@ -610,18 +612,6 @@ impl AccountUiPort for FakePort {
         state.confirm_calls += 1;
         state.accounts.push(prepared.summary.clone());
         Ok(prepared.summary)
-    }
-}
-
-impl Default for DialogState {
-    fn default() -> Self {
-        Self {
-            export_queue: Vec::new(),
-            restore_queue: Vec::new(),
-            export_calls: 0,
-            restore_calls: 0,
-            panic_export: false,
-        }
     }
 }
 
@@ -1097,15 +1087,17 @@ fn fill_matching<P: AccountUiPort, D: AccountDialogs>(
     let _ = type_text(ui, app, secret);
 }
 
-fn open_window(
-    accounts: Vec<AccountSummary>,
-) -> (
+type OpenWindowFixture = (
     AccountWindow<FakePort, FakeDialogs>,
     Rc<RefCell<PortState>>,
     Rc<RefCell<DialogState>>,
-) {
-    let mut state = PortState::default();
-    state.accounts = accounts;
+);
+
+fn open_window(accounts: Vec<AccountSummary>) -> OpenWindowFixture {
+    let state = PortState {
+        accounts,
+        ..PortState::default()
+    };
     let (port, records) = FakePort::new(state);
     let (dialogs, dialog_records) = FakeDialogs::new(DialogState::default());
     (
@@ -1129,6 +1121,27 @@ fn first_list<P: AccountUiPort, D: AccountDialogs>(
     assert!(frame.paints(NOTICE_PAYMENTS));
     assert!(frame.paints(TITLE) || frame.title.as_deref() == Some(TITLE));
     frame
+}
+
+fn assert_list_sync_controls(frame: &FrameObservation, endpoint: &str) {
+    frame.assert_usable(SERVER);
+    frame.assert_usable(endpoint);
+    frame.assert_usable(CONNECTION_DISCLOSURE);
+    frame.assert_usable(SYNC);
+    frame.assert_usable(BALANCE);
+    assert!(!frame.paints(SYNC_BALANCE));
+}
+
+fn queue_running_sync(records: &Rc<RefCell<PortState>>, account_id: &str, job: u64) {
+    let mut state = records.borrow_mut();
+    state.sync_start_results.push_back(Ok(live_job_id(job)));
+    state.sync_status = Some(sync_snapshot(
+        account_id,
+        Some(job),
+        LiveSyncPhase::Syncing,
+        Some((103, 107)),
+        None,
+    ));
 }
 
 #[test]
@@ -1962,7 +1975,7 @@ fn wal018_default_server_survives_reentering_sync() {
     let _ = first_list(&mut ui, &mut app);
     let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
 
-    let first_scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let first_scene = click_label(&mut ui, &mut app, BALANCE);
     first_scene.assert_usable("https://zaino.testnet.unsafe.zec.rocks:443");
     {
         let mut state = records.borrow_mut();
@@ -1985,7 +1998,7 @@ fn wal018_default_server_survives_reentering_sync() {
     );
 
     let _ = click_label(&mut ui, &mut app, BACK);
-    let second_scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let second_scene = click_label(&mut ui, &mut app, BALANCE);
     second_scene.assert_usable("https://zaino.testnet.unsafe.zec.rocks:443");
     {
         let mut state = records.borrow_mut();
@@ -2020,7 +2033,7 @@ fn wal015_sync_pointer_flow_is_explicit_editable_and_paints_progress_then_receiv
     let mut ui = PersistentUi::new(NATIVE_SIZE);
     let _ = first_list(&mut ui, &mut app);
     let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
-    let scene = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let scene = click_label(&mut ui, &mut app, BALANCE);
     scene.assert_usable(SYNC_TITLE);
     scene.assert_usable(SERVER);
     scene.assert_usable(SUGGESTED_ENDPOINT);
@@ -2088,7 +2101,7 @@ fn wal015_cancel_stale_job_lock_back_and_hide_invalidate_sync_results() {
     let mut ui = PersistentUi::new(NATIVE_SIZE);
     let _ = first_list(&mut ui, &mut app);
     let _ = click_label(&mut ui, &mut app, LOCKED_ID);
-    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let _ = click_label(&mut ui, &mut app, BALANCE);
     {
         let mut state = records.borrow_mut();
         state.sync_start_results.push_back(Ok(live_job_id(9)));
@@ -2135,7 +2148,7 @@ fn wal015_cancel_stale_job_lock_back_and_hide_invalidate_sync_results() {
 
     let _ = click_label(&mut ui, &mut app, BACK);
     let _ = click_label(&mut ui, &mut app, LOCKED_ID);
-    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let _ = click_label(&mut ui, &mut app, BALANCE);
     {
         let mut state = records.borrow_mut();
         state.sync_start_results.push_back(Ok(live_job_id(10)));
@@ -2194,7 +2207,7 @@ fn wal016_idle_locked_sync_stays_visible_and_inline_unlock_reveals_the_same_comp
     let mut ui = PersistentUi::new(NATIVE_SIZE);
     let _ = first_list(&mut ui, &mut app);
     let _ = click_label(&mut ui, &mut app, LOCKED_ID);
-    let _ = click_label(&mut ui, &mut app, SYNC_BALANCE);
+    let _ = click_label(&mut ui, &mut app, BALANCE);
     {
         let mut state = records.borrow_mut();
         state.sync_start_results.push_back(Ok(live_job_id(12)));
@@ -2332,4 +2345,310 @@ fn wal016_idle_locked_sync_stays_visible_and_inline_unlock_reveals_the_same_comp
         records.borrow().sync_cancel_calls,
         [(LOCKED_ID.to_owned(), live_job_id(12))]
     );
+}
+
+#[test]
+fn wal019_list_server_disclosure_and_one_click_starts_at_both_sizes() {
+    for size in [NATIVE_SIZE, SMALL_SIZE] {
+        let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+        let mut ui = PersistentUi::new(size);
+        let list = first_list(&mut ui, &mut app);
+        assert_list_sync_controls(&list, SUGGESTED_ENDPOINT);
+        assert!(records.borrow().sync_start_calls.is_empty());
+
+        let selected = click_label(&mut ui, &mut app, UNLOCKED_ID);
+        assert_list_sync_controls(&selected, SUGGESTED_ENDPOINT);
+        assert!(records.borrow().sync_start_calls.is_empty());
+        let repaint = ui.run(&mut app, Vec::new(), false);
+        assert_list_sync_controls(&repaint, SUGGESTED_ENDPOINT);
+        assert!(records.borrow().sync_start_calls.is_empty());
+
+        queue_running_sync(&records, UNLOCKED_ID, 21);
+        let started = click_label(&mut ui, &mut app, SYNC);
+        assert_eq!(
+            records.borrow().sync_start_calls,
+            [(UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned())]
+        );
+        started.assert_usable(SYNC_TITLE);
+        started.assert_usable(PROGRESS);
+        started.assert_usable(CANCEL_SYNC);
+    }
+
+    for size in [NATIVE_SIZE, SMALL_SIZE] {
+        let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+        let mut ui = PersistentUi::new(size);
+        let _ = first_list(&mut ui, &mut app);
+        let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+        let _ = focus_field(&mut ui, &mut app, SERVER);
+        let _ = ui.run(
+            &mut app,
+            vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+            false,
+        );
+        let edited = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+        assert_list_sync_controls(&edited, CUSTOM_ENDPOINT);
+        assert!(records.borrow().sync_start_calls.is_empty());
+        queue_running_sync(&records, UNLOCKED_ID, 22);
+        let started = click_label(&mut ui, &mut app, SYNC);
+        assert_eq!(
+            records.borrow().sync_start_calls,
+            [(UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned())]
+        );
+        started.assert_usable(PROGRESS);
+        started.assert_usable(CANCEL_SYNC);
+    }
+}
+
+#[test]
+fn wal019_one_job_across_frames_and_balance_navigation_starts_zero() {
+    let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let armed = ui.run(&mut app, Vec::new(), false);
+    assert_list_sync_controls(&armed, SUGGESTED_ENDPOINT);
+    let list_sync = armed.visible_label(SYNC).center();
+    queue_running_sync(&records, UNLOCKED_ID, 31);
+    let running = click(&mut ui, &mut app, list_sync);
+    running.assert_usable(PROGRESS);
+    running.assert_usable(CANCEL_SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned())]
+    );
+
+    let extra = ui.run(&mut app, Vec::new(), false);
+    extra.assert_usable(PROGRESS);
+    extra.assert_usable(CANCEL_SYNC);
+    let replayed = click(&mut ui, &mut app, list_sync);
+    replayed.assert_usable(PROGRESS);
+    replayed.assert_usable(CANCEL_SYNC);
+    let after = ui.run(&mut app, Vec::new(), false);
+    after.assert_usable(PROGRESS);
+    after.assert_usable(CANCEL_SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned())]
+    );
+
+    let (mut balance_app, balance_records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut balance_ui = PersistentUi::new(SMALL_SIZE);
+    let _ = first_list(&mut balance_ui, &mut balance_app);
+    let _ = click_label(&mut balance_ui, &mut balance_app, UNLOCKED_ID);
+    let balance = click_label(&mut balance_ui, &mut balance_app, BALANCE);
+    assert!(balance_records.borrow().sync_start_calls.is_empty());
+    balance.assert_usable(SYNC_TITLE);
+    balance.assert_usable(SERVER);
+    balance.assert_usable(SUGGESTED_ENDPOINT);
+    balance.assert_usable(UNSYNCED);
+    balance.assert_usable(SYNC);
+    balance.assert_usable(BACK);
+    assert!(!balance.paints(PROGRESS));
+}
+
+#[test]
+fn wal019_missing_locked_failed_and_stale_selection_do_not_start() {
+    let (mut app, records, _) =
+        open_window(vec![summary(LOCKED_ID, true), summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let empty_selection = first_list(&mut ui, &mut app);
+    assert_list_sync_controls(&empty_selection, SUGGESTED_ENDPOINT);
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    assert!(records.borrow().sync_start_calls.is_empty());
+
+    let locked = click_label(&mut ui, &mut app, LOCKED_ID);
+    assert_list_sync_controls(&locked, SUGGESTED_ENDPOINT);
+    let _ = click_label(&mut ui, &mut app, SYNC);
+    assert!(records.borrow().sync_start_calls.is_empty());
+
+    let _ = click_label(&mut ui, &mut app, UNLOCK);
+    let _ = focus_field(&mut ui, &mut app, PASSPHRASE);
+    let _ = type_text(&mut ui, &mut app, RIGHT_UNLOCK);
+    let unlocked = click_label(&mut ui, &mut app, UNLOCK_ACCOUNT);
+    assert!(unlocked.paints(CREATE_ACCOUNT));
+    assert!(records.borrow().sync_start_calls.is_empty());
+    assert_eq!(
+        records.borrow().unlock_calls,
+        [(LOCKED_ID.to_owned(), RIGHT_UNLOCK.as_bytes().to_vec())]
+    );
+
+    records.borrow_mut().list_error = Some(RAW_ERROR_CANARY);
+    let failed = ui.run(&mut app, Vec::new(), false);
+    failed.assert_usable(UNAVAILABLE_MESSAGE);
+    failed.assert_no_substr(RAW_ERROR_CANARY);
+    if failed.paints(SYNC) {
+        let _ = click_label(&mut ui, &mut app, SYNC);
+    }
+    assert!(records.borrow().sync_start_calls.is_empty());
+    records.borrow_mut().list_error = None;
+    records.borrow_mut().accounts = vec![summary(UNLOCKED_ID, false)];
+
+    let restored = ui.run(&mut app, Vec::new(), false);
+    restored.assert_usable(UNLOCKED_ID);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    records.borrow_mut().accounts.clear();
+    let disappeared = ui.run(&mut app, Vec::new(), false);
+    if disappeared.paints(SYNC) {
+        let _ = click_label(&mut ui, &mut app, SYNC);
+    }
+    assert!(records.borrow().sync_start_calls.is_empty());
+    assert!(
+        !records
+            .borrow()
+            .sync_start_calls
+            .iter()
+            .any(|(id, _)| id == UNLOCKED_ID)
+    );
+}
+
+#[test]
+fn wal019_start_error_is_safe_and_retry_is_explicit() {
+    let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let _ = focus_field(&mut ui, &mut app, SERVER);
+    let _ = ui.run(
+        &mut app,
+        vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+        false,
+    );
+    let edited = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+    assert_list_sync_controls(&edited, CUSTOM_ENDPOINT);
+    records
+        .borrow_mut()
+        .sync_start_results
+        .push_back(Err(RAW_ERROR_CANARY));
+    let failed = click_label(&mut ui, &mut app, SYNC);
+    failed.assert_usable(UNAVAILABLE_MESSAGE);
+    failed.assert_no_substr(RAW_ERROR_CANARY);
+    assert!(!failed.paints(PROGRESS));
+    assert!(!failed.paints(CANCEL_SYNC));
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned())]
+    );
+    let idle = ui.run(&mut app, Vec::new(), false);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+    idle.assert_usable(UNAVAILABLE_MESSAGE);
+    idle.assert_no_substr(RAW_ERROR_CANARY);
+
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let retry_list = ui.run(&mut app, Vec::new(), false);
+    assert_list_sync_controls(&retry_list, CUSTOM_ENDPOINT);
+    queue_running_sync(&records, UNLOCKED_ID, 41);
+    let retried = click_label(&mut ui, &mut app, SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [
+            (UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned()),
+            (UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned()),
+        ]
+    );
+    retried.assert_usable(PROGRESS);
+}
+
+#[test]
+fn wal019_endpoint_survives_back_and_balance_reentry() {
+    let (mut app, records, _) =
+        open_window(vec![summary(LOCKED_ID, false), summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let _ = focus_field(&mut ui, &mut app, SERVER);
+    let _ = ui.run(
+        &mut app,
+        vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+        false,
+    );
+    let edited = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+    assert_list_sync_controls(&edited, CUSTOM_ENDPOINT);
+
+    let balance = click_label(&mut ui, &mut app, BALANCE);
+    assert!(records.borrow().sync_start_calls.is_empty());
+    balance.assert_usable(CUSTOM_ENDPOINT);
+    let listed = click_label(&mut ui, &mut app, BACK);
+    assert_list_sync_controls(&listed, CUSTOM_ENDPOINT);
+
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    queue_running_sync(&records, UNLOCKED_ID, 51);
+    let running = click_label(&mut ui, &mut app, SYNC);
+    running.assert_usable(PROGRESS);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned())]
+    );
+    let cancelled = click_label(&mut ui, &mut app, CANCEL_SYNC);
+    cancelled.assert_usable(SYNC);
+    assert_eq!(
+        records.borrow().sync_cancel_calls,
+        [(UNLOCKED_ID.to_owned(), live_job_id(51))]
+    );
+    let after_cancel = click_label(&mut ui, &mut app, BACK);
+    assert_list_sync_controls(&after_cancel, CUSTOM_ENDPOINT);
+    let reentered = click_label(&mut ui, &mut app, BALANCE);
+    reentered.assert_usable(CUSTOM_ENDPOINT);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+}
+
+#[test]
+fn wal019_running_endpoint_stays_frozen_until_next_explicit_sync() {
+    let (mut app, records, _) = open_window(vec![summary(UNLOCKED_ID, false)]);
+    let mut ui = PersistentUi::new(NATIVE_SIZE);
+    let _ = first_list(&mut ui, &mut app);
+    let _ = click_label(&mut ui, &mut app, UNLOCKED_ID);
+    let armed = ui.run(&mut app, Vec::new(), false);
+    assert_list_sync_controls(&armed, SUGGESTED_ENDPOINT);
+    queue_running_sync(&records, UNLOCKED_ID, 61);
+    let running = click_label(&mut ui, &mut app, SYNC);
+    running.assert_usable(PROGRESS);
+    running.assert_usable(CANCEL_SYNC);
+    running.assert_usable(SUGGESTED_ENDPOINT);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned())]
+    );
+
+    let _ = focus_field(&mut ui, &mut app, SERVER);
+    let _ = ui.run(
+        &mut app,
+        vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+        false,
+    );
+    let attempted = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+    attempted.assert_usable(PROGRESS);
+    attempted.assert_usable(CANCEL_SYNC);
+    attempted.assert_usable(SUGGESTED_ENDPOINT);
+    assert!(!attempted.paints(CUSTOM_ENDPOINT));
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [(UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned())]
+    );
+
+    let cancelled = click_label(&mut ui, &mut app, CANCEL_SYNC);
+    assert_eq!(
+        records.borrow().sync_cancel_calls,
+        [(UNLOCKED_ID.to_owned(), live_job_id(61))]
+    );
+    cancelled.assert_usable(SUGGESTED_ENDPOINT);
+    let _ = focus_field(&mut ui, &mut app, SERVER);
+    let _ = ui.run(
+        &mut app,
+        vec![key(egui::Key::A, egui::Modifiers::COMMAND)],
+        false,
+    );
+    let edited = type_text(&mut ui, &mut app, CUSTOM_ENDPOINT);
+    edited.assert_usable(CUSTOM_ENDPOINT);
+    assert_eq!(records.borrow().sync_start_calls.len(), 1);
+
+    queue_running_sync(&records, UNLOCKED_ID, 62);
+    let restarted = click_label(&mut ui, &mut app, SYNC);
+    assert_eq!(
+        records.borrow().sync_start_calls,
+        [
+            (UNLOCKED_ID.to_owned(), SUGGESTED_ENDPOINT.to_owned()),
+            (UNLOCKED_ID.to_owned(), CUSTOM_ENDPOINT.to_owned()),
+        ]
+    );
+    restarted.assert_usable(PROGRESS);
 }

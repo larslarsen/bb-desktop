@@ -19,6 +19,8 @@ use crate::zec::{
 const MAX_PASSPHRASE_BYTES: usize = 1_024;
 const TITLE: &str = "BitBook accounts";
 const UNAVAILABLE: &str = "UNAVAILABLE";
+const DEFAULT_SYNC_ENDPOINT: &str = "https://zaino.testnet.unsafe.zec.rocks:443";
+const CONNECTION_DISCLOSURE: &str = "The selected server can see your connection IP address.";
 
 pub trait AccountUiPort {
     type Restore;
@@ -527,6 +529,7 @@ pub struct AccountWindow<P: AccountUiPort, D: AccountDialogs> {
     message: Option<SafeMessage>,
     list_failed: bool,
     quit_sent: bool,
+    sync_endpoint: String,
 }
 
 impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
@@ -547,6 +550,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             message: None,
             list_failed: false,
             quit_sent: false,
+            sync_endpoint: DEFAULT_SYNC_ENDPOINT.to_owned(),
         }
     }
 
@@ -725,6 +729,49 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
         }
     }
 
+    fn open_sync_scene(&mut self, account_id: String) {
+        self.message = None;
+        self.scene = Scene::Sync {
+            account_id,
+            endpoint: self.sync_endpoint.clone(),
+            job: None,
+            snapshot: None,
+            passphrase: MaskedInput::new(),
+        };
+    }
+
+    fn begin_sync(&mut self, account_id: String) {
+        let endpoint = self.sync_endpoint.clone();
+        match self.port.start_sync(&account_id, &endpoint) {
+            Ok(id) => {
+                self.message = None;
+                if let Scene::Sync {
+                    account_id: current,
+                    endpoint: current_endpoint,
+                    job,
+                    snapshot,
+                    ..
+                } = &mut self.scene
+                    && *current == account_id
+                {
+                    *current_endpoint = endpoint;
+                    *job = Some(id);
+                    *snapshot = None;
+                } else {
+                    self.scene = Scene::Sync {
+                        account_id,
+                        endpoint,
+                        job: Some(id),
+                        snapshot: None,
+                        passphrase: MaskedInput::new(),
+                    };
+                }
+                self.poll_sync();
+            }
+            Err(error) => self.port_error(error),
+        }
+    }
+
     fn show_list(&mut self, ui: &mut egui::Ui) {
         ui.heading(TITLE);
         ui.label("Zcash testnet accounts");
@@ -733,7 +780,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             ui.label(message.text());
         }
 
-        let body_height = (ui.available_height() - 195.0).max(40.0);
+        let body_height = (ui.available_height() - 250.0).max(40.0);
         egui::ScrollArea::vertical()
             .id_salt("account-list")
             .max_height(body_height)
@@ -788,22 +835,26 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             };
             return;
         }
-        if ui
-            .add_enabled(
-                selected.as_ref().is_some_and(|(_, locked)| !*locked),
-                egui::Button::new("Sync balance"),
-            )
-            .clicked()
-            && let Some((account_id, _)) = selected.as_ref()
-        {
-            self.message = None;
-            self.scene = Scene::Sync {
-                account_id: account_id.clone(),
-                endpoint: "https://zaino.testnet.unsafe.zec.rocks:443".to_owned(),
-                job: None,
-                snapshot: None,
-                passphrase: MaskedInput::new(),
-            };
+        ui.label("Server");
+        ui.add(egui::TextEdit::singleline(&mut self.sync_endpoint).desired_width(f32::INFINITY));
+        ui.add(egui::Label::new(CONNECTION_DISCLOSURE).wrap());
+        let can_sync = selected.as_ref().is_some_and(|(_, locked)| !*locked);
+        let mut sync_clicked = false;
+        let mut balance_clicked = false;
+        ui.horizontal(|ui| {
+            sync_clicked = ui
+                .add_enabled(can_sync, egui::Button::new("Sync"))
+                .clicked();
+            balance_clicked = ui
+                .add_enabled(can_sync, egui::Button::new("Balance"))
+                .clicked();
+        });
+        if sync_clicked && let Some((account_id, _)) = selected.as_ref() {
+            self.begin_sync(account_id.clone());
+            return;
+        }
+        if balance_clicked && let Some((account_id, _)) = selected.as_ref() {
+            self.open_sync_scene(account_id.clone());
             return;
         }
         if ui
@@ -873,11 +924,6 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
 
     fn show_sync(&mut self, ui: &mut egui::Ui) {
         ui.heading("Sync Zcash balance");
-        ui.label("Server");
-        if let Scene::Sync { endpoint, .. } = &mut self.scene {
-            ui.text_edit_singleline(endpoint);
-        }
-        ui.label("The selected server can see your connection IP address.");
         let (account_id, job, snapshot) = match &self.scene {
             Scene::Sync {
                 account_id,
@@ -896,6 +942,24 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             && snapshot
                 .as_ref()
                 .is_none_or(|value| value.phase == LiveSyncPhase::Syncing);
+        ui.label("Server");
+        let edited_endpoint = if let Scene::Sync { endpoint, .. } = &mut self.scene {
+            ui.add_enabled(
+                !running,
+                egui::TextEdit::singleline(endpoint).desired_width(f32::INFINITY),
+            );
+            if running {
+                None
+            } else {
+                Some(endpoint.clone())
+            }
+        } else {
+            None
+        };
+        if let Some(endpoint) = edited_endpoint {
+            self.sync_endpoint = endpoint;
+        }
+        ui.label(CONNECTION_DISCLOSURE);
         if let Some(snapshot) = snapshot {
             if let (Some(scanned), Some(target)) = (snapshot.scanned_height, snapshot.target_height)
             {
@@ -935,20 +999,7 @@ impl<P: AccountUiPort, D: AccountDialogs> AccountWindow<P, D> {
             ui.label("Unsynced — no completed scan");
         }
         if !running && ui.add_enabled(!locked, egui::Button::new("Sync")).clicked() {
-            let endpoint = match &self.scene {
-                Scene::Sync { endpoint, .. } => endpoint.clone(),
-                _ => return,
-            };
-            match self.port.start_sync(&account_id, &endpoint) {
-                Ok(id) => {
-                    if let Scene::Sync { job, snapshot, .. } = &mut self.scene {
-                        *job = Some(id);
-                        *snapshot = None
-                    }
-                    self.poll_sync()
-                }
-                Err(error) => self.port_error(error),
-            }
+            self.begin_sync(account_id.clone());
         }
         if job.is_some() && ui.button("Cancel sync").clicked() {
             self.cancel_current_sync();
