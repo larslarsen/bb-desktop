@@ -88,22 +88,28 @@ Selected: 6. Passed: 0. Failed: 6. Ignored: 0. Filtered out: 16. Finished in 0.0
 
 EXPECTED RED CAPTURED.
 
-This is the intended red: the test looks for a Server/Sync/Balance label/button on the account list, before any sync start, that does not exist yet in production. All six tests fail on the same missing-widget assertion, not on compilation errors, infrastructure errors, or timeouts. The sixteen non-wal019 UI tests were correctly filtered out. The production edit that adds the list Server/Sync/Balance controls is the authorized next step, not taken here.
+This is the intended red: the test looks for a Server/Sync/Balance label/button on the
+account list, before any sync start, that does not exist yet in production. All six tests
+fail on the same missing-widget assertion, not on compilation errors, infrastructure
+errors, or timeouts. The sixteen non-wal019 UI tests were correctly filtered out. The
+production edit that adds the list Server/Sync/Balance controls was NOT authorized by this
+red capture; production became authorized only by the later reviewer decision in
+[BBD-WAL-019-EXPECTED-RED-REVIEW-01.md](../testing/BBD-WAL-019-EXPECTED-RED-REVIEW-01.md).
 
 Raw captures (relative to repository root, disk-backed under wallet-broker/target):
 
 | Artifact | SHA-256 |
 |---|---|
-| preflight.json | `4d76258aac72e25ab296a4244f5f637be4c8e7f105e8c6a30ae9998a74d1253f` |
-| postflight.json | `b71c3063f3570ad2331c9be0067d480c28dbc31fcff2543a4335e07346f9ac26` |
-| 00-hermes-version.log | `7171f1418b425b98c7040b6e838fab15ef17a048bda0b419b5638867ba5768bf` |
-| 00-hermes-version.json | `e3974be4ca2c7a7cf90e54e9b9264e6753bb59dc0f5ac28816564f8416c0050b` |
-| 01-rust-version.log | `785f1364c0d5bf077f7bfb885fd4bde99899dfd80ce0fb6226a4527d9b27724c` |
-| 01-rust-version.json | `90fe8f95f16d6d30f4f263cd859f40192ddf7b1cdf1e1cb590bcbe8b49e619f8` |
-| 02-format.log | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| 02-format.json | `a340b555e934e6a4fcd86575c514da2c6358bc4460c94f0926e94136eccdd674` |
-| 03-focused-red.log | `cb5061ad15c1e8d4067f6fe611b4f7760054145d1252124ef7efbe55f7420018` |
-| 03-focused-red.json | `bcef23c2a6c3181c14fbbcc222695c88685c5600df0c8f34258354cae2cea2b3` |
+| [preflight.json](../../wallet-broker/target/wal019-sync-expected-red-01/preflight.json) | `4d76258aac72e25ab296a4244f5f637be4c8e7f105e8c6a30ae9998a74d1253f` |
+| [postflight.json](../../wallet-broker/target/wal019-sync-expected-red-01/postflight.json) | `b71c3063f3570ad2331c9be0067d480c28dbc31fcff2543a4335e07346f9ac26` |
+| [00-hermes-version.log](../../wallet-broker/target/wal019-sync-expected-red-01/00-hermes-version.log) | `7171f1418b425b98c7040b6e838fab15ef17a048bda0b419b5638867ba5768bf` |
+| [00-hermes-version.json](../../wallet-broker/target/wal019-sync-expected-red-01/00-hermes-version.json) | `e3974be4ca2c7a7cf90e54e9b9264e6753bb59dc0f5ac28816564f8416c0050b` |
+| [01-rust-version.log](../../wallet-broker/target/wal019-sync-expected-red-01/01-rust-version.log) | `785f1364c0d5bf077f7bfb885fd4bde99899dfd80ce0fb6226a4527d9b27724c` |
+| [01-rust-version.json](../../wallet-broker/target/wal019-sync-expected-red-01/01-rust-version.json) | `90fe8f95f16d6d30f4f263cd859f40192ddf7b1cdf1e1cb590bcbe8b49e619f8` |
+| [02-format.log](../../wallet-broker/target/wal019-sync-expected-red-01/02-format.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` (empty) |
+| [02-format.json](../../wallet-broker/target/wal019-sync-expected-red-01/02-format.json) | `a340b555e934e6a4fcd86575c514da2c6358bc4460c94f0926e94136eccdd674` |
+| [03-focused-red.log](../../wallet-broker/target/wal019-sync-expected-red-01/03-focused-red.log) | `cb5061ad15c1e8d4067f6fe611b4f7760054145d1252124ef7efbe55f7420018` |
+| [03-focused-red.json](../../wallet-broker/target/wal019-sync-expected-red-01/03-focused-red.json) | `bcef23c2a6c3181c14fbbcc222695c88685c5600df0c8f34258354cae2cea2b3` |
 
 No production authorization follows automatically from red. Production became authorized
 only by the later reviewer decision in

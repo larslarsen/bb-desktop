@@ -11,10 +11,11 @@ Session identifier: not recoverable from Hermes version output.
 
 ## Baseline
 
-HEAD: `2b5ad193f01af31f2a2bdcc7b0d1080dd5a2f68e` (verified before/after).
+Preflight baseline HEAD: `2b5ad193f01af31f2a2bdcc7b0d1080dd5a2f68e`
+Published feature HEAD: `f2d9c9a513b3285531352df84ada818fdac0faf6`
+Live origin master: `f2d9c9a513b3285531352df84ada818fdac0faf6` (verified post-push).
 Branch: master.
 Origin: `larslarsen/bb-desktop` on GitHub.
-Remote master equals baseline (verified via `git ls-remote`).
 
 ## Pin verification
 
@@ -69,25 +70,29 @@ publication; no new tests were executed.
 
 `target/security-tools/gitleaks-v8.30.1/gitleaks`: size 21,958,840 bytes.
 SHA-256: `88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509`
-Version: gitleaks v8.30.1 (from embedded metadata).
+Version: gitleaks v8.30.1 (from embedded module metadata).
 
-## Staged-content secret scan
+## Staged-content secret scan (substantiated)
 
 Command:
 ```
 target/security-tools/gitleaks-v8.30.1/gitleaks git --pre-commit --staged --redact=100 --ignore-gitleaks-allow --no-banner .
 ```
 
-First scan: exit 0, no leaks found.
-Second scan (after adding publication report and restaging): exit 0, no leaks found.
-
-Staged bytes verified unchanged between scans; accepted source hashes confirmed.
+Only ONE scan is substantiated by retained evidence: `scan1.log` (188 bytes,
+SHA-256 `b674dc3b9301edb1307805f36b4bc6f795f7dc1f0d0c2ec33d889e9eb7af54f2`)
+in `wallet-broker/target/wal019-publication-01/`. It reports approximately 120,035
+scanned bytes and no leaks found. There is NO retained argv/exit metadata, second
+log, or staged-tree identity. A second scan was performed after restaging but its
+exit/output is unverified from retained evidence.
 
 ## Commit and push
 
-Commit message: "Make native wallet sync start with one click"
+Commit: `f2d9c9a513b3285531352df84ada818fdac0faf6`
+Message: "Make native wallet sync start with one click"
 Push destination: `origin HEAD:master`
 Force-push: none.
 Amend: none.
+Remote master verified at `f2d9c9a513b3285531352df84ada818fdac0faf6`.
 
 Report returned to owner for Codex review.

@@ -1,6 +1,19 @@
 # Current Task
 
-ACTIVE: BBD-WAL-019 — runtime and local wallet refresh accepted; Hermes publication 01.
+ACTIVE: BBD-WAL-019 — feature pushed; publication evidence correction 01.
+
+Codex verified feature commit f2d9c9a513b3285531352df84ada818fdac0faf6 on local
+and origin master, exactly 20 authorized paths, all ten source pins and wallet
+artifacts. Runtime acceptance stands. Publication evidence requires correction:
+only one scan log is retained, final staged-byte coverage is unsubstantiated, and
+report corrections remain incomplete. See
+docs/testing/BBD-WAL-019-PUBLICATION-REVIEW-01.md.
+Owner may relay docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_CORRECTION_01.md to
+Hermes on a free Nous Portal model. It authorizes exact record corrections, new
+captured publication scans and an eight-path corrective commit. No tests, builds,
+source changes or restart. The older publication 01 instructions below are
+historical and must not be rerun. Codex has launched no actor. Final closeout waits
+for correction verification; no new implementation task is authorized.
 
 WALLET DESIGN DIRECTION: owner expects a possible mobile version and wants mobile
 ZEC wallet references considered. See docs/architecture/BBD-WAL-MOBILE-DESIGN-DIRECTION-01.md.
@@ -43,7 +56,7 @@ and the manifest matches. The next normal app restart loads this wallet resource
 The daemon executable is unchanged. The review corrects the green report's wrong
 mutation hash and missing artifact details from raw evidence.
 
-Owner may relay docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_01.md to Hermes using
+HISTORICAL PUBLICATION 01: Owner could relay docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_01.md to Hermes using
 a free Nous Portal model. It authorizes report corrections, an exact 20-path staged
 scan/commit/push and publication evidence. All source and artifacts stay frozen;
 no rerun or rebuild. Keep all unrelated changes. Codex verifies publication before

@@ -1,6 +1,12 @@
 # BBD-WAL-019 — One-click native wallet sync
 
-State: runtime and local wallet refresh ACCEPTED; publication 01 active.
+State: runtime and local wallet refresh ACCEPTED; feature published, evidence correction active.
+Feature: `f2d9c9a513b3285531352df84ada818fdac0faf6`, verified on origin/master.
+Final closeout requires `docs/testing/BBD-WAL-019-PUBLICATION-REVIEW-01.md`
+findings to be resolved through
+`docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_CORRECTION_01.md`.
+Only its record/scan/eight-path corrective publication scope is active. Earlier
+publication 01 instructions below are historical. No source, test or build work.
 Review: `docs/testing/BBD-WAL-019-GREEN-REVIEW-01.md`.
 Handoff: `docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_01.md`.
 The green handoff's ten-pin table remains frozen. Accepted production: 1332 lines,
