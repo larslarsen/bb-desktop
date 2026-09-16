@@ -1,0 +1,81 @@
+{
+  "local_peer_id": "12D3KooWPayer",
+  "payee_peer_id": "12D3KooWPayee",
+  "other_peer_id": "12D3KooWOther",
+  "vectors": [
+    {
+      "name": "inbound-zec-coffee",
+      "source": "wallet-contract/golden-v1.json payment-request-zec-positive",
+      "kind": "request",
+      "direction": "inbound",
+      "digest": "c21d03fcacab9128ce5d058b6b3b9b95adbf22de222df6d70d92390361ca60dc",
+      "canonical": "{\"amount_atomic\":\"100000000\",\"asset\":\"ZEC\",\"created_at\":\"2026-08-30T12:00:00Z\",\"expires_at\":\"2026-08-30T12:15:00Z\",\"memo\":\"coffee\",\"network\":\"zec-testnet\",\"nonce\":\"ffeeddccbbaa99887766554433221100\",\"payee_peer_id\":\"12D3KooWPayee\",\"payer_peer_id\":\"12D3KooWPayer\",\"receiver\":\"u1testreceiver\",\"receiver_kind\":\"zec-ua-orchard-protocol\",\"request_id\":\"00112233445566778899aabbccddeeff\",\"v\":1}",
+      "amount_display": "1.00000000",
+      "status_at_121000Z": "requested"
+    },
+    {
+      "name": "inbound-zec-tea",
+      "kind": "request",
+      "direction": "inbound",
+      "digest": "6dfc7893e121c39976431c6081b48627d6ce54a363910e0d7d923cbedd9be1f5",
+      "canonical": "{\"amount_atomic\":\"250000000\",\"asset\":\"ZEC\",\"created_at\":\"2026-08-30T13:00:00Z\",\"expires_at\":\"2026-08-30T14:00:00Z\",\"memo\":\"tea\",\"network\":\"zec-testnet\",\"nonce\":\"0123456789abcdef0123456789abcdef\",\"payee_peer_id\":\"12D3KooWPayee\",\"payer_peer_id\":\"12D3KooWPayer\",\"receiver\":\"u1testreceiver\",\"receiver_kind\":\"zec-ua-orchard-protocol\",\"request_id\":\"aabbccddeeff00112233445566778899\",\"v\":1}",
+      "amount_display": "2.50000000"
+    },
+    {
+      "name": "inbound-xmr",
+      "kind": "request",
+      "direction": "inbound",
+      "digest": "10724b9585325352637e9ebe170e0e8c0ea99d388997386ff7cd9a25fd32e335",
+      "canonical": "{\"amount_atomic\":\"1234567890123\",\"asset\":\"XMR\",\"created_at\":\"2026-08-30T12:30:00Z\",\"expires_at\":\"2026-08-30T15:00:00Z\",\"memo\":\"\",\"network\":\"xmr-stagenet\",\"nonce\":\"fedcba9876543210fedcba9876543210\",\"payee_peer_id\":\"12D3KooWPayee\",\"payer_peer_id\":\"12D3KooWPayer\",\"receiver\":\"4Abcdefghijklmnopqrstuvw\",\"receiver_kind\":\"xmr-subaddress\",\"request_id\":\"bbbbccccddddeeeeffff000011112222\",\"v\":1}",
+      "amount_display": "1.234567890123"
+    },
+    {
+      "name": "inbound-zec-precise-large",
+      "kind": "request",
+      "direction": "inbound",
+      "digest": "df9cbf483c377b3a8dfa84b11a93281da56b15c9b1ffbfc616b53f6dae9cbba9",
+      "canonical": "{\"amount_atomic\":\"12345678901234567\",\"asset\":\"ZEC\",\"created_at\":\"2026-08-30T11:00:00Z\",\"expires_at\":\"2026-08-31T11:00:00Z\",\"memo\":\"precise\",\"network\":\"zec-testnet\",\"nonce\":\"aaaabbbbccccddddeeeeffff00001111\",\"payee_peer_id\":\"12D3KooWPayee\",\"payer_peer_id\":\"12D3KooWPayer\",\"receiver\":\"u1testreceiver\",\"receiver_kind\":\"zec-ua-orchard-protocol\",\"request_id\":\"ccccddddeeeeffff0000111122223333\",\"v\":1}",
+      "amount_display": "123456789.01234567"
+    },
+    {
+      "name": "outbound-zec",
+      "kind": "request",
+      "direction": "outbound",
+      "digest": "f787141b1715229c952b7d91ef0e517147b44f72b8b42fa2676bd1b4ac5cbec7",
+      "canonical": "{\"amount_atomic\":\"100000000\",\"asset\":\"ZEC\",\"created_at\":\"2026-08-30T12:00:00Z\",\"expires_at\":\"2026-08-30T16:00:00Z\",\"memo\":\"out\",\"network\":\"zec-testnet\",\"nonce\":\"11112222333344445555666677778888\",\"payee_peer_id\":\"12D3KooWPayer\",\"payer_peer_id\":\"12D3KooWOther\",\"receiver\":\"u1testreceiver\",\"receiver_kind\":\"zec-ua-orchard-protocol\",\"request_id\":\"ddddffffeeeeaaaa1111222233334444\",\"v\":1}"
+    },
+    {
+      "name": "cancel-coffee",
+      "source": "wallet-contract/golden-v1.json payment-status-cancelled-positive",
+      "kind": "status",
+      "direction": "inbound",
+      "digest": "9e4b7b6ef01506b93aa76ef1e609a90a70d6fb491dd996e0660881de5c38c3aa",
+      "canonical": "{\"at\":\"2026-08-30T12:05:00Z\",\"event_id\":\"11112222333344445555666677778888\",\"nonce\":\"9999aaaabbbbccccddddeeeeffff0000\",\"request_id\":\"00112233445566778899aabbccddeeff\",\"status\":\"cancelled\",\"tx_ref\":\"\",\"v\":1}"
+    },
+    {
+      "name": "inbound-zec-late",
+      "kind": "request",
+      "direction": "inbound",
+      "digest": "c6882edc61cfa3c7d8a3c818a008b0520e634c5e8ebc6588e3b370d21cc2da1b",
+      "canonical": "{\"amount_atomic\":\"100000000\",\"asset\":\"ZEC\",\"created_at\":\"2026-08-30T11:00:00Z\",\"expires_at\":\"2026-08-30T12:05:00Z\",\"memo\":\"late\",\"network\":\"zec-testnet\",\"nonce\":\"ccccddddffffeeeeaaaa111122223333\",\"payee_peer_id\":\"12D3KooWPayee\",\"payer_peer_id\":\"12D3KooWPayer\",\"receiver\":\"u1testreceiver\",\"receiver_kind\":\"zec-ua-orchard-protocol\",\"request_id\":\"eeeeffff000011112222333344445555\",\"v\":1}",
+      "amount_display": "1.00000000",
+      "status_at_121000Z": "expired"
+    },
+    {
+      "name": "paid-coffee-status",
+      "kind": "status",
+      "direction": "inbound",
+      "digest": "29efce87975d176bf41682f7897b0da454f7deb7c6bf38381bc9a8392d8e6fa2",
+      "canonical": "{\"at\":\"2026-08-30T12:05:00Z\",\"event_id\":\"22223333444455556666777788889999\",\"nonce\":\"aaaa1111bbbb2222cccc3333dddd4444\",\"request_id\":\"00112233445566778899aabbccddeeff\",\"status\":\"paid\",\"tx_ref\":\"txid1\",\"v\":1}",
+      "independent_domain": "bitbook-payment-status-v1\n"
+    },
+    {
+      "name": "expired-event-status",
+      "kind": "status",
+      "direction": "inbound",
+      "digest": "0abc64f84a3831f045c537026392a2f8e1c20198a89b7cfaf7edaa1d99f46733",
+      "canonical": "{\"at\":\"2026-08-30T12:06:00Z\",\"event_id\":\"3333444455556666777788889999aaaa\",\"nonce\":\"bbbb1111cccc2222dddd3333eeee4444\",\"request_id\":\"00112233445566778899aabbccddeeff\",\"status\":\"expired\",\"tx_ref\":\"\",\"v\":1}",
+      "independent_domain": "bitbook-payment-status-v1\n"
+    }
+  ]
+}

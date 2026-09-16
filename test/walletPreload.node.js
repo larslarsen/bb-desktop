@@ -37,12 +37,13 @@ function load() {
   return { calls, listeners, exposed };
 }
 
-test('preload: one frozen bitbookWallet object exposes exactly six frozen own functions', () => {
+test('preload: one frozen bitbookWallet object exposes exactly eight frozen own functions', () => {
   const ctx = load();
   assert.strictEqual(ctx.exposed.name, 'bitbookWallet');
   assert.strictEqual(Object.isFrozen(ctx.exposed.value), true);
   assert.deepStrictEqual(Object.keys(ctx.exposed.value), [
     'getSnapshot', 'subscribeSnapshot', 'beginIntent', 'cancelIntent', 'listAccounts', 'getPayeeRequest',
+    'getPaymentInbox', 'connectPaymentInbox',
   ]);
   for (const value of Object.values(ctx.exposed.value)) {
     assert.strictEqual(typeof value, 'function');
@@ -59,13 +60,18 @@ test('preload: each callable API uses only its fixed channel and page supplies n
   await ctx.exposed.value.getPayeeRequest({
     account_id: '2'.repeat(32), asset: 'ZEC', network: 'zec-testnet', request_id: '3'.repeat(32),
   });
+  await ctx.exposed.value.getPaymentInbox();
+  await ctx.exposed.value.connectPaymentInbox();
   const invokes = ctx.calls.filter((call) => call[0] === 'invoke');
   assert.deepStrictEqual(invokes.map((call) => call[1]), [
     CHANNELS.getSnapshot, CHANNELS.beginIntent, CHANNELS.cancelIntent,
     CHANNELS.listAccounts, CHANNELS.getPayeeRequest,
+    'payment:inbox:get', 'payment:inbox:connect',
   ]);
   assert.strictEqual(invokes[0].length, 2, 'getSnapshot smuggled a payload');
   assert.strictEqual(invokes[3].length, 2, 'listAccounts smuggled a payload');
+  assert.strictEqual(invokes[5].length, 2, 'getPaymentInbox smuggled a payload');
+  assert.strictEqual(invokes[6].length, 2, 'connectPaymentInbox smuggled a payload');
   assert.ok(!Object.keys(ctx.exposed.value).some((key) => /invoke|send|confirm|unlock|backup|sign|broadcast/i.test(key)));
 });
 

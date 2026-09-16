@@ -190,6 +190,8 @@ const PRELOAD_INVOKE_CHANNELS = [
   'wallet:intent:cancel',
   'wallet:accounts:list',
   'wallet:payee-request:get',
+  'payment:inbox:get',
+  'payment:inbox:connect',
 ];
 const PRELOAD_SUBSCRIBE_CHANNEL = 'wallet:snapshot:subscribe';
 const QUOTE_WORKER_PATHS = [
@@ -398,6 +400,19 @@ const WAL008_ZEC_RUST_SOURCE_PATHS = [
   'wallet-broker/src/zec/store.rs',
   'wallet-broker/src/zec/test_support.rs',
 ];
+const WAL009_PRODUCTION_EXTRACT_REL = 'wallet-broker/src/zec/spend.rs';
+const WAL009_VERIFICATION_EXTRACT_REL =
+  'wallet-broker/src/zec/spend/verification_context_tests.rs';
+const WAL009_PRODUCTION_EXTRACT_STATEMENT = [
+  '    let transaction = TransactionExtractor::new(finalized)',
+  '        .extract()',
+  '        .map_err(|_| ZecError::signature_invalid())?;',
+].join('\n');
+const WAL009_VERIFICATION_EXTRACT_STATEMENT = [
+  '    let transaction = TransactionExtractor::new(finalized)',
+  '        .extract()',
+  '        .expect("extract transaction");',
+].join('\n');
 
 const FORBIDDEN_DOC_PATHS = new Set([
   '**',
@@ -2064,6 +2079,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'zcash_client_backend = { version = "=0.24.0", default-features = false, features = ["lightwalletd-tonic", "pczt"] }',
     'zcash_client_sqlite = { version = "=0.22.0", default-features = false, features = ["orchard", "serde", "test-dependencies", "transparent-inputs"] }',
     'pczt = { version = "=0.9.3", default-features = false }',
+    'orchard = { version = "=0.15.5", default-features = false, features = ["circuit"] }',
     'zcash_primitives = { version = "=0.30.1", default-features = false }',
     'zcash_protocol = { version = "=0.10.5", default-features = false, features = ["local-consensus"] }',
     'zcash_keys = { version = "=0.16.1", default-features = false, features = ["orchard"] }',
@@ -2116,6 +2132,7 @@ function checkWalletBrokerManifest(manifestText, options = {}) {
     'zec_prepare:tests/zec_prepare.rs',
     'zec_hygiene:tests/zec_hygiene.rs',
     'zec_hardware:tests/zec_hardware.rs',
+    'zec_sign_verify:tests/zec_sign_verify.rs',
     'xmr_distribution:tests/xmr_distribution.rs',
     'xmr_process:tests/xmr_process.rs',
     'xmr_rpc:tests/xmr_rpc.rs',
@@ -2275,6 +2292,35 @@ function checkWal008RustSourceInventory(actual) {
   }
 }
 
+function wal009ExtractorStatementPattern(statement) {
+  return new RegExp(`^${statement.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'gm');
+}
+
+function countWal009ExtractorStatements(source, statement) {
+  const matches = source.match(wal009ExtractorStatementPattern(statement));
+  return matches ? matches.length : 0;
+}
+
+function stripWal009ExtractorStatement(source, statement) {
+  return source.replace(wal009ExtractorStatementPattern(statement), '');
+}
+
+function wal009ExtractorAllowance(rel) {
+  if (rel === WAL009_PRODUCTION_EXTRACT_REL) {
+    return {
+      allowed: WAL009_PRODUCTION_EXTRACT_STATEMENT,
+      foreign: WAL009_VERIFICATION_EXTRACT_STATEMENT,
+    };
+  }
+  if (rel === WAL009_VERIFICATION_EXTRACT_REL) {
+    return {
+      allowed: WAL009_VERIFICATION_EXTRACT_STATEMENT,
+      foreign: WAL009_PRODUCTION_EXTRACT_STATEMENT,
+    };
+  }
+  return null;
+}
+
 function checkRustWalletSource(source, rel) {
   if (typeof source !== 'string' || !source.trim()) {
     throw new PolicyError(`wallet Rust source ${rel} is empty`);
@@ -2322,8 +2368,26 @@ function checkRustWalletSource(source, rel) {
         throw new PolicyError(`wallet Rust source ${rel} contains forbidden ${label}`);
       }
     }
-    if (/\.(?:sign|prove|extract)\s*\(|\b(?:sign|prove|extract)\s*\(/i.test(screened) ||
-        /\b(?:pczt|transaction|tx|prepared_pczt|artifact)\s*\.\s*finalize\s*\(/i.test(screened)) {
+    let authorityScreened = screened;
+    const extractorAllowance = wal009ExtractorAllowance(rel);
+    if (extractorAllowance) {
+      if (countWal009ExtractorStatements(screened, extractorAllowance.allowed) !== 1) {
+        throw new PolicyError(
+          `wallet Rust source ${rel} contains forbidden extraction authority`
+        );
+      }
+      if (countWal009ExtractorStatements(screened, extractorAllowance.foreign) !== 0) {
+        throw new PolicyError(
+          `wallet Rust source ${rel} contains forbidden extraction authority`
+        );
+      }
+      authorityScreened = stripWal009ExtractorStatement(
+        screened,
+        extractorAllowance.allowed
+      );
+    }
+    if (/\.(?:sign|prove|extract)\s*\(|\b(?:sign|prove|extract)\s*\(/i.test(authorityScreened) ||
+        /\b(?:pczt|transaction|tx|prepared_pczt|artifact)\s*\.\s*finalize\s*\(/i.test(authorityScreened)) {
       throw new PolicyError(`wallet Rust source ${rel} contains forbidden WAL-006 Zcash authority`);
     }
     if (rel.startsWith('wallet-broker/src/zec') &&
@@ -2488,8 +2552,11 @@ function checkPackageJson(packageText) {
   if (JSON.stringify(Object.keys(dev).sort()) !== JSON.stringify(['electron'])) {
     throw new PolicyError('package.json must not add dependencies');
   }
-  if (pkg.dependencies && Object.keys(pkg.dependencies).length) {
-    throw new PolicyError('package.json must not add runtime dependencies');
+  const runtimeDependencies = pkg.dependencies;
+  if (!runtimeDependencies || typeof runtimeDependencies !== 'object' || Array.isArray(runtimeDependencies) ||
+      JSON.stringify(Object.keys(runtimeDependencies)) !== JSON.stringify(['maplibre-gl']) ||
+      runtimeDependencies['maplibre-gl'] !== '6.8.0') {
+    throw new PolicyError('package.json runtime dependencies must pin only maplibre-gl 6.8.0');
   }
   if (!pkg.scripts || pkg.scripts['test:security'] !== TEST_SECURITY_SCRIPT) {
     throw new PolicyError('package.json must expose test:security');

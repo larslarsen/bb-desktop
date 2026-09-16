@@ -7,6 +7,7 @@ const {
   derivePayView,
   buildPayeeReceiverParams,
 } = require('../wallet-pay/model');
+const paymentInbox = require('./paymentInbox.node.js');
 
 const tests = [];
 function test(name, fn) { tests.push({ name, fn }); }
@@ -759,7 +760,7 @@ test('derive and parameter results are fresh and retain neither sanitized snapsh
   assert.strictEqual(source.accounts[0].account_id, IDS.zecSoftware);
 });
 
-function run() {
+async function run() {
   let failed = 0;
   for (const { name, fn } of tests) {
     try {
@@ -770,9 +771,20 @@ function run() {
       process.stderr.write(`not ok ${name}\n${error && error.stack ? error.stack : error}\n`);
     }
   }
+  for (const { name, fn } of paymentInbox.tests) {
+    try {
+      await fn();
+      process.stdout.write(`ok ${name}\n`);
+    } catch (error) {
+      failed += 1;
+      process.stderr.write(`not ok ${name}\n${error && error.stack ? error.stack : error}\n`);
+    }
+  }
   if (failed) process.exit(1);
-  process.stdout.write(`BitBook wallet Pay tests passed (${tests.length}).\n`);
+  process.stdout.write(
+    `BitBook wallet Pay tests passed (${tests.length + paymentInbox.tests.length}).\n`
+  );
 }
 
 if (require.main === module) run();
-module.exports = { tests };
+module.exports = { tests, run };

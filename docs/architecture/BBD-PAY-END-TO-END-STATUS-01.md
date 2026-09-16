@@ -3,10 +3,53 @@
 Reviewer: Codex. Owner-directed priority: requests and payments between BitBook users.
 This supersedes the inventory-cleanup routing, not the recorded security findings.
 
-Current planning baseline: bb-desktop HEAD 2b5ad193f01af31f2a2bdcc7b0d1080dd5a2f68e
+Current reviewer status: WAL-019 COMPLETE; feature f2d9c9a and correction 7a31c41
+are published, with final immutable-range scan accepted in
+[WAL-019 final review](../testing/BBD-WAL-019-FINAL-REVIEW-01.md).
+Daemon BBGO-PAY-003 is accepted and published: authenticated local read access to
+stored signed records. See its
+[final review](../../../bb-go/docs/testing/BBGO-PAY-003-FINAL-REVIEW-01.md).
+Active desktop task: [BBD-PAY-001](../../tickets/BBD-PAY-001.md), received request
+cards within the requesting peer's Messages conversation. Governing decision:
+[requests in Messages](BBD-PAY-MESSAGES-UX-01.md). The standalone Requests tab is
+superseded. Grok's automatic-inbox report is delivered and its handoff closed; Hermes
+standalone UI capture is superseded. Grok exhausted weekly usage during correction;
+source and 63-test green captures exist but its completion report is missing. Sole
+active authorization is now [Hermes final publication/closeout](../handoff/HERMES_BBD_PAY_001_PUBLICATION_01.md).
+[Review 20](../testing/BBD-PAY-001-MESSAGES-REVIEW-20.md) accepts the exact clean
+95-path candidate scan and complete capture. One bounded assignment covers updated
+final-file scanning, feature publication/remote verification and scanned completion-record
+publication. Functional acceptance stands; no source repair or routine repeated tests.
+Inherited release blockers and historical metadata limitations remain explicit.
+Recovery is closed;
+[review 02](../testing/BBD-PAY-001-MESSAGES-REVIEW-02.md) corrects its counts and requires
+read-status/receipt and runner/driver fixes. Sol High is selected because Grok is
+unavailable. Paused earlier source contract:
+[Grok Messages correction 01](../handoff/GROK_BUILD_BBD_PAY_001_MESSAGES_CORRECTION_01.md).
+The Messages source is present and saved 54-test evidence is verified, but
+[review 01](../testing/BBD-PAY-001-MESSAGES-REVIEW-01.md) requires stale-response,
+polling lifecycle, rendering and Electron fixture corrections. This preserves automatic
+updates for both text messages and requests with missed-event reconciliation. Reuse the
+authenticated bridge; no new daemon API is authorized. Hermes acceptance remains pending.
+Prior boundary reviews and evidence remain retained. The owner reported a working empty
+inbox, then identified controls and placement problems. Messages UI assertion/visual proof is now accepted; remaining scans and record closeout
+are pending, and the feature is not finally accepted.
+DEV-001 is cancelled. The existing daemon binary was rebuilt directly; routine
+binary refreshes are part of task completion. Earlier WAL-019 routing is historical.
+
+Current planning baseline: bb-desktop HEAD 7a31c41cb29692a94acf1f24adb379f3a829d237
 plus preserved unpublished work; bb-go HEAD
-2b695a8719a7381f3919bb83c63e54251f43536d. The daemon has an existing
-untracked modern/bitbookd binary; it was not run, replaced or used as evidence.
+68aec8538e19722e56918645b4c7b8a897d77161. The accepted modern/bitbookd binary was
+rebuilt with Go 1.27.0; its embedded pre-commit revision is 2b695a8 with
+vcs.modified=true. Its identity is retained in the daemon final review. No process restart.
+
+## Owner Monero availability update
+
+Owner now reports monerod has synced. This supersedes the earlier planning assumption
+that node synchronization is still in progress. It is an owner report, not a live RPC
+verification of network/endpoint/height, wallet refresh or adapter readiness. Carry it
+into the next WAL-007/XMR planning review. Existing XMR implementation defects and gates
+remain; current PAY work continues without live node/wallet operations.
 
 ## What works as components, and what is missing
 
@@ -14,6 +57,7 @@ untracked modern/bitbookd binary; it was not run, replaced or used as evidence.
 | --- | --- | --- |
 | Request money from a peer | wallet-pay/model.js has payee gating; native account receiving exists | social/app.js has chat but no Pay/Request flow; runtime.rs:574 returns UNAVAILABLE for receiver.fresh |
 | Deliver the signed request | BBGO-PAY-002 phase A now starts/closes payment.Service in the real daemon; request delivery, payer rejection and restart persistence are accepted | api/handler.go still has no payment routes; desktop cannot yet use this transport as a complete request flow |
+| See received requests | BBGO-PAY-003 provides authenticated local GET /v1/payment/records; desktop bridge and standalone UI source exist | Messages card rendering and automatic-update UI assertions passed; final scans/acceptance pending |
 | Open and approve the received request | preload/supervisor have begin/cancel boundaries; native signing components exist | runtime.rs:574 returns UNAVAILABLE for intent.begin and intent.cancel; no complete request-to-native-review path |
 | Send funds | reviewed Zcash prepare/sign/verify and recovery components | chain submission and confirmation are later WAL-009 work, not implemented by the accepted non-broadcast slice |
 | Show accurate status on both sides | signed status codec exists; transport permits cancellation | network paid receipts remain deliberately blocked; receipt/privacy semantics need a separate contract, and chain confirmation cannot be replaced by a peer claim |
@@ -34,11 +78,12 @@ transactions, broker calls or chain submission move there.
 
 Next payment product sequence:
 
-1. Freeze authenticated local-client access for request creation, listing and
-   cancellation before implementing payment HTTP routes. Bind the desktop main
-   process to the intended daemon instance; never put authority in renderer input.
-2. Connect native fresh receiving to signed request creation and a visible Request
-   action/inbox. Preserve native account/network/privacy validation. Specialized
+1. Integrate BBD-PAY-001's received requests into Messages using the accepted
+   authenticated read endpoint. Bind the social and payment local identities;
+   show peer conversation cards, cancellation/expiry and automatic updates.
+2. Separately freeze authenticated creation/cancellation access and connect native
+   fresh receiving to signed request creation and a visible Request action.
+   Preserve native account/network/privacy validation. Specialized
    nodes may be counterparties without requiring a human social profile.
 3. Open received requests in native review with authenticated counterparty,
    immutable destination/amount/network and explicit approval. A renderer cannot
@@ -48,17 +93,24 @@ Next payment product sequence:
    the UI. Peer status alone never proves payment; paid receipts need their own
    privacy and verification contract.
 
-These are planning dependencies, not implementation authorizations. Do not introduce
+Step 1 has the bounded Hermes UI verification authorization above. Final acceptance and
+publication still require actual UI results and remaining security evidence.
+Before steps 2–3 freeze new recipient/creation/approval contracts, settle the account/device
+migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
+The owner requires persistent identity across desktop/phone, readable names and planned
+WebRTC connectivity, with video calls later. The read-only v1 UI may finish; its current
+peer-ID binding must not silently acquire account/handle semantics. Later steps are planning
+dependencies. Do not introduce
 an unauthenticated payment
 API by inheriting the current wildcard-CORS social surface without a specific trust
 contract. Do not enable paid receipts or expose on-chain links just because requests
 now travel. No real funds, mainnet or public peer run is authorized by this status map.
 
-The immediate authorized UI slice is BBD-WAL-019: show server/disclosure before a
+The completed UI slice is BBD-WAL-019: show server/disclosure before a
 single Sync action, keep separate Balance navigation, preserve cancellation and
 locked-balance protections. Source inspection confirms the two actions are currently
 navigation then start, not evidence that the sync engine needs two start calls.
-Grok first authors real-pointer regression tests; production follows reviewed red.
+Its real-pointer regressions, runtime behavior and publication are accepted.
 
 Social UI recovery is separate: profile pictures first, followed by a comparison
 of old frontend capabilities with current equivalents before more replacement work.
@@ -95,21 +147,24 @@ any direct code or asset reuse. The next wallet design ticket should translate t
 observed structure into reviewable BitBook screens. Current WAL-019 Hermes acceptance
 and the separate profile-picture recovery work retain their scope.
 
-The desktop inventory task is cancelled as the active task. Six policy failures and
+The desktop inventory task is cancelled as the active task. Four remaining policy failures and
 global lint debt remain recorded release blockers, but are not the next implementation
 priority. No more Rust proving-suite reruns for this network integration slice.
 
 ## Roles and authorized documents
 
-Codex remains reviewer. Owner manually relays actors; none was launched. Active
-publication handoff: docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_01.md.
-WAL-019 runtime, falsification and the 22-test account UI target are accepted; the
-local wallet resource and manifest have been rebuilt and verified. Hermes may
-correct the specified records and publish the exact scoped path set after scanning.
-All source/artifacts stay frozen. Publication verification remains pending. The
-daemon has not been refreshed and neither app restarted; daemon build automation
-is queued. Existing payment integration gaps and release blockers remain open.
+Codex remains reviewer. Owner manually relays actors; none was launched. WAL-019
+runtime, falsification, 22-test account UI target and publication are accepted; its
+local wallet resource and manifest are verified. No WAL-019 handoff remains active.
+The daemon binary has been refreshed directly; neither app was restarted.
+BBGO-DEV-001 is cancelled. BBGO-PAY-003's read endpoint and lifecycle integration
+are accepted. BBD-PAY-001 is the active desktop source task. Routine affected local
+artifact refresh is included in completion.
+Existing payment integration gaps and release blockers remain open.
 
-Reviewer governance paths for this planning turn: this status map, desktop
-CURRENT_TASK.md, tickets/BBD-WAL-019.md, its Grok test handoff and bb-go
-CURRENT_TASK.md. No publication or acceptance execution is claimed.
+Reviewer governance paths for this authorization: this status map, desktop AGENTS.md,
+docs/engineering/DEVELOPMENT_ROLES.md, docs/handoff/CURRENT_TASK.md,
+tickets/BBD-PAY-001.md and docs/handoff/GROK_BUILD_BBD_PAY_001_INBOX_01.md.
+Repository documents are the owner's existing control plane for decisions,
+authorizations and evidence; chat only relays pointers.
+No product source edit, publication or acceptance execution is claimed.

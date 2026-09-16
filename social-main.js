@@ -5,6 +5,7 @@ const { app, BrowserWindow, Menu, ipcMain, session, dialog } = require('electron
 const { resolveWalletBrokerLaunch } = require('./wallet-broker/launch-config');
 const { createWalletSupervisor } = require('./wallet-broker/supervisor');
 const { sanitizeWalletSnapshot } = require('./wallet-pay/model');
+const { createPaymentInboxClient } = require('./wallet-pay/inbox-client');
 
 app.enableSandbox();
 
@@ -12,6 +13,7 @@ let window;
 let quitState = 'idle';
 let walletSupervisor = createWalletSupervisor();
 let walletStartupAttempted = false;
+let paymentInboxClient;
 const ID = /^[0-9a-f]{32}$/;
 const WALLET_ENV = Object.freeze([
   'LANG',
@@ -147,6 +149,7 @@ function denyNavigation(event) {
 function approveNormalQuit() {
   if (quitState !== 'pending') return;
   quitState = 'approved';
+  if (paymentInboxClient) paymentInboxClient.dispose();
   app.quit();
 }
 
@@ -266,8 +269,20 @@ function createWindow() {
   window.webContents.on('will-attach-webview', denyNavigation);
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.on('closed', () => {
+    if (paymentInboxClient) paymentInboxClient.dispose();
     window = null;
   });
+}
+
+function paymentHandler(method) {
+  return (event, ...payload) => {
+    requireFrame(event);
+    if (payload.length !== 0) throw new Error('unexpected payment IPC payload');
+    if (!paymentInboxClient) return Promise.resolve({ v: 1, state: 'unavailable', peer_id: '', requests: [] });
+    return Promise.resolve(method === 'connect'
+      ? paymentInboxClient.connectInbox()
+      : paymentInboxClient.getInbox()).then(cloneBoundary);
+  };
 }
 
 app.on('ready', () => {
@@ -282,6 +297,14 @@ app.on('ready', () => {
   ipcMain.handle('wallet:intent:begin', walletHandler('wallet:intent:begin', 'intent.begin'));
   ipcMain.handle('wallet:intent:cancel', walletHandler('wallet:intent:cancel', 'intent.cancel'));
   ipcMain.handle('wallet:payee-request:get', walletHandler('wallet:payee-request:get', 'receiver.fresh'));
+  paymentInboxClient = createPaymentInboxClient({
+    platform: process.platform,
+    homedir: () => app.getPath('home'),
+    dialog,
+    parentWindow: () => window,
+  });
+  ipcMain.handle('payment:inbox:get', paymentHandler('get'));
+  ipcMain.handle('payment:inbox:connect', paymentHandler('connect'));
   startWalletBroker();
 });
 

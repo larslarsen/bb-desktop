@@ -138,8 +138,8 @@ code {
 
 .tab {
   position: relative;
-  min-width: 88px;
-  padding: 0 16px;
+  min-width: 72px;
+  padding: 0 12px;
   color: var(--muted);
   background: transparent;
   font-size: 13px;
@@ -475,6 +475,68 @@ code {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+.tab:focus-visible,
+.paymentRequestDetails summary:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+}
+
+.paymentNotice {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.paymentNotice.hidden {
+  display: none;
+}
+
+.paymentRequest {
+  max-width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--line-soft);
+  border-radius: 13px;
+  background: rgba(20, 29, 44, .86);
+}
+
+.paymentRequestKicker {
+  margin: 0 0 4px;
+  color: var(--accent-bright);
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.paymentRequest h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.paymentRequestMeta,
+.paymentRequestMemo {
+  margin: 0 0 6px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.paymentRequestDetails {
+  margin-top: 8px;
+}
+
+.paymentRequestDetails p {
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.inlineNotice {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .composer {

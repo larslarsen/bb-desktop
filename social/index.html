@@ -106,6 +106,7 @@
             <div class="peerGrid" id="connectedPeers"></div>
           </section>
         </section>
+
       </main>
 
       <aside class="chatPanel">
@@ -113,6 +114,7 @@
           <div>
             <h2>Messages</h2>
             <small id="chatStatus">Direct and signed</small>
+            <p id="paymentNotice" class="paymentNotice hidden" role="status"></p>
           </div>
           <button class="iconButton" id="newChatButton" type="button" aria-label="New conversation">+</button>
         </div>
@@ -181,6 +183,7 @@
 
     <div class="toastRegion" id="toasts" aria-live="polite"></div>
     <script src="core.js"></script>
+    <script src="payment-inbox.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

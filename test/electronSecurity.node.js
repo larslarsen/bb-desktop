@@ -53,6 +53,8 @@ const MAINTAINED_SOURCE_PATHS = [
   path.join('social', 'index.html'),
   path.join('social', 'app.js'),
   path.join('social', 'core.js'),
+  path.join('social', 'payment-inbox.js'),
+  path.join('wallet-pay', 'inbox-client.js'),
 ];
 
 const FORBIDDEN_MAINTAINED_SINKS = [
@@ -107,6 +109,10 @@ function createElectronMock(options = {}) {
     forceExitCalls: [],
     beforeQuitDepth: 0,
     readyEmitted: false,
+    paymentGetCalls: 0,
+    paymentConnectCalls: 0,
+    paymentDisposeCalls: 0,
+    paymentFactoryCalls: 0,
   };
 
   class WebContents {
@@ -226,6 +232,9 @@ function createElectronMock(options = {}) {
       state.enableSandboxCalls += 1;
     },
     getPath(name) {
+      if (name === 'home') {
+        return options.homePath || path.resolve('/bb-electron-security-home');
+      }
       if (name !== 'userData') {
         throw new Error(`unexpected app.getPath(${String(name)})`);
       }
@@ -286,6 +295,11 @@ function createElectronMock(options = {}) {
         return options.showErrorBox(title, content);
       }
       return undefined;
+    },
+    showOpenDialog() {
+      state.openDialogCalls = state.openDialogCalls || [];
+      state.openDialogCalls.push(Array.from(arguments));
+      return Promise.resolve({ canceled: true, filePaths: [] });
     },
   };
 
@@ -414,6 +428,29 @@ function loadMaintainedMain(options = {}) {
     }
     if (/(?:^|\/)wallet-pay\/model$/.test(request)) {
       return { sanitizeWalletSnapshot: trackedSanitizer };
+    }
+    if (/(?:^|\/)wallet-pay\/inbox-client$/.test(request)) {
+      return {
+        createPaymentInboxClient() {
+          mock.state.paymentFactoryCalls += 1;
+          const closed = Object.freeze({
+            v: 1, state: 'unavailable', peer_id: '', requests: Object.freeze([]),
+          });
+          return {
+            getInbox() {
+              mock.state.paymentGetCalls += 1;
+              return Promise.resolve(closed);
+            },
+            connectInbox() {
+              mock.state.paymentConnectCalls += 1;
+              return Promise.resolve(closed);
+            },
+            dispose() {
+              mock.state.paymentDisposeCalls += 1;
+            },
+          };
+        },
+      };
     }
     return originalLoad.call(this, request, parent, isMain);
   };
@@ -841,7 +878,10 @@ test('CSP keeps self-only script/style and denies objects, frames, base, and for
 test('maintained source has no HTML injection, eval, or javascript: sinks', () => {
   assert.deepStrictEqual(
     MAINTAINED_SOURCE_PATHS.map((rel) => rel.split(path.sep).join('/')),
-    ['social-main.js', 'social/index.html', 'social/app.js', 'social/core.js']
+    [
+      'social-main.js', 'social/index.html', 'social/app.js', 'social/core.js',
+      'social/payment-inbox.js', 'wallet-pay/inbox-client.js',
+    ]
   );
   const scanned = [];
   for (const rel of MAINTAINED_SOURCE_PATHS) {
@@ -855,7 +895,7 @@ test('maintained source has no HTML injection, eval, or javascript: sinks', () =
     }
   }
   assert.deepStrictEqual(scanned, MAINTAINED_SOURCE_PATHS);
-  assert.strictEqual(scanned.length, 4);
+  assert.strictEqual(scanned.length, 6);
 });
 
 const WALLET_IPC_CHANNELS = [
@@ -868,13 +908,20 @@ const WALLET_IPC_CHANNELS = [
 const WALLET_PRELOAD_METHODS = [
   'beginIntent',
   'cancelIntent',
+  'connectPaymentInbox',
   'getPayeeRequest',
+  'getPaymentInbox',
   'getSnapshot',
   'listAccounts',
   'subscribeSnapshot',
 ];
+const PAYMENT_IPC_CHANNELS = [
+  'payment:inbox:connect',
+  'payment:inbox:get',
+];
+const MAIN_IPC_CHANNELS = WALLET_IPC_CHANNELS.concat(PAYMENT_IPC_CHANNELS).sort();
 
-test('wallet preload retains exactly six frozen methods and no Electron confirmation action', () => {
+test('wallet preload retains exactly eight frozen methods and no Electron confirmation action', () => {
   let exposed;
   const listeners = new Map();
   const electron = {
@@ -917,12 +964,65 @@ test('wallet preload retains exactly six frozen methods and no Electron confirma
 
 test('wallet IPC registers only the exact renderer channel allowlist', () => {
   const ctx = boot();
-  assert.deepStrictEqual(Object.keys(ctx.state.ipcHandlers).sort(), WALLET_IPC_CHANNELS);
+  assert.deepStrictEqual(Object.keys(ctx.state.ipcHandlers).sort(), MAIN_IPC_CHANNELS);
   for (const forbidden of [
     'wallet:invoke', 'wallet:intent:confirm', 'wallet:account:unlock',
     'wallet:account:export-backup', 'wallet:account:create-software',
     'wallet:signer:sign', 'wallet:tx:broadcast', 'wallet:intent:broadcast',
   ]) assert.strictEqual(ctx.state.ipcHandlers[forbidden], undefined);
+});
+
+test('payment inbox IPC rejects untrusted senders and extra arguments before side effects', async () => {
+  const ctx = loadIsolatedMaintainedMain();
+  const get = ctx.state.ipcHandlers['payment:inbox:get'];
+  const connect = ctx.state.ipcHandlers['payment:inbox:connect'];
+  assert.strictEqual(typeof get, 'function');
+  assert.strictEqual(typeof connect, 'function');
+  const valid = trustedWalletEvent(ctx);
+  const win = ctx.state.windows[0];
+  const gets = ctx.state.paymentGetCalls;
+  const connects = ctx.state.paymentConnectCalls;
+  const dialogs = (ctx.state.openDialogCalls || []).length;
+  assert.throws(() => get({ senderFrame: {}, sender: win.webContents }));
+  assert.throws(() => get({
+    senderFrame: win.webContents.mainFrame,
+    sender: { getURL: () => 'https://evil.example' },
+  }));
+  assert.throws(() => get({
+    senderFrame: { url: 'file:///tmp/evil.html' },
+    sender: win.webContents,
+  }));
+  assert.throws(() => connect({ senderFrame: {}, sender: win.webContents }));
+  assert.throws(() => connect({
+    senderFrame: win.webContents.mainFrame,
+    sender: { getURL: () => 'https://evil.example' },
+  }));
+  assert.throws(() => connect({
+    senderFrame: { url: 'file:///tmp/evil.html' },
+    sender: win.webContents,
+  }));
+  assert.throws(() => get(valid, undefined));
+  assert.throws(() => get(valid, undefined, { path: '/etc/passwd' }));
+  assert.throws(() => connect(valid, undefined));
+  assert.throws(() => connect(valid, { endpoint: 'http://127.0.0.1:1' }));
+  assert.strictEqual(ctx.state.paymentGetCalls, gets);
+  assert.strictEqual(ctx.state.paymentConnectCalls, connects);
+  assert.strictEqual((ctx.state.openDialogCalls || []).length, dialogs);
+  const dto = await get(valid);
+  assert.deepStrictEqual(dto, { v: 1, state: 'unavailable', peer_id: '', requests: [] });
+  dto.state = 'mutated';
+  dto.peer_id = 'mutated';
+  const dtoAgain = await get(valid);
+  assert.strictEqual(dtoAgain.state, 'unavailable');
+  assert.strictEqual(dtoAgain.peer_id, '');
+  assert.notStrictEqual(dtoAgain, dto);
+  assert.strictEqual(ctx.state.paymentGetCalls, gets + 2);
+  const connected = await connect(valid);
+  connected.state = 'mutated';
+  const connectedAgain = await connect(valid);
+  assert.strictEqual(connectedAgain.state, 'unavailable');
+  assert.notStrictEqual(connectedAgain, connected);
+  assert.strictEqual(ctx.state.paymentConnectCalls, connects + 2);
 });
 
 test('wallet IPC rejects non-main frames, non-local origins, malformed shapes, and oversize input', () => {
@@ -2032,6 +2132,37 @@ test('window-all-closed uses the host platform branch and the same before-quit g
       message: 'unsettled window-all-closed quit fixture',
     });
   }
+});
+
+test('payment inbox dispose runs on window close and approved quit, not rejected shutdown', async () => {
+  const deferred = createDeferred();
+  const ctx = loadIsolatedMaintainedMain({
+    shutdown() {
+      return deferred.promise;
+    },
+  });
+  assert.strictEqual(ctx.state.paymentFactoryCalls, 1);
+  assert.strictEqual(ctx.state.paymentDisposeCalls, 0);
+  ctx.emitBeforeQuit();
+  await waitEventLoopTurn();
+  assert.strictEqual(ctx.state.paymentDisposeCalls, 0);
+  const get = ctx.state.ipcHandlers['payment:inbox:get'];
+  await get(trustedWalletEvent(ctx));
+  assert.strictEqual(ctx.state.paymentGetCalls, 1);
+  deferred.reject(fixtureSupervisorError('TIMEOUT', 'fixture request timeout'));
+  await waitEventLoopTurn();
+  assert.strictEqual(ctx.state.paymentDisposeCalls, 0);
+  for (const handler of ctx.state.windows[0]._closedHandlers) handler();
+  assert.strictEqual(ctx.state.paymentDisposeCalls, 1);
+  const approved = createDeferred();
+  const ok = loadIsolatedMaintainedMain({
+    shutdown() { return approved.promise; },
+  });
+  ok.emitBeforeQuit();
+  approved.resolve();
+  await waitEventLoopTurn();
+  await waitEventLoopTurn();
+  assert.ok(ok.state.paymentDisposeCalls >= 1);
 });
 
 async function run() {

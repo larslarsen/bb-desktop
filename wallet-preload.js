@@ -52,6 +52,8 @@ const listAccounts = () => cloneResult(ipcRenderer.invoke('wallet:accounts:list'
 const getPayeeRequest = (value) => cloneResult(
   ipcRenderer.invoke('wallet:payee-request:get', cloneBoundary(value))
 );
+const getPaymentInbox = () => cloneResult(ipcRenderer.invoke('payment:inbox:get'));
+const connectPaymentInbox = () => cloneResult(ipcRenderer.invoke('payment:inbox:connect'));
 
 const api = Object.create(null);
 Object.assign(api, {
@@ -61,6 +63,8 @@ Object.assign(api, {
   cancelIntent,
   listAccounts,
   getPayeeRequest,
+  getPaymentInbox,
+  connectPaymentInbox,
 });
 for (const value of Object.values(api)) Object.freeze(value);
 Object.freeze(api);

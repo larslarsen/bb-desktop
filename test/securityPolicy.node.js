@@ -1423,9 +1423,9 @@ test('WAL-005 Pay model package, syntax, top-level, and routine CI commands are 
   const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
   const pkg = JSON.parse(packageText);
   const lock = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package-lock.json'), 'utf8'));
-  assert.strictEqual(pkg.dependencies, undefined, 'Pay model must add no production dependency');
+  assert.deepStrictEqual(pkg.dependencies, { 'maplibre-gl': '6.8.0' }, 'Pay package must retain only the reviewed mapping dependency');
   assert.deepStrictEqual(pkg.devDependencies, { electron: ELECTRON_VERSION });
-  assert.strictEqual(lock.packages[''].dependencies, undefined, 'Pay model must add no locked production dependency');
+  assert.deepStrictEqual(lock.packages[''].dependencies, { 'maplibre-gl': '6.8.0' }, 'Pay lock root must retain only the reviewed mapping dependency');
   assert.deepStrictEqual(lock.packages[''].devDependencies, { electron: ELECTRON_VERSION });
   assert.strictEqual(pkg.scripts[PAY_TEST_SCRIPT], PAY_TEST_COMMAND);
   assert.strictEqual(pkg.scripts.test, TOP_LEVEL_TEST_CMD);
@@ -1551,8 +1551,38 @@ const PRELOAD_INVOKE_CHANNELS = [
   'wallet:intent:cancel',
   'wallet:accounts:list',
   'wallet:payee-request:get',
+  'payment:inbox:get',
+  'payment:inbox:connect',
 ];
 const PRELOAD_SUBSCRIBE_CHANNEL = 'wallet:snapshot:subscribe';
+const PAY001_VALID_PRELOAD_SOURCE = [
+  "const { contextBridge, ipcRenderer } = require('electron');",
+  "const getSnapshot = () => ipcRenderer.invoke('wallet:snapshot:get');",
+  "const beginIntent = () => ipcRenderer.invoke('wallet:intent:begin');",
+  "const cancelIntent = () => ipcRenderer.invoke('wallet:intent:cancel');",
+  "const listAccounts = () => ipcRenderer.invoke('wallet:accounts:list');",
+  "const getPayeeRequest = () => ipcRenderer.invoke('wallet:payee-request:get');",
+  "const getPaymentInbox = () => ipcRenderer.invoke('payment:inbox:get');",
+  "const connectPaymentInbox = () => ipcRenderer.invoke('payment:inbox:connect');",
+  "const listener = (_event, value) => callback(value);",
+  "ipcRenderer.on('wallet:snapshot:subscribe', listener);",
+  "ipcRenderer.removeListener('wallet:snapshot:subscribe', listener);",
+  "contextBridge.exposeInMainWorld('bitbookWallet', {",
+  '  getSnapshot, beginIntent, cancelIntent, listAccounts, getPayeeRequest,',
+  '  getPaymentInbox, connectPaymentInbox,',
+  '});',
+].join('\n');
+
+function mutatePreloadOccurrence(source, occurrence, replacement) {
+  assert.strictEqual(
+    source.split(occurrence).length - 1,
+    1,
+    `expected exactly one preload mutation target: ${JSON.stringify(occurrence)}`
+  );
+  const mutated = source.replace(occurrence, replacement);
+  assert.notStrictEqual(mutated, source, 'preload mutation did not change the valid source');
+  return mutated;
+}
 
 test('wallet broker boundary package scripts and syntax checks are exact', () => {
   const policy = loadPolicy();
@@ -1637,6 +1667,8 @@ test('wallet boundary source policy allows only reviewed built-ins and forbids l
       "  cancelIntent: (value) => ipcRenderer.invoke('wallet:intent:cancel', value),",
       "  listAccounts: () => ipcRenderer.invoke('wallet:accounts:list'),",
       "  getPayeeRequest: (value) => ipcRenderer.invoke('wallet:payee-request:get', value),",
+      "  getPaymentInbox: () => ipcRenderer.invoke('payment:inbox:get'),",
+      "  connectPaymentInbox: () => ipcRenderer.invoke('payment:inbox:connect'),",
       "};",
       "const listener = (_event, value) => callback(value);",
       "ipcRenderer.on('wallet:snapshot:subscribe', listener);",
@@ -1699,6 +1731,80 @@ test('wallet boundary source policy allows only reviewed built-ins and forbids l
   for (const [rel, source] of forbidden) assertRejects(
     () => policy.checkWalletBoundarySource(source, rel),
     /wallet|boundary|forbidden|allowlist|listener|generic|module|capability|spawn|ipc/i
+  );
+});
+
+test('PAY-001 preload policy accepts the exact seven channels and real bridge', () => {
+  const policy = loadPolicy();
+  assert.deepStrictEqual(policy.PRELOAD_INVOKE_CHANNELS, PRELOAD_INVOKE_CHANNELS);
+  assert.strictEqual(PRELOAD_INVOKE_CHANNELS.length, 7);
+  assert.strictEqual(new Set(PRELOAD_INVOKE_CHANNELS).size, 7);
+  policy.checkWalletBoundarySource(PAY001_VALID_PRELOAD_SOURCE, 'wallet-preload.js');
+
+  const actualPath = path.join(repoRoot, 'wallet-preload.js');
+  const actualSource = fs.readFileSync(actualPath, 'utf8');
+  assert.ok(actualSource.trim(), 'actual wallet-preload.js is empty');
+  policy.checkWalletBoundarySource(actualSource, 'wallet-preload.js');
+});
+
+test('PAY-001 preload policy rejects missing duplicate computed and unlisted channels', () => {
+  const policy = loadPolicy();
+  const reject = (source, cause) => {
+    let error;
+    try {
+      policy.checkWalletBoundarySource(source, 'wallet-preload.js');
+    } catch (caught) {
+      error = caught;
+    }
+    assert.ok(error instanceof policy.PolicyError, 'expected a PolicyError for mutated preload source');
+    assert.match(String(error.message), cause);
+  };
+
+  policy.checkWalletBoundarySource(PAY001_VALID_PRELOAD_SOURCE, 'wallet-preload.js');
+  for (const channel of PRELOAD_INVOKE_CHANNELS) {
+    const invoke = `ipcRenderer.invoke('${channel}')`;
+    reject(
+      mutatePreloadOccurrence(PAY001_VALID_PRELOAD_SOURCE, invoke, 'Promise.resolve()'),
+      /every fixed wallet invoke channel exactly once/
+    );
+    reject(
+      mutatePreloadOccurrence(
+        PAY001_VALID_PRELOAD_SOURCE,
+        invoke,
+        `Promise.all([${invoke}, ${invoke}])`
+      ),
+      /every fixed wallet invoke channel exactly once/
+    );
+    reject(
+      mutatePreloadOccurrence(
+        PAY001_VALID_PRELOAD_SOURCE,
+        invoke,
+        `(() => { const channel = '${channel}'; return ipcRenderer.invoke(channel); })()`
+      ),
+      /dynamic or unlisted IPC invoke/
+    );
+  }
+
+  for (const channel of ['payment:inbox:other', 'payment:send', 'wallet:anything']) {
+    const mutated = `${PAY001_VALID_PRELOAD_SOURCE}\nipcRenderer.invoke('${channel}');`;
+    assert.notStrictEqual(mutated, PAY001_VALID_PRELOAD_SOURCE);
+    reject(mutated, /dynamic or unlisted IPC invoke/);
+  }
+  for (const call of [
+    "ipcRenderer.send('payment:inbox:get');",
+    "ipcRenderer.sendSync('payment:inbox:get');",
+  ]) {
+    const mutated = `${PAY001_VALID_PRELOAD_SOURCE}\n${call}`;
+    assert.notStrictEqual(mutated, PAY001_VALID_PRELOAD_SOURCE);
+    reject(mutated, /forbidden generic IPC send/);
+  }
+  reject(
+    mutatePreloadOccurrence(
+      PAY001_VALID_PRELOAD_SOURCE,
+      "ipcRenderer.removeListener('wallet:snapshot:subscribe', listener);",
+      "ipcRenderer.removeListener('wallet:other', listener);"
+    ),
+    /dynamic or mismatched subscription IPC/
   );
 });
 
@@ -2329,8 +2435,14 @@ const WAL008_ZEC_RUST_SOURCE_PATHS = [
   'wallet-broker/src/zec/hardware.rs',
   'wallet-broker/src/zec/prepare.rs',
   'wallet-broker/src/zec/scan.rs',
+  'wallet-broker/src/zec/spend.rs',
+  'wallet-broker/src/zec/spend/cleanup_lifecycle_tests.rs',
+  'wallet-broker/src/zec/spend/effects.rs',
+  'wallet-broker/src/zec/spend/external_binding_tests.rs',
+  'wallet-broker/src/zec/spend/verification_context_tests.rs',
   'wallet-broker/src/zec/store.rs',
   'wallet-broker/src/zec/test_support.rs',
+  'wallet-broker/src/zec/test_support/cleanup_lifecycle_tests.rs',
 ];
 
 test('WAL-006 manifest requires six exact defaults-off pins and the minimum direct feature union', () => {
@@ -2667,7 +2779,7 @@ test('WAL-006 policy rejects live-network and authority-bearing Rust snippets wi
   );
 });
 
-test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy inventory', () => {
+test('BBD-WAL-008 closes the hardware target and current fourteen-path WAL-008/WAL-009 ZEC policy inventory', () => {
   const policy = loadPolicy();
   const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
   const hardwareTargetBlock = [
@@ -2687,13 +2799,14 @@ test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy i
   const hardwareTargetIndex = manifestTargets.indexOf('zec_hardware:tests/zec_hardware.rs');
   assert.ok(hardwareTargetIndex > 0, 'WAL-008 hardware target is absent from manifest order');
   assert.deepStrictEqual(
-    manifestTargets.slice(hardwareTargetIndex - 1, hardwareTargetIndex + 2),
+    manifestTargets.slice(hardwareTargetIndex - 1, hardwareTargetIndex + 3),
     [
       'zec_hygiene:tests/zec_hygiene.rs',
       'zec_hardware:tests/zec_hardware.rs',
+      'zec_sign_verify:tests/zec_sign_verify.rs',
       'xmr_distribution:tests/xmr_distribution.rs',
     ],
-    'WAL-008 hardware target is not in the reviewed manifest order'
+    'WAL-008 hardware/signing target neighborhood is not the reviewed four-entry order'
   );
 
   assert.deepStrictEqual(policy.WAL008_TEST_TARGETS, WAL008_TEST_TARGETS);
@@ -2736,7 +2849,7 @@ test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy i
     /WAL-008|Zcash|hardware|manifest|target|duplicate/i
   );
 
-  assert.strictEqual(WAL008_ZEC_RUST_SOURCE_PATHS.length, 8);
+  assert.strictEqual(WAL008_ZEC_RUST_SOURCE_PATHS.length, 14);
   assert.strictEqual(
     new Set(WAL008_ZEC_RUST_SOURCE_PATHS).size,
     WAL008_ZEC_RUST_SOURCE_PATHS.length
@@ -2763,14 +2876,20 @@ test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy i
     .sort();
   assert.deepStrictEqual(actual, WAL008_ZEC_RUST_SOURCE_PATHS);
   policy.checkWal008RustSourceInventory(WAL008_ZEC_RUST_SOURCE_PATHS);
-  assertRejects(
-    () => policy.checkWal008RustSourceInventory(
-      WAL008_ZEC_RUST_SOURCE_PATHS.filter(
-        (relative) => relative !== 'wallet-broker/src/zec/hardware.rs'
-      )
-    ),
-    /WAL-008|Zcash|source|inventory|missing|hardware/i
-  );
+  for (const omitted of WAL008_ZEC_RUST_SOURCE_PATHS) {
+    const remaining = WAL008_ZEC_RUST_SOURCE_PATHS.filter((relative) => relative !== omitted);
+    assert.strictEqual(
+      remaining.length,
+      WAL008_ZEC_RUST_SOURCE_PATHS.length - 1,
+      `omission of ${omitted} did not remove exactly one reviewed path`
+    );
+    assertRejects(
+      () => policy.checkWal008RustSourceInventory(remaining),
+      omitted === 'wallet-broker/src/zec/hardware.rs'
+        ? /WAL-008|Zcash|source|inventory|missing|hardware/i
+        : /WAL-008|Zcash|source|inventory|missing/i
+    );
+  }
   assertRejects(
     () => policy.checkWal008RustSourceInventory([
       ...WAL008_ZEC_RUST_SOURCE_PATHS,
@@ -2817,6 +2936,445 @@ test('BBD-WAL-008 closes the hardware target and current eight-path ZEC policy i
   }
 });
 
+const WAL009_RUNTIME_DEPENDENCIES = {
+  'maplibre-gl': '6.8.0',
+};
+const WAL009_ORCHARD_DEPENDENCY =
+  'orchard = { version = "=0.15.5", default-features = false, features = ["circuit"] }';
+const WAL009_SIGN_VERIFY_TARGET_BLOCK = [
+  '[[test]]',
+  'name = "zec_sign_verify"',
+  'path = "tests/zec_sign_verify.rs"',
+].join('\n');
+const WAL009_HARDWARE_SIGNING_XMR_NEIGHBORHOOD = [
+  'zec_hygiene:tests/zec_hygiene.rs',
+  'zec_hardware:tests/zec_hardware.rs',
+  'zec_sign_verify:tests/zec_sign_verify.rs',
+  'xmr_distribution:tests/xmr_distribution.rs',
+];
+const WAL009_PACKAGE_REJECTION = /runtime dependenc|leaflet|maplibre|version/i;
+const WAL009_ORCHARD_REJECTION = /orchard|dependency|feature|circuit|default|pin|displaced|duplicate/i;
+const WAL009_SIGNING_TARGET_REJECTION =
+  /zec_sign_verify|signing|integration-test target|neighborhood/i;
+const WAL009_PRODUCTION_EXTRACT_REL = 'wallet-broker/src/zec/spend.rs';
+const WAL009_VERIFICATION_EXTRACT_REL =
+  'wallet-broker/src/zec/spend/verification_context_tests.rs';
+const WAL009_UNLISTED_EXTRACT_REL = 'wallet-broker/src/zec/unlisted.rs';
+const WAL009_PRODUCTION_EXTRACT_STATEMENT = [
+  '    let transaction = TransactionExtractor::new(finalized)',
+  '        .extract()',
+  '        .map_err(|_| ZecError::signature_invalid())?;',
+].join('\n');
+const WAL009_VERIFICATION_EXTRACT_STATEMENT = [
+  '    let transaction = TransactionExtractor::new(finalized)',
+  '        .extract()',
+  '        .expect("extract transaction");',
+].join('\n');
+const WAL009_EXTRACTOR_STATEMENT_REJECTION = /authority|extract/i;
+const WAL009_EXTRACTOR_APPEND_MUTATIONS = [
+  ['pczt.sign(key)', 'pczt.sign(key);', /authority|sign|extract/i],
+  ['pczt.prove()', 'pczt.prove();', /authority|prove|extract/i],
+  ['pczt.extract()', 'pczt.extract();', /authority|extract/i],
+  ['pczt.finalize()', 'pczt.finalize();', /authority|final|extract/i],
+  ['broadcast(raw_transaction)', 'broadcast(raw_transaction);', /authority|broadcast/i],
+  ['std::net::TcpStream import', 'use std::net::TcpStream;', /network|listener|authority/i],
+  ['Network::MainNetwork assignment', 'let network = Network::MainNetwork;', /mainnet|authority/i],
+  ['unsafe {}', 'unsafe {}', /unsafe/i],
+];
+
+function wal009PackageJsonWithDependencies(dependencies) {
+  const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  if (dependencies === undefined) {
+    delete pkg.dependencies;
+  } else {
+    pkg.dependencies = dependencies;
+  }
+  return JSON.stringify(pkg);
+}
+
+test('WAL-009 package policy accepts only exact maplibre-gl 6.8.0 and rejects Leaflet, extras, and unpinned versions', () => {
+  const policy = loadPolicy();
+  assert.strictEqual(typeof policy.checkPackageJson, 'function');
+  assert.deepStrictEqual(WAL009_RUNTIME_DEPENDENCIES, { 'maplibre-gl': '6.8.0' });
+  assert.deepStrictEqual(Object.keys(WAL009_RUNTIME_DEPENDENCIES), ['maplibre-gl']);
+  assert.strictEqual(WAL009_RUNTIME_DEPENDENCIES['maplibre-gl'], '6.8.0');
+
+  policy.checkPackageJson(wal009PackageJsonWithDependencies(WAL009_RUNTIME_DEPENDENCIES));
+
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies(undefined)),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({})),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({ leaflet: '1.9.4' })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({
+      'maplibre-gl': '6.8.0',
+      leaflet: '1.9.4',
+    })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({
+      'maplibre-gl': '6.8.0',
+      'unreviewed-runtime': '1.0.0',
+    })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({ 'maplibre-gl': '^6.8.0' })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({ 'maplibre-gl': '~6.8.0' })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({ 'maplibre-gl': '6.8.1' })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({
+      'maplibre-gl': 'npm:maplibre-gl@6.8.0',
+    })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({
+      'maplibre-gl': 'git+https://example.invalid/maplibre-gl.git',
+    })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({
+      'maplibre-gl': 'file:../maplibre-gl',
+    })),
+    WAL009_PACKAGE_REJECTION
+  );
+  assertRejects(
+    () => policy.checkPackageJson(wal009PackageJsonWithDependencies({ 'maplibre-gl': 6.8 })),
+    WAL009_PACKAGE_REJECTION
+  );
+});
+
+test('WAL-009 manifest requires the exact reviewed Orchard circuit pin and rejects independent mutations', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  assert.strictEqual(
+    manifestText.split(`${WAL009_ORCHARD_DEPENDENCY}\n`).length - 1,
+    1,
+    'reviewed Orchard declaration must appear exactly once'
+  );
+  policy.checkWalletBrokerManifest(manifestText, {
+    requireLibrary: true, requireLockfile: false,
+  });
+
+  const omitted = replaceOnce(manifestText, `${WAL009_ORCHARD_DEPENDENCY}\n`, '');
+  assert.strictEqual(
+    omitted.split(WAL009_ORCHARD_DEPENDENCY).length - 1,
+    0,
+    'omitted Orchard mutation still contains the reviewed declaration'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(omitted, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_ORCHARD_REJECTION
+  );
+
+  for (const [label, replacement] of [
+    [
+      'unpinned version',
+      'orchard = { version = "0.15.5", default-features = false, features = ["circuit"] }',
+    ],
+    [
+      'wrong version',
+      'orchard = { version = "=0.16.0", default-features = false, features = ["circuit"] }',
+    ],
+    [
+      'enabled defaults',
+      'orchard = { version = "=0.15.5", default-features = true, features = ["circuit"] }',
+    ],
+    [
+      'absent circuit feature',
+      'orchard = { version = "=0.15.5", default-features = false }',
+    ],
+    [
+      'extra circuit feature',
+      'orchard = { version = "=0.15.5", default-features = false, features = ["circuit", "extra"] }',
+    ],
+    [
+      'duplicate declaration',
+      `${WAL009_ORCHARD_DEPENDENCY}\n${WAL009_ORCHARD_DEPENDENCY}`,
+    ],
+  ]) {
+    assert.strictEqual(
+      manifestText.split(WAL009_ORCHARD_DEPENDENCY).length - 1,
+      1,
+      `Orchard mutation target was not unique before ${label}`
+    );
+    const mutated = replaceOnce(manifestText, WAL009_ORCHARD_DEPENDENCY, replacement);
+    assert.notStrictEqual(mutated, manifestText, `Orchard mutation did not change: ${label}`);
+    assertRejects(
+      () => policy.checkWalletBrokerManifest(mutated, {
+        requireLibrary: true, requireLockfile: false,
+      }),
+      WAL009_ORCHARD_REJECTION
+    );
+  }
+
+  assert.ok(
+    !manifestText.includes('[dev-dependencies]'),
+    'reviewed manifest already contains a dev-dependencies section'
+  );
+  const displaced = replaceOnce(
+    omitted,
+    '\n[[test]]\n',
+    `\n[dev-dependencies]\n${WAL009_ORCHARD_DEPENDENCY}\n\n[[test]]\n`
+  );
+  assert.strictEqual(
+    displaced.split(WAL009_ORCHARD_DEPENDENCY).length - 1,
+    1,
+    'displaced Orchard declaration must appear exactly once under dev-dependencies'
+  );
+  assert.ok(
+    displaced.includes(`[dev-dependencies]\n${WAL009_ORCHARD_DEPENDENCY}\n`),
+    'Orchard displacement did not move the reviewed declaration into dev-dependencies'
+  );
+  assert.notStrictEqual(displaced, manifestText, 'Orchard displacement did not change the manifest');
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(displaced, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_ORCHARD_REJECTION
+  );
+});
+
+test('WAL-009 signing target requires zec_sign_verify in the hardware/signing/xmr neighborhood', () => {
+  const policy = loadPolicy();
+  const manifestText = fs.readFileSync(path.join(repoRoot, WAL004_MANIFEST), 'utf8');
+  assert.strictEqual(
+    manifestText.split(WAL009_SIGN_VERIFY_TARGET_BLOCK).length - 1,
+    1,
+    'manifest must contain exactly one WAL-009 zec_sign_verify target block'
+  );
+  const manifestTargets = [...manifestText.matchAll(
+    /\[\[test\]\]\nname = "([^"]+)"\npath = "([^"]+)"/g
+  )].map((match) => `${match[1]}:${match[2]}`);
+  const hardwareTargetIndex = manifestTargets.indexOf('zec_hardware:tests/zec_hardware.rs');
+  assert.ok(hardwareTargetIndex > 0, 'WAL-009 signing neighborhood is missing zec_hardware');
+  assert.deepStrictEqual(
+    manifestTargets.slice(hardwareTargetIndex - 1, hardwareTargetIndex + 3),
+    WAL009_HARDWARE_SIGNING_XMR_NEIGHBORHOOD
+  );
+  policy.checkWalletBrokerManifest(manifestText, {
+    requireLibrary: true, requireLockfile: false,
+  });
+
+  const removedTarget = replaceOnce(manifestText, `${WAL009_SIGN_VERIFY_TARGET_BLOCK}\n\n`, '');
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(removedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_SIGNING_TARGET_REJECTION
+  );
+  const renamedTarget = replaceOnce(
+    manifestText,
+    'name = "zec_sign_verify"\npath = "tests/zec_sign_verify.rs"',
+    'name = "zec_sign_verify_renamed"\npath = "tests/zec_sign_verify.rs"'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(renamedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_SIGNING_TARGET_REJECTION
+  );
+  const duplicatedTarget = replaceOnce(
+    manifestText,
+    WAL009_SIGN_VERIFY_TARGET_BLOCK,
+    `${WAL009_SIGN_VERIFY_TARGET_BLOCK}\n\n${WAL009_SIGN_VERIFY_TARGET_BLOCK}`
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(duplicatedTarget, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_SIGNING_TARGET_REJECTION
+  );
+  const changedPath = replaceOnce(
+    manifestText,
+    'name = "zec_sign_verify"\npath = "tests/zec_sign_verify.rs"',
+    'name = "zec_sign_verify"\npath = "tests/zec_sign.rs"'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(changedPath, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_SIGNING_TARGET_REJECTION
+  );
+
+  const xmrDistributionBlock = [
+    '[[test]]',
+    'name = "xmr_distribution"',
+    'path = "tests/xmr_distribution.rs"',
+  ].join('\n');
+  const movedOutsideNeighborhood = replaceOnce(
+    removedTarget,
+    `${xmrDistributionBlock}\n\n`,
+    `${xmrDistributionBlock}\n\n${WAL009_SIGN_VERIFY_TARGET_BLOCK}\n\n`
+  );
+  const movedTargets = [...movedOutsideNeighborhood.matchAll(
+    /\[\[test\]\]\nname = "([^"]+)"\npath = "([^"]+)"/g
+  )].map((match) => `${match[1]}:${match[2]}`);
+  const movedHardwareIndex = movedTargets.indexOf('zec_hardware:tests/zec_hardware.rs');
+  assert.notDeepStrictEqual(
+    movedTargets.slice(movedHardwareIndex - 1, movedHardwareIndex + 3),
+    WAL009_HARDWARE_SIGNING_XMR_NEIGHBORHOOD,
+    'signing-target move remained in the reviewed hardware/signing/xmr neighborhood'
+  );
+  assertRejects(
+    () => policy.checkWalletBrokerManifest(movedOutsideNeighborhood, {
+      requireLibrary: true, requireLockfile: false,
+    }),
+    WAL009_SIGNING_TARGET_REJECTION
+  );
+});
+
+function assertWal009ExtractorSourcePolicy({
+  relative,
+  reviewedStatement,
+  foreignStatement,
+  mappingSearch,
+  mappingReplacement,
+}) {
+  const policy = loadPolicy();
+  assert.notStrictEqual(
+    reviewedStatement,
+    foreignStatement,
+    `${relative} reviewed statement is not independent of the other file`
+  );
+  assert.ok(
+    reviewedStatement.includes('.extract()'),
+    `${relative} reviewed statement omitted .extract()`
+  );
+  assert.ok(
+    foreignStatement.includes('.extract()'),
+    `${relative} foreign statement omitted .extract()`
+  );
+  assert.strictEqual(
+    reviewedStatement.split('TransactionExtractor::new(finalized)').length - 1,
+    1,
+    `${relative} reviewed constructor target must be unique in the statement`
+  );
+  assert.strictEqual(
+    reviewedStatement.split(mappingSearch).length - 1,
+    1,
+    `${relative} reviewed error mapping/expect target must be unique in the statement`
+  );
+
+  const source = fs.readFileSync(path.join(repoRoot, relative), 'utf8');
+  assert.ok(source.trim(), `${relative} source is empty`);
+  assert.strictEqual(
+    source.split(reviewedStatement).length - 1,
+    1,
+    `${relative} must contain the reviewed extraction statement exactly once`
+  );
+  assert.strictEqual(
+    source.split(foreignStatement).length - 1,
+    0,
+    `${relative} must not contain the other file's reviewed extraction statement`
+  );
+  policy.checkRustWalletSource(source, relative);
+
+  const duplicated = `${source}\n${reviewedStatement}\n`;
+  assert.notStrictEqual(duplicated, source, `${relative} duplicate statement did not change bytes`);
+  assert.strictEqual(
+    duplicated.split(reviewedStatement).length - 1,
+    2,
+    `${relative} duplicate statement must appear twice after append`
+  );
+  assertRejects(
+    () => policy.checkRustWalletSource(duplicated, relative),
+    WAL009_EXTRACTOR_STATEMENT_REJECTION
+  );
+
+  const unreviewedConstructor = replaceOnce(
+    reviewedStatement,
+    'TransactionExtractor::new(finalized)',
+    'UnreviewedExtractor::new(finalized)'
+  );
+  assert.ok(
+    unreviewedConstructor.includes('.extract()'),
+    `${relative} constructor mutation dropped .extract()`
+  );
+  const constructorMutated = replaceOnce(source, reviewedStatement, unreviewedConstructor);
+  assertRejects(
+    () => policy.checkRustWalletSource(constructorMutated, relative),
+    WAL009_EXTRACTOR_STATEMENT_REJECTION
+  );
+
+  const mappingStatement = replaceOnce(reviewedStatement, mappingSearch, mappingReplacement);
+  assert.ok(
+    mappingStatement.includes('.extract()'),
+    `${relative} mapping mutation dropped .extract()`
+  );
+  const mappingMutated = replaceOnce(source, reviewedStatement, mappingStatement);
+  assertRejects(
+    () => policy.checkRustWalletSource(mappingMutated, relative),
+    WAL009_EXTRACTOR_STATEMENT_REJECTION
+  );
+
+  const swapped = replaceOnce(source, reviewedStatement, foreignStatement);
+  assertRejects(
+    () => policy.checkRustWalletSource(swapped, relative),
+    WAL009_EXTRACTOR_STATEMENT_REJECTION
+  );
+
+  assert.strictEqual(
+    new Set(WAL009_EXTRACTOR_APPEND_MUTATIONS.map(([, mutation]) => mutation)).size,
+    WAL009_EXTRACTOR_APPEND_MUTATIONS.length,
+    `${relative} append mutations must be independent`
+  );
+  for (const [label, mutation, rejection] of WAL009_EXTRACTOR_APPEND_MUTATIONS) {
+    const mutated = `${source}\n${mutation}\n`;
+    assert.notStrictEqual(mutated, source, `${relative} ${label} mutation did not change bytes`);
+    assertRejects(
+      () => policy.checkRustWalletSource(mutated, relative),
+      rejection
+    );
+  }
+
+  assertRejects(
+    () => policy.checkRustWalletSource(source, WAL009_UNLISTED_EXTRACT_REL),
+    /authority|extract|source|unlisted/i
+  );
+}
+
+test('WAL-009 production spend.rs accepts the exact reviewed TransactionExtractor statement and rejects independent mutations', () => {
+  assertWal009ExtractorSourcePolicy({
+    relative: WAL009_PRODUCTION_EXTRACT_REL,
+    reviewedStatement: WAL009_PRODUCTION_EXTRACT_STATEMENT,
+    foreignStatement: WAL009_VERIFICATION_EXTRACT_STATEMENT,
+    mappingSearch: '.map_err(|_| ZecError::signature_invalid())?',
+    mappingReplacement: '.map_err(|_| ZecError::internal())?',
+  });
+});
+
+test('WAL-009 verification-fixture spend/verification_context_tests.rs accepts the exact reviewed TransactionExtractor statement and rejects independent mutations', () => {
+  assertWal009ExtractorSourcePolicy({
+    relative: WAL009_VERIFICATION_EXTRACT_REL,
+    reviewedStatement: WAL009_VERIFICATION_EXTRACT_STATEMENT,
+    foreignStatement: WAL009_PRODUCTION_EXTRACT_STATEMENT,
+    mappingSearch: '.expect("extract transaction")',
+    mappingReplacement: '.expect("unreviewed extract")',
+  });
+});
+
 const QUOTE_WORKER_PATHS = [
   'quote-worker/providers.js',
   'quote-worker/model.js',
@@ -2853,9 +3411,9 @@ test('RATE-001 quote-worker package, syntax, top-level, and routine CI commands 
   const packageText = fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8');
   const pkg = JSON.parse(packageText);
   const lock = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package-lock.json'), 'utf8'));
-  assert.strictEqual(pkg.dependencies, undefined, 'quote worker must add no production dependency');
+  assert.deepStrictEqual(pkg.dependencies, { 'maplibre-gl': '6.8.0' }, 'quote worker package must retain only the reviewed mapping dependency');
   assert.deepStrictEqual(pkg.devDependencies, { electron: ELECTRON_VERSION });
-  assert.strictEqual(lock.packages[''].dependencies, undefined, 'quote worker must add no locked production dependency');
+  assert.deepStrictEqual(lock.packages[''].dependencies, { 'maplibre-gl': '6.8.0' }, 'quote worker lock root must retain only the reviewed mapping dependency');
   assert.deepStrictEqual(lock.packages[''].devDependencies, { electron: ELECTRON_VERSION });
   assert.strictEqual(pkg.scripts[RATE_TEST_SCRIPT], RATE_TEST_COMMAND);
   assert.ok(pkg.scripts.test.split(/\s*&&\s*/).includes(RATE_CI_COMMAND));

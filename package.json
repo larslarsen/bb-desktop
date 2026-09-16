@@ -36,7 +36,6 @@
     "electron": "44.0.0"
   },
   "dependencies": {
-    "leaflet": "^1.9.4",
-    "maplibre-gl": "^6.8.0"
+    "maplibre-gl": "6.8.0"
   }
 }

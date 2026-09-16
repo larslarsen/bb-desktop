@@ -1,6 +1,221 @@
 # Current Task
 
-ACTIVE: BBD-WAL-019 — feature pushed; publication evidence correction 01.
+ACTIVE: BBD-PAY-001 — Hermes final publication and closeout 01.
+
+[Review 20](../testing/BBD-PAY-001-MESSAGES-REVIEW-20.md) accepts the exact 95-path
+candidate scan, matching original/copy manifests, zero findings and complete metadata.
+Sole execution authority: [Hermes publication/closeout](HERMES_BBD_PAY_001_PUBLICATION_01.md).
+ONE assignment covers updated-final-byte scan, exact-path feature commit/push, remote
+verification, actual completion records and their scanned documentation commit/push.
+Do not add routine owner relays between successful authorized steps. Stop on failed
+checks, unexpected drift or remote movement; no source repair or force operations.
+No UI/application-suite/audit rerun, native build, restart or live node/wallet work.
+Final durable report: `docs/testing/BBD-PAY-001-PUBLICATION-01.md`.
+Functional acceptance stands; inherited release blockers and historical gaps remain.
+No actor launched; owner relays this consolidated final handoff.
+
+Owner reports monerod has synced. Availability is recorded in WAL-007/WAL-009 and the
+status map; node/network/height and wallet readiness are not independently verified.
+Active PAY work continues; no live RPC or XMR implementation is authorized by this update.
+
+Owner's portable identity/readable-name, WebRTC and future video-call requirements are
+recorded in [identity/transport direction](../architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
+Finish read-only v1 UI; settle account/device migration before the next signed-recipient
+creation/approval contract or mobile enrollment. No identity/transport source work authorized.
+
+All authorizations below are historical and do not grant current execution authority.
+
+## Hermes finish red (closed; report now present and reviewed)
+
+Routing clarification: the owner relayed a sixteen-file BBGO-PAY-003 publication list.
+That is the completed daemon task, confirmed by bb-go's CURRENT_TASK and final review.
+It provides no evidence for this desktop run. Hermes must work in **bb-desktop** using
+the linked finish-red handoff; no daemon republication or Git action is authorized.
+
+Completion check: after the owner's latest done notice, the reviewer found neither
+`docs/testing/BBD-PAY-001-HERMES-FINISH-RED-01.md` nor `dist/pay001-finish-red01/`
+in this checkout. Workspace filename/reference searches found no alternate report.
+The four test/production hashes still match the handoff. Execution is unverified;
+no production repair is authorized. Hermes must finish the existing handoff and save
+its required record. If execution occurred elsewhere, recover its actual captures and
+identify that cwd before considering another run. Do not reconstruct missing results.
+
+Sol's two test files are reviewed; production hashes are unchanged. Source has 70
+registered cases, not yet run. Review: [test-source review 03](../testing/BBD-PAY-001-MESSAGES-REVIEW-03.md).
+Sole execution authority: [Hermes finish red 01](HERMES_BBD_PAY_001_MESSAGES_FINISH_RED_01.md).
+Verify frozen identities, run the two syntax checks and bounded Node suite, save the
+named report/raw captures. No source changes, Electron, broader acceptance or Git.
+Next source authorization follows reviewer inspection of actual red results.
+No actor launched and no owner UI test requested.
+
+## Sol finish test-source phase (closed)
+
+Recovery is closed. [Review 02](../testing/BBD-PAY-001-MESSAGES-REVIEW-02.md) verifies
+the eleven saved captures, corrects recovery-report counts and records remaining
+read-status, receipt ownership, runner/viewport and Electron driver defects.
+Former source authorization: [Sol finish tests 01](SOL_BBD_PAY_001_MESSAGES_FINISH_TESTS_01.md).
+Use gpt-5.6-sol High under the documented Grok-usage-exhaustion fallback. Only its two
+test files may change; no execution or production edits. Hermes records red after
+reviewer test-source inspection, before production repair. No actor launched.
+
+## Record recovery (closed)
+
+Owner reports Grok exhausted weekly usage. Correction source and eleven captures are
+present, including a 63-test restored green, but Grok's completion report is absent.
+Former handoff: [Hermes record recovery](HERMES_BBD_PAY_001_CORRECTION_RECORD_RECOVERY_01.md).
+Read and document existing evidence only; no reruns, source changes or Git mutation.
+Grok is paused. Codex reviews the recovered drop before any further source assignment;
+Sol High is the documented fallback if source work remains. No actor launched.
+The correction routing below is historical and does not grant execution authority.
+
+## Messages correction authorization (paused; usage exhausted)
+
+Governing decision: [requests in Messages](../architecture/BBD-PAY-MESSAGES-UX-01.md).
+Requests appear as cards in the requesting peer's conversation, including peers with
+no text history, and update automatically. The standalone Requests tab is superseded.
+Grok's automatic-inbox drop is delivered; its handoff is closed. Hermes standalone UI
+capture is superseded and must not run. Paused source authorization:
+[Grok Messages correction 01](GROK_BUILD_BBD_PAY_001_MESSAGES_CORRECTION_01.md), four
+source/test paths, focused commands and its named report. Messages-01 hashes/logs are
+verified (54 inbox tests, 32 security), but review found stale session/chat mutations,
+polling ownership/cleanup defects, unstable rendering and Electron fixture failures.
+Review: [Messages review 01](../testing/BBD-PAY-001-MESSAGES-REVIEW-01.md).
+The correction preserves automatic updates for text and requests. Owner relays the handoff;
+no actor has been launched. Hermes acceptance and Git remain unauthorized pending source
+review. No additional owner test is requested.
+The earlier authorizations below are historical and do not grant execution authority.
+
+## Automatic inbox authorization (historical; closed)
+
+The owner rejected manual connection management and needing Refresh for incoming P2P
+requests. Remove both controls and daemon/folder instructions; no replacement setting.
+The accepted local endpoint is snapshot-only: reread on activation and five seconds
+after each completed read while Requests is visible, with bounded scheduling, cleanup
+and stable background rendering. This is automatic local synchronization, not push.
+Recorded source authorization:
+[Grok automatic inbox 01](GROK_BUILD_BBD_PAY_001_AUTOMATIC_INBOX_01.md).
+Only its four UI/test paths and named completion report are writable. Preserve all
+transport/IPC/daemon source and prior evidence. No actor launched by Codex.
+
+Hermes UI runtime 01 is paused until the changed UI/harness hashes are reviewed and
+its baseline updated. Do not run the older frozen capture during these edits. Broader
+acceptance and Git publication remain pending. Owner's prior empty-inbox observation
+stands; no further manual testing is requested before this removal is implemented.
+
+## Hermes UI runtime 01 authorization (paused pending revised UI baseline)
+
+UI-finish harness source and retained evidence are verified; actual Electron still
+aborted on its adjacent unconfigured helper before UI startup. Review:
+[UI finish review 04](../testing/BBD-PAY-001-SOURCE-REVIEW-04.md).
+The former [Hermes UI runtime 01](HERMES_BBD_PAY_001_UI_RUNTIME_01.md) authorization
+was to stage an identical isolated Electron copy omitting its unconfigured helper,
+use the verified pre-existing installed helper, run the frozen smoke once and record
+artifacts. No source/test edits, host permission changes, broader gates or Git mutation.
+New report: `docs/testing/BBD-PAY-001-HERMES-UI-RUNTIME-01.md`.
+Owner reports the actual inbox shows no requests and "everything works". The label
+"Connect local daemon" is confusing. Observation, interpretation and the queued
+plain-language connection-setting follow-up are recorded in
+[owner UI check](../testing/BBD-PAY-001-OWNER-UI-CHECK-01.md). No source changes are
+authorized by this feedback. Populated fixture UI, sandbox proof, screenshots and
+final acceptance remain pending. No actor launched by Codex.
+
+## Grok UI finish 01 authorization (historical; closed)
+
+Codex verified correction 02: all nineteen source/input identities, six command
+metadata/log pairs, timestamp red, 38 inbox / 32 security / 58 combined green.
+Review: [source review 03](../testing/BBD-PAY-001-SOURCE-REVIEW-03.md).
+Actual Electron screenshots and final acceptance remain pending. Do not repeat the
+old failed sandbox command or rerun unchanged Node suites.
+Owner may relay only [Grok UI finish 01](GROK_BUILD_BBD_PAY_001_UI_FINISH_01.md).
+It authorizes a conditional run using the already-installed Chrome sandbox helper,
+the collapsed-details geometry correction and demonstrated inbox CSS fixes only.
+Transport/IPC and all other source stay frozen. No helper/host policy changes.
+New report: `docs/testing/BBD-PAY-001-GROK-UI-FINISH-01.md`.
+No Hermes acceptance, Git mutation or real user-process restart. No actor launched.
+
+## Correction 02 authorization (historical; closed)
+
+Correction 01 source/capture hashes are verified: 33 inbox, 6 preload, 32 security,
+53 combined tests green; most earlier source defects are addressed. Review found a
+new daemon compatibility defect: fractional-second received_at values are rejected.
+UI screenshot execution still fails before startup; layout assertions also need repair.
+Review: [source review 02](../testing/BBD-PAY-001-SOURCE-REVIEW-02.md).
+Owner may relay only [Grok correction 02](GROK_BUILD_BBD_PAY_001_CORRECTION_02.md).
+It authorizes the narrow fixes, missing focused checks and a tool-escalated isolated
+UI run where available, retaining Chromium sandboxing and any tool approval requirement.
+New report: `docs/testing/BBD-PAY-001-GROK-CORRECTION-02.md`.
+No Hermes acceptance, Git mutation or user process restart. No actor launched by Codex.
+
+## Correction 01 authorization (historical; closed)
+
+Codex reviewed Grok's saved drop. Source and raw-log hashes match, but request cleanup,
+reselection/disposal, descriptor type checks, record validation and IPC need correction.
+The Requests UI exists in source; Electron aborted before screenshots or UI validation.
+Review: [source review 01](../testing/BBD-PAY-001-SOURCE-REVIEW-01.md).
+Owner may relay only [Grok correction 01](GROK_BUILD_BBD_PAY_001_CORRECTION_01.md).
+It authorizes bounded test-first fixes and isolated sandboxed UI evidence, with a new
+report at `docs/testing/BBD-PAY-001-GROK-CORRECTION-01.md`. Preserve original evidence.
+No Hermes acceptance, Git mutation or real process restart. No actor launched by Codex.
+The original implementation handoff below is historical and superseded for execution.
+
+## Original PAY-001 authorization (historical)
+
+Owner-directed next step: make received requests visible in the desktop UI.
+Ticket: [BBD-PAY-001](../../tickets/BBD-PAY-001.md).
+Selected source actor: Grok Build 4.6 High, manually relayed by the owner.
+Original handoff: [Grok inbox handoff](GROK_BUILD_BBD_PAY_001_INBOX_01.md).
+It authorizes bounded tests, UI/main-process implementation, focused offline checks,
+and Grok's own repository completion report. No actor has been launched by Codex.
+No Hermes acceptance or Git mutation is authorized at this stage.
+
+Required drop: working Requests tab, authenticated local-daemon read bridge, clear
+empty/disconnected states, focused test evidence and actual fixture UI screenshots in
+`docs/testing/BBD-PAY-001-GROK-01.md`. The owner relays pointers, not evidence in chat.
+No desktop inbox implementation or screenshot is claimed by this task authorization.
+
+Daemon BBGO-PAY-003 is accepted and published; its final review is
+`../../../bb-go/docs/testing/BBGO-PAY-003-FINAL-REVIEW-01.md`.
+Daemon sources/binary remain frozen; no real app or daemon restart is authorized.
+Preserve all unrelated dirty WAL-009, dependency, policy and historical record work.
+This active prefix supersedes the stale routing below; earlier handoffs stay closed.
+
+## Historical WAL-019 closeout and earlier routing
+
+COMPLETE: BBD-WAL-019 — runtime, local wallet refresh and publication accepted.
+
+NO ACTIVE DEV-001 TASK. Owner cancelled the helper project; the request was simply
+to rebuild the existing daemon. Codex successfully rebuilt ../bb-go/modern/bitbookd
+directly with Go 1.27.0. No process restart. Do not relay or execute DEV-001 handoffs.
+At this historical closeout, daemon PAY-003 was next. It is now accepted; the
+active prefix above authorizes desktop PAY-001. Desktop WAL-019 remains complete.
+Routine binary builds follow AGENTS.md and are included in task completion.
+
+Codex verified immutable capture 02: all 17 command metadata/log pairs, actual
+Gitleaks 8.30.1 output, exit 0 and no leaks across the two published commits.
+HEAD/tree/remote stay fixed at correction 7a31c41cb29692a94acf1f24adb379f3a829d237;
+all ten source pins and wallet artifacts match. Final decision:
+docs/testing/BBD-WAL-019-FINAL-REVIEW-01.md. Historical pre-commit evidence gaps
+remain documented; the new exact published-range scan resolves final-byte coverage.
+All WAL-019 handoffs are closed. No further implementation or actor execution is
+authorized under WAL-019. No app restart occurred; the next full restart loads the refreshed wallet.
+Mobile-aware UI, social profile pictures and remaining payment work stay queued.
+Daemon build automation is cancelled. Inherited release blockers remain open. Closeout records
+are local; the feature and correction commits are already published.
+
+HISTORICAL CAPTURE 02:
+
+Correction commit 7a31c41cb29692a94acf1f24adb379f3a829d237 is pushed and its exact
+eight paths, accepted source/artifacts and 32 raw-file links/digests are verified.
+Closeout still waits: the reported final scanned tree differs from the committed
+tree, and exit/version metadata was not captured. See
+docs/testing/BBD-WAL-019-PUBLICATION-REVIEW-02.md. Owner may relay
+docs/handoff/HERMES_BBD_WAL_019_PUBLICATION_CAPTURE_02.md to Hermes. Its sole
+authorization is the supplied read-only scan/capture driver with an ignored output
+directory. No report edits, staging, commits, pushes, tests, builds or restart.
+Runtime acceptance stands. Earlier publication/correction instructions below are
+historical and closed. Codex has launched no actor; no new implementation is active.
+
+HISTORICAL CORRECTION 01:
 
 Codex verified feature commit f2d9c9a513b3285531352df84ada818fdac0faf6 on local
 and origin master, exactly 20 authorized paths, all ten source pins and wallet
@@ -20,7 +235,7 @@ ZEC wallet references considered. See docs/architecture/BBD-WAL-MOBILE-DESIGN-DI
 Reviewer proposes Zodl (formerly Zashi) for simple home/action/status organization,
 YWallet for compact/wide activity layouts, and MonteZecret as a secondary desktop
 reference. Plan consistent flows across phone and desktop; no mobile framework or
-shared-UI-code decision yet. Current Hermes publication scope stays active.
+shared-UI-code decision yet. WAL-019 publication is complete; redesign remains queued.
 
 QUEUED WORKFLOW FOLLOW-UP: the owner expects the local daemon executable to stay
 current through the development workflow. npm start currently launches Electron;
