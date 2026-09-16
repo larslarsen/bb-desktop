@@ -9,31 +9,20 @@ are published, with final immutable-range scan accepted in
 Daemon BBGO-PAY-003 is accepted and published: authenticated local read access to
 stored signed records. See its
 [final review](../../../bb-go/docs/testing/BBGO-PAY-003-FINAL-REVIEW-01.md).
-Active desktop task: [BBD-PAY-001](../../tickets/BBD-PAY-001.md) — PUBLISHED.
-Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
-[Publication report](../../docs/testing/BBD-PAY-001-PUBLICATION-01.md).
-Functional acceptance stands; inherited release blockers and historical metadata
-limitations remain explicit. No source repair or routine repeated tests.
-[review 02](../testing/BBD-PAY-001-MESSAGES-REVIEW-02.md) corrects its counts and requires
-read-status/receipt and runner/driver fixes. Sol High is selected because Grok is
-unavailable. Paused earlier source contract:
-[Grok Messages correction 01](../handoff/GROK_BUILD_BBD_PAY_001_MESSAGES_CORRECTION_01.md).
-The Messages source is present and saved 54-test evidence is verified, but
-[review 01](../testing/BBD-PAY-001-MESSAGES-REVIEW-01.md) requires stale-response,
-polling lifecycle, rendering and Electron fixture corrections. This preserves automatic
-updates for both text messages and requests with missed-event reconciliation. Reuse the
-authenticated bridge; no new daemon API is authorized. Hermes acceptance remains pending.
-Prior boundary reviews and evidence remain retained. The owner reported a working empty
-inbox, then identified controls and placement problems. Messages UI assertion/visual proof is now accepted; remaining scans and record closeout
-are pending, and the feature is not finally accepted.
-DEV-001 is cancelled. The existing daemon binary was rebuilt directly; routine
-binary refreshes are part of task completion. Earlier WAL-019 routing is historical.
+Desktop [BBD-PAY-001](../../tickets/BBD-PAY-001.md) is COMPLETE and published.
+Feature `f23950245c338d83072caa3d96503b69a21682e2`; actor closeout
+`48c60b3f05591323b06f493df974819c50add76f`.
+[Final reviewer acceptance](../testing/BBD-PAY-001-FINAL-REVIEW-01.md) verifies the
+published content and records execution-evidence limitations. Received request cards
+appear in peer Messages conversations, with automatic message/request updates. The
+standalone Requests tab and payment connection/refresh controls were superseded.
+Four inherited Rust inventory policy failures remain release blockers. No new source,
+execution or live-wallet task is authorized. DEV-001 and older inventory-cleanup routing
+remain inactive. Historical review requirements are resolved to the extent stated in
+the final review; they are not current execution instructions.
 
-Current planning baseline: bb-desktop HEAD 7a31c41cb29692a94acf1f24adb379f3a829d237
-plus preserved unpublished work; bb-go HEAD
-68aec8538e19722e56918645b4c7b8a897d77161. The accepted modern/bitbookd binary was
-rebuilt with Go 1.27.0; its embedded pre-commit revision is 2b695a8 with
-vcs.modified=true. Its identity is retained in the daemon final review. No process restart.
+The existing daemon binary was previously rebuilt and its identity retained in the
+daemon final review. No application or daemon process restart is claimed here.
 
 ## Owner Monero availability update
 
@@ -41,7 +30,7 @@ Owner now reports monerod has synced. This supersedes the earlier planning assum
 that node synchronization is still in progress. It is an owner report, not a live RPC
 verification of network/endpoint/height, wallet refresh or adapter readiness. Carry it
 into the next WAL-007/XMR planning review. Existing XMR implementation defects and gates
-remain; current PAY work continues without live node/wallet operations.
+remain; PAY-001 is complete and no live node/wallet operation is authorized.
 
 ## What works as components, and what is missing
 
@@ -49,7 +38,7 @@ remain; current PAY work continues without live node/wallet operations.
 | --- | --- | --- |
 | Request money from a peer | wallet-pay/model.js has payee gating; native account receiving exists | social/app.js has chat but no Pay/Request flow; runtime.rs:574 returns UNAVAILABLE for receiver.fresh |
 | Deliver the signed request | BBGO-PAY-002 phase A now starts/closes payment.Service in the real daemon; request delivery, payer rejection and restart persistence are accepted | api/handler.go still has no payment routes; desktop cannot yet use this transport as a complete request flow |
-| See received requests | BBGO-PAY-003 provides authenticated local GET /v1/payment/records; desktop bridge and standalone UI source exist | Messages card rendering and automatic-update UI assertions passed; final scans/acceptance pending |
+| See received requests | BBGO-PAY-003 provides authenticated local GET /v1/payment/records; desktop authenticated bridge and request cards in Messages are accepted/published | Request creation and native approval are separate future steps |
 | Open and approve the received request | preload/supervisor have begin/cancel boundaries; native signing components exist | runtime.rs:574 returns UNAVAILABLE for intent.begin and intent.cancel; no complete request-to-native-review path |
 | Send funds | reviewed Zcash prepare/sign/verify and recovery components | chain submission and confirmation are later WAL-009 work, not implemented by the accepted non-broadcast slice |
 | Show accurate status on both sides | signed status codec exists; transport permits cancellation | network paid receipts remain deliberately blocked; receipt/privacy semantics need a separate contract, and chain confirmation cannot be replaced by a peer claim |
@@ -68,11 +57,11 @@ rejects a request bound to another payer. Feature commit
 The daemon remains wallet-free: no keys, signing of coin
 transactions, broker calls or chain submission move there.
 
-Next payment product sequence:
+Payment product sequence (later steps are planning only):
 
-1. Integrate BBD-PAY-001's received requests into Messages using the accepted
-   authenticated read endpoint. Bind the social and payment local identities;
-   show peer conversation cards, cancellation/expiry and automatic updates.
+1. COMPLETE: BBD-PAY-001 integrates received requests into Messages through the
+   authenticated read endpoint, with local identity binding, peer conversation cards,
+   cancellation/expiry and automatic updates.
 2. Separately freeze authenticated creation/cancellation access and connect native
    fresh receiving to signed request creation and a visible Request action.
    Preserve native account/network/privacy validation. Specialized
@@ -85,12 +74,12 @@ Next payment product sequence:
    the UI. Peer status alone never proves payment; paid receipts need their own
    privacy and verification contract.
 
-Step 1 has the bounded Hermes UI verification authorization above. Final acceptance and
-publication still require actual UI results and remaining security evidence.
+Step 1 is accepted and published; its execution handoffs are closed. No later step is
+authorized for implementation by this planning sequence.
 Before steps 2–3 freeze new recipient/creation/approval contracts, settle the account/device
 migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
 The owner requires persistent identity across desktop/phone, readable names and planned
-WebRTC connectivity, with video calls later. The read-only v1 UI may finish; its current
+WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning
 dependencies. Do not introduce
 an unauthenticated payment

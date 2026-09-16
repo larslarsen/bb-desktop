@@ -1,9 +1,12 @@
 # BBD-PAY-001 — visible received payment requests
 
-Status: PUBLISHED — REVIEWER FINAL VERIFICATION.
-Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
-[Publication report](../docs/testing/BBD-PAY-001-PUBLICATION-01.md).
-Inherited release blockers and historical evidence limits remain.
+Status: COMPLETE — ACCEPTED AND PUBLISHED.
+Feature: `f23950245c338d83072caa3d96503b69a21682e2`.
+Actor closeout: `48c60b3f05591323b06f493df974819c50add76f`.
+[Final reviewer acceptance](../docs/testing/BBD-PAY-001-FINAL-REVIEW-01.md) verifies
+publication and closes all PAY handoffs. Read-only received-request display/automatic
+updates are complete; creation/approval/transfer remain future work. Inherited release
+blockers and historical evidence limitations remain explicit. No next task is authorized.
 [Identity/transport direction](../docs/architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md)
 records portable accounts/readable names/WebRTC/video calls. Current read-only v1 binding
 remains; migration must precede the next signed-recipient creation/approval contract.

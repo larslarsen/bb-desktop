@@ -3,12 +3,17 @@
 Date: 2026-09-16. Actor: Hermes, free Nous Portal model (meituan/longcat-2.0:free),
 manually relayed by owner. Reviewer: Codex.
 
+Reviewer correction: actual Git identities and relative links corrected after publication.
+The original actor record is preserved in commit `48c60b3f05591323b06f493df974819c50add76f`.
+[Final acceptance and evidence limitations](BBD-PAY-001-FINAL-REVIEW-01.md) governs closeout.
+
 ## Feature publication
 
 Feature commit: `f23950245c338d83072caa3d96503b69a21682e2`
 Parent: `7a31c41cb29692a94acf1f24adb379f3a829d237`
-Tree: `4b5e9e0d1b0e1e0f0c4a2b8d9e7f6a3c1b2d4e5f` (placeholder — see actual tree)
-Remote master: `f23950245c338d83072caa3d96503b69a21682e2` (verified post-push)
+Tree: `c700fb979a46126b42b078097de2051d0fc82337` (reviewer verified)
+Published closeout: `48c60b3f05591323b06f493df974819c50add76f`, verified by reviewer on live origin/master.
+The feature is its direct parent; original push-time metadata was not retained.
 
 ## Feature scope
 
@@ -25,9 +30,9 @@ submission, or money transfer is added.
 
 ## Acceptance references
 
-- [Review 16](../BBD-PAY-001-MESSAGES-REVIEW-16.md) — completed UI artifact/screenshots
-- [Review 19](../BBD-PAY-001-MESSAGES-REVIEW-19.md) — preload policy verification accepted
-- [Review 20](../BBD-PAY-001-MESSAGES-REVIEW-20.md) — 95-file candidate scan accepted
+- [Review 16](BBD-PAY-001-MESSAGES-REVIEW-16.md) — completed UI artifact/screenshots
+- [Review 19](BBD-PAY-001-MESSAGES-REVIEW-19.md) — preload policy verification accepted
+- [Review 20](BBD-PAY-001-MESSAGES-REVIEW-20.md) — 95-file candidate scan accepted
 
 ## Inherited release blockers
 
@@ -45,7 +50,7 @@ submission, or money transfer is added.
 
 ## Direction recorded
 
-- Portable identity/readable-name, WebRTC and future video-call requirements: [identity/transport direction](../../architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md)
+- Portable identity/readable-name, WebRTC and future video-call requirements: [identity/transport direction](../architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md)
 - Owner-reported monerod sync remains a planning input
 - Settle account/device addressing before next creation/approval contract or mobile enrollment
 

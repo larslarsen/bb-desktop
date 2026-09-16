@@ -1,16 +1,22 @@
 # Current Task
 
-ACTIVE: BBD-PAY-001 — PUBLISHED — REVIEWER FINAL VERIFICATION.
-Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
-Functional acceptance stands; inherited release blockers and historical gaps remain.
+COMPLETE: BBD-PAY-001 — received requests in automatically updated Messages.
+
+Feature `f23950245c338d83072caa3d96503b69a21682e2` and closeout
+`48c60b3f05591323b06f493df974819c50add76f` are published and reviewer verified.
+[Final review](../testing/BBD-PAY-001-FINAL-REVIEW-01.md) accepts the delivered read-only
+slice and records the exact remaining release blockers and evidence limitations.
+All PAY execution handoffs are closed. No further testing, publication, source work,
+restart or live node/wallet operation is assigned to another actor. No next implementation
+is authorized. Reviewer-only documentation correction is recorded in the final review.
 
 Owner reports monerod has synced. Availability is recorded in WAL-007/WAL-009 and the
 status map; node/network/height and wallet readiness are not independently verified.
-Active PAY work continues; no live RPC or XMR implementation is authorized by this update.
+PAY is complete; no live RPC or XMR implementation is authorized by this availability update.
 
 Owner's portable identity/readable-name, WebRTC and future video-call requirements are
 recorded in [identity/transport direction](../architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
-Finish read-only v1 UI; settle account/device migration before the next signed-recipient
+Read-only v1 UI is complete; settle account/device migration before the next signed-recipient
 creation/approval contract or mobile enrollment. No identity/transport source work authorized.
 
 All authorizations below are historical and do not grant current execution authority.
