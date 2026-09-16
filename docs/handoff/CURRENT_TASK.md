@@ -11,15 +11,21 @@ Spam for inspection/restoration and persistent personal overrides. Zero-reputati
 accounts have full ordinary feature access with a warning to others. Reputation alone
 must not quarantine newcomers or disable messages, requests or calls. Limited
 behavior-based spam controls are permitted. This supersedes the prior A recommendation.
-Next reviewer work: community source/bootstrap and bounded aggregation, evidence/decay,
-and resource/freshness rules; no further owner confirmation of T1 is needed.
-Shared identity/trust protocol details still need to be frozen.
+Reviewer architecture selection is recorded in section 3A: replaceable default profile,
+bounded assessor delegation, distinct-issuer matching and strict two-thirds quorum
+(initially four of five source groups), explicit expiry and finite synchronization.
+The actual source roster and workload calibration remain activation requirements.
+Next reviewer work: assess/select portable account authority against those requirements,
+then freeze the shared signed-record, private-sync and authenticated enforcement contract.
+No further owner confirmation of T1 is needed.
+Owner requests a notice when High is sufficient again. Keep xhigh during the remaining
+authority architecture; explicitly signal High once sensitive semantics are fixed.
 No implementation actor or execution handoff is authorized.
 
-DEFERRED REVIEWER DESIGN: portable accounts and recipient migration. Read
+NEXT REVIEWER DESIGN: portable account authority and recipient migration. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
-Naming choice N1 is deferred pending trust research. The reviewer is responsible for selecting
-and assessing account authority; the owner is not being asked to choose cryptography.
+Naming choice N1 remains deferred while authority is assessed. The reviewer selects
+and assesses account authority; the owner is not being asked to choose cryptography.
 No source/test/execution actor or handoff is authorized. The six exact reviewer
 governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.

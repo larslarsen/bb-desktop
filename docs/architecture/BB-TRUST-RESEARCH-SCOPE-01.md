@@ -5,7 +5,9 @@ Status: initial research and integrated proposal recorded in
 [BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md). T1 is resolved: automatic
 community filtering, reviewable Spam with personal overrides, full ordinary feature
 access with warnings for zero-reputation accounts, and limited spam protection.
-Protocol/aggregation design remains open; no source work authorized.
+Section 3A now selects reviewer engineering semantics for source profiles, bounded
+delegation, quorum evaluation and expiry. Wire/identity integration and calibration
+remain open; no source work authorized.
 
 ## Priority correction
 
@@ -24,9 +26,11 @@ Agreement is a product expectation, not a verified assumption for raw majority v
 
 The owner reports setting reasoning to xhigh and considers higher settings excessive.
 That satisfies the requested session adjustment; do not ask for another increase.
-Codex did not change the setting. Reviewer research now proceeds in
-[BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md); no design acceptance or
-implementation result is implied by starting that research.
+Codex did not change the setting. The owner also asks to be told when High is sufficient.
+Retain xhigh through the remaining trust/identity authority architecture; explicitly
+tell the owner when semantics are fixed and the work moves to bounded implementation
+or review. This is a task-specific reviewer judgment, not a claim about measured model
+performance. The [architecture record](BB-TRUST-ARCHITECTURE-01.md) retains the decisions.
 
 ## Questions the research must resolve
 
@@ -53,9 +57,14 @@ These are research questions, not assumed meanings of the owner's term â€œring.â
 The research must explicitly examine whether any proposed trust/reputation mechanism
 would grant sensitive capabilities. Do not infer wallet spending authority or account
 recovery authority from social proximity, list membership or a generic reputation score.
-No particular aggregation algorithm, source/bootstrap authority, numeric threshold
-or trust depth is selected here. The owner-selected behavior above is settled;
-remaining mechanics are reviewer engineering work.
+The architecture record's section 3A now selects the source/bootstrap authority and
+aggregation model: replaceable default profile, independent source groups, one level
+of explicit assessor delegation, distinct-issuer matching, strict two-thirds quorum,
+expiring evidence and finite synchronization budgets. Initial default: five groups,
+four qualifying contributions. Source independence is an explicit reviewed assumption;
+the actual launch roster and calibrated resource limits are not yet established.
+The owner-selected behavior is settled. Account method, wire representation, private
+synchronization and enforcement integration remain reviewer engineering work.
 
 ## Deliverable and continuation
 

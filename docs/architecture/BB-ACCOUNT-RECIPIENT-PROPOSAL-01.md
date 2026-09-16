@@ -18,6 +18,12 @@ Social trust does not implicitly appoint account-recovery authorities. No identi
 method is selected by that proposal. T1 is now resolved: automatic community filtering
 with reviewable Spam/personal overrides; zero reputation means warnings and normal
 feature access. These choices do not grant recovery or wallet-spending authority.
+Section 3A now selects a replaceable community profile, bounded explicit assessor
+delegation, distinct-issuer quorum evaluation and expiry. Account authority must verify
+assessment and profile-update capabilities separately from message signing, support
+causal revocation without resetting a source's identity, and never infer recovery
+authority from participation standing. The real source roster is a later activation
+requirement; it does not prevent assessing the account method now.
 
 ## Product result
 
@@ -234,9 +240,11 @@ work is preserved. Inspected implementation:
 No product/test source changed and no tests, scans, builds, live nodes or wallet
 operations ran for this architecture review. No implementation actor was launched.
 
-Next reviewer work is to resolve N1, assess the shortlisted authority method's
-implementation/deployment fit, and freeze one bounded account-verifier contract with
-failure cases for forged enrollment, rollback, revocation, conflicts and restart.
+Next reviewer work is to assess the shortlisted authority method's implementation and
+deployment fit against trust section 3A, then freeze one bounded account-verifier
+contract with failure cases for forged enrollment, rollback, revocation, conflicts
+and restart.
+N1 remains a later naming choice; method assessment does not require its answer.
 That contract must name exact source paths and retained evidence once ready. Do not
 send an implementer this proposal as an implicit source authorization. Consolidate
 source work and execution into their normal role-bounded phases; do not create a

@@ -2,10 +2,14 @@
 
 Reviewer: Codex. Started 2026-09-16 against the
 [owner's research scope](BB-TRUST-RESEARCH-SCOPE-01.md).
-Status: initial research complete; owner product decision T1 recorded below.
-Automatic reputation/filtering mechanics remain an engineering design task.
+Status: owner product decision T1 recorded; reviewer selects the community-source,
+aggregation and freshness architecture in section 3A. Wire/identity integration and
+measured resource calibration remain prerequisites for implementation authorization.
 No trust implementation, protocol format or identity method is authorized.
 Owner reports selecting xhigh; higher reasoning effort is not requested.
+The owner asks to be told when High is sufficient again. Keep xhigh through the
+remaining identity/authority architecture decisions; explicitly signal the transition
+to High when those semantics are fixed and work becomes bounded implementation/review.
 
 ## Owner-selected behavior in plain language
 
@@ -29,9 +33,9 @@ recovery helper are different decisions. A single reputation score cannot expres
 
 The owner expects broad community agreement on good and bad actors. Treat that as a
 product expectation to support, not proof that a raw vote count or every signed report
-is reliable. Community-source selection, aggregation, abuse resistance and warning
-thresholds still need a concrete engineering contract. No global registry, mandatory
-operator or unchangeable community blacklist is selected here.
+is reliable. Section 3A defines the source authority, aggregation and warning rules,
+including assumptions that cannot be established by counting signatures. No global
+registry, mandatory operator or unchangeable community blacklist is selected here.
 
 ## T1: control over inherited rules
 
@@ -129,7 +133,7 @@ Community reputation may use signed endorsements and feedback about identified
 accounts/content, with reasons, issuer provenance and retractions. Account age, traffic
 volume, number of keys and circular endorsements must not by themselves establish a
 good reputation. Private messages and payment activity are not automatically published
-as reputation evidence. Eligible evidence and decay rules remain to be specified.
+as reputation evidence. Section 3A defines eligible assessments and expiration.
 
 Use bounded influence and traversal. The earlier two-edge introduction model is a
 candidate for discovery only, not the selected community-reputation algorithm. Do not
@@ -141,6 +145,258 @@ Automatically incorporating eligible judgments about Carol is different from fil
 Carol merely because she knows Bob. Do not spread guilt by association through every
 follow edge. Lists and endorsements feed a bounded, explainable community evaluation;
 one arbitrary accusation is not automatically community consensus.
+
+## 3A. Selected community evaluation architecture
+
+Reviewer decision, 2026-09-16, based on the owner's instruction to continue. This
+selects engineering semantics; it does not attribute these details to the owner or
+authorize source work. Review baseline: bb-desktop `439bb762e7eae71859081e85035e97c9a279edad`;
+the daemon baseline in section 1 is unchanged.
+
+### Why this model
+
+Use **local evaluation of signed, scoped assessments from a replaceable community
+profile**, with bounded, explicit delegation. A profile supplies the starting sources
+automatically, so a new user needs neither contacts nor a list-setup exercise. Each
+source has a limited contribution; ordinary follows, likes and positive reputation
+cannot create new assessment authority. Different users can choose different profiles.
+
+This adopts the separation between assertions and their consumers illustrated by
+[NIP-85](https://github.com/nostr-protocol/nips/blob/master/85.md), and the issuer,
+subject, retraction and expiration concepts in [AT Protocol labels](https://atproto.com/specs/label).
+Neither specification supplies our aggregation algorithm. The
+[Sybil paper](https://www.microsoft.com/en-us/research/publication/the-sybil-attack/)
+motivates making starting trust assumptions explicit. [EigenTrust](https://nlp.stanford.edu/pubs/eigentrust.pdf)
+likewise relies on pre-trusted peers; its file-transfer score is not selected here.
+These primary sources were revisited on 2026-09-16.
+
+| Alternative | Decision and reason |
+| --- | --- |
+| One vote per account, popularity or stake | Reject for filtering: accounts can be fabricated; popularity and money do not establish good judgment. |
+| Automatic propagation through all follows or positively rated accounts | Reject: endorsement cycles would create new assessment authority. |
+| One required remote scorer | Reject: an outage or one compromised scorer must not determine everyone's inbox. |
+| Unrestricted global graph score | Defer: harder to explain, synchronize and bound; graph position is not evidence for a specific accusation. |
+| Bounded sources, explicit delegation and local quorum | Select: makes each source's power and the failure assumptions inspectable. It still requires trustworthy starting sources. |
+
+### Bootstrap and source authority
+
+A **community profile** is signed data identifying its purpose, version, predecessor,
+source groups, update keys, permitted categories and evaluator version. Ship a reviewed
+default profile with the client. Peers and caches may distribute identical signed
+copies; the peer returning a copy acquires no authority. A profile can be replaced or
+disabled in advanced settings, and ordinary account use continues without it.
+
+The initial evaluator permits 3–32 configured source groups. The launch profile targets
+**five separately controlled groups**. Each group contributes at most one unit to an
+assessment. Multiple accounts, keys, devices, mirrors or lists operated by one known
+controller belong to one group. This classification is a reviewed governance claim,
+not cryptographic proof that operators are independent people. Do not discover new
+trusted roots by asking random peers which accounts are most popular.
+
+Each group identifies one accountable source account. It may directly assess a subject
+or explicitly authorize up to 32 assessor accounts for named categories. Delegations
+expire, cannot be delegated again, and grant assessment rights only. This is one
+authority edge from a configured source to an assessor, followed by that assessor's
+judgment about a subject. An endorsement that someone is a good participant is a
+different record and grants no right to judge others. Group controllers can themselves
+consume ordinary community reports; signing an assessment accepts responsibility for it.
+
+Circles remain freely editable and overlapping. Personal rules retain section 4
+precedence. Following someone or adding them to Friends does not silently insert them
+into the profile. Optional alternative profiles apply independently by purpose; two
+profiles containing the same sources must not be stacked to manufacture a quorum.
+The first evaluator uses one active community profile per purpose. Personal source
+edits form an explicit local profile fork; remote updates cannot overwrite those edits.
+
+**Launch requirement:** retain the actual source accounts, controller relationships,
+update keys, consent to serve and stated assessment policies in a reviewed public
+profile before enabling the default. No such roster has been established by this
+research. Do not invent five identities, recruit actors without authorization, or ship
+developer test keys as a community. Before that roster exists, show reputation as
+unavailable and preserve full ordinary use, personal rules and spam budgets. That
+state is not completion of the requested automatic community feature.
+
+### Profile updates and compromised sources
+
+Keep profile-update authority separate from routine assessment-signing keys. Require
+a strict two-thirds quorum of configured groups for roster/key updates, with signatures
+under both the old and new update-key sets when replacing them. Persist the version
+and predecessor; reject rollback, skipped continuity, conflicting successors and
+unsupported evaluator versions. The threshold is `floor(2*N/3) + 1`, where `N` is the
+configured group count; five groups require four signatures. Count a controller once.
+Do not reduce the threshold because some keys or sources are offline.
+
+The [TUF specification](https://theupdateframework.github.io/specification/latest/)
+provides the reference for pinned bootstrap metadata, threshold key transitions,
+version checks and expiration. This selects those update requirements, not a custom
+cryptographic primitive or a TUF dependency. Exact metadata encoding and library fit
+belong in the shared identity/wire contract. A valid update may rotate sources within
+the supported social-policy boundary; it cannot grant spending, recovery, deletion or
+private-data publication rights. New program semantics require a reviewed application
+update. Personal overrides survive every profile revision.
+
+If conflicting profile successors are observed, retain the last unambiguous profile,
+mark updates conflicted and honor its existing expiration. Resume only through an
+explicit authenticated resolution that references both forks. A compromised assessment
+key invalidates that group's affected contributions immediately when verified evidence
+arrives. Other groups and personal rules continue. Losing enough update keys prevents
+automatic roster repair; an explicit locally authorized profile replacement is the
+recovery path. A malicious update quorum can poison its profile: users' ability to
+inspect, override or replace it is essential, not a proof that this attack is impossible.
+An adverse social label about an assessor does not itself revoke assessment authority
+or remove a source group from the denominator. Use authenticated authority revocation,
+profile updates or an explicit personal source change; reputation cannot elect its own
+judges or expel dissenting sources recursively.
+
+### Eligible evidence and how reputation develops
+
+Assessments bind issuer, delegated authority, subject type/ID, category, scope,
+operation ID, predecessor, assessment time, expiry and evidence references/reason.
+Use separate categories for participation standing and specific adverse behavior.
+Initial adverse categories are unsolicited spam, impersonation/deception and targeted
+harassment, with explicit affected surfaces. Topic, viewpoint or taste labels do not
+silently acquire automatic blocking effects. One objection to a post does not become
+an account-wide judgment; those are different signed targets and scopes.
+
+An eligible assessor may endorse participation after meaningful interactions, or assess
+a report against the identified account/content. An ordinary user can report, endorse
+or retract without being an eligible assessor. Their publication reaches interested
+community assessors but supplies no extra quorum unit by itself. Reporting is a
+deliberate sharing action; personal Block/Allow, local message history, payment amounts
+and private bodies are never automatically published. Public reason text is untrusted
+data; render safely and never fetch its links or attachments automatically.
+
+Evidence may be the same authenticated public item inspected by several assessors.
+Count their accountable assessments, not the number of copies or claimed incidents.
+A forwarded assessment keeps its original issuer; countersigning a transport wrapper
+does not make it a new opinion. An assessor asserting an independent assessment signs
+that fact and its basis. Hidden coordination or dishonest claims of independent review
+cannot be detected from signatures alone. The trust bound is about authorized source
+contributions, not a guarantee that accusations are true.
+
+For each issuer/subject/category/scope, retain one current causally ordered assessment:
+support, adverse, clear-the-specific-allegation, or abstain, as appropriate to category.
+Concurrent contradictory versions make that issuer abstain for the affected slot until
+resolved. Retraction removes the cited claim; it is not a positive endorsement. General
+positive reputation cannot cancel a current, independently qualifying adverse category.
+Renewals keep their evidence provenance; re-signing old evidence is not a new incident.
+
+### Deterministic aggregation
+
+Evaluate an immutable snapshot containing the profile revision, verified source state,
+complete relevant assessment data, personal-policy revision and evaluation time.
+Fetching data is background synchronization; no remote scoring call occurs inside
+admission or native payment approval.
+
+1. Apply validity, authority, scope, freshness and resource checks. Unknown categories
+   have no automatic effect. Missing/corrupt/oversized data makes the affected source
+   contribution unavailable. Self-assessments and assessments by a known controller
+   of the subject do not contribute to its standing or clearance. Never trim away
+   inconvenient opposing records and then claim a complete result.
+2. Within each group and category, a current direct source assessment takes precedence
+   over its delegates. Direct abstention contributes nothing. Otherwise, consider the
+   authorized delegates: conflicting current opinions make the group abstain for that
+   category; agreeing opinions supply candidate issuers for one group contribution.
+3. Deduplicate actual issuer accounts and declared common-control groups across source
+   paths. Compute the maximum number of group-to-issuer assignments with each group
+   and each issuer/controller used at most once. This is a bounded bipartite matching,
+   not a count of graph paths. Sort identifiers for a deterministic explanation when
+   several equally sized assignments exist. A delegate shared by four groups can
+   therefore contribute only one unit, even through four valid delegations.
+4. For each adverse category and scope, filter only if adverse assignments reach
+   `Q = floor(2*N/3) + 1`. Calculate `N` from the configured profile, never from the
+   currently responding sources. Five groups require four contributions. Abstention,
+   expiry, a missing shard or a removed local source cannot lower the existing quorum;
+   changing the roster is an explicit profile change.
+5. Established community participation requires the same quorum of current positive
+   participation assessments. Below-quorum allegations cannot independently quarantine
+   content or remove feature access. Show coverage and disagreement in the explanation;
+   avoid amplifying one accusation into a prominent bad-actor badge. Qualifying adverse
+   categories take precedence over a general participation badge on affected surfaces.
+6. Apply personal rules/overrides and presentation as section 4 specifies. Return the
+   evidence revision, counted groups/issuers, excluded or missing inputs, expiry and
+   reason. Persist the decision revision with admitted content and notify the UI.
+
+These thresholds are a conservative reviewer-selected starting policy, not values
+measured against a real community. With five genuinely separate roots, fabricated
+accounts under one or two roots cannot alone reach four contributions. Four dishonest
+or fooled roots still can. Two unavailable roots can prevent a decision, so false
+negatives are an intentional cost of requiring broad agreement. No account is denied
+ordinary use for lacking that agreement.
+
+Positive reputation spreads through explicit assessor delegation and assessments,
+without recursively promoting every endorsed person into an assessor. A local user
+may additionally mark someone personally known; the UI says “Known to you” rather
+than inventing community agreement. Interaction counts, days online and money sent
+are never automatic substitutes for the required evidence.
+
+| Five-group example | Result |
+| --- | --- |
+| Four distinct eligible issuers in four groups assess spam | Filter to Spam; show those judgments and allow personal override. |
+| Ten thousand reports enter through one source group | At most one contribution; no community filter. |
+| One assessor is authorized by all five groups | At most one contribution, not five. |
+| Two groups assess spam, three are offline | No quorum; ordinary use with incomplete reputation context. |
+| Four endorse participation; one alleges spam | Established participation; allegation is inspectable but cannot alone filter. |
+| Four endorse participation and four separately assess a current spam category | Filter that scope; positive standing cannot wash away adverse evidence. |
+| Four qualifying spam assessments become three after a retraction | Remove community filtering, unless another active rule applies; no replayed alerts or actions. |
+| User always-allows a person who meets the community spam threshold | Personal exception wins within its scope; retain the reason/context. |
+
+### Freshness, decay and bounded synchronization
+
+Use expiring assessments rather than an opaque continuously decaying score. Initial
+reviewer-selected profile values are below. They are engineering starting limits;
+later acceptance must measure the mobile/desktop load and false-positive behavior.
+Any changed values must be recorded before implementation acceptance.
+
+| Item | Initial contract |
+| --- | --- |
+| Positive and adverse assessment | Maximum 30 days from signed assessment time; earlier explicit expiry wins. A renewal is a new causally linked assessment, retaining incident provenance. |
+| Assessor delegation | Maximum 30 days; explicitly renewed/revoked by its source group. No onward delegation. |
+| Source checkpoint | At most 72 hours of validity; an online publisher should renew at least every 24 hours. A checkpoint cannot extend an assessment's own expiry. |
+| Profile metadata | At most 180 days; roster continuity and update quorum still required. Expiry suspends community-derived effects, not personal choices or account access. |
+| Clock allowance | At most five minutes of future skew. Persist an observed time floor; significant rollback/uncertainty produces unavailable reputation until corrected, never a new permanent ban. Local clock correctness remains an explicit assumption. |
+| Refresh | Consume authenticated update hints with coalescing; reconcile every 15 minutes while online, and on reconnect/resume. Hints are not evidence. Mobile suspension/partitions can delay receipt. |
+| Graph work | At most 32 groups and 32 direct delegates per group; no recursion. At most 1,024 delegated issuer slots per subject/category before deduplication. |
+| Data budgets | At most 8 KiB per assessment, 256 KiB per metadata object and 4 MiB per fetched chunk; 64 MiB community cache per device for the initial profile. Enforce decoded limits as well as transport limits. |
+
+The effective expiry is the earliest relevant claim, delegation, source checkpoint,
+profile or authority expiry. There is **no extra grace period for automatic filtering**.
+Recompute on retraction, revocation, source/profile/personal-rule change and expiry,
+including while offline. Timers must not depend on receiving another message.
+Persist source high-water marks and retractions across restart and cache eviction;
+never revive an older snapshot because a newer chunk disappeared. Wall-clock rollback
+cannot refresh evidence. Monotonic elapsed time bounds validity during a running
+session; reboot cannot prove elapsed time or discover unseen revocations.
+
+Sources publish authenticated, versioned snapshots/deltas in bounded content-addressed
+chunks. Fetch by profile/source data, not by sending a private contact list to a scorer.
+Subject sharding is allowed, but the wire contract must define verifiable completeness
+for the relevant shard, including delegate conflicts, removals and generation binding.
+No mixed-generation evaluation. An incomplete shard makes that group's contribution
+unavailable; cached valid complete data may serve only until its original expiry.
+Cache budget or source overload does not evict personal rules or extend negative claims.
+Sharded retrieval can reveal interest in a subset of subjects; this is not a promise
+of anonymous network access. Private policy is synchronized only between authorized
+devices through the separate encrypted channel.
+
+Absence of an assessment is not an authenticated claim that someone is good. While
+eligible data is incomplete, show unavailable/partial coverage; continue normal use
+unless valid evidence still reaches quorum or a personal restriction applies. A new
+account can participate on day one even if no community source is reachable.
+
+### Acceptance obligations before activating the community profile
+
+Retain source-authored cases for the example table plus source/delegate overlap,
+common controllers, conflicting delegated opinions, full-versus-partial shards,
+equivocation, expiry without traffic, clock rollback, retraction after restart,
+compromised keys, source removal, profile-fork resolution, disconnected devices and
+personal overrides surviving profile updates. Include a load case where one authorized
+source fills its budget without starving personal-rule enforcement or control messages.
+These are requirements, not executed tests or evidence of measured performance.
+
+Before public activation, supply the real source roster and calibrated limits, bind
+authority and serialization to the selected identity method, and retain execution
+evidence for those cases. No new product choice is delegated to the owner here.
 
 ## 4. Actions, defaults and precedence
 
@@ -197,6 +453,7 @@ Community policy is active by default. Its source discovery/bootstrap, aggregati
 freshness and maximum effects must be inspectable, versioned and user-changeable;
 ordinary users should not configure each constituent list. Changing sources/retracting
 claims automatically recomputes derived results without overwriting personal rules.
+Section 3A defines that default and its real-roster activation prerequisite.
 Community updates cannot expand from reversible social filtering to spending, account
 recovery, private-data publication or destructive deletion. List data cannot execute
 scripts or unrestricted matching rules. Personal imported rules still get a preview.
@@ -288,7 +545,7 @@ bindings for portable records:
 | Endorsement or label | Issuer account and delegated signing authority, typed target/account or content digest, purpose/value, audience, operation ID, causal version and retraction/expiry semantics. |
 | Shared list | Stable list identity under issuer, declared purpose, versioned membership/claims and verified update history. |
 | Community policy/source settings | Community-view identity/version, eligible sources/roots and aggregation rules, effect ceiling, freshness handling, optional personal subscriptions/overrides and bounded delegation. |
-| Reputation result | Account, assessment scope, evidence coverage/confidence, supporting and adverse evidence, freshness and policy version; unknown must remain distinct from adverse. |
+| Reputation result | Account, assessment scope, source coverage, supporting and adverse evidence, freshness and policy version; unknown must remain distinct from adverse. Coverage is not a calibrated probability of truth. |
 | Evaluated decision | Subject/action, outcome, effective policy revision, considered evidence and a local explanation; reproducible cache, not an authority certificate. |
 
 Target types must distinguish account, legacy peer, content version and infrastructure
@@ -358,13 +615,14 @@ The signed format and storage algorithm are later engineering contracts; require
 - Community-source expiry/outage handling is declared up front. If no still-valid
   adverse evidence or personal restriction applies, permit normal use with an
   unavailable/unknown warning. Previously valid adverse evidence may retain filtering
-  only within the specified validity/staleness window, with age and reason visible.
+  only until the earliest effective expiry in section 3A, with age and reason visible.
   Do not hold all new users merely because a provider is offline. Source changes and
   personal overrides can resolve social filtering. Never invent a clean reputation.
 - A device cannot enforce a block/revocation it has not received. Show synchronization
   status and limitations; no immediate all-device or network-wide guarantee. Trusted
-  time/skew bounds, refresh budgets, compaction and maximum offline windows must be
-  specified before the persistence/protocol implementation is accepted.
+  time/skew bounds and refresh windows follow section 3A. Compaction, exact account
+  authority freshness and private-sync rules must be bound to the selected identity
+  method before persistence/protocol implementation is accepted.
 
 ## 7. Threat model and bounded influence
 
@@ -381,9 +639,10 @@ The signed format and storage algorithm are later engineering contracts; require
 
 Evaluate graph influence only over eligible, authenticated data. Unknown or truncated
 parts are marked incomplete; do not convert absence to condemnation. Automatic source
-bootstrap must work without per-list manual setup, but its roots and update authority
-remain to be designed openly. No unchangeable global trust anchors, proof-of-personhood
-requirement, mandatory domain purchase, identity fee or blockchain registry is selected.
+bootstrap uses section 3A's reviewed default profile, bounded delegation and threshold
+updates; the actual launch roster is still required. No unchangeable global trust
+anchors, proof-of-personhood requirement, mandatory domain purchase, identity fee or
+blockchain registry is selected.
 
 ### Limited spam protection: feasible direction, not a completed implementation
 
@@ -494,9 +753,9 @@ or claimed passing results.
 
 1. **Product contract recorded:** T1 selects automatic community filtering, reviewable
    Spam and personal overrides, with full ordinary access plus warnings for unknown
-   accounts. Next specify community source/bootstrap policy, bounded aggregation,
-   evidence/decay thresholds and behavior-based spam budgets. Select identity authority
-   only after it satisfies subjects, delegation, continuity and revocation requirements.
+   accounts. Section 3A now selects community-source authority, bounded aggregation,
+   expiration and initial resource limits. Next bind these to a selected account
+   authority and wire/private-sync contract; calibrate traffic budgets before release.
 2. **Daemon foundation:** a deterministic policy evaluator with immutable input
    snapshots and explanations, then private durable operations, conflict/restart
    semantics and authenticated local management. Candidate boundary is a new
@@ -521,17 +780,22 @@ selected or launched by this proposal, and no work is assigned to Hermes now.
 
 **Review outcome:** T1 is resolved by the owner's automatic-filtering/Spam/newcomer
 requirements. The previous A recommendation and novice restrictions are superseded.
-No further product confirmation is requested for those requirements. The full trust
-protocol is not frozen; community-source/bootstrap and aggregation rules, exact signed
-format, authority-method selection, private sync, resource/freshness bounds and the
-authenticated policy API remain reviewer engineering work. New account/payment
-contracts remain gated on the shared semantics; no implementation actor is authorized.
+No further product confirmation is requested for those requirements. The reviewer
+selects section 3A's profile/bootstrap authority, delegation, aggregation, expiry and
+bounded-data model. Shared authority/wire/private-sync/API integration remains to be
+frozen; real source identities and workload calibration are activation requirements.
+Next work is the portable account authority assessment using these constraints,
+followed by one coherent contract for records, persistence and local enforcement.
+No implementation actor is authorized. Keep xhigh for that architecture work; explicitly
+notify the owner when the transition to bounded work makes High appropriate.
 
 Initial research verification at commit `46c0f2367`: read source/specifications and
 inspect the scoped diff; 44 local document links had zero missing targets and scoped
-`git diff --check` exited 0. This owner-decision revision updates the behavior in place
-and retains the source inspection baseline. Its repeated document reference audit
-checked 44 local links with zero missing targets; scoped `git diff --check` exited 0.
+`git diff --check` exited 0. The T1 owner-decision revision at `439bb762e` repeated
+that audit with the same results. Section 3A is a subsequent documentation-only
+architecture selection: inspected primary references and scoped diff, checked 44 local
+document links with zero missing targets, and scoped `git diff --check` exited 0.
+It makes no new runtime claim.
 No product/test code changes, tests, acceptance commands,
 security scans, builds, live-node/wallet operations or private user-data reads.
 Publication scope is the six reviewer-authored governance paths enumerated in the

@@ -10,7 +10,9 @@ The [initial research and integrated proposal](BB-TRUST-ARCHITECTURE-01.md) now
 describe scoped circles/lists, local enforcement and account/device migration impacts.
 T1 is resolved: automatic community filtering with a Spam/review override, while
 zero-reputation accounts retain ordinary feature access with warnings. No trust or
-identity implementation is authorized; source/aggregation/protocol mechanics remain open.
+identity implementation is authorized. Trust section 3A selects source/bootstrap,
+bounded aggregation and freshness semantics; account authority, shared wire/private-sync
+contracts, launch source identities and measured calibration still need completion.
 
 Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
 the migration boundaries, recovery-method shortlist, payment execution constraint and

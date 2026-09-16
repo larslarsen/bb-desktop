@@ -92,6 +92,11 @@ requests remain reviewable/restorable in Spam. Zero-reputation accounts can requ
 and pay normally with reputation context shown to others; reputation is not a feature
 gate. Native confirmation and immutable request validation still apply. No code change
 or enabled payment execution is implied by this product decision.
+Trust section 3A now selects quorum-based community assessment and expiring evidence.
+That evaluator supplies scoped context/admission decisions to requests; it cannot
+authorize a transfer. Source outages preserve normal access when no valid adverse
+quorum or personal restriction applies. Account authority and native binding contracts
+still precede implementation of request creation or payment execution.
 The owner requires persistent identity across desktop/phone, readable names and planned
 WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning
