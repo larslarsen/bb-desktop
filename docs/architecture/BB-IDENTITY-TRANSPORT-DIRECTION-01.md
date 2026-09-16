@@ -3,9 +3,13 @@
 Owner requirements recorded by Codex, 2026-09-16. Status: architecture direction and
 migration gate; no identity, transport or calling implementation authorized by this note.
 
+Owner priority update: an extensive ring of trust, blacklists and whitelists must be
+researched and resolved before freezing this architecture. See
+[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). Naming choice N1 is deferred.
+
 Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
 the migration boundaries, recovery-method shortlist, payment execution constraint and
-owner naming choice N1. N1 remains pending; no account method or wire format is frozen.
+owner naming choice N1. No account method or wire format is frozen.
 
 ## Required experience
 

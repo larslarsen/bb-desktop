@@ -5,6 +5,11 @@ authorized. This develops the [identity/transport direction](BB-IDENTITY-TRANSPO
 PAY-001 remains complete. This proposal does not claim that account migration exists
 or that its protocol gate has passed.
 
+Owner priority update: [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md),
+including blacklists and whitelists, comes first. This proposal's choices remain
+provisional and must be reassessed against that design. N1 is deferred; no owner
+answer to naming is needed now.
+
 ## Product result
 
 Alice adds her phone to her existing BitBook account. Bob still sees one Alice in
@@ -29,7 +34,7 @@ can allocate/reassign a name. The choices are recorded here before asking the ow
 | B | A unique qualified name, such as `alice@provider.example`, can locate the account. | Names depend on the selected provider/domain; multiple providers and contact links preserve alternatives. Changing providers can change the name while the account stays the same. |
 | C | One globally unique short name, such as `@alice`, is an exact address. | Needs an explicit namespace allocation/conflict policy and registry or consensus design. This infrastructure is not in the current daemon. |
 
-**Owner decision: pending.** Recommendation A is not recorded as owner approval.
+**Owner decision: deferred pending trust research.** Recommendation A is not owner approval.
 All choices still use stable account IDs underneath names. Optional verified domain
 aliases can be added to A later. Exact typed syntax remains unselected until the
 product choice is resolved. A duplicate-name search result must never auto-select a

@@ -78,9 +78,11 @@ Step 1 is accepted and published; its execution handoffs are closed. No later st
 authorized for implementation by this planning sequence.
 Before steps 2–3 freeze new recipient/creation/approval contracts, settle the account/device
 migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
-The [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is the active
-reviewer design: naming choice N1 is pending, and authority-method/wire-contract
-selection remains an engineering gate. It is not an implementation handoff.
+Owner now prioritizes [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md), including
+blacklists and whitelists, before freezing account/recipient architecture. The
+[account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is provisional;
+naming choice N1 is deferred. Trust design and authority-method/wire-contract selection
+remain engineering gates. None of these documents is an implementation handoff.
 The owner requires persistent identity across desktop/phone, readable names and planned
 WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning
@@ -142,8 +144,8 @@ runtime, falsification, 22-test account UI target and publication are accepted; 
 local wallet resource and manifest are verified. No WAL-019 handoff remains active.
 The daemon binary has been refreshed directly; neither app was restarted.
 BBGO-DEV-001 is cancelled. BBGO-PAY-003's read endpoint and lifecycle integration
-are accepted. BBD-PAY-001 is complete; portable account/recipient architecture is the
-active reviewer work. Routine affected local artifact refresh is included in later
+are accepted. BBD-PAY-001 is complete; trust-system research precedes further portable
+account/recipient design. Routine affected local artifact refresh is included in later
 implementation completion.
 Existing payment integration gaps and release blockers remain open.
 

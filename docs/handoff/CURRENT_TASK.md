@@ -1,11 +1,17 @@
 # Current Task
 
-ACTIVE REVIEWER DESIGN: portable accounts and recipient migration. Read
+ACTIVE REVIEWER PRIORITY: ring-of-trust research, including blacklists and whitelists.
+Read [BB-TRUST-RESEARCH-SCOPE-01](../architecture/BB-TRUST-RESEARCH-SCOPE-01.md).
+Owner directs resolving this before account/recipient architecture is frozen.
+Raise session reasoning effort before the substantive architecture pass; this update
+records scope only. No implementation actor or execution handoff is authorized.
+
+DEFERRED REVIEWER DESIGN: portable accounts and recipient migration. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
-Naming choice N1 is pending owner input. The reviewer is responsible for selecting
+Naming choice N1 is deferred pending trust research. The reviewer is responsible for selecting
 and assessing account authority; the owner is not being asked to choose cryptography.
-No source/test/execution actor or handoff is authorized. The four exact reviewer
-governance paths are enumerated at the end of the proposal. Existing v1 behavior
+No source/test/execution actor or handoff is authorized. The five exact reviewer
+governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.
 
 COMPLETE: BBD-PAY-001 — received requests in automatically updated Messages.
