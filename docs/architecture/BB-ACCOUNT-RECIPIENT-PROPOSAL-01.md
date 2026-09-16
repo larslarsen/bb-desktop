@@ -37,7 +37,35 @@ WebRTC can carry the same authenticated conversations. A future video call rings
 the account's eligible devices, and accepting on one device ends the other rings.
 Neither connecting a device nor accepting a call authorizes a wallet payment.
 
-## N1: naming decision for the owner
+## N1: names people see and how they find a new contact
+
+Owner clarification, 2026-09-16: the naming choices have become confusing. This is
+not an answer to N1 or approval of a naming system. Separate the everyday experience
+from the engineering mechanism; account-authority assessment continues independently.
+
+Three jobs were being mixed together:
+
+| Job | Plain-language meaning |
+| --- | --- |
+| Persistent account | The same Alice on her desktop and phone. The application tracks this through a stable internal identity. |
+| Display name | The name people see, such as Alice. Other accounts may use the same name. |
+| Finding the right Alice | A shared contact link/QR identifies her exact account; name search may show several candidates. A unique typed handle would be another way to find her. |
+
+Reviewer recommendation for the first naming experience:
+
+1. Alice chooses a display name. BitBook supplies a Share contact action and QR code;
+   nobody needs to type or memorize the underlying cryptographic identifier.
+2. Bob opens the contact Alice shared and saves her. A link identifies one account;
+   whether it is the intended real-world Alice still depends on where Bob obtained it.
+3. Alice pairs her phone with that same account. Once the required synchronization is
+   implemented, the account's contacts, reputation and personal rules follow it.
+4. Alice can change her display name without replacing Bob's saved account binding.
+
+The limitation is concrete: typing only “Alice” cannot guarantee one exact result.
+A globally unique username adds a rule for who gets a name when several people want
+it. It is a separate discovery feature; it is not required for portable identity.
+Keep that addition possible without making it a prerequisite for account design.
+This restates recommendation A below; it is not a newly approved owner decision.
 
 The requirement establishes readable names but does not establish whether those names
 must be globally unique. This changes discovery, registration, availability and who
@@ -49,7 +77,8 @@ can allocate/reassign a name. The choices are recorded here before asking the ow
 | B | A unique qualified name, such as `alice@provider.example`, can locate the account. | Names depend on the selected provider/domain; multiple providers and contact links preserve alternatives. Changing providers can change the name while the account stays the same. |
 | C | One globally unique short name, such as `@alice`, is an exact address. | Needs an explicit namespace allocation/conflict policy and registry or consensus design. This infrastructure is not in the current daemon. |
 
-**Owner decision: deferred pending trust research.** Recommendation A is not owner approval.
+**Owner decision: deferred; no selection recorded.** Recommendation A remains a
+proposal. Account-authority design does not require an answer to N1.
 All choices still use stable account IDs underneath names. Optional verified domain
 aliases can be added to A later. Exact typed syntax remains unselected until the
 product choice is resolved. A duplicate-name search result must never auto-select a

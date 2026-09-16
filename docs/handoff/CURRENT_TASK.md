@@ -26,6 +26,10 @@ NEXT REVIEWER DESIGN: portable account authority and recipient migration. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
 Naming choice N1 remains deferred while authority is assessed. The reviewer selects
 and assesses account authority; the owner is not being asked to choose cryptography.
+Owner reports confusion about naming. The account proposal now separates persistent
+account, display name and exact-contact discovery, with an everyday example. Display
+names plus contact sharing remain a recommendation, not owner approval. Unique typed
+handles are a separate discovery choice and do not block account-authority assessment.
 No source/test/execution actor or handoff is authorized. The six exact reviewer
 governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.
