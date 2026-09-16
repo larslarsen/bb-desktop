@@ -10,6 +10,13 @@ including blacklists and whitelists, comes first. This proposal's choices remain
 provisional and must be reassessed against that design. N1 is deferred; no owner
 answer to naming is needed now.
 
+The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) now records the first
+research pass. Its sections 6 and 8 add account requirements: separate policy-writer
+and assertion-publisher capabilities, private policy synchronization, conservative
+revocation/conflict handling, and preservation of trust scope during legacy migration.
+Social trust does not implicitly appoint account-recovery authorities. No identity
+method is selected by that proposal; T1 remains pending.
+
 ## Product result
 
 Alice adds her phone to her existing BitBook account. Bob still sees one Alice in

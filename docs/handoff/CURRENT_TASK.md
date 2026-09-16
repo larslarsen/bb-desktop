@@ -1,16 +1,21 @@
 # Current Task
 
-ACTIVE REVIEWER PRIORITY: ring-of-trust research, including blacklists and whitelists.
+ACTIVE REVIEWER PRIORITY: ring-of-trust architecture, including blacklists and whitelists.
 Read [BB-TRUST-RESEARCH-SCOPE-01](../architecture/BB-TRUST-RESEARCH-SCOPE-01.md).
 Owner directs resolving this before account/recipient architecture is frozen.
-Raise session reasoning effort before the substantive architecture pass; this update
-records scope only. No implementation actor or execution handoff is authorized.
+Owner reports selecting xhigh; no higher setting is requested. Initial research and
+the integrated proposal are recorded in
+[BB-TRUST-ARCHITECTURE-01](../architecture/BB-TRUST-ARCHITECTURE-01.md).
+T1 asks whether inherited rules require an explicit scoped subscription; recommended
+A keeps personal choices first. No owner answer is recorded. Defaults and shared
+identity/trust semantics remain proposed, with protocol details still to be frozen.
+No implementation actor or execution handoff is authorized.
 
 DEFERRED REVIEWER DESIGN: portable accounts and recipient migration. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
 Naming choice N1 is deferred pending trust research. The reviewer is responsible for selecting
 and assessing account authority; the owner is not being asked to choose cryptography.
-No source/test/execution actor or handoff is authorized. The five exact reviewer
+No source/test/execution actor or handoff is authorized. The six exact reviewer
 governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.
 

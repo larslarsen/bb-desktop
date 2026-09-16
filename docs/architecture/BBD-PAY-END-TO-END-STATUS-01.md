@@ -83,6 +83,10 @@ blacklists and whitelists, before freezing account/recipient architecture. The
 [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is provisional;
 naming choice N1 is deferred. Trust design and authority-method/wire-contract selection
 remain engineering gates. None of these documents is an implementation handoff.
+The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) records the initial
+research pass. Payment-request permission is separate from spend approval; valid
+cancellation of a known request must remain effective even when its payee is blocked.
+These are proposed future semantics, not changes to the accepted v1 code.
 The owner requires persistent identity across desktop/phone, readable names and planned
 WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning

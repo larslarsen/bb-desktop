@@ -1,7 +1,9 @@
 # Ring of trust — research priority
 
 Owner requirement recorded by Codex, 2026-09-16.
-Status: research scope only; no trust model selected or implementation authorized.
+Status: initial research and integrated proposal recorded in
+[BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md). Product choice T1 remains
+pending; no trust model accepted for implementation and no source work authorized.
 
 ## Priority correction
 
@@ -11,11 +13,11 @@ freezing portable account authority, naming/discovery, device enrollment and new
 payment-recipient contracts. The account proposal remains provisional input.
 Its naming question N1 is deferred; the owner need not answer it before this work.
 
-The owner also requested higher reasoning effort for architecture work. Codex must
-ask for the session setting to be raised before the substantive architecture pass;
-it must not claim to have changed the setting itself. This turn records scope and
-priority only. No trust research completion, design acceptance or implementation
-result is claimed.
+The owner reports setting reasoning to xhigh and considers higher settings excessive.
+That satisfies the requested session adjustment; do not ask for another increase.
+Codex did not change the setting. Reviewer research now proceeds in
+[BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md); no design acceptance or
+implementation result is implied by starting that research.
 
 ## Questions the research must resolve
 
@@ -59,7 +61,8 @@ Record all findings and decisions in repository documents. Do not create a separ
 actor handoff for each research question. Existing PAY-001 acceptance is unchanged;
 no source, tests, live wallets, daemon operations or actors are authorized here.
 
-Reviewer governance scope: this scope document, `BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md`,
+Reviewer governance scope: this scope document, `BB-TRUST-ARCHITECTURE-01.md`,
+`BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md`,
 `BB-IDENTITY-TRANSPORT-DIRECTION-01.md`, `BBD-PAY-END-TO-END-STATUS-01.md` and
 `../handoff/CURRENT_TASK.md`, all in bb-desktop. The existing daemon direction link
 leads to this priority; no daemon edit or publication is included.
