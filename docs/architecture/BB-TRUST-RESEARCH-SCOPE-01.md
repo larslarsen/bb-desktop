@@ -2,8 +2,10 @@
 
 Owner requirement recorded by Codex, 2026-09-16.
 Status: initial research and integrated proposal recorded in
-[BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md). Product choice T1 remains
-pending; no trust model accepted for implementation and no source work authorized.
+[BB-TRUST-ARCHITECTURE-01](BB-TRUST-ARCHITECTURE-01.md). T1 is resolved: automatic
+community filtering, reviewable Spam with personal overrides, full ordinary feature
+access with warnings for zero-reputation accounts, and limited spam protection.
+Protocol/aggregation design remains open; no source work authorized.
 
 ## Priority correction
 
@@ -12,6 +14,13 @@ whitelists, and directs that this be researched and resolved first. This precede
 freezing portable account authority, naming/discovery, device enrollment and new
 payment-recipient contracts. The account proposal remains provisional input.
 Its naming question N1 is deferred; the owner need not answer it before this work.
+
+Owner refinement recorded 2026-09-16: expect broad community agreement and apply its
+judgments automatically. Retain filtered content for inspection/override like a spam
+folder. New/zero-reputation users can use all features; warn others until reputation
+develops. Limited spam controls are acceptable if feasible. This supersedes the
+reviewer's earlier explicit-subscription default and restrictions on unknown users.
+Agreement is a product expectation, not a verified assumption for raw majority voting.
 
 The owner reports setting reasoning to xhigh and considers higher settings excessive.
 That satisfies the requested session adjustment; do not ask for another increase.
@@ -44,7 +53,9 @@ These are research questions, not assumed meanings of the owner's term â€œring.â
 The research must explicitly examine whether any proposed trust/reputation mechanism
 would grant sensitive capabilities. Do not infer wallet spending authority or account
 recovery authority from social proximity, list membership or a generic reputation score.
-No particular scoring algorithm, trust depth or precedence rule is selected here.
+No particular aggregation algorithm, source/bootstrap authority, numeric threshold
+or trust depth is selected here. The owner-selected behavior above is settled;
+remaining mechanics are reviewer engineering work.
 
 ## Deliverable and continuation
 

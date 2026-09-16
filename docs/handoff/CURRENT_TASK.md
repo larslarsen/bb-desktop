@@ -6,9 +6,14 @@ Owner directs resolving this before account/recipient architecture is frozen.
 Owner reports selecting xhigh; no higher setting is requested. Initial research and
 the integrated proposal are recorded in
 [BB-TRUST-ARCHITECTURE-01](../architecture/BB-TRUST-ARCHITECTURE-01.md).
-T1 asks whether inherited rules require an explicit scoped subscription; recommended
-A keeps personal choices first. No owner answer is recorded. Defaults and shared
-identity/trust semantics remain proposed, with protocol details still to be frozen.
+T1 RESOLVED: apply community judgments automatically; retain filtered content in
+Spam for inspection/restoration and persistent personal overrides. Zero-reputation
+accounts have full ordinary feature access with a warning to others. Reputation alone
+must not quarantine newcomers or disable messages, requests or calls. Limited
+behavior-based spam controls are permitted. This supersedes the prior A recommendation.
+Next reviewer work: community source/bootstrap and bounded aggregation, evidence/decay,
+and resource/freshness rules; no further owner confirmation of T1 is needed.
+Shared identity/trust protocol details still need to be frozen.
 No implementation actor or execution handoff is authorized.
 
 DEFERRED REVIEWER DESIGN: portable accounts and recipient migration. Read

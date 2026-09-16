@@ -15,7 +15,9 @@ research pass. Its sections 6 and 8 add account requirements: separate policy-wr
 and assertion-publisher capabilities, private policy synchronization, conservative
 revocation/conflict handling, and preservation of trust scope during legacy migration.
 Social trust does not implicitly appoint account-recovery authorities. No identity
-method is selected by that proposal; T1 remains pending.
+method is selected by that proposal. T1 is now resolved: automatic community filtering
+with reviewable Spam/personal overrides; zero reputation means warnings and normal
+feature access. These choices do not grant recovery or wallet-spending authority.
 
 ## Product result
 

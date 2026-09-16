@@ -87,6 +87,11 @@ The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) records the initial
 research pass. Payment-request permission is separate from spend approval; valid
 cancellation of a known request must remain effective even when its payee is blocked.
 These are proposed future semantics, not changes to the accepted v1 code.
+Owner T1 refinement: community filtering applies automatically but valid filtered
+requests remain reviewable/restorable in Spam. Zero-reputation accounts can request
+and pay normally with reputation context shown to others; reputation is not a feature
+gate. Native confirmation and immutable request validation still apply. No code change
+or enabled payment execution is implied by this product decision.
 The owner requires persistent identity across desktop/phone, readable names and planned
 WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning

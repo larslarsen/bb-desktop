@@ -8,7 +8,9 @@ researched and resolved before freezing this architecture. See
 [trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). Naming choice N1 is deferred.
 The [initial research and integrated proposal](BB-TRUST-ARCHITECTURE-01.md) now
 describe scoped circles/lists, local enforcement and account/device migration impacts.
-T1 is pending; neither trust nor identity implementation is authorized.
+T1 is resolved: automatic community filtering with a Spam/review override, while
+zero-reputation accounts retain ordinary feature access with warnings. No trust or
+identity implementation is authorized; source/aggregation/protocol mechanics remain open.
 
 Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
 the migration boundaries, recovery-method shortlist, payment execution constraint and
