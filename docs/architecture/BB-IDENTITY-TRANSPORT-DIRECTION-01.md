@@ -3,6 +3,10 @@
 Owner requirements recorded by Codex, 2026-09-16. Status: architecture direction and
 migration gate; no identity, transport or calling implementation authorized by this note.
 
+Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
+the migration boundaries, recovery-method shortlist, payment execution constraint and
+owner naming choice N1. N1 remains pending; no account method or wire format is frozen.
+
 ## Required experience
 
 A person should retain one identity and contacts across desktop and phone daemons, and

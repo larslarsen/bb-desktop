@@ -1,5 +1,13 @@
 # Current Task
 
+ACTIVE REVIEWER DESIGN: portable accounts and recipient migration. Read
+[BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
+Naming choice N1 is pending owner input. The reviewer is responsible for selecting
+and assessing account authority; the owner is not being asked to choose cryptography.
+No source/test/execution actor or handoff is authorized. The four exact reviewer
+governance paths are enumerated at the end of the proposal. Existing v1 behavior
+remains accepted; the new account-protocol implementation gate has not passed.
+
 COMPLETE: BBD-PAY-001 — received requests in automatically updated Messages.
 
 Feature `f23950245c338d83072caa3d96503b69a21682e2` and closeout

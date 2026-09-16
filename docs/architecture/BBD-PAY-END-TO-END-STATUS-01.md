@@ -78,6 +78,9 @@ Step 1 is accepted and published; its execution handoffs are closed. No later st
 authorized for implementation by this planning sequence.
 Before steps 2–3 freeze new recipient/creation/approval contracts, settle the account/device
 migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
+The [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is the active
+reviewer design: naming choice N1 is pending, and authority-method/wire-contract
+selection remains an engineering gate. It is not an implementation handoff.
 The owner requires persistent identity across desktop/phone, readable names and planned
 WebRTC connectivity, with video calls later. The read-only v1 UI is complete; its current
 peer-ID binding must not silently acquire account/handle semantics. Later steps are planning
@@ -139,11 +142,12 @@ runtime, falsification, 22-test account UI target and publication are accepted; 
 local wallet resource and manifest are verified. No WAL-019 handoff remains active.
 The daemon binary has been refreshed directly; neither app was restarted.
 BBGO-DEV-001 is cancelled. BBGO-PAY-003's read endpoint and lifecycle integration
-are accepted. BBD-PAY-001 is the active desktop source task. Routine affected local
-artifact refresh is included in completion.
+are accepted. BBD-PAY-001 is complete; portable account/recipient architecture is the
+active reviewer work. Routine affected local artifact refresh is included in later
+implementation completion.
 Existing payment integration gaps and release blockers remain open.
 
-Reviewer governance paths for this authorization: this status map, desktop AGENTS.md,
+Historical PAY-001 governance paths for its closed authorization: this status map, desktop AGENTS.md,
 docs/engineering/DEVELOPMENT_ROLES.md, docs/handoff/CURRENT_TASK.md,
 tickets/BBD-PAY-001.md and docs/handoff/GROK_BUILD_BBD_PAY_001_INBOX_01.md.
 Repository documents are the owner's existing control plane for decisions,
