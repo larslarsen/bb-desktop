@@ -1,12 +1,9 @@
 # BBD-PAY-001 — visible received payment requests
 
-Status: ACCEPTED FOR SOURCE PUBLICATION; CONSOLIDATED FINAL EXECUTION AUTHORIZED.
-Active handoff: [Hermes publication/closeout](../docs/handoff/HERMES_BBD_PAY_001_PUBLICATION_01.md).
-[Review 20](../docs/testing/BBD-PAY-001-MESSAGES-REVIEW-20.md) verifies the clean exact
-95-path preparation scan. The single remaining assignment scans updated final bytes,
-commits/pushes the exact feature set, verifies origin/master, then writes/scans/publishes
-completion records and verifies again. No routine intermediate approval or handoff.
-Source remains frozen. Inherited release blockers and historical evidence limits remain.
+Status: PUBLISHED — REVIEWER FINAL VERIFICATION.
+Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
+[Publication report](../docs/testing/BBD-PAY-001-PUBLICATION-01.md).
+Inherited release blockers and historical evidence limits remain.
 [Identity/transport direction](../docs/architecture/BB-IDENTITY-TRANSPORT-DIRECTION-01.md)
 records portable accounts/readable names/WebRTC/video calls. Current read-only v1 binding
 remains; migration must precede the next signed-recipient creation/approval contract.

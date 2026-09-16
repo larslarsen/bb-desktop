@@ -1,18 +1,8 @@
 # Current Task
 
-ACTIVE: BBD-PAY-001 — Hermes final publication and closeout 01.
-
-[Review 20](../testing/BBD-PAY-001-MESSAGES-REVIEW-20.md) accepts the exact 95-path
-candidate scan, matching original/copy manifests, zero findings and complete metadata.
-Sole execution authority: [Hermes publication/closeout](HERMES_BBD_PAY_001_PUBLICATION_01.md).
-ONE assignment covers updated-final-byte scan, exact-path feature commit/push, remote
-verification, actual completion records and their scanned documentation commit/push.
-Do not add routine owner relays between successful authorized steps. Stop on failed
-checks, unexpected drift or remote movement; no source repair or force operations.
-No UI/application-suite/audit rerun, native build, restart or live node/wallet work.
-Final durable report: `docs/testing/BBD-PAY-001-PUBLICATION-01.md`.
+ACTIVE: BBD-PAY-001 — PUBLISHED — REVIEWER FINAL VERIFICATION.
+Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
 Functional acceptance stands; inherited release blockers and historical gaps remain.
-No actor launched; owner relays this consolidated final handoff.
 
 Owner reports monerod has synced. Availability is recorded in WAL-007/WAL-009 and the
 status map; node/network/height and wallet readiness are not independently verified.

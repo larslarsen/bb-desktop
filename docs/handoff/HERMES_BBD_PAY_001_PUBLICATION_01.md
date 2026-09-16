@@ -1,12 +1,6 @@
 # Hermes — PAY publication and closeout 01
 
-ACTIVE. Actor: locally installed Hermes, owner-relayed. Reviewer: Codex.
-Read AGENTS.md, TESTING.md, CURRENT_TASK, HERMES_JR_DEV_ROUTING.md and
-[review 20](../testing/BBD-PAY-001-MESSAGES-REVIEW-20.md).
-This ONE assignment authorizes the complete successful sequence below: final snapshot
-scan, exact-path feature commit/push, immutable/remote verification, actual closeout
-records, their scan/commit/push and final verification. Do not stop after a successful
-scan or first push to request a new handoff. Failure/drift still stops safely.
+CLOSED — feature `f23950245` published. No further execution authorized.
 
 ## Frozen baseline and scope
 

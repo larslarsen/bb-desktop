@@ -9,19 +9,11 @@ are published, with final immutable-range scan accepted in
 Daemon BBGO-PAY-003 is accepted and published: authenticated local read access to
 stored signed records. See its
 [final review](../../../bb-go/docs/testing/BBGO-PAY-003-FINAL-REVIEW-01.md).
-Active desktop task: [BBD-PAY-001](../../tickets/BBD-PAY-001.md), received request
-cards within the requesting peer's Messages conversation. Governing decision:
-[requests in Messages](BBD-PAY-MESSAGES-UX-01.md). The standalone Requests tab is
-superseded. Grok's automatic-inbox report is delivered and its handoff closed; Hermes
-standalone UI capture is superseded. Grok exhausted weekly usage during correction;
-source and 63-test green captures exist but its completion report is missing. Sole
-active authorization is now [Hermes final publication/closeout](../handoff/HERMES_BBD_PAY_001_PUBLICATION_01.md).
-[Review 20](../testing/BBD-PAY-001-MESSAGES-REVIEW-20.md) accepts the exact clean
-95-path candidate scan and complete capture. One bounded assignment covers updated
-final-file scanning, feature publication/remote verification and scanned completion-record
-publication. Functional acceptance stands; no source repair or routine repeated tests.
-Inherited release blockers and historical metadata limitations remain explicit.
-Recovery is closed;
+Active desktop task: [BBD-PAY-001](../../tickets/BBD-PAY-001.md) — PUBLISHED.
+Feature commit: `f23950245c338d83072caa3d96503b69a21682e2` on origin/master.
+[Publication report](../../docs/testing/BBD-PAY-001-PUBLICATION-01.md).
+Functional acceptance stands; inherited release blockers and historical metadata
+limitations remain explicit. No source repair or routine repeated tests.
 [review 02](../testing/BBD-PAY-001-MESSAGES-REVIEW-02.md) corrects its counts and requires
 read-status/receipt and runner/driver fixes. Sol High is selected because Grok is
 unavailable. Paused earlier source contract:
