@@ -15,9 +15,11 @@ The owner requires an extensive ring-of-trust system, including blacklists and
 whitelists, and directs that this be researched and resolved first. This precedes
 freezing portable account authority, naming/discovery, device enrollment and new
 payment-recipient contracts. The account proposal remains provisional input.
-Naming question N1 is unresolved and deferred at the owner's direction. No immediate
-naming blocker for account-authority assessment is established. Global uniqueness is
-neither required nor rejected; persistent identity and readable names remain required.
+Naming question N1 is unresolved and active following the owner's clarification that
+it needs to be solved, not ignored. Assess advertiser recognition and imitation using
+the owner's paid-ad proposals. Global uniqueness is neither required nor rejected;
+persistent identity and readable names remain required. The account proposal records
+the current analysis; it is not an accepted naming policy.
 
 Owner refinement recorded 2026-09-16: expect broad community agreement and apply its
 judgments automatically. Retain filtered content for inspection/override like a spam

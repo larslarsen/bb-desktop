@@ -7,8 +7,9 @@ or that its protocol gate has passed.
 
 Owner priority update: [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md),
 including blacklists and whitelists, comes first. This proposal's choices remain
-provisional and must be reassessed against that design. N1 is unresolved and deferred
-at the owner's direction; no immediate naming blocker for authority assessment is established.
+provisional and must be reassessed against that design. N1 is unresolved and active:
+the owner wants it solved. Review advertiser recognition and imitation using the
+owner's paid-ad example; no global name-allocation requirement is assumed.
 
 The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) now records the first
 research pass. Its sections 6 and 8 add account requirements: separate policy-writer
@@ -37,28 +38,73 @@ WebRTC can carry the same authenticated conversations. A future video call rings
 the account's eligible devices, and accepting on one device ends the other rings.
 Neither connecting a device nor accepting a call authorizes a wallet payment.
 
-## Readable names — unresolved and deferred (N1)
+## Readable names — active unresolved review (N1)
 
-Latest owner direction, 2026-09-16: move on if there is no pressing issue, without
-assuming naming has been solved. No immediate naming blocker for account-authority
-assessment has been established. Neither requiring nor rejecting global name uniqueness
-is an owner decision. Earlier reviewer recommendations and the unpublished withdrawal
-of N1 are not accepted naming designs. No answer is requested now.
+Latest owner clarification, 2026-09-16: “We need to solve this problem we can't just
+ignore it.” The reviewer interprets this as retaining active work on naming, not as
+acceptance of indefinite deferral. Neither requiring nor rejecting global name
+uniqueness is an owner decision. Earlier reviewer recommendations are not accepted
+naming designs. Continue with concrete consequences, without another option menu.
 
 The owner identifies paid ads as a discovery path. Do not invent a requirement that
 people must find each other by typing a globally unique username. The owner proposed
 perceptual image hashes for similar ad images, Levenshtein distance and confusable
 character checks for ad names, and optional DNS-based names for advertisers seeking
-more brand protection. These are proposals to revisit, not an approved solution or
+more brand protection. These are proposals under review, not an approved solution or
 evidence that uniqueness is either necessary or unnecessary. No ad policy, ownership
 rule, namespace, lookup mechanism or naming implementation is selected.
 
 Persistent identity across desktop/phone and readable names in normal use remain
-requirements. Continue account-authority assessment without deciding N1 implicitly.
-Revisit naming when concrete discovery/advertiser behavior needs a decision, or an
-identified engineering dependency makes it necessary; explain that dependency first.
+requirements. Account-authority assessment does not settle N1. The current naming
+review examines the owner's ad-protection proposal directly.
 The account design must preserve authenticated contact and approved-recipient bindings
 when presentation text changes.
+
+### What the ad example establishes
+
+The concrete concern is an imitation ad that looks like the intended advertiser but
+leads to another account. No such incident is claimed to have occurred. Giving every
+account a unique short name would prevent identical registered short names, but alone
+would not prevent copying an image or choosing a misleadingly similar name.
+
+The owner's similarity checks do **not** inherently require exclusive names. They
+compare records and report matches. Rejecting every matching name would add a separate
+exclusivity policy; merely finding a match does not add that policy. Optional domain
+verification uses a distinct full domain name; it does not require an exclusive
+business display name. For example, two hypothetical businesses could both display
+“Oak Bakery” while linking different domains to their respective accounts.
+
+**Reviewer recommendation for evaluation, not owner-approved policy:** use the proposed
+similarity checks as evidence of possible imitation, and optional domain verification
+as evidence of control of the particular displayed domain. Preserve ordinary account
+access without a domain. Payment for an ad is not proof of advertiser legitimacy.
+
+| Case | Proposed handling |
+| --- | --- |
+| An advertiser reuses its own image/name | Same authenticated account; similarity alone supplies no reason to call it impersonation. |
+| Different accounts use the same business name | A matching name alone does not establish deception or give the earlier account ownership. Preserve distinguishing account, reputation and any verified-domain information. |
+| A different account copies an ad's name and image | Flag the similarity for review with the matching evidence. Do not award name ownership to the first uploader. An adverse community judgment uses the existing trust criteria and reviewable filtering; similarity alone is not such a judgment. |
+| An account proves control of a domain | Show which domain was verified. This does not establish entitlement to every use of the business name or make the account generally trustworthy. |
+
+Primary references checked 2026-09-16: [ImageHash](https://github.com/JohannesBuchner/imagehash)
+documents image-similarity fingerprints; [Unicode UTS #39](https://www.unicode.org/reports/tr39/)
+describes confusable comparison and its limitations; the [AT Protocol handle specification](https://atproto.com/specs/handle)
+provides a concrete domain/account verification pattern and discusses lookalike domains.
+These support the mechanisms, not a conclusion about who legitimately owns a brand.
+No library or external identity system is selected by citing them.
+
+Remaining naming work is concrete: define how a flagged ad is reviewed and corrected,
+and evaluate whether the visible account/reputation/domain information lets someone
+distinguish the intended advertiser. Checks cover only the ads available to the
+checker; finding no match does not prove network-wide uniqueness. Similarity thresholds and
+false-match behavior need evaluation before implementation. This proposal supplies a
+path to assess the owner's idea; it neither solves impersonation completely nor
+settles whether an additional unique-name feature is wanted. Advertising implementation
+and broader auction/funding design remain outside this review.
+
+Documentation verification: inspected primary references and the scoped diff; 44 local
+links checked with zero missing targets; scoped `git diff --check` exited 0. No product
+or test source changed and no implementation tests were run.
 
 ## Reviewer account decisions
 
@@ -272,7 +318,7 @@ Next reviewer work is to assess the shortlisted authority method's implementatio
 deployment fit against trust section 3A, then freeze one bounded account-verifier
 contract with failure cases for forged enrollment, rollback, revocation, conflicts
 and restart.
-N1 is unresolved and deferred; no naming mechanism is assumed by method assessment.
+N1 remains an active unresolved review; no naming mechanism is assumed by method assessment.
 That contract must name exact source paths and retained evidence once ready. Do not
 send an implementer this proposal as an implicit source authorization. Consolidate
 source work and execution into their normal role-bounded phases; do not create a

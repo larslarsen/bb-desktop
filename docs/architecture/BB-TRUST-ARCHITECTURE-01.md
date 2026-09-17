@@ -58,8 +58,8 @@ Required qualifications:
    not an adverse judgment, and accumulated positive reputation is not an entry fee.
 4. Explore limited spam protection, without making ordinary newcomers earn feature access.
 
-No further answer to T1 is needed. N1 is unresolved and deferred at the owner's direction;
-no immediate naming blocker for account-authority assessment is established.
+No further answer to T1 is needed. N1 is unresolved and active following the owner's
+clarification; the account proposal examines the paid-ad recognition/imitator cases.
 Source selection, aggregation and limits are reviewer engineering work, not delegated
 to the owner.
 
@@ -691,8 +691,8 @@ first, then implement bounded pieces.
   a peer-only whitelist into permission for every device of a newly linked account
   without an explicit migration choice. Contradictory mappings remain unresolved.
 - Contacts may use local trust context to help choose among same-name search results.
-  Bind the selected result to its authenticated account. N1 remains unresolved and
-  deferred; no global uniqueness requirement or rejection has been established.
+  Bind the selected result to its authenticated account. N1 remains an active unresolved
+  review; no global uniqueness requirement or rejection has been established.
 - Payment-request permission means permission to present a request. Payment approval
   still requires native review of the exact authenticated account, request digest,
   asset/network/amount/receiver and selected wallet. “Trusted” never becomes auto-pay.
@@ -790,7 +790,8 @@ Next work is the portable account authority assessment using these constraints,
 followed by one coherent contract for records, persistence and local enforcement.
 No implementation actor is authorized. The account proposal records the initial
 implementation-fit assessment; no authority method is selected. Naming remains
-unresolved and deferred, and the reviewer has recommended returning to High.
+unresolved and active following the owner's clarification. The paid-ad proposal is
+under review; the reviewer has recommended returning to High.
 
 Initial research verification at commit `46c0f2367`: read source/specifications and
 inspect the scoped diff; 44 local document links had zero missing targets and scoped

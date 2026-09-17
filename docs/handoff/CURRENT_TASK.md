@@ -14,21 +14,24 @@ Reviewer architecture selection is recorded in section 3A: replaceable default p
 bounded assessor delegation, distinct-issuer matching and strict two-thirds quorum
 (initially four of five source groups), explicit expiry and finite synchronization.
 The actual source roster and workload calibration remain activation requirements.
-Next reviewer work: assess/select portable account authority against those requirements,
-then freeze the shared signed-record, private-sync and authenticated enforcement contract.
+Current reviewer work: assess the owner's naming/ad-protection proposal through concrete
+advertiser-recognition cases. Portable authority selection and the shared signed-record,
+private-sync and authenticated enforcement contract remain required engineering work.
 No further owner confirmation of T1 is needed.
 Codex has recommended returning to High after the owner's cost concern. This supersedes
 the earlier instruction to keep xhigh; the owner's actual setting change is unverified.
 No implementation actor or execution handoff is authorized.
 
-NEXT REVIEWER DESIGN: portable account authority and recipient migration. Read
+ACTIVE NAMING REVIEW and portable account design: read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
-N1 UNRESOLVED / DEFERRED: the owner directs moving on absent a pressing issue, without
-assuming naming is solved. No immediate naming blocker for authority assessment is
-established. Global uniqueness is neither required nor rejected. The account proposal
-records paid-ad discovery and the owner's ad-image/name-similarity and optional DNS
-ideas as proposals only. No naming answer is requested now. Revisit on a concrete
-product or engineering dependency; do not infer a unique-username lookup requirement.
+N1 ACTIVE / UNRESOLVED: the owner clarifies that naming needs to be solved, not ignored.
+The account proposal now evaluates paid-ad imitation, similarity checks and optional
+domain verification. Similarity detection does not inherently impose exclusive names;
+domain verification does not impose exclusive business display names. Proposed behavior
+is recorded with concrete cases and primary references, not as owner approval.
+Remaining work: handling/correction of flagged ads and evaluating visible advertiser
+distinctions. Global uniqueness is neither required nor rejected. Do not substitute
+authority research for resolving this product concern or require another option menu.
 Authority assessment has resumed: current peer-key persistence supplies daemon restart
 continuity, not a multi-device account. The initial KERI implementation-fit findings
 are recorded in the account proposal; no dependency or recovery profile is selected.

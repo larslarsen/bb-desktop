@@ -81,8 +81,8 @@ migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.m
 Owner now prioritizes [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md), including
 blacklists and whitelists, before freezing account/recipient architecture. The
 [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is provisional;
-N1 is unresolved and deferred; no immediate naming blocker for authority assessment is
-established. Authority-method/wire-contract selection and trust integration remain
+N1 remains an active unresolved review of naming and the owner's ad-protection proposal.
+Authority-method/wire-contract selection and trust integration remain
 engineering gates. None of these documents is an implementation handoff.
 The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) records the initial
 research pass. Payment-request permission is separate from spend approval; valid

@@ -5,8 +5,8 @@ migration gate; no identity, transport or calling implementation authorized by t
 
 Owner priority update: an extensive ring of trust, blacklists and whitelists must be
 researched and resolved before freezing this architecture. See
-[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). N1 is unresolved and deferred
-at the owner's direction. Readable names remain required; uniqueness is not decided.
+[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). N1 is unresolved and active
+following the owner's clarification. Readable names remain required; uniqueness is not decided.
 The [initial research and integrated proposal](BB-TRUST-ARCHITECTURE-01.md) now
 describe scoped circles/lists, local enforcement and account/device migration impacts.
 T1 is resolved: automatic community filtering with a Spam/review override, while
@@ -44,7 +44,7 @@ contracts must account for this requirement before they are frozen.
 Example: Bob saves Alice's authenticated account under her readable name. That account
 can authorize her laptop and phone. Replacing the phone changes device authorization
 and routing while preserving Bob's saved contact. Matching a name alone cannot select
-the account. Name uniqueness and discovery behavior remain unresolved and deferred;
+the account. Name uniqueness and discovery behavior remain under active review;
 account-ID format and contact binding remain engineering work.
 
 Proposed device model: separate device keys authorized by a recoverable account identity.
@@ -125,8 +125,8 @@ is not part of PAY-001.
 - Account authority/key rotation and recovery; enrollment/revocation of a lost phone;
   stale devices and conflicting authority updates.
 - Readable profile/contact presentation and authenticated selection in distributed
-  discovery; name changes must preserve saved account bindings. N1 is deferred, not
-  solved. Paid-ad discovery and the owner's ad-protection proposals are recorded in
+  discovery; name changes must preserve saved account bindings. N1 is active and
+  unresolved. Paid-ad discovery and the owner's ad-protection proposals are assessed in
   the account proposal; no unique-name lookup requirement is inferred.
 - Private history/key synchronization, device fan-out, offline queues, deduplication and
   consistent read/cancellation status. A second device must not cause duplicate payments.
