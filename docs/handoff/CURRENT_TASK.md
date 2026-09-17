@@ -17,13 +17,13 @@ The actual source roster and workload calibration remain activation requirements
 Account authority is now selected: a backed-up controller with independently revocable
 device keys. The first verifier contract is
 [BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md), which is also the sole handoff.
-Owner relays it to Codex Sol (`gpt-5.6-sol`, High). The daemon's principal-dev role
-authorizes its three test-source files only. No desktop source change or actor launch.
+The current daemon actor, phase and relay instructions are governed by that ticket
+and [bb-go CURRENT_TASK](../../../bb-go/docs/handoff/CURRENT_TASK.md). Follow their
+latest phase authorization. No desktop source change or actor launch is assigned here.
 No further owner confirmation of T1 is needed.
-Codex has recommended returning to High after the owner's cost concern. This supersedes
-the earlier instruction to keep xhigh; the owner's actual setting change is unverified.
-Hermes execution and production source require the ticket's later reviewer phase
-activation; they are not authorized now. Evidence goes in its named repository report.
+The owner confirms switching reviewer effort to High. This supersedes the earlier
+instruction to keep xhigh. Daemon evidence goes in the ticket's named repository report;
+this desktop routing note does not independently activate a daemon phase.
 
 SELECTED ACCOUNT ARCHITECTURE: read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
