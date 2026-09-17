@@ -14,27 +14,29 @@ Reviewer architecture selection is recorded in section 3A: replaceable default p
 bounded assessor delegation, distinct-issuer matching and strict two-thirds quorum
 (initially four of five source groups), explicit expiry and finite synchronization.
 The actual source roster and workload calibration remain activation requirements.
-Current reviewer work: assess the owner's naming/ad-protection proposal through concrete
-advertiser-recognition cases. Portable authority selection and the shared signed-record,
-private-sync and authenticated enforcement contract remain required engineering work.
+Current reviewer work: portable account authority for desktop/phone and independently
+revocable devices, followed by signed-record, private-sync and enforcement contracts.
+The owner directs continuing. Naming is not a prerequisite for this work.
 No further owner confirmation of T1 is needed.
 Codex has recommended returning to High after the owner's cost concern. This supersedes
 the earlier instruction to keep xhigh; the owner's actual setting change is unverified.
 No implementation actor or execution handoff is authorized.
 
-ACTIVE NAMING REVIEW and portable account design: read
+ACTIVE REVIEWER DESIGN: portable account authority. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
-N1 ACTIVE / UNRESOLVED: the owner clarifies that naming needs to be solved, not ignored.
-The account proposal now evaluates paid-ad imitation, similarity checks and optional
-domain verification. Similarity detection does not inherently impose exclusive names;
-domain verification does not impose exclusive business display names. Proposed behavior
-is recorded with concrete cases and primary references, not as owner approval.
-Remaining work: handling/correction of flagged ads and evaluating visible advertiser
-distinctions. Global uniqueness is neither required nor rejected. Do not substitute
-authority research for resolving this product concern or require another option menu.
-Authority assessment has resumed: current peer-key persistence supplies daemon restart
-continuity, not a multi-device account. The initial KERI implementation-fit findings
-are recorded in the account proposal; no dependency or recovery profile is selected.
+N1 PROVISIONAL / NOT A PROJECT GATE: the owner tentatively accepted the naming proposal
+with reservations and now directs continuing. Earlier instructions to obtain another
+naming decision before continuing are superseded. Do not report naming as solved or
+reopen the discussion without a concrete feature dependency.
+Completed source screen: grapeid/keri-go v0.1.5 at
+`f06d1dac5a36dea4b619eb6934e43e6fdc68b835` is not accepted unchanged. The account proposal
+records a rotation-threshold authorization gap, ignored threshold parse errors,
+recovery-reconciliation gaps in the reviewed APIs, and limited mobile evidence.
+These are source findings; no package execution or BitBook integration was performed.
+Next engineering comparison: an established primary-key/device-subkey model for the
+actual portability requirement, with explicit backup and root-compromise limits.
+No account method is selected yet. This gate applies to new account/device and signed
+recipient protocols, not unrelated UI work or the already accepted v1 behavior.
 No source/test/execution actor or handoff is authorized. The six exact reviewer
 governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.

@@ -7,9 +7,9 @@ or that its protocol gate has passed.
 
 Owner priority update: [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md),
 including blacklists and whitelists, comes first. This proposal's choices remain
-provisional and must be reassessed against that design. N1 is unresolved and active:
-the owner wants it solved. Review advertiser recognition and imitation using the
-owner's paid-ad example; no global name-allocation requirement is assumed.
+provisional and must be reassessed against that design. The owner directs continuing
+the project; N1 is not a prerequisite for portable-account engineering. Naming remains
+a provisional direction with reservations, not a solved problem or a global namespace decision.
 
 The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) now records the first
 research pass. Its sections 6 and 8 add account requirements: separate policy-writer
@@ -38,73 +38,23 @@ WebRTC can carry the same authenticated conversations. A future video call rings
 the account's eligible devices, and accepting on one device ends the other rings.
 Neither connecting a device nor accepting a call authorizes a wallet payment.
 
-## Readable names — active unresolved review (N1)
+## Readable names — provisional direction, not a project gate (N1)
 
-Latest owner clarification, 2026-09-16: “We need to solve this problem we can't just
-ignore it.” The reviewer interprets this as retaining active work on naming, not as
-acceptance of indefinite deferral. Neither requiring nor rejecting global name
-uniqueness is an owner decision. Earlier reviewer recommendations are not accepted
-naming designs. Continue with concrete consequences, without another option menu.
+Latest owner direction, 2026-09-16: continue the project. The reviewer had not established
+that choosing global name uniqueness was necessary to continue account portability.
+Earlier instructions to obtain a naming decision before continuing are superseded.
 
-The owner identifies paid ads as a discovery path. Do not invent a requirement that
-people must find each other by typing a globally unique username. The owner proposed
-perceptual image hashes for similar ad images, Levenshtein distance and confusable
-character checks for ad names, and optional DNS-based names for advertisers seeking
-more brand protection. These are proposals under review, not an approved solution or
-evidence that uniqueness is either necessary or unnecessary. No ad policy, ownership
-rule, namespace, lookup mechanism or naming implementation is selected.
+The owner tentatively accepted the proposal with explicit reservations. Retain readable
+names, the owner's ad-image/name-similarity proposal, optional verified domains and
+reviewable trust filtering as provisional direction. Do not report a confident final
+endorsement, guaranteed impersonation prevention, or a selected global namespace.
+Do not reopen a general naming debate unless a specific feature requires a decision.
 
-Persistent identity across desktop/phone and readable names in normal use remain
-requirements. Account-authority assessment does not settle N1. The current naming
-review examines the owner's ad-protection proposal directly.
-The account design must preserve authenticated contact and approved-recipient bindings
-when presentation text changes.
-
-### What the ad example establishes
-
-The concrete concern is an imitation ad that looks like the intended advertiser but
-leads to another account. No such incident is claimed to have occurred. Giving every
-account a unique short name would prevent identical registered short names, but alone
-would not prevent copying an image or choosing a misleadingly similar name.
-
-The owner's similarity checks do **not** inherently require exclusive names. They
-compare records and report matches. Rejecting every matching name would add a separate
-exclusivity policy; merely finding a match does not add that policy. Optional domain
-verification uses a distinct full domain name; it does not require an exclusive
-business display name. For example, two hypothetical businesses could both display
-“Oak Bakery” while linking different domains to their respective accounts.
-
-**Reviewer recommendation for evaluation, not owner-approved policy:** use the proposed
-similarity checks as evidence of possible imitation, and optional domain verification
-as evidence of control of the particular displayed domain. Preserve ordinary account
-access without a domain. Payment for an ad is not proof of advertiser legitimacy.
-
-| Case | Proposed handling |
-| --- | --- |
-| An advertiser reuses its own image/name | Same authenticated account; similarity alone supplies no reason to call it impersonation. |
-| Different accounts use the same business name | A matching name alone does not establish deception or give the earlier account ownership. Preserve distinguishing account, reputation and any verified-domain information. |
-| A different account copies an ad's name and image | Flag the similarity for review with the matching evidence. Do not award name ownership to the first uploader. An adverse community judgment uses the existing trust criteria and reviewable filtering; similarity alone is not such a judgment. |
-| An account proves control of a domain | Show which domain was verified. This does not establish entitlement to every use of the business name or make the account generally trustworthy. |
-
-Primary references checked 2026-09-16: [ImageHash](https://github.com/JohannesBuchner/imagehash)
-documents image-similarity fingerprints; [Unicode UTS #39](https://www.unicode.org/reports/tr39/)
-describes confusable comparison and its limitations; the [AT Protocol handle specification](https://atproto.com/specs/handle)
-provides a concrete domain/account verification pattern and discusses lookalike domains.
-These support the mechanisms, not a conclusion about who legitimately owns a brand.
-No library or external identity system is selected by citing them.
-
-Remaining naming work is concrete: define how a flagged ad is reviewed and corrected,
-and evaluate whether the visible account/reputation/domain information lets someone
-distinguish the intended advertiser. Checks cover only the ads available to the
-checker; finding no match does not prove network-wide uniqueness. Similarity thresholds and
-false-match behavior need evaluation before implementation. This proposal supplies a
-path to assess the owner's idea; it neither solves impersonation completely nor
-settles whether an additional unique-name feature is wanted. Advertising implementation
-and broader auction/funding design remain outside this review.
-
-Documentation verification: inspected primary references and the scoped diff; 44 local
-links checked with zero missing targets; scoped `git diff --check` exited 0. No product
-or test source changed and no implementation tests were run.
+Account authority, device enrollment/revocation and signed recipient binding use stable
+account references independently of presentation names. Their engineering review can
+proceed. A future naming feature must explain its own dependency and behavior; it must
+not become a prerequisite for unrelated project work. The next work below concerns the
+actual desktop/phone requirement, not another naming choice for the owner.
 
 ## Reviewer account decisions
 
@@ -176,6 +126,48 @@ for the actual desktop/phone deployment and map the existing device capabilities
 it. Do not require the owner to choose cryptography or introduce a mandatory hosted
 identity service to bypass this assessment. No implementation, build or runtime
 verification was performed. Naming remains outside this selection.
+
+### Pinned Go implementation review, 2026-09-16
+
+**Decision: do not adopt `github.com/grapeid/keri-go` v0.1.5 unchanged.**
+Source reviewed at commit `f06d1dac5a36dea4b619eb6934e43e6fdc68b835`, which the upstream
+GitHub tag API identifies as v0.1.5. This is a separate implementation from the archived
+DIF `kerigo`; the earlier archived-library finding did not exhaust Go candidates.
+
+Reviewed the pinned README, module manifest, validation, signed-log, delegation,
+duplicity and keychain sources plus mobile documentation. The manifest declares Go
+1.24 and BLAKE3 dependencies. This is compatible in declared language level with the
+current Go 1.27 daemon, but no compilation or integration was performed.
+
+| Finding | Evidence and consequence |
+| --- | --- |
+| Rotation does not enforce the prior next-key threshold against actual signers in the reviewed path | `checkPrecommitment` checks the old threshold against public keys *listed* in the rotation. `ValidateSignedKEL` then switches to the rotation's new threshold before checking signatures. The verified signer set is not checked against the old threshold. A rotation listing two previously committed keys, setting its new threshold to one and carrying one valid signature follows those checks despite a prior threshold of two. This conflicts with KERI's dual-threshold rule and prevents accepting the package unchanged for account authority. This is source reasoning, not an executed reproduction. |
+| Malformed threshold parsing can leave validation without a threshold | `ParseEvent` discards errors from `parseThreshold`; the signature path enforces the threshold only when it is non-nil. Presence/order checks do not validate the threshold value's type. A strict caller would need to reject such inputs before trusting the result. |
+| The reviewed APIs do not provide reconciliation of an already observed history with a valid superseding recovery | `ValidateKEL` checks a contiguous single chain; `Watcher.Observe` reports differing events at the same sequence as duplicity. Neither reviewed path applies KERI's superseding-recovery rules. The application cannot equate every such result with an unrecoverable account conflict. |
+| Mobile readiness remains limited evidence | The upstream mobile note reports cross-compilation/binding but explicitly says nothing has run on a device. Those are upstream claims, not BitBook acceptance results. |
+
+Pinned primary evidence:
+[precommitment and parsing](https://github.com/grapeid/keri-go/blob/f06d1dac5a36dea4b619eb6934e43e6fdc68b835/validation.go),
+[signature validation](https://github.com/grapeid/keri-go/blob/f06d1dac5a36dea4b619eb6934e43e6fdc68b835/signed_kel.go),
+[observed-history handling](https://github.com/grapeid/keri-go/blob/f06d1dac5a36dea4b619eb6934e43e6fdc68b835/duplicity.go),
+[mobile limitations](https://github.com/grapeid/keri-go/blob/f06d1dac5a36dea4b619eb6934e43e6fdc68b835/MOBILE.md).
+The [KERI specification](https://trustoverip.github.io/kswg-keri-specification/) sections
+“Rotation using pre-rotation” and “Superseding Recovery” supply the comparison rules.
+The README's conformance/interoperability pass counts were not independently reproduced.
+No dependency was installed, no upstream code was executed or modified, and no upstream
+report was sent. A reproduction/correction would require a bounded source/test task.
+
+This completes the initial source screen of this candidate, not the entire account
+method selection. It rules out a particular adoption path rather than blocking the
+whole project. Next assess an established primary-key/device-subkey model against the
+narrow portability requirement, including its root-key backup/compromise limitation.
+The existing shortlist's rejection of `did:key` *alone* must not be misread as proof
+that a backed-up stable controller with separately revocable device keys cannot work.
+No identity-method decision is delegated to the owner.
+
+Review checks: inspected the two-file diff, checked 28 local document links with no
+missing targets, and ran scoped `git diff HEAD --check` (exit 0). These are document
+checks, not execution evidence for the candidate or the daemon.
 
 ### Required behavior of the selected method/profile
 
@@ -318,7 +310,7 @@ Next reviewer work is to assess the shortlisted authority method's implementatio
 deployment fit against trust section 3A, then freeze one bounded account-verifier
 contract with failure cases for forged enrollment, rollback, revocation, conflicts
 and restart.
-N1 remains an active unresolved review; no naming mechanism is assumed by method assessment.
+N1 is provisional and not a gate for this work; no global naming mechanism is assumed.
 That contract must name exact source paths and retained evidence once ready. Do not
 send an implementer this proposal as an implicit source authorization. Consolidate
 source work and execution into their normal role-bounded phases; do not create a
