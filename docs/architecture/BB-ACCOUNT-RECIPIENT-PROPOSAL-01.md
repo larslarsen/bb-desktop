@@ -1,7 +1,8 @@
 # Portable accounts and recipient migration
 
-Reviewer: Codex, 2026-09-16. Status: architecture proposal; no implementation
-authorized. This develops the [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
+Reviewer: Codex, 2026-09-16. Status: account authority selected; first verifier contract
+authorized in [BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md), test-source phase.
+This develops the [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
 PAY-001 remains complete. This proposal does not claim that account migration exists
 or that its protocol gate has passed.
 
@@ -15,8 +16,8 @@ The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) now records the fir
 research pass. Its sections 6 and 8 add account requirements: separate policy-writer
 and assertion-publisher capabilities, private policy synchronization, conservative
 revocation/conflict handling, and preservation of trust scope during legacy migration.
-Social trust does not implicitly appoint account-recovery authorities. No identity
-method is selected by that proposal. T1 is now resolved: automatic community filtering
+Social trust does not implicitly appoint account-recovery authorities. The account
+authority selection below supplies that separate boundary. T1 is resolved: automatic community filtering
 with reviewable Spam/personal overrides; zero reputation means warnings and normal
 feature access. These choices do not grant recovery or wallet-spending authority.
 Section 3A now selects a replaceable community profile, bounded explicit assessor
@@ -24,7 +25,7 @@ delegation, distinct-issuer quorum evaluation and expiry. Account authority must
 assessment and profile-update capabilities separately from message signing, support
 causal revocation without resetting a source's identity, and never infer recovery
 authority from participation standing. The real source roster is a later activation
-requirement; it does not prevent assessing the account method now.
+requirement; it does not prevent the bounded account-verifier implementation.
 
 ## Product result
 
@@ -77,12 +78,64 @@ actual desktop/phone requirement, not another naming choice for the owner.
 7. Social device enrollment transfers no wallet keys or spending authority. Replayed
    delivery to two devices is one logical request, not two payment instructions.
 
-## Account authority: requirements and method shortlist
+## Selected account authority
 
-Account identity must survive replacement of operational device keys. Its controller
-state must support rotation, enrollment, revocation and a deliberately configured
-recovery path. An authenticated history of those changes is needed; simply fetching
-the highest sequence number advertised by an arbitrary peer is insufficient.
+Use one backed-up Ed25519 account controller and separate Ed25519 application-signing
+keys for each device. The account identifier derives from the controller's public key;
+it remains the same when a phone is added, replaced or revoked. Routine messages use
+device keys. The controller signs narrowly scoped grants and revocations; the enrolling
+device also signs its grant to confirm the binding. Neither names nor reputation
+authorize enrollment. Existing libp2p transport keys and v1 signed meanings stay intact.
+
+This selects the established primary-key/subkey pattern, not the OpenPGP wire format.
+[RFC 9580 sections 5.2.1.8–9 and 5.2.1.12](https://www.rfc-editor.org/rfc/rfc9580.html#section-5.2.1.8)
+specify primary/subkey binding, a signing subkey's cross-signature and primary-authorized
+subkey revocation. Those are useful precedents. BitBook still needs its own explicit
+capabilities, revocation handling and synchronization contract; adding an OpenPGP parser
+would not supply them. The bounded verifier uses Go's existing
+[standard Ed25519 implementation](https://pkg.go.dev/crypto/ed25519), with no new
+cryptographic algorithm or dependency. Its application protocol still requires source
+review and executable evidence; referencing the standard is not a security audit.
+
+Recovery means restoring the controller from its protected backup and replacing lost
+device keys. The controller must be protected separately from routine device keys;
+ordinary phone enrollment does not copy it. Losing every controller backup loses
+control; stealing the controller compromises the account. This profile does not promise
+same-identifier recovery after controller compromise or controller-key rotation.
+Changing the controller requires an explicit new-account migration, including trust
+and contact handling. This narrows the earlier overbroad rotation requirement to the
+actual device-portability need; no owner request required loss-proof root recovery.
+
+Revocations are permanent, signed facts. Revoking a grant removes that grant; revoking
+a device key removes all its grants, including grants learned later. Re-enrollment after
+device revocation uses a new device key. Devices merge verified records without choosing
+a winner by clock time. Device permissions remain separate for messages, payment
+requests, private policy, assessments and community-profile updates. A profile-update
+permission is only one prerequisite; the trust profile's membership and quorum still apply.
+
+[BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md) freezes the bytes, verification,
+known-state rules, bounds and test obligations for one isolated daemon package. It is
+the single source/acceptance contract for this slice. Sol High authors tests first;
+Hermes owns execution and evidence under reviewer phase authorization. The reviewer
+does not implement or execute tests, and the owner only relays the document pointer.
+
+This first package does not turn on portable accounts. Before integration, finish
+protected controller backup/unlock, authenticated device pairing, durable revocation
+storage and bounded synchronization/freshness. A partition can hide a revocation;
+`AuthorizesKnown` proves only the supplied local authority state. New message/request
+admission and payment approval need their own freshness rules. Private-history recovery
+is separate. These are subsequent implementation boundaries, not reasons to block this
+verifier or unrelated accepted features. No additional naming decision is needed.
+
+## Earlier method comparison and source evidence
+
+The assessments below explain the selection above. They are historical comparisons,
+not a still-open request to choose another identity method.
+
+Account identity must survive replacement of operational device keys. The selected
+controller authorizes enrollment and revocation; backup supplies its recovery path.
+Verified records are needed; simply fetching the highest sequence number advertised
+by an arbitrary peer is insufficient.
 
 | Candidate | Primary-source finding | Reviewer disposition |
 | --- | --- | --- |
@@ -98,11 +151,10 @@ Sources checked 2026-09-16: [did:key method](https://w3c-ccg.github.io/did-key-s
 These findings explain the shortlist; none establishes library suitability or a
 production-ready BitBook recovery system.
 
-**Recommendation:** evaluate an existing transferable-identity method before inventing
-a BitBook key-rotation protocol. Keep the account identifier opaque outside the
-identity verifier. The choice of method is an engineering gate, not a request for the
-owner to choose cryptography. No `did:bb` syntax, new algorithm or dependency is
-approved by this proposal.
+**Earlier recommendation, assessment now complete:** evaluate an existing transferable
+identity method before inventing a BitBook key-rotation protocol. The selected profile
+keeps the controller stable and rotates device keys. Keep the account identifier opaque
+outside the verifier. No `did:bb` syntax, new algorithm or dependency is approved.
 
 ### Initial implementation-fit assessment, 2026-09-16
 
@@ -157,10 +209,9 @@ The README's conformance/interoperability pass counts were not independently rep
 No dependency was installed, no upstream code was executed or modified, and no upstream
 report was sent. A reproduction/correction would require a bounded source/test task.
 
-This completes the initial source screen of this candidate, not the entire account
-method selection. It rules out a particular adoption path rather than blocking the
-whole project. Next assess an established primary-key/device-subkey model against the
-narrow portability requirement, including its root-key backup/compromise limitation.
+This completed the initial source screen of this candidate. It ruled out a particular
+adoption path. The subsequent primary-key/device-subkey comparison and selection are
+recorded above, including the root-key backup/compromise limitation.
 The existing shortlist's rejection of `did:key` *alone* must not be misread as proof
 that a backed-up stable controller with separately revocable device keys cannot work.
 No identity-method decision is delegated to the owner.
@@ -194,8 +245,8 @@ checks, not execution evidence for the candidate or the daemon.
 ## Recipient contract and payment safety
 
 The following are semantic requirements, not a JSON schema or canonical signed format.
-Wire fields, domain separators, bounds and test vectors must be frozen together after
-the authority method is selected.
+Their wire fields, domain separators, bounds and test vectors must be frozen together
+in the later recipient contract using the selected account authority.
 
 | Binding | Meaning |
 | --- | --- |
@@ -306,17 +357,13 @@ work is preserved. Inspected implementation:
 No product/test source changed and no tests, scans, builds, live nodes or wallet
 operations ran for this architecture review. No implementation actor was launched.
 
-Next reviewer work is to assess the shortlisted authority method's implementation and
-deployment fit against trust section 3A, then freeze one bounded account-verifier
-contract with failure cases for forged enrollment, rollback, revocation, conflicts
-and restart.
-N1 is provisional and not a gate for this work; no global naming mechanism is assumed.
-That contract must name exact source paths and retained evidence once ready. Do not
-send an implementer this proposal as an implicit source authorization. Consolidate
-source work and execution into their normal role-bounded phases; do not create a
-handoff for each individual design subsection.
+The authority comparison is complete. Next actor work is ACC-001's three test files;
+its single ticket names the protocol, exact paths, executable gates and evidence owner.
+The reviewer inspects that drop before execution and records phase changes there.
+Persistence/restart, pairing/custody and admission freshness are subsequent integration
+contracts. N1 remains provisional and is not a gate for this work. Consolidate source
+work and execution into their normal role-bounded phases; no handoff per subsection.
 
-Reviewer-authored governance scope for this review: this proposal,
-`BB-IDENTITY-TRANSPORT-DIRECTION-01.md`, `BBD-PAY-END-TO-END-STATUS-01.md` and
-`../handoff/CURRENT_TASK.md`, all in bb-desktop. No daemon publication is part of it;
-the daemon's existing direction link reaches this proposal through the direction note.
+Reviewer governance publication scope and cross-repository baselines are enumerated
+in [BB-TRUST-RESEARCH-SCOPE-01](BB-TRUST-RESEARCH-SCOPE-01.md): six desktop documents
+and exactly the new ticket/current-task routing in bb-go. All other work is preserved.

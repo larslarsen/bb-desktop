@@ -7,19 +7,20 @@ community filtering, reviewable Spam with personal overrides, full ordinary feat
 access with warnings for zero-reputation accounts, and limited spam protection.
 Section 3A now selects reviewer engineering semantics for source profiles, bounded
 delegation, quorum evaluation and expiry. Wire/identity integration and calibration
-remain open; no source work authorized.
+remain open. The first account-verifier source task is bounded by
+[BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md); its current phase controls authorization.
 
 ## Priority correction
 
 The owner requires an extensive ring-of-trust system, including blacklists and
 whitelists, and directs that this be researched and resolved first. This precedes
 freezing portable account authority, naming/discovery, device enrollment and new
-payment-recipient contracts. The account proposal remains provisional input.
-Naming question N1 is unresolved and active following the owner's clarification that
-it needs to be solved, not ignored. Assess advertiser recognition and imitation using
-the owner's paid-ad proposals. Global uniqueness is neither required nor rejected;
-persistent identity and readable names remain required. The account proposal records
-the current analysis; it is not an accepted naming policy.
+payment-recipient contracts. T1 and the shared trust semantics are now recorded;
+the account proposal selects authority within those constraints.
+Naming N1 is provisional and is not a project gate. The owner tentatively accepted
+the proposal with reservations and directed continuing. Do not reopen a general naming
+debate without a concrete feature dependency. Persistent identity and readable names
+remain required; no final global namespace decision is claimed.
 
 Owner refinement recorded 2026-09-16: expect broad community agreement and apply its
 judgments automatically. Retain filtered content for inspection/override like a spam
@@ -66,8 +67,10 @@ of explicit assessor delegation, distinct-issuer matching, strict two-thirds quo
 expiring evidence and finite synchronization budgets. Initial default: five groups,
 four qualifying contributions. Source independence is an explicit reviewed assumption;
 the actual launch roster and calibrated resource limits are not yet established.
-The owner-selected behavior is settled. Account method, wire representation, private
-synchronization and enforcement integration remain reviewer engineering work.
+The owner-selected behavior is settled. The account proposal now selects a backed-up
+account controller with separately revocable device keys. BBGO-ACC-001 freezes its
+first verifier contract. Private synchronization and enforcement integration remain
+reviewer engineering work.
 
 ## Deliverable and continuation
 
@@ -81,11 +84,28 @@ before selecting data models or algorithms. Produce one integrated proposal with
 4. Bounded implementation sequence and meaningful acceptance cases.
 
 Record all findings and decisions in repository documents. Do not create a separate
-actor handoff for each research question. Existing PAY-001 acceptance is unchanged;
-no source, tests, live wallets, daemon operations or actors are authorized here.
+actor handoff for each research question. Existing PAY-001 acceptance is unchanged.
+Only BBGO-ACC-001's active phase authorizes source work; this scope does not authorize
+live wallets, daemon operations or actor launches.
 
 Reviewer governance scope: this scope document, `BB-TRUST-ARCHITECTURE-01.md`,
 `BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md`,
 `BB-IDENTITY-TRANSPORT-DIRECTION-01.md`, `BBD-PAY-END-TO-END-STATUS-01.md` and
-`../handoff/CURRENT_TASK.md`, all in bb-desktop. The existing daemon direction link
-leads to this priority; no daemon edit or publication is included.
+`../handoff/CURRENT_TASK.md`, all in bb-desktop. This continuation also authorizes
+exactly `tickets/BBGO-ACC-001.md` and `docs/handoff/CURRENT_TASK.md` in bb-go for the
+reviewer-authored contract and routing. No other daemon changes are included.
+
+Cross-repository publication baselines: bb-desktop
+`58c854dbeda3031a57ac18ee601f1a588496d28d`; bb-go
+`cd497749a771b063300e2c3edf8748fe285b06c4`. Validate the scoped diffs, local links,
+source baseline hashes and whitespace; commit and publish only these enumerated
+governance paths in each repository. Preserve all unrelated dirty/untracked work.
+This exception includes no source/test integration, test execution or implementation
+evidence. Source authors and Hermes retain their existing roles.
+
+Reviewer verification for this continuation: inspected the eight scoped document
+changes and primary-source comparison; the local-link audit checked 89 links with
+zero missing targets. The ticket's four frozen source SHA-256 values match, and all
+six reserved source/test targets remain absent. Scoped tracked `git diff --check`
+returned exit 0 in both repositories. No implementation or execution evidence is
+claimed by these documentation checks.

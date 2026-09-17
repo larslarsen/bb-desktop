@@ -5,7 +5,9 @@ Reviewer: Codex. Started 2026-09-16 against the
 Status: owner product decision T1 recorded; reviewer selects the community-source,
 aggregation and freshness architecture in section 3A. Wire/identity integration and
 measured resource calibration remain prerequisites for implementation authorization.
-No trust implementation, protocol format or identity method is authorized.
+No trust enforcement implementation is authorized. The account authority selection
+and isolated verifier contract are now recorded in the account proposal and
+[BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md), test-source phase only.
 Codex has recommended returning to High after the owner's cost concern. This supersedes
 the earlier direction to retain xhigh; no actual setting change is verified. Continue
 bounded reviewer work without requiring an effort increase.
@@ -58,8 +60,8 @@ Required qualifications:
    not an adverse judgment, and accumulated positive reputation is not an entry fee.
 4. Explore limited spam protection, without making ordinary newcomers earn feature access.
 
-No further answer to T1 is needed. N1 is unresolved and active following the owner's
-clarification; the account proposal examines the paid-ad recognition/imitator cases.
+No further answer to T1 is needed. N1 is provisional with owner reservations and is
+not a project gate; the account proposal records the latest direction to continue.
 Source selection, aggregation and limits are reviewer engineering work, not delegated
 to the owner.
 
@@ -691,8 +693,8 @@ first, then implement bounded pieces.
   a peer-only whitelist into permission for every device of a newly linked account
   without an explicit migration choice. Contradictory mappings remain unresolved.
 - Contacts may use local trust context to help choose among same-name search results.
-  Bind the selected result to its authenticated account. N1 remains an active unresolved
-  review; no global uniqueness requirement or rejection has been established.
+  Bind the selected result to its authenticated account. N1 remains provisional and
+  does not block this work; no final global namespace decision is claimed.
 - Payment-request permission means permission to present a request. Payment approval
   still requires native review of the exact authenticated account, request digest,
   asset/network/amount/receiver and selected wallet. “Trusted” never becomes auto-pay.
@@ -777,8 +779,9 @@ or claimed passing results.
    personal protections; transport optimization is an independent later task.
 
 One source phase and one execution/evidence phase per cohesive slice, subject to the
-repository role rules; no handoff per design subsection. No implementation actor is
-selected or launched by this proposal, and no work is assigned to Hermes now.
+repository role rules; no handoff per design subsection. ACC-001 is the single contract
+for the first account verifier, with Sol High test-source authoring active. No actor
+has been launched and no execution is assigned to Hermes yet.
 
 **Review outcome:** T1 is resolved by the owner's automatic-filtering/Spam/newcomer
 requirements. The previous A recommendation and novice restrictions are superseded.
@@ -786,12 +789,11 @@ No further product confirmation is requested for those requirements. The reviewe
 selects section 3A's profile/bootstrap authority, delegation, aggregation, expiry and
 bounded-data model. Shared authority/wire/private-sync/API integration remains to be
 frozen; real source identities and workload calibration are activation requirements.
-Next work is the portable account authority assessment using these constraints,
-followed by one coherent contract for records, persistence and local enforcement.
-No implementation actor is authorized. The account proposal records the initial
-implementation-fit assessment; no authority method is selected. Naming remains
-unresolved and active following the owner's clarification. The paid-ad proposal is
-under review; the reviewer has recommended returning to High.
+The account proposal now selects a backed-up controller with independent, revocable
+device keys. ACC-001 freezes the first grant/revocation verifier; private synchronization,
+durability, freshness and local enforcement remain follow-on integration contracts.
+Naming remains provisional with reservations and is not a project gate. The reviewer
+has recommended returning to High.
 
 Initial research verification at commit `46c0f2367`: read source/specifications and
 inspect the scoped diff; 44 local document links had zero missing targets and scoped
@@ -805,5 +807,5 @@ diff and primary implementation/specification references. The local link audit c
 44 links with zero missing targets; scoped `git diff --check` exited 0.
 No product/test code changes, tests, acceptance commands,
 security scans, builds, live-node/wallet operations or private user-data reads.
-Publication scope is the six reviewer-authored governance paths enumerated in the
+Publication scope is the reviewer-authored governance paths enumerated in the
 [research scope](BB-TRUST-RESEARCH-SCOPE-01.md); unrelated work is preserved.

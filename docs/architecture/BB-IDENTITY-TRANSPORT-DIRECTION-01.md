@@ -5,19 +5,22 @@ migration gate; no identity, transport or calling implementation authorized by t
 
 Owner priority update: an extensive ring of trust, blacklists and whitelists must be
 researched and resolved before freezing this architecture. See
-[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). N1 is unresolved and active
-following the owner's clarification. Readable names remain required; uniqueness is not decided.
+[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). N1 is provisional with owner
+reservations and is not a project gate. Readable names remain required.
 The [initial research and integrated proposal](BB-TRUST-ARCHITECTURE-01.md) now
 describe scoped circles/lists, local enforcement and account/device migration impacts.
 T1 is resolved: automatic community filtering with a Spam/review override, while
-zero-reputation accounts retain ordinary feature access with warnings. No trust or
-identity implementation is authorized. Trust section 3A selects source/bootstrap,
-bounded aggregation and freshness semantics; account authority, shared wire/private-sync
-contracts, launch source identities and measured calibration still need completion.
+zero-reputation accounts retain ordinary feature access with warnings. Trust section
+3A selects source/bootstrap, bounded aggregation and freshness semantics. Account
+authority is now selected; shared trust/private-sync contracts, launch source identities
+and measured calibration still need completion.
 
 Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
 the migration boundaries, recovery-method shortlist, payment execution constraint and
-corrected naming scope. No account method or wire format is frozen.
+corrected naming scope. It selects a backed-up account controller with independently
+revocable device keys. [BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md) freezes
+the first isolated verifier and authorizes Sol High test-source work. No daemon/client
+identity integration, transport or call implementation is authorized by that task.
 
 ## Required experience
 
@@ -122,12 +125,12 @@ is not part of PAY-001.
 
 ## Decisions still needed before migration implementation
 
-- Account authority/key rotation and recovery; enrollment/revocation of a lost phone;
-  stale devices and conflicting authority updates.
+- Protected controller backup/unlock and device pairing under the selected authority;
+  durable revocation synchronization and freshness for newly admitted operations.
 - Readable profile/contact presentation and authenticated selection in distributed
-  discovery; name changes must preserve saved account bindings. N1 is active and
-  unresolved. Paid-ad discovery and the owner's ad-protection proposals are assessed in
-  the account proposal; no unique-name lookup requirement is inferred.
+  discovery; name changes must preserve saved account bindings. N1 is provisional,
+  not a migration prerequisite. Paid-ad protection remains provisional in the account
+  proposal; no unique-name lookup requirement is inferred.
 - Private history/key synchronization, device fan-out, offline queues, deduplication and
   consistent read/cancellation status. A second device must not cause duplicate payments.
 - Mapping v1 peer identities to accounts, authority for signing new payment requests,

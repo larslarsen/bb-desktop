@@ -80,10 +80,12 @@ Before steps 2–3 freeze new recipient/creation/approval contracts, settle the 
 migration in [identity/transport direction](BB-IDENTITY-TRANSPORT-DIRECTION-01.md).
 Owner now prioritizes [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md), including
 blacklists and whitelists, before freezing account/recipient architecture. The
-[account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) is provisional;
-N1 remains an active unresolved review of naming and the owner's ad-protection proposal.
-Authority-method/wire-contract selection and trust integration remain
-engineering gates. None of these documents is an implementation handoff.
+[account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) now selects a backed-up
+controller with independent revocable device keys. Naming and ad protection remain
+provisional with owner reservations and do not block that work. The isolated verifier
+contract [BBGO-ACC-001](../../../bb-go/tickets/BBGO-ACC-001.md) is the first handoff,
+Sol High test-source phase only. Durable authority synchronization, trust integration
+and signed-recipient/native approval contracts remain engineering gates for steps 2–3.
 The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) records the initial
 research pass. Payment-request permission is separate from spend approval; valid
 cancellation of a known request must remain effective even when its payee is blocked.
