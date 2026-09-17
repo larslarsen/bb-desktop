@@ -15,7 +15,9 @@ The owner requires an extensive ring-of-trust system, including blacklists and
 whitelists, and directs that this be researched and resolved first. This precedes
 freezing portable account authority, naming/discovery, device enrollment and new
 payment-recipient contracts. The account proposal remains provisional input.
-Its naming question N1 is deferred; the owner need not answer it before this work.
+Naming question N1 is unresolved and deferred at the owner's direction. No immediate
+naming blocker for account-authority assessment is established. Global uniqueness is
+neither required nor rejected; persistent identity and readable names remain required.
 
 Owner refinement recorded 2026-09-16: expect broad community agreement and apply its
 judgments automatically. Retain filtered content for inspection/override like a spam
@@ -24,13 +26,12 @@ develops. Limited spam controls are acceptable if feasible. This supersedes the
 reviewer's earlier explicit-subscription default and restrictions on unknown users.
 Agreement is a product expectation, not a verified assumption for raw majority voting.
 
-The owner reports setting reasoning to xhigh and considers higher settings excessive.
-That satisfies the requested session adjustment; do not ask for another increase.
-Codex did not change the setting. The owner also asks to be told when High is sufficient.
-Retain xhigh through the remaining trust/identity authority architecture; explicitly
-tell the owner when semantics are fixed and the work moves to bounded implementation
-or review. This is a task-specific reviewer judgment, not a claim about measured model
-performance. The [architecture record](BB-TRUST-ARCHITECTURE-01.md) retains the decisions.
+The owner previously selected xhigh, then raised the cost of continued discussion.
+Codex subsequently recommended switching to High. This supersedes the earlier direction
+to retain xhigh through authority architecture; do not request an increase. No setting
+change by the owner is verified. The recommendation is task-specific judgment, not a
+measured model-performance claim. Keep continuation bounded and avoid repeated menus
+or handoffs. The [architecture record](BB-TRUST-ARCHITECTURE-01.md) retains the decisions.
 
 ## Questions the research must resolve
 

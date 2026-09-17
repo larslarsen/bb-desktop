@@ -6,10 +6,9 @@ Status: owner product decision T1 recorded; reviewer selects the community-sourc
 aggregation and freshness architecture in section 3A. Wire/identity integration and
 measured resource calibration remain prerequisites for implementation authorization.
 No trust implementation, protocol format or identity method is authorized.
-Owner reports selecting xhigh; higher reasoning effort is not requested.
-The owner asks to be told when High is sufficient again. Keep xhigh through the
-remaining identity/authority architecture decisions; explicitly signal the transition
-to High when those semantics are fixed and work becomes bounded implementation/review.
+Codex has recommended returning to High after the owner's cost concern. This supersedes
+the earlier direction to retain xhigh; no actual setting change is verified. Continue
+bounded reviewer work without requiring an effort increase.
 
 ## Owner-selected behavior in plain language
 
@@ -59,8 +58,10 @@ Required qualifications:
    not an adverse judgment, and accumulated positive reputation is not an entry fee.
 4. Explore limited spam protection, without making ordinary newcomers earn feature access.
 
-No further answer to T1 is needed. Naming choice N1 remains deferred. Source selection,
-aggregation and limits are reviewer engineering work, not delegated to the owner.
+No further answer to T1 is needed. N1 is unresolved and deferred at the owner's direction;
+no immediate naming blocker for account-authority assessment is established.
+Source selection, aggregation and limits are reviewer engineering work, not delegated
+to the owner.
 
 ## 1. What the existing research and code establish
 
@@ -690,7 +691,8 @@ first, then implement bounded pieces.
   a peer-only whitelist into permission for every device of a newly linked account
   without an explicit migration choice. Contradictory mappings remain unresolved.
 - Contacts may use local trust context to help choose among same-name search results.
-  This does not provide a global namespace or remove the later N1 product decision.
+  Bind the selected result to its authenticated account. N1 remains unresolved and
+  deferred; no global uniqueness requirement or rejection has been established.
 - Payment-request permission means permission to present a request. Payment approval
   still requires native review of the exact authenticated account, request digest,
   asset/network/amount/receiver and selected wallet. “Trusted” never becomes auto-pay.
@@ -743,7 +745,7 @@ force a third party to retract its claim.
 | Reputation sources are unavailable for a previously unknown account | Show reputation unavailable and preserve ordinary use; no outage-created blacklist. |
 | A newcomer bursts past the traffic budget | Temporary local throttling with recovery, while ordinary rates and all feature types remain available; no reputation prerequisite. |
 | Same signed message arrives through multiple devices | Deduplicate storage, budget accounting and alerts; do not fabricate multiple interactions or endorsements. |
-| A different account acquires an old readable handle | No transfer of saved trust or an approved recipient binding. |
+| A different account uses the same readable name | No transfer of saved trust or an approved recipient binding. |
 | User blocks during a queued send/native approval | Unsent social work stops; unsubmitted payment re-evaluates. Already submitted funds require reconciliation. |
 
 These are behavior requirements for later meaningful tests, not authored test source
@@ -786,8 +788,9 @@ bounded-data model. Shared authority/wire/private-sync/API integration remains t
 frozen; real source identities and workload calibration are activation requirements.
 Next work is the portable account authority assessment using these constraints,
 followed by one coherent contract for records, persistence and local enforcement.
-No implementation actor is authorized. Keep xhigh for that architecture work; explicitly
-notify the owner when the transition to bounded work makes High appropriate.
+No implementation actor is authorized. The account proposal records the initial
+implementation-fit assessment; no authority method is selected. Naming remains
+unresolved and deferred, and the reviewer has recommended returning to High.
 
 Initial research verification at commit `46c0f2367`: read source/specifications and
 inspect the scoped diff; 44 local document links had zero missing targets and scoped
@@ -796,6 +799,9 @@ that audit with the same results. Section 3A is a subsequent documentation-only
 architecture selection: inspected primary references and scoped diff, checked 44 local
 document links with zero missing targets, and scoped `git diff --check` exited 0.
 It makes no new runtime claim.
+The subsequent naming-deferral and initial authority-fit review inspected the scoped
+diff and primary implementation/specification references. The local link audit checked
+44 links with zero missing targets; scoped `git diff --check` exited 0.
 No product/test code changes, tests, acceptance commands,
 security scans, builds, live-node/wallet operations or private user-data reads.
 Publication scope is the six reviewer-authored governance paths enumerated in the

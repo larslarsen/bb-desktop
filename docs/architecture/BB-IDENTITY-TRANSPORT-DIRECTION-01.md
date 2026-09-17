@@ -5,7 +5,8 @@ migration gate; no identity, transport or calling implementation authorized by t
 
 Owner priority update: an extensive ring of trust, blacklists and whitelists must be
 researched and resolved before freezing this architecture. See
-[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). Naming choice N1 is deferred.
+[trust research scope](BB-TRUST-RESEARCH-SCOPE-01.md). N1 is unresolved and deferred
+at the owner's direction. Readable names remain required; uniqueness is not decided.
 The [initial research and integrated proposal](BB-TRUST-ARCHITECTURE-01.md) now
 describe scoped circles/lists, local enforcement and account/device migration impacts.
 T1 is resolved: automatic community filtering with a Spam/review override, while
@@ -16,7 +17,7 @@ contracts, launch source identities and measured calibration still need completi
 
 Follow-on [account/recipient proposal](BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md) records
 the migration boundaries, recovery-method shortlist, payment execution constraint and
-owner naming choice N1. No account method or wire format is frozen.
+corrected naming scope. No account method or wire format is frozen.
 
 ## Required experience
 
@@ -36,14 +37,15 @@ contracts must account for this requirement before they are frozen.
 | Concept | Job | Required behavior |
 | --- | --- | --- |
 | Account identity | Identifies the same person or specialized service over time | Survives device replacement; contacts and authorization bind here in the future model |
-| Readable handle | Lets people find and recognize an identity | Verified mapping to identity; rename/reassignment cannot silently change an existing contact or signed recipient |
+| Readable name | Lets people find and recognize an account | Bind the selected profile/contact to its authenticated account; uniqueness and exact lookup behavior remain open |
 | Device identity | Identifies an authorized desktop/phone daemon | Separate device keys and explicit enrollment/revocation; transport peer ID remains useful here |
 | Connection address/transport | Reaches a currently available device | May change between TCP, QUIC, WebRTC or relay without changing the intended account |
 
-Example: Alice's readable handle resolves to her persistent identity; that identity
-can authorize her laptop and phone. Replacing the phone changes a device authorization
-and route, not the contact Bob has saved. A bare profile display name is not a verified
-handle. Exact handle syntax, resolver and account-ID format are not selected here.
+Example: Bob saves Alice's authenticated account under her readable name. That account
+can authorize her laptop and phone. Replacing the phone changes device authorization
+and routing while preserving Bob's saved contact. Matching a name alone cannot select
+the account. Name uniqueness and discovery behavior remain unresolved and deferred;
+account-ID format and contact binding remain engineering work.
 
 Proposed device model: separate device keys authorized by a recoverable account identity.
 Do not use copying one daemon's private identity key onto every running device as the
@@ -72,7 +74,7 @@ No source changed for this assessment.
 Therefore, portable multi-device accounts will affect identity verification, signed
 message/request envelopes, routing, conversation/contact storage and synchronization,
 and desktop/native recipient presentation. This warrants a versioned migration, not
-substituting a handle into a peer_id field or silently equating unrelated peer IDs.
+substituting a display name into a peer_id field or silently equating unrelated peer IDs.
 Preserve historical signed bytes and original verified peer bindings. A future verified
 mapping may associate old history with an account; it must not rewrite the old signatures.
 Define compatibility/capability negotiation and downgrade handling before implementation.
@@ -122,8 +124,10 @@ is not part of PAY-001.
 
 - Account authority/key rotation and recovery; enrollment/revocation of a lost phone;
   stale devices and conflicting authority updates.
-- Handle namespace/resolution/verification and continuity when a name changes owner;
-  no mandatory centralized search service or domain purchase inferred from the examples.
+- Readable profile/contact presentation and authenticated selection in distributed
+  discovery; name changes must preserve saved account bindings. N1 is deferred, not
+  solved. Paid-ad discovery and the owner's ad-protection proposals are recorded in
+  the account proposal; no unique-name lookup requirement is inferred.
 - Private history/key synchronization, device fan-out, offline queues, deduplication and
   consistent read/cancellation status. A second device must not cause duplicate payments.
 - Mapping v1 peer identities to accounts, authority for signing new payment requests,

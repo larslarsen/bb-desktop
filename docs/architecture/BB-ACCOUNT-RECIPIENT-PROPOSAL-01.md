@@ -7,8 +7,8 @@ or that its protocol gate has passed.
 
 Owner priority update: [ring-of-trust research](BB-TRUST-RESEARCH-SCOPE-01.md),
 including blacklists and whitelists, comes first. This proposal's choices remain
-provisional and must be reassessed against that design. N1 is deferred; no owner
-answer to naming is needed now.
+provisional and must be reassessed against that design. N1 is unresolved and deferred
+at the owner's direction; no immediate naming blocker for authority assessment is established.
 
 The [integrated trust proposal](BB-TRUST-ARCHITECTURE-01.md) now records the first
 research pass. Its sections 6 and 8 add account requirements: separate policy-writer
@@ -37,54 +37,30 @@ WebRTC can carry the same authenticated conversations. A future video call rings
 the account's eligible devices, and accepting on one device ends the other rings.
 Neither connecting a device nor accepting a call authorizes a wallet payment.
 
-## N1: names people see and how they find a new contact
+## Readable names — unresolved and deferred (N1)
 
-Owner clarification, 2026-09-16: the naming choices have become confusing. This is
-not an answer to N1 or approval of a naming system. Separate the everyday experience
-from the engineering mechanism; account-authority assessment continues independently.
+Latest owner direction, 2026-09-16: move on if there is no pressing issue, without
+assuming naming has been solved. No immediate naming blocker for account-authority
+assessment has been established. Neither requiring nor rejecting global name uniqueness
+is an owner decision. Earlier reviewer recommendations and the unpublished withdrawal
+of N1 are not accepted naming designs. No answer is requested now.
 
-Three jobs were being mixed together:
+The owner identifies paid ads as a discovery path. Do not invent a requirement that
+people must find each other by typing a globally unique username. The owner proposed
+perceptual image hashes for similar ad images, Levenshtein distance and confusable
+character checks for ad names, and optional DNS-based names for advertisers seeking
+more brand protection. These are proposals to revisit, not an approved solution or
+evidence that uniqueness is either necessary or unnecessary. No ad policy, ownership
+rule, namespace, lookup mechanism or naming implementation is selected.
 
-| Job | Plain-language meaning |
-| --- | --- |
-| Persistent account | The same Alice on her desktop and phone. The application tracks this through a stable internal identity. |
-| Display name | The name people see, such as Alice. Other accounts may use the same name. |
-| Finding the right Alice | A shared contact link/QR identifies her exact account; name search may show several candidates. A unique typed handle would be another way to find her. |
+Persistent identity across desktop/phone and readable names in normal use remain
+requirements. Continue account-authority assessment without deciding N1 implicitly.
+Revisit naming when concrete discovery/advertiser behavior needs a decision, or an
+identified engineering dependency makes it necessary; explain that dependency first.
+The account design must preserve authenticated contact and approved-recipient bindings
+when presentation text changes.
 
-Reviewer recommendation for the first naming experience:
-
-1. Alice chooses a display name. BitBook supplies a Share contact action and QR code;
-   nobody needs to type or memorize the underlying cryptographic identifier.
-2. Bob opens the contact Alice shared and saves her. A link identifies one account;
-   whether it is the intended real-world Alice still depends on where Bob obtained it.
-3. Alice pairs her phone with that same account. Once the required synchronization is
-   implemented, the account's contacts, reputation and personal rules follow it.
-4. Alice can change her display name without replacing Bob's saved account binding.
-
-The limitation is concrete: typing only “Alice” cannot guarantee one exact result.
-A globally unique username adds a rule for who gets a name when several people want
-it. It is a separate discovery feature; it is not required for portable identity.
-Keep that addition possible without making it a prerequisite for account design.
-This restates recommendation A below; it is not a newly approved owner decision.
-
-The requirement establishes readable names but does not establish whether those names
-must be globally unique. This changes discovery, registration, availability and who
-can allocate/reassign a name. The choices are recorded here before asking the owner.
-
-| Choice | User experience | Infrastructure/tradeoff |
-| --- | --- | --- |
-| A — recommended | Search can show several people called Alice; choose the person once and save the contact. Share links/QR identify the exact account. | Works with distributed discovery and requires no naming provider. A name by itself is not an exact global address. |
-| B | A unique qualified name, such as `alice@provider.example`, can locate the account. | Names depend on the selected provider/domain; multiple providers and contact links preserve alternatives. Changing providers can change the name while the account stays the same. |
-| C | One globally unique short name, such as `@alice`, is an exact address. | Needs an explicit namespace allocation/conflict policy and registry or consensus design. This infrastructure is not in the current daemon. |
-
-**Owner decision: deferred; no selection recorded.** Recommendation A remains a
-proposal. Account-authority design does not require an answer to N1.
-All choices still use stable account IDs underneath names. Optional verified domain
-aliases can be added to A later. Exact typed syntax remains unselected until the
-product choice is resolved. A duplicate-name search result must never auto-select a
-payment recipient. Profile name/photo matching is not identity verification.
-
-## Reviewer decisions independent of N1
+## Reviewer account decisions
 
 1. Contacts and new signed recipient contracts bind to an account, not a display name,
    daemon peer ID, IP address or transport session. Keep these as separate typed values.
@@ -100,7 +76,7 @@ payment recipient. Profile name/photo matching is not identity verification.
    separately versioned account protocol. A mapping can group old history, but cannot
    make a v1 request payable by a different device or silently upgrade its authority.
 6. New native payment review consumes an immutable verified recipient/request
-   binding. Renderer display text, handle re-resolution and changing network routes
+   binding. Renderer display text, repeated name lookup and changing network routes
    cannot replace its destination, amount, network or account identity.
 7. Social device enrollment transfers no wallet keys or spending authority. Replayed
    delivery to two devices is one logical request, not two payment instructions.
@@ -131,6 +107,29 @@ a BitBook key-rotation protocol. Keep the account identifier opaque outside the
 identity verifier. The choice of method is an engineering gate, not a request for the
 owner to choose cryptography. No `did:bb` syntax, new algorithm or dependency is
 approved by this proposal.
+
+### Initial implementation-fit assessment, 2026-09-16
+
+Read-only daemon baseline remains `cd497749a771b063300e2c3edf8748fe285b06c4`.
+Inspected `modern/network/identity.go`, `modern/direct/types.go` and `modern/go.mod`;
+these files have no working-tree diff. The daemon persists one libp2p key and its
+message/conversation records use peer IDs. This gives restart continuity for that
+daemon; it supplies no separate desktop/phone account authority. A new phone's own
+key must be authorized under the same account, and removing that phone must leave
+the other device authorized. This is the concrete portability requirement being assessed.
+
+| Evidence checked | Consequence for selection |
+| --- | --- |
+| [DIF's Go implementation, kerigo](https://github.com/decentralized-identity/kerigo) is archived; its README describes runnable witness/validator services as future work. | Do not select that repository as a maintained, complete drop-in authority implementation. This does not establish that no suitable Go implementation exists. |
+| [KERIpy's documented dependencies](https://github.com/WebOfTrust/keripy) include Python and libsodium. | It is an implementation reference; adopting it would require an explicit desktop/mobile packaging and process-boundary assessment, not simply adding a Go module. |
+| [KERI's rotation and recovery rules](https://trustoverip.github.io/kswg-keri-specification/) depend on previously committed next keys and specify which competing events can supersede others. | Preserving an identifier through rotation is supported in the design. A backup/recovery promise still needs a concrete key-custody profile; witness receipts alone do not repair theft of the next authority keys. |
+
+**Reviewer disposition:** KERI remains a candidate, not a selected dependency or a
+completed recovery design. The next comparison must establish a supportable verifier
+for the actual desktop/phone deployment and map the existing device capabilities to
+it. Do not require the owner to choose cryptography or introduce a mandatory hosted
+identity service to bypass this assessment. No implementation, build or runtime
+verification was performed. Naming remains outside this selection.
 
 ### Required behavior of the selected method/profile
 
@@ -185,7 +184,7 @@ Normal manual transfers outside the request workflow cannot be deduplicated by B
 
 At native approval, refresh the required authority evidence and bind the reviewed
 account state. Define how revocation/conflict arriving before submission cancels the
-unsubmitted intent. Never automatically re-resolve a handle and reuse the old approval.
+unsubmitted intent. Never repeat a name lookup to change the recipient of an old approval.
 Unknown submission outcome requires reconciliation, not blind retry. A peer's claim
 of payment still does not establish a confirmed chain transaction.
 
@@ -273,7 +272,7 @@ Next reviewer work is to assess the shortlisted authority method's implementatio
 deployment fit against trust section 3A, then freeze one bounded account-verifier
 contract with failure cases for forged enrollment, rollback, revocation, conflicts
 and restart.
-N1 remains a later naming choice; method assessment does not require its answer.
+N1 is unresolved and deferred; no naming mechanism is assumed by method assessment.
 That contract must name exact source paths and retained evidence once ready. Do not
 send an implementer this proposal as an implicit source authorization. Consolidate
 source work and execution into their normal role-bounded phases; do not create a

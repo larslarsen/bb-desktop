@@ -3,8 +3,7 @@
 ACTIVE REVIEWER PRIORITY: ring-of-trust architecture, including blacklists and whitelists.
 Read [BB-TRUST-RESEARCH-SCOPE-01](../architecture/BB-TRUST-RESEARCH-SCOPE-01.md).
 Owner directs resolving this before account/recipient architecture is frozen.
-Owner reports selecting xhigh; no higher setting is requested. Initial research and
-the integrated proposal are recorded in
+Initial research and the integrated proposal are recorded in
 [BB-TRUST-ARCHITECTURE-01](../architecture/BB-TRUST-ARCHITECTURE-01.md).
 T1 RESOLVED: apply community judgments automatically; retain filtered content in
 Spam for inspection/restoration and persistent personal overrides. Zero-reputation
@@ -18,18 +17,21 @@ The actual source roster and workload calibration remain activation requirements
 Next reviewer work: assess/select portable account authority against those requirements,
 then freeze the shared signed-record, private-sync and authenticated enforcement contract.
 No further owner confirmation of T1 is needed.
-Owner requests a notice when High is sufficient again. Keep xhigh during the remaining
-authority architecture; explicitly signal High once sensitive semantics are fixed.
+Codex has recommended returning to High after the owner's cost concern. This supersedes
+the earlier instruction to keep xhigh; the owner's actual setting change is unverified.
 No implementation actor or execution handoff is authorized.
 
 NEXT REVIEWER DESIGN: portable account authority and recipient migration. Read
 [BB-ACCOUNT-RECIPIENT-PROPOSAL-01](../architecture/BB-ACCOUNT-RECIPIENT-PROPOSAL-01.md).
-Naming choice N1 remains deferred while authority is assessed. The reviewer selects
-and assesses account authority; the owner is not being asked to choose cryptography.
-Owner reports confusion about naming. The account proposal now separates persistent
-account, display name and exact-contact discovery, with an everyday example. Display
-names plus contact sharing remain a recommendation, not owner approval. Unique typed
-handles are a separate discovery choice and do not block account-authority assessment.
+N1 UNRESOLVED / DEFERRED: the owner directs moving on absent a pressing issue, without
+assuming naming is solved. No immediate naming blocker for authority assessment is
+established. Global uniqueness is neither required nor rejected. The account proposal
+records paid-ad discovery and the owner's ad-image/name-similarity and optional DNS
+ideas as proposals only. No naming answer is requested now. Revisit on a concrete
+product or engineering dependency; do not infer a unique-username lookup requirement.
+Authority assessment has resumed: current peer-key persistence supplies daemon restart
+continuity, not a multi-device account. The initial KERI implementation-fit findings
+are recorded in the account proposal; no dependency or recovery profile is selected.
 No source/test/execution actor or handoff is authorized. The six exact reviewer
 governance paths are enumerated at the end of the trust scope. Existing v1 behavior
 remains accepted; the new account-protocol implementation gate has not passed.
