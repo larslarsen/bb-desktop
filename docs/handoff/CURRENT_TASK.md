@@ -1,5 +1,17 @@
 # Current Task
 
+QUEUED OWNER REQUESTS (2026-09-17):
+[rich media/IPFS attachments](../../../bb-go/tickets/BBGO-MEDIA-001.md) and
+[libsignal messaging](../../../bb-go/tickets/BBGO-MSG-001.md).
+The first covers posts and private messages: emoji/GIF pickers, inline images/video,
+reactions, desktop paste/drop and Android native file selection. Shared React components
+and the Android host are
+new work, not an existing foundation. Private attachment keys travel inside libsignal
+messages. Public posts use signed public content/IPFS and no libsignal. Both tickets
+are queued; no desktop source assignment or actor launch.
+The active daemon phase remains [NET-001](../../../bb-go/tickets/BBGO-NET-001.md).
+Reviewer-only cross-repository documentation scope and baselines are in MEDIA-001.
+
 ACTIVE REVIEWER PRIORITY: ring-of-trust architecture, including blacklists and whitelists.
 Read [BB-TRUST-RESEARCH-SCOPE-01](../architecture/BB-TRUST-RESEARCH-SCOPE-01.md).
 Owner directs resolving this before account/recipient architecture is frozen.
