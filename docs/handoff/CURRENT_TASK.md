@@ -1,18 +1,21 @@
 # Current Task
 
-QUEUED OWNER REQUESTS (2026-09-17):
+DAEMON MEDIA FOUNDATION ACTIVE (2026-09-18):
 [rich media/IPFS attachments](../../../bb-go/tickets/BBGO-MEDIA-001.md) and
 [libsignal messaging](../../../bb-go/tickets/BBGO-MSG-001.md).
 The first covers posts and private messages: emoji/GIF pickers, inline images/video,
 reactions, desktop paste/drop and Android native file selection. Shared React components
 and the Android host are
 new work, not an existing foundation. Private attachment keys travel inside libsignal
-messages. Public posts use signed public content/IPFS and no libsignal. Both tickets
-are queued; no desktop source assignment or actor launch.
-The active daemon phase remains [NET-001](../../../bb-go/tickets/BBGO-NET-001.md).
+messages. Public posts use signed public content/IPFS and no libsignal. MEDIA-001 M2A
+assigns bounded IPFS file import/read to Sol High in bb-go; libsignal remains queued.
+User uploads use IPFS. Klipy-selected GIFs use supplied provider URLs through the unified
+adapter; rehosting is not required. No desktop source assignment or actor launch.
+[NET-001](../../../bb-go/tickets/BBGO-NET-001.md) is accepted and closed. The daemon's
+current actor and exact commands are governed by MEDIA-001 and bb-go CURRENT_TASK.
 Reviewer-only cross-repository documentation scope and baselines are in MEDIA-001.
 
-ACTIVE REVIEWER PRIORITY: ring-of-trust architecture, including blacklists and whitelists.
+ARCHITECTURE BACKGROUND: ring-of-trust architecture, including blacklists and whitelists.
 Read [BB-TRUST-RESEARCH-SCOPE-01](../architecture/BB-TRUST-RESEARCH-SCOPE-01.md).
 Owner directs resolving this before account/recipient architecture is frozen.
 Initial research and the integrated proposal are recorded in
